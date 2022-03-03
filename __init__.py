@@ -19,10 +19,10 @@ import importlib
 
 # Import files from main directory:
 
-importList = ['DNA_Generator', 'Batch_Sorter', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'UIList']
+importList = ['Batch_Sorter', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'UIList', 'Previewer']
 
 if bpy in locals():
-        importlib.reload(DNA_Generator)
+        importlib.reload(Previewer)
         importlib.reload(Batch_Sorter)
         importlib.reload(Exporter)
         importlib.reload(Batch_Refactorer)
@@ -30,7 +30,7 @@ if bpy in locals():
         importlib.reload(UIList)
 else:
     from .main import \
-        DNA_Generator, \
+        Previewer, \
         Batch_Sorter, \
         Exporter, \
         Batch_Refactorer, \
@@ -43,7 +43,7 @@ else:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Main BMNFTS Panel properties: 
-
+    
     nftName: bpy.props.StringProperty(name="NFT Name")
 
     collectionSize: bpy.props.IntProperty(name="NFT Collection Size", default=1, min=1)  # max=(combinations - offset)
@@ -59,6 +59,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     )
 
     enableRarity: bpy.props.BoolProperty(name="Enable Rarity")
+
+    inputDNA: bpy.props.StringProperty(name="DNA")
 
     imageBool: bpy.props.BoolProperty(name="Image")
     imageEnum: bpy.props.EnumProperty(
@@ -151,7 +153,7 @@ class createData(bpy.types.Operator):
 
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
 
-        DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
+        Previewer.DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
         Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
         return {"FINISHED"}
 
@@ -214,6 +216,42 @@ class refactor_Batches(bpy.types.Operator):
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
 
+class randomizePreview(bpy.types.Operator):
+    bl_idname = 'randomize.preview'
+    bl_label = 'Randomize'
+    bl_description = "u hovered!!!!!!!!"
+    bl_options = {"REGISTER", "UNDO"} # what do these mean btw lmao
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        # some randomize dna code here
+        print()
+        return {'FINISHED'}
+
+class previewNFT(bpy.types.Operator):
+    bl_idname = 'create.preview'
+    bl_label = 'Create Preview'
+    bl_description = 'Generates Test NFT'
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        nftName = "temp"
+        maxNFTs = bpy.context.scene.my_tool.collectionSize
+        nftsPerBatch = 1
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        enableRarity = bpy.context.scene.my_tool.enableRarity
+
+        # Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+        Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+        # DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
+        # Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
+        return {"FINISHED"}
+
+
+
 # Create Data Panel:
 class BMNFTS_PT_CreateData(bpy.types.Panel):
     bl_label = "Create NFT Data"
@@ -249,6 +287,30 @@ class BMNFTS_PT_CreateData(bpy.types.Panel):
 
         row = layout.row()
         self.layout.operator("create.data", icon='DISCLOSURE_TRI_RIGHT', text="Create Data")
+
+class CUSTOM_PT_PreviewNFTs(bpy.types.Panel):
+    bl_label = "Preview NFT"
+    bl_idname = "CUSTOM_PT_PreviewNFTs"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "inputDNA")
+        row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
+        row = layout.row()
+        layout.label(text="wah")
+
+        row = layout.row()
+
+        # previewNFT
+        self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
+
 
 # Generate NFTs Panel:
 class BMNFTS_PT_GenerateNFTs(bpy.types.Panel):
@@ -382,6 +444,7 @@ classes = (
     BMNFTS_PT_GenerateNFTs,
     BMNFTS_PT_Refactor,
     BMNFTS_PT_Documentation,
+    CUSTOM_PT_PreviewNFTs,
 
     # Other panels:
 
@@ -392,6 +455,8 @@ classes = (
     createData,
     exportNFTs,
     refactor_Batches,
+    randomizePreview,
+    previewNFT,
 
     # UIList 1:
 
