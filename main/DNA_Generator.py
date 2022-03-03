@@ -14,6 +14,9 @@ from functools import partial
 from . import Rarity_Sorter
 importlib.reload(Rarity_Sorter)
 
+from . import Outfit_Generator
+importlib.reload(Outfit_Generator)
+
 enableGeneration = False
 colorList = []
 
@@ -93,6 +96,11 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
    if "Master Collection" in listAllCollections:
       listAllCollections.remove("Master Collection")
 
+   #print(f"List all collection {listAllCollections}")
+   '''
+   listAllCollections is essentially every collection in the scene bar script ignore, master collection and scene collection
+   '''
+
    def allScriptIgnore(collection):
       '''
       Removes all collections, sub collections in Script_Ignore collection from listAllCollections.
@@ -123,6 +131,9 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    attributeVariants = [x for x in listAllCollections if x not in attributeCollections]
    attributeCollections1 = copy.deepcopy(attributeCollections)
+   '''
+   Once this has finished the two collections reaming have been sorted in to attributes and varients. attributeCollections1 and attributeVariants
+   '''
 
    def attributeData(attributeVariants):
       """
@@ -322,6 +333,7 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
       print(f"{bcolors.OK} Rarity is on. Weights listed in .blend will be taken into account {bcolors.RESET}")
       possibleCombinations = maxNFTs
       DNAList = Rarity_Sorter.sortRarityWeights(hierarchy, listOptionVariant, DNAList, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+      Outfit_Generator.GenerateOutfit(hierarchy)
 
    if len(DNAList) < maxNFTs:
       print(f"{bcolors.ERROR} \nWARNING: \n"
