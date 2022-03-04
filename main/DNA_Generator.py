@@ -143,12 +143,11 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
       count = 0
       previousAttribute = ""
       for i in attributeVariants:
-
          def getName(i):
             """
-            Returns the name of "i" attribute variant
+            Returns the name of "i" attribute name, attribute genre, attribute variant
             """
-            name = i.split("_")[0]
+            name = i.split("_")[:3]
             return name
 
          def getOrder_rarity(i):
@@ -157,8 +156,12 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
             """
             x = re.sub(r'[a-zA-Z]', "", i)
             a = x.split("_")
-            del a[0]
+            del a[0] #Remove Attribute Name
+            del a[0] #Remove Genre Name
+            del a[0] #Remove ItemName Name
+            print(a)
             return list(a)
+            
 
          name = getName(i)
          orderRarity = getOrder_rarity(i)
@@ -171,6 +174,9 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
          elif len(orderRarity) > 0:
             number = orderRarity[0]
+            slotName = name[0]
+            clothingGenre = name[1]
+            clothingItem = name[2]
             if enableGeneration:
                if count == 1 or count == 0:
                   previousAttribute = i.partition("_")[0]
@@ -185,7 +191,7 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
                color = orderRarity[2]
             else:
                color = "0"
-            eachObject = {"name": name, "number": number, "rarity": rarity, "color": color}
+            eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "number": number, "rarity": rarity, "color": color}
             allAttDataList[i] = eachObject
       return allAttDataList
 
