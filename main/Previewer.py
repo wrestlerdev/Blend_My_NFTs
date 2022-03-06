@@ -1,6 +1,7 @@
 # Purpose:
 # This file generates NFT DNA based on a .blend file scene structure and exports NFTRecord.json.
 
+from venv import create
 import bpy
 import os
 import re
@@ -17,6 +18,8 @@ importlib.reload(DNA_Generator)
 
 enableGeneration = False
 colorList = []
+current_hierarchy = {}
+
 
 class bcolors:
    '''
@@ -30,8 +33,35 @@ class bcolors:
 
 time_start = time.time()
 
+def show_NFT(DNA, hierarchy):
+   print("DNA: " + str(DNA))
+   dnaDictionary = {}
+   listAttributes = list(hierarchy.keys())
 
-def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
+   listDNADeconstructed = DNA.split('-')
+   for i, j in zip(listAttributes, listDNADeconstructed): 
+                dnaDictionary[i] = j
+
+   for x in dnaDictionary: 
+      for k in hierarchy[x]:
+                    kNum = hierarchy[x][k]["number"]
+                    if kNum == dnaDictionary[x]:
+                        dnaDictionary.update({x: k})
+
+
+   for c in dnaDictionary:
+      # bpy.data.collections[c].hide_render = False
+      # bpy.data.collections[c].hide_viewport = False
+      print(dnaDictionary[c])
+      mesh_collection = bpy.data.collections[c].children[str(dnaDictionary[c])]
+      mesh_collection.hide_render = False
+      mesh_collection.hide_viewport = False
+      # for obj in mesh_collection.objects:
+      #    print(obj)
+
+
+
+def create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
    print("wow")
    # DNA_Generator.generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
    """
@@ -40,10 +70,9 @@ def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    listAllCollections, attributeCollections, attributeCollections1, hierarchy, possibleCombinations = DNA_Generator.returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
 
+   print("Generating one preview NFT")
    print(f"NFT Combinations: {possibleCombinations}\n")
-   print(f"Generating {maxNFTs} combinations of DNA.\n")
 
-   DataDictionary = {}
    listOptionVariant = []
    DNAList = []
 
@@ -72,7 +101,7 @@ def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
          return str(dna)
 
-      for i in range(maxNFTs):
+      for i in range(1):
          dnaPushToList = partial(createDNARandom)
 
          DNASet |= {''.join([dnaPushToList()]) for _ in range(maxNFTs - len(DNASet))}
@@ -88,15 +117,35 @@ def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
    else:
       print(f"{bcolors.OK} Rarity is on. Weights listed in .blend will be taken into account {bcolors.RESET}")
       possibleCombinations = maxNFTs
-      DNAList = DNA_Generator.Rarity_Sorter.sortRarityWeights(hierarchy, listOptionVariant, DNAList, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
-      print(DNAList[0])
+      DNAList = DNA_Generator.Rarity_Sorter.sortRarityWeights(hierarchy, listOptionVariant, DNAList, nftName, 1, 1, save_path, enableRarity)
+   
+   # print(DNAList[0])
 
    # Data stored in batchDataDictionary:
    # DataDictionary["numNFTsGenerated"] = len(DNAList)
    # DataDictionary["hierarchy"] = hierarchy
    # DataDictionary["DNAList"] = DNAList
+   current_hierarchy = hierarchy
+   return DNAList[0], hierarchy
 
-   return DNAList
+def hide_all():
+   print("this should hide all current meshes")
+
+def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
+   hide_all()
+   DNA, hierarchy = create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+   global current_hierarchy
+   current_hierarchy = hierarchy
+   show_NFT(DNA, current_hierarchy)
+
+def show_nft_from_dna(DNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
+   hide_all()
+   global current_hierarchy
+   if len(current_hierarchy) == 0:
+      randDNA, hierarchy = create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+      current_hierarchy = hierarchy
+   show_NFT(DNA, current_hierarchy)
+
 
 if __name__ == '__main__':
    print("okay")

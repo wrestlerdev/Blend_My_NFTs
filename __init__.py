@@ -227,8 +227,14 @@ class randomizePreview(bpy.types.Operator):
         return True
 
     def execute(self, context):
+        nftName = "temp"
+        maxNFTs = bpy.context.scene.my_tool.collectionSize
+        nftsPerBatch = 1
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        enableRarity = bpy.context.scene.my_tool.enableRarity
         # some randomize dna code here
-        print()
+        Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+        
         return {'FINISHED'}
 
 class previewNFT(bpy.types.Operator):
@@ -243,9 +249,12 @@ class previewNFT(bpy.types.Operator):
         nftsPerBatch = 1
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         enableRarity = bpy.context.scene.my_tool.enableRarity
-
+        inputDNA = bpy.context.scene.my_tool.inputDNA
+        if inputDNA == "":
+            Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+        else:
+            Previewer.show_nft_from_dna(inputDNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
         # Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-        Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
         # DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
         # Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
         return {"FINISHED"}
@@ -288,9 +297,9 @@ class BMNFTS_PT_CreateData(bpy.types.Panel):
         row = layout.row()
         self.layout.operator("create.data", icon='DISCLOSURE_TRI_RIGHT', text="Create Data")
 
-class CUSTOM_PT_PreviewNFTs(bpy.types.Panel):
+class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_label = "Preview NFT"
-    bl_idname = "CUSTOM_PT_PreviewNFTs"
+    bl_idname = "WCUSTOM_PT_PreviewNFTs"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
@@ -441,10 +450,11 @@ def redraw_panel():
 classes = (
     BMNFTS_PGT_MyProperties,
     BMNFTS_PT_CreateData,
+    WCUSTOM_PT_PreviewNFTs,
     BMNFTS_PT_GenerateNFTs,
     BMNFTS_PT_Refactor,
     BMNFTS_PT_Documentation,
-    CUSTOM_PT_PreviewNFTs,
+
 
     # Other panels:
 
