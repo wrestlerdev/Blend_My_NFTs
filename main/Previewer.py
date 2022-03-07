@@ -21,6 +21,7 @@ colorList = []
 current_hierarchy = {}
 
 
+
 class bcolors:
    '''
    The colour of console messages.
@@ -34,6 +35,8 @@ class bcolors:
 time_start = time.time()
 
 def show_NFT(DNA, hierarchy):
+
+
    print("DNA: " + str(DNA))
    dnaDictionary = {}
    listAttributes = list(hierarchy.keys())
@@ -48,14 +51,23 @@ def show_NFT(DNA, hierarchy):
                     if kNum == dnaDictionary[x]:
                         dnaDictionary.update({x: k})
 
-
+      
    for c in dnaDictionary:
       # bpy.data.collections[c].hide_render = False
       # bpy.data.collections[c].hide_viewport = False
       print(dnaDictionary[c])
+      objs = bpy.data.collections[c].children
       mesh_collection = bpy.data.collections[c].children[str(dnaDictionary[c])]
-      mesh_collection.hide_render = False
-      mesh_collection.hide_viewport = False
+
+      for obj in objs:
+         print(obj)
+         if obj == mesh_collection:
+            mesh_collection.hide_render = False
+            mesh_collection.hide_viewport = False
+         else:
+            obj.hide_render = True
+            obj.hide_viewport = True
+
       # for obj in mesh_collection.objects:
       #    print(obj)
 
@@ -119,27 +131,19 @@ def create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
       possibleCombinations = maxNFTs
       DNAList = DNA_Generator.Rarity_Sorter.sortRarityWeights(hierarchy, listOptionVariant, DNAList, nftName, 1, 1, save_path, enableRarity)
    
-   # print(DNAList[0])
-
-   # Data stored in batchDataDictionary:
-   # DataDictionary["numNFTsGenerated"] = len(DNAList)
-   # DataDictionary["hierarchy"] = hierarchy
-   # DataDictionary["DNAList"] = DNAList
    current_hierarchy = hierarchy
    return DNAList[0], hierarchy
 
-def hide_all():
-   print("this should hide all current meshes")
+
 
 def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
-   hide_all()
    DNA, hierarchy = create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
    global current_hierarchy
    current_hierarchy = hierarchy
    show_NFT(DNA, current_hierarchy)
+   return DNA
 
 def show_nft_from_dna(DNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
-   hide_all()
    global current_hierarchy
    if len(current_hierarchy) == 0:
       randDNA, hierarchy = create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)

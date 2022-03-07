@@ -233,7 +233,8 @@ class randomizePreview(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         enableRarity = bpy.context.scene.my_tool.enableRarity
         # some randomize dna code here
-        Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+        DNA = Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+        bpy.context.scene.my_tool.inputDNA = DNA
         
         return {'FINISHED'}
 
