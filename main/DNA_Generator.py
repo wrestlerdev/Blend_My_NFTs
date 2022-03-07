@@ -131,6 +131,8 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    attributeVariants = [x for x in listAllCollections if x not in attributeCollections]
    attributeCollections1 = copy.deepcopy(attributeCollections)
+   print("Atribute Col: " + str(attributeCollections))
+
    '''
    Once this has finished the two collections reaming have been sorted in to attributes and varients. attributeCollections1 and attributeVariants
    '''
@@ -159,7 +161,6 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
             del a[0] #Remove Attribute Name
             del a[0] #Remove Genre Name
             del a[0] #Remove ItemName Name
-            print(a)
             return list(a)
             
 
@@ -339,7 +340,8 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
       print(f"{bcolors.OK} Rarity is on. Weights listed in .blend will be taken into account {bcolors.RESET}")
       possibleCombinations = maxNFTs
       DNAList = Rarity_Sorter.sortRarityWeights(hierarchy, listOptionVariant, DNAList, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
-      Outfit_Generator.GenerateOutfit(hierarchy)
+      DNAList= Outfit_Generator.GenerateOutfit(hierarchy, maxNFTs)
+      print(DNAList)
 
    if len(DNAList) < maxNFTs:
       print(f"{bcolors.ERROR} \nWARNING: \n"

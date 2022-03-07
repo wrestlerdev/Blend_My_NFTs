@@ -33,6 +33,27 @@ def makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
                 os.remove(
                     os.path.join(batch_json_save_path, i)
                 )
+    i = 0
+    for nft in DNAList:
+        singleNFT = {}
+        singleNFT["DNAList"] = nft
+        index = 0
+
+        chracterItemDict = {}
+        for char in nft.split('-'):
+            varientArray = hierarchy.get( list(hierarchy)[index])
+
+            print(list(hierarchy)[index])
+            print(list(varientArray)[int(char) -1])
+            chracterItemDict[list(hierarchy)[index]] = list(varientArray)[int(char) -1]
+            index += 1
+
+        singleNFT["CharacterItems"] = chracterItemDict
+
+        singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
+        with open(os.path.join(batch_json_save_path, ("NFTNumber{}.json".format(i + 1))), "w") as outfile:
+            outfile.write(singleNFTObject)
+        i += 1
 
     i = 0
     while i < numBatches:
