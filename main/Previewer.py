@@ -151,5 +151,18 @@ def show_nft_from_dna(DNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRari
    show_NFT(DNA, current_hierarchy)
 
 
+#  ----------------------------------------------------------------------------------
+
+
+def get_random_from_collection(coll): # doesn't respect weights or filled slots yet
+   rand_int = random.randint(0,len(coll.children)-1)
+   chosen_coll = coll.children[rand_int]
+   for child in coll.children:
+      child.hide_render = True
+      child.hide_viewport = True
+   chosen_coll.hide_render = False
+   chosen_coll.hide_viewport = False
+   return chosen_coll
+ 
 if __name__ == '__main__':
    print("okay")

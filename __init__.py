@@ -39,6 +39,11 @@ else:
     from .ui_Lists import UIList
 
 
+class WCUSTOM_PGT_SlotCollection(bpy.types.PropertyGroup):
+    inputUpperTorso2: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
+
+    
+
 # User input Property Group:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
@@ -59,8 +64,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     )
 
     enableRarity: bpy.props.BoolProperty(name="Enable Rarity")
-
-    inputDNA: bpy.props.StringProperty(name="DNA")
 
     imageBool: bpy.props.BoolProperty(name="Image")
     imageEnum: bpy.props.EnumProperty(
@@ -106,6 +109,23 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # API Panel properties:
     apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
+
+    # Custom properties
+
+    inputDNA: bpy.props.StringProperty(name="DNA")
+
+    inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
+    inputLowerTorso: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection)
+    # inputLForearm: bpy.props.PointerProperty(name="Left Forearm Slot",type=bpy.types.Collection)
+    # inputRForearm: bpy.props.PointerProperty(name="Right Forearm Slot",type=bpy.types.Collection)
+    # inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection)
+    # inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection)
+    inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection)
+    inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection)
+    inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection)
+    inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection)
+    inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection)
+
 
 def make_directories(save_path):
     Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
@@ -219,7 +239,7 @@ class refactor_Batches(bpy.types.Operator):
 class randomizePreview(bpy.types.Operator):
     bl_idname = 'randomize.preview'
     bl_label = 'Randomize'
-    bl_description = "u hovered!!!!!!!!"
+    bl_description = "Create and generate random combination"
     bl_options = {"REGISTER", "UNDO"} # what do these mean btw lmao
 
     @classmethod
@@ -260,6 +280,70 @@ class previewNFT(bpy.types.Operator):
         # Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
         return {"FINISHED"}
 
+class randomizeModel(bpy.types.Operator):
+    bl_idname = 'randomize.model'
+    bl_label = 'Randomize Model'
+    bl_options = {"REGISTER", "UNDO"}
+    # collection: bpy.props.CollectionProperty(type=BMNFTS_PGT_MyProperties)
+    collection_name: bpy.props.StringProperty(default="")
+    # coll_text: bpy.context.scene.my_tool.inputUpperTorso
+    # var: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
+
+
+    def setSlot(self, string, scene_slot):
+        self.collection_name = string
+
+    def execute(self, context):
+        if self.collection_name != "":
+            print("wow")
+            rand_model_coll = Previewer.get_random_from_collection(bpy.data.collections[self.collection_name])
+            if self.collection_name == "AUpperTorso":
+                # bpy.context.scene.my_tool.inputUpperTorso = bpy.data.collections[self.collection_name]
+                bpy.context.scene.my_tool.inputUpperTorso = rand_model_coll
+            elif self.collection_name == "ILowerTorso":
+                bpy.context.scene.my_tool.inputLowerTorso = rand_model_coll
+            elif self.collection_name == "HHands":
+                bpy.context.scene.my_tool.inputHands = rand_model_coll
+            elif self.collection_name == "JCalf":
+                bpy.context.scene.my_tool.inputCalf = rand_model_coll
+            elif self.collection_name == "KAnkle":
+                bpy.context.scene.my_tool.inputAnkle = rand_model_coll
+            elif self.collection_name == "LFeet":
+                bpy.context.scene.my_tool.inputFeet = rand_model_coll
+            elif self.collection_name == "MNeck":
+                bpy.context.scene.my_tool.inputNeck = rand_model_coll
+            # colls2 = {'AUpperTorso': bpy.context.scene.my_tool.inputUpperTorso,'ILowerTorso': bpy.context.scene.my_tool.inputLowerTorso}
+            # coll1 = colls2.get(self.collection_name, 'default')
+            # coll1 = bpy.data.collections[self.collection_name]
+            # print(coll1)
+        
+        return {'FINISHED'}
+
+class randomizeColor(bpy.types.Operator):
+    bl_idname = 'randomize.color'
+    bl_label = 'Randomize Color/Texture'
+    bl_options = {"REGISTER", "UNDO"}
+    collection_name: bpy.props.StringProperty(default="")
+
+    def execute(self, context):
+        if self.collection_name != "":
+            print("wow")
+            # if self.collection_name == "AUpperTorso":
+            #     bpy.context.scene.my_tool.inputUpperTorso = bpy.data.collections[self.collection_name]
+            # elif self.collection_name == "ILowerTorso":
+            #     bpy.context.scene.my_tool.inputLowerTorso = bpy.data.collections[self.collection_name]
+            # elif self.collection_name == "HHands":
+            #     bpy.context.scene.my_tool.inputHands = bpy.data.collections[self.collection_name]
+            # elif self.collection_name == "JCalf":
+            #     bpy.context.scene.my_tool.inputCalf = bpy.data.collections[self.collection_name]
+            # elif self.collection_name == "KAnkle":
+            #     bpy.context.scene.my_tool.inputAnkle = bpy.data.collections[self.collection_name]
+            # elif self.collection_name == "LFeet":
+            #     bpy.context.scene.my_tool.inputFeet = bpy.data.collections[self.collection_name]
+            # elif self.collection_name == "MNeck":
+            #     bpy.context.scene.my_tool.inputNeck = bpy.data.collections[self.collection_name]
+        
+        return {'FINISHED'}
 
 
 # Create Data Panel:
@@ -305,6 +389,14 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
 
+    Slots = (("inputUpperTorso", "AUpperTorso", "Upper Torso Slot"), 
+        ("inputLowerTorso", "ILowerTorso", "Lower Torso Slot"),
+        ("inputHands", "HHands", "Hands Slot"),
+        ("inputCalf", "JCalf", "Calf Slot"),
+        ("inputAnkle", "KAnkle", "Ankle Slot"),
+        ("inputFeet", "LFeet", "Feet Slot"),
+        ("inputNeck", "MNeck", "Neck Slot"),)
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -321,6 +413,47 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         # previewNFT
         self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
 
+        for name in self.Slots:
+            layout.row().label(text=name[2])
+            row = layout.row()
+            row.prop(mytool, name[0], text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name[1]
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+
+
+        # layout.row().label(text="hm")
+        # row = layout.row()
+        # row.prop(mytool, "inputUpperTorso", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "AUpperTorso"
+
+        # layout.row().label(text="hm")
+        # row = layout.row()
+        # row.prop(mytool, "inputLowerTorso", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "ILowerTorso"
+
+        # row = layout.row()
+        # row.prop(mytool, "inputHands", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "HHands"
+
+        # row = layout.row()
+        # row.prop(mytool, "inputCalf", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "JCalf"
+
+        # row = layout.row()
+        # row.prop(mytool, "inputAnkle", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "KAnkle"
+
+        # row = layout.row()
+        # row.prop(mytool, "inputFeet", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "LFeet"
+
+        # row = layout.row()
+        # row.prop(mytool, "inputNeck", text="")
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "MNeck"
+
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).var = coll
+        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).var = '3'
+        # self.layout.operator(randomizeModel.bl_idname).var = '2'
 
 # Generate NFTs Panel:
 class BMNFTS_PT_GenerateNFTs(bpy.types.Panel):
@@ -462,7 +595,8 @@ classes = (
     # BMNFTS_PT_LOGIC_Panel,
     # BMNFTS_PT_MATERIALS_Panel,
     # BMNFTS_PT_API_Panel,
-
+    randomizeModel,
+    randomizeColor,
     createData,
     exportNFTs,
     refactor_Batches,
