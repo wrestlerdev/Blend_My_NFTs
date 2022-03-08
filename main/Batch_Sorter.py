@@ -43,8 +43,9 @@ def makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
         for char in nft.split('-'):
             varientArray = hierarchy.get( list(hierarchy)[index])
 
-            print(list(hierarchy)[index])
-            print(list(varientArray)[int(char) -1])
+            '''
+            Make list of all items character used
+            '''
             chracterItemDict[list(hierarchy)[index]] = list(varientArray)[int(char) -1]
             index += 1
 
@@ -54,6 +55,7 @@ def makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
         with open(os.path.join(batch_json_save_path, ("NFTNumber{}.json".format(i + 1))), "w") as outfile:
             outfile.write(singleNFTObject)
         i += 1
+        #bpy.ops.wm.save_as_mainfile(filepath=batch_json_save_path+".blend")
 
     i = 0
     while i < numBatches:

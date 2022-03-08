@@ -22,9 +22,12 @@ ShoesMiddleSlots = ["KAnkle", "LFeet"]
 ItemUsedBodySlot = {"Coats": CoatSlots, "Pants": PantsSlots, "ShoesHigh" : ShoesHighSlots, "ShoesMiddle" : ShoesMiddleSlots}
 
 def GenerateOutfit(hierarchy, maxNFTs):
-    DNASet = []
+    DNASet = set()
+    numberToGen = maxNFTs
 
-    for x in range(maxNFTs):
+    allowFailedAttempts = 50
+    currentFailedAttempts = 0
+    while numberToGen > 0: 
 
         SingleDNA = []
 
@@ -35,13 +38,13 @@ def GenerateOutfit(hierarchy, maxNFTs):
 
         for slot in BodySlotKeys:
             if BodySlotsDict.get(slot):
-                print("Slot Full")
                 SingleDNA.append("1")
             else:
-                
                 BodySlotChildren = list(hierarchy.get(slot))
-                ItemIndexChoosen = random.randrange(0, len(BodySlotChildren))
+                ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
                 ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
+
+
                 
                 #Get item metadata from object 
                 ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
@@ -59,11 +62,44 @@ def GenerateOutfit(hierarchy, maxNFTs):
                 bpy.data.collections.get(ItemChoosen).hide_viewport = False
 
         formattedDNA = '-'.join(SingleDNA)
-        DNASet.append(formattedDNA)
-    return DNASet
+        if formattedDNA not in DNASet:
+            print("ADDING DNA TO SET")
+            DNASet.add(formattedDNA)
+            numberToGen -= 1
+        else:
+            print("ALL READY IN SET")
+            currentFailedAttempts += 1
+            if currentFailedAttempts > allowFailedAttempts:
+                break
             
+    print(DNASet)
+    return list(DNASet)
             
+def PickWeightedDNAStrand(BodySlotChildren):
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+    ifZeroBool = None
 
+    for k in BodySlotChildren:
+        number = BodySlotChildren[k]["number"]
+        number_List_Of_i.append(number)
+
+        rarity = BodySlotChildren[k]["rarity"]
+        rarity_List_Of_i.append(float(rarity))
+
+    for x in rarity_List_Of_i:
+        if x == 0:
+            ifZeroBool = True
+        elif x != 0:
+            ifZeroBool = False
+
+    if ifZeroBool == True:
+        variantByNum = random.choices(number_List_Of_i, k=1)
+    elif ifZeroBool == False:
+        variantByNum = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
+    
+    print(int(variantByNum[0])-1)
+    return (int(variantByNum[0]) -1)
 
  
 if __name__ == '__main__':
