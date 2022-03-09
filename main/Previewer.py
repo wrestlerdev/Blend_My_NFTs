@@ -155,6 +155,7 @@ def show_nft_from_dna(DNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRari
 
 
 def get_random_from_collection(coll): # doesn't respect weights or filled slots yet
+                                       # should check if from right collection
    rand_int = random.randint(0,len(coll.children)-1)
    chosen_coll = coll.children[rand_int]
    for child in coll.children:

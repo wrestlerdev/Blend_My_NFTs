@@ -10,6 +10,8 @@ bl_info = {
 
 # Import handling:
 
+from cgitb import text
+from venv import create
 import bpy
 from bpy.app.handlers import persistent
 
@@ -38,11 +40,6 @@ else:
 
     from .ui_Lists import UIList
 
-
-class WCUSTOM_PGT_SlotCollection(bpy.types.PropertyGroup):
-    inputUpperTorso2: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
-
-    
 
 # User input Property Group:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
@@ -110,16 +107,15 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     # API Panel properties:
     apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
 
+
+
+
     # Custom properties
 
     inputDNA: bpy.props.StringProperty(name="DNA")
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
     inputLowerTorso: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection)
-    # inputLForearm: bpy.props.PointerProperty(name="Left Forearm Slot",type=bpy.types.Collection)
-    # inputRForearm: bpy.props.PointerProperty(name="Right Forearm Slot",type=bpy.types.Collection)
-    # inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection)
-    # inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection)
     inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection)
     inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection)
     inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection)
@@ -152,89 +148,26 @@ def update_combinations(dummy1, dummy2):
 
     combinations = (get_combinations.get_combinations_from_scene()) - offset
 
-    redraw_panel()
+    # redraw_panel()
 
 bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
-# Main Operators:
-class createData(bpy.types.Operator):
-    bl_idname = 'create.data'
-    bl_label = 'Create Data'
-    bl_description = 'Creates NFT Data. Run after any changes were made to scene.'
-    bl_options = {"REGISTER", "UNDO"}
+# ------------------------------- Operators ---------------------------------------------
 
-    def execute(self, context):
-
-        nftName = bpy.context.scene.my_tool.nftName
-        maxNFTs = bpy.context.scene.my_tool.collectionSize
-        nftsPerBatch = bpy.context.scene.my_tool.nftsPerBatch
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        enableRarity = bpy.context.scene.my_tool.enableRarity
-
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-
-        Previewer.DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
-        Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
-        return {"FINISHED"}
-
-class exportNFTs(bpy.types.Operator):
-    bl_idname = 'exporter.nfts'
-    bl_label = 'Export NFTs'
-    bl_description = 'Generate and export a given batch of NFTs.'
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
-        nftName = bpy.context.scene.my_tool.nftName
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        batchToGenerate = bpy.context.scene.my_tool.batchToGenerate
-        maxNFTs = bpy.context.scene.my_tool.collectionSize
-
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-
-        enableImages = bpy.context.scene.my_tool.imageBool
-        imageFileFormat = bpy.context.scene.my_tool.imageEnum
-
-        enableAnimations = bpy.context.scene.my_tool.animationBool
-        animationFileFormat = bpy.context.scene.my_tool.animationEnum
-
-        enableModelsBlender = bpy.context.scene.my_tool.modelBool
-        modelFileFormat = bpy.context.scene.my_tool.modelEnum
-
-
-        Exporter.render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path, nftBatch_save_path, enableImages,
-                                      imageFileFormat, enableAnimations, animationFileFormat, enableModelsBlender,
-                                      modelFileFormat
-                                      )
-        return {"FINISHED"}
-
-class refactor_Batches(bpy.types.Operator):
-    """Refactor your Batches? This action cannot be undone."""
-    bl_idname = 'refactor.batches'
-    bl_label = 'Refactor your Batches?'
-    bl_description = 'This action cannot be undone.'
-    bl_options = {'REGISTER', 'INTERNAL'}
-
-    @classmethod
-    def poll(cls, context):
-        return True
-
-    def execute(self, context):
-        self.report({'INFO'}, "Batches Refactored, MetaData created!")
-
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-
-        cardanoMetaDataBool = bpy.context.scene.my_tool.cardanoMetaDataBool
-        solanaMetaDataBool = bpy.context.scene.my_tool.solanaMetaDataBool
-        erc721MetaData = bpy.context.scene.my_tool.erc721MetaData
-
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-
-        Batch_Refactorer.reformatNFTCollection(save_path, Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path,
-                                               cardanoMetaDataBool, solanaMetaDataBool, erc721MetaData)
-        return {"FINISHED"}
+class createNFTRecord(bpy.types.Operator):
+    bl_idname = 'create.record'
+    bl_label = 'Create NFT Record'
+    bl_description = "This will reinitialize the entire NFT ledger. Are you sure?"
+    bl_options = {"REGISTER", "INTERNAL"}
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+
+        
+        return {'FINISHED'}
+
 
 class randomizePreview(bpy.types.Operator):
     bl_idname = 'randomize.preview'
@@ -258,6 +191,7 @@ class randomizePreview(bpy.types.Operator):
         
         return {'FINISHED'}
 
+
 class previewNFT(bpy.types.Operator):
     bl_idname = 'create.preview'
     bl_label = 'Create Preview'
@@ -275,48 +209,37 @@ class previewNFT(bpy.types.Operator):
             Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
         else:
             Previewer.show_nft_from_dna(inputDNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
-        # Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-        # DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
-        # Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
         return {"FINISHED"}
+
 
 class randomizeModel(bpy.types.Operator):
     bl_idname = 'randomize.model'
     bl_label = 'Randomize Model'
     bl_options = {"REGISTER", "UNDO"}
-    # collection: bpy.props.CollectionProperty(type=BMNFTS_PGT_MyProperties)
     collection_name: bpy.props.StringProperty(default="")
-    # coll_text: bpy.context.scene.my_tool.inputUpperTorso
-    # var: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
 
-
-    def setSlot(self, string, scene_slot):
-        self.collection_name = string
+    # def invoke(self, context, event):
+    #     print("I HAVE BEEN INVOKED")
+    #     print(event.type)
+    #     return {'FINISHED'}
 
     def execute(self, context):
         if self.collection_name != "":
-            print("wow")
-            rand_model_coll = Previewer.get_random_from_collection(bpy.data.collections[self.collection_name])
+            rand_variant = Previewer.get_random_from_collection(bpy.data.collections[self.collection_name])
             if self.collection_name == "AUpperTorso":
-                # bpy.context.scene.my_tool.inputUpperTorso = bpy.data.collections[self.collection_name]
-                bpy.context.scene.my_tool.inputUpperTorso = rand_model_coll
+                bpy.context.scene.my_tool.inputUpperTorso = rand_variant
             elif self.collection_name == "ILowerTorso":
-                bpy.context.scene.my_tool.inputLowerTorso = rand_model_coll
+                bpy.context.scene.my_tool.inputLowerTorso = rand_variant
             elif self.collection_name == "HHands":
-                bpy.context.scene.my_tool.inputHands = rand_model_coll
+                bpy.context.scene.my_tool.inputHands = rand_variant
             elif self.collection_name == "JCalf":
-                bpy.context.scene.my_tool.inputCalf = rand_model_coll
+                bpy.context.scene.my_tool.inputCalf = rand_variant
             elif self.collection_name == "KAnkle":
-                bpy.context.scene.my_tool.inputAnkle = rand_model_coll
+                bpy.context.scene.my_tool.inputAnkle = rand_variant
             elif self.collection_name == "LFeet":
-                bpy.context.scene.my_tool.inputFeet = rand_model_coll
+                bpy.context.scene.my_tool.inputFeet = rand_variant
             elif self.collection_name == "MNeck":
-                bpy.context.scene.my_tool.inputNeck = rand_model_coll
-            # colls2 = {'AUpperTorso': bpy.context.scene.my_tool.inputUpperTorso,'ILowerTorso': bpy.context.scene.my_tool.inputLowerTorso}
-            # coll1 = colls2.get(self.collection_name, 'default')
-            # coll1 = bpy.data.collections[self.collection_name]
-            # print(coll1)
-        
+                bpy.context.scene.my_tool.inputNeck = rand_variant
         return {'FINISHED'}
 
 class randomizeColor(bpy.types.Operator):
@@ -327,61 +250,97 @@ class randomizeColor(bpy.types.Operator):
 
     def execute(self, context):
         if self.collection_name != "":
-            print("wow")
-            # if self.collection_name == "AUpperTorso":
-            #     bpy.context.scene.my_tool.inputUpperTorso = bpy.data.collections[self.collection_name]
-            # elif self.collection_name == "ILowerTorso":
-            #     bpy.context.scene.my_tool.inputLowerTorso = bpy.data.collections[self.collection_name]
-            # elif self.collection_name == "HHands":
-            #     bpy.context.scene.my_tool.inputHands = bpy.data.collections[self.collection_name]
-            # elif self.collection_name == "JCalf":
-            #     bpy.context.scene.my_tool.inputCalf = bpy.data.collections[self.collection_name]
-            # elif self.collection_name == "KAnkle":
-            #     bpy.context.scene.my_tool.inputAnkle = bpy.data.collections[self.collection_name]
-            # elif self.collection_name == "LFeet":
-            #     bpy.context.scene.my_tool.inputFeet = bpy.data.collections[self.collection_name]
-            # elif self.collection_name == "MNeck":
-            #     bpy.context.scene.my_tool.inputNeck = bpy.data.collections[self.collection_name]
+            print("this should rando color sometime")
         
         return {'FINISHED'}
 
 
-# Create Data Panel:
-class BMNFTS_PT_CreateData(bpy.types.Panel):
-    bl_label = "Create NFT Data"
-    bl_idname = "BMNFTS_PT_CreateData"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+# # Main Operators:
+# class createData(bpy.types.Operator):
+#     bl_idname = 'create.data'
+#     bl_label = 'Create Data'
+#     bl_description = 'Creates NFT Data. Run after any changes were made to scene.'
+#     bl_options = {"REGISTER", "UNDO"}
 
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        mytool = scene.my_tool
+#     def execute(self, context):
 
-        layout.label(text=f"Maximum Number Of NFTs: {combinations}")
+#         nftName = bpy.context.scene.my_tool.nftName
+#         maxNFTs = bpy.context.scene.my_tool.collectionSize
+#         nftsPerBatch = bpy.context.scene.my_tool.nftsPerBatch
+#         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+#         enableRarity = bpy.context.scene.my_tool.enableRarity
 
-        row = layout.row()
-        layout.label(text="")
+#         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
 
-        row = layout.row()
-        row.prop(mytool, "nftName")
+#         Previewer.DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
+#         Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
+#         return {"FINISHED"}
 
-        row = layout.row()
-        row.prop(mytool, "collectionSize")
+# class exportNFTs(bpy.types.Operator):
+#     bl_idname = 'exporter.nfts'
+#     bl_label = 'Export NFTs'
+#     bl_description = 'Generate and export a given batch of NFTs.'
+#     bl_options = {"REGISTER", "UNDO"}
 
-        row = layout.row()
-        row.prop(mytool, "nftsPerBatch")
+#     def execute(self, context):
+#         nftName = bpy.context.scene.my_tool.nftName
+#         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+#         batchToGenerate = bpy.context.scene.my_tool.batchToGenerate
+#         maxNFTs = bpy.context.scene.my_tool.collectionSize
 
-        row = layout.row()
-        row.prop(mytool, "save_path")
+#         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
 
-        row = layout.row()
-        row.prop(mytool, "enableRarity")
+#         enableImages = bpy.context.scene.my_tool.imageBool
+#         imageFileFormat = bpy.context.scene.my_tool.imageEnum
 
-        row = layout.row()
-        self.layout.operator("create.data", icon='DISCLOSURE_TRI_RIGHT', text="Create Data")
+#         enableAnimations = bpy.context.scene.my_tool.animationBool
+#         animationFileFormat = bpy.context.scene.my_tool.animationEnum
 
+#         enableModelsBlender = bpy.context.scene.my_tool.modelBool
+#         modelFileFormat = bpy.context.scene.my_tool.modelEnum
+
+
+#         Exporter.render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path, nftBatch_save_path, enableImages,
+#                                       imageFileFormat, enableAnimations, animationFileFormat, enableModelsBlender,
+#                                       modelFileFormat
+#                                       )
+#         return {"FINISHED"}
+
+# class refactor_Batches(bpy.types.Operator):
+#     """Refactor your Batches? This action cannot be undone."""
+#     bl_idname = 'refactor.batches'
+#     bl_label = 'Refactor your Batches?'
+#     bl_description = 'This action cannot be undone.'
+#     bl_options = {'REGISTER', 'INTERNAL'}
+
+#     @classmethod
+#     def poll(cls, context):
+#         return True
+
+#     def execute(self, context):
+#         self.report({'INFO'}, "Batches Refactored, MetaData created!")
+
+#         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+
+#         cardanoMetaDataBool = bpy.context.scene.my_tool.cardanoMetaDataBool
+#         solanaMetaDataBool = bpy.context.scene.my_tool.solanaMetaDataBool
+#         erc721MetaData = bpy.context.scene.my_tool.erc721MetaData
+
+#         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+
+#         Batch_Refactorer.reformatNFTCollection(save_path, Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path,
+#                                                cardanoMetaDataBool, solanaMetaDataBool, erc721MetaData)
+#         return {"FINISHED"}
+
+#     def invoke(self, context, event):
+#         return context.window_manager.invoke_confirm(self, event)
+
+
+
+
+# ------------------------------- Panels ----------------------------------------------
+
+#Create Preview Panel
 class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_label = "Preview NFT"
     bl_idname = "WCUSTOM_PT_PreviewNFTs"
@@ -403,15 +362,20 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         mytool = scene.my_tool
 
         row = layout.row()
+        row.operator(createNFTRecord.bl_idname, text=createNFTRecord.bl_label)
+
+        row = layout.row()
+        row.label(text='')
+
+        row = layout.row()
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
-        row = layout.row()
-        layout.label(text="wah")
 
         row = layout.row()
-
-        # previewNFT
         self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
+
+        row = layout.row()
+        row.label(text='')
 
         for name in self.Slots:
             layout.row().label(text=name[2])
@@ -421,112 +385,116 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
 
 
-        # layout.row().label(text="hm")
-        # row = layout.row()
-        # row.prop(mytool, "inputUpperTorso", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "AUpperTorso"
+# # Create Data Panel:
+# class BMNFTS_PT_CreateData(bpy.types.Panel):
+#     bl_label = "Create NFT Data"
+#     bl_idname = "BMNFTS_PT_CreateData"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
 
-        # layout.row().label(text="hm")
-        # row = layout.row()
-        # row.prop(mytool, "inputLowerTorso", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "ILowerTorso"
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+#         mytool = scene.my_tool
 
-        # row = layout.row()
-        # row.prop(mytool, "inputHands", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "HHands"
+#         layout.label(text=f"Maximum Number Of NFTs: {combinations}")
 
-        # row = layout.row()
-        # row.prop(mytool, "inputCalf", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "JCalf"
+#         row = layout.row()
+#         layout.label(text="")
 
-        # row = layout.row()
-        # row.prop(mytool, "inputAnkle", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "KAnkle"
+#         row = layout.row()
+#         row.prop(mytool, "nftName")
 
-        # row = layout.row()
-        # row.prop(mytool, "inputFeet", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "LFeet"
+#         row = layout.row()
+#         row.prop(mytool, "collectionSize")
 
-        # row = layout.row()
-        # row.prop(mytool, "inputNeck", text="")
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = "MNeck"
+#         row = layout.row()
+#         row.prop(mytool, "nftsPerBatch")
 
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).var = coll
-        # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).var = '3'
-        # self.layout.operator(randomizeModel.bl_idname).var = '2'
+#         row = layout.row()
+#         row.prop(mytool, "save_path")
 
-# Generate NFTs Panel:
-class BMNFTS_PT_GenerateNFTs(bpy.types.Panel):
-    bl_label = "Generate NFTs"
-    bl_idname = "BMNFTS_PT_GenerateNFTs"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+#         row = layout.row()
+#         row.prop(mytool, "enableRarity")
 
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        mytool = scene.my_tool
+#         row = layout.row()
+#         self.layout.operator("create.data", icon='DISCLOSURE_TRI_RIGHT', text="Create Data")
 
-        row = layout.row()
-        row.prop(mytool, "imageBool")
-        if  bpy.context.scene.my_tool.imageBool == True:
-            row.prop(mytool, "imageEnum")
 
-        row = layout.row()
-        row.prop(mytool, "animationBool")
-        if  bpy.context.scene.my_tool.animationBool == True:
-            row.prop(mytool, "animationEnum")
 
-        row = layout.row()
-        row.prop(mytool, "modelBool")
-        if  bpy.context.scene.my_tool.modelBool == True:
-            row.prop(mytool, "modelEnum")
+# # Generate NFTs Panel:
+# class BMNFTS_PT_GenerateNFTs(bpy.types.Panel):
+#     bl_label = "Generate NFTs"
+#     bl_idname = "BMNFTS_PT_GenerateNFTs"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
 
-        row = layout.row()
-        row.prop(mytool, "batchToGenerate")
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+#         mytool = scene.my_tool
 
-        row = layout.row()
-        self.layout.operator("exporter.nfts", icon='RENDER_RESULT', text="Generate NFTs")
+#         row = layout.row()
+#         row.prop(mytool, "imageBool")
+#         if  bpy.context.scene.my_tool.imageBool == True:
+#             row.prop(mytool, "imageEnum")
 
-# Refactor Batches & create MetaData Panel:
-class BMNFTS_PT_Refactor(bpy.types.Panel):
-    bl_label = "Refactor Batches & create MetaData"
-    bl_idname = "BMNFTS_PT_Refactor"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+#         row = layout.row()
+#         row.prop(mytool, "animationBool")
+#         if  bpy.context.scene.my_tool.animationBool == True:
+#             row.prop(mytool, "animationEnum")
 
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        mytool = scene.my_tool
+#         row = layout.row()
+#         row.prop(mytool, "modelBool")
+#         if  bpy.context.scene.my_tool.modelBool == True:
+#             row.prop(mytool, "modelEnum")
 
-        row = layout.row()
-        layout.label(text="Meta Data format:")
+#         row = layout.row()
+#         row.prop(mytool, "batchToGenerate")
 
-        row = layout.row()
-        row.prop(mytool, "cardanoMetaDataBool")
-        row.prop(mytool, "solanaMetaDataBool")
-        row.prop(mytool, "erc721MetaData")
-        self.layout.operator("refactor.batches", icon='FOLDER_REDIRECT', text="Refactor Batches & create MetaData")
+#         row = layout.row()
+#         self.layout.operator("exporter.nfts", icon='RENDER_RESULT', text="Generate NFTs")
 
-# Documentation Panel:
-class BMNFTS_PT_Documentation(bpy.types.Panel):
-    bl_label = "Documentation"
-    bl_idname = "BMNFTS_PT_Documentation"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+# # Refactor Batches & create MetaData Panel:
+# class BMNFTS_PT_Refactor(bpy.types.Panel):
+#     bl_label = "Refactor Batches & create MetaData"
+#     bl_idname = "BMNFTS_PT_Refactor"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
 
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        mytool = scene.my_tool
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+#         mytool = scene.my_tool
 
-        row = layout.row()
-        row.operator("wm.url_open", text="Documentation",
-                     icon='URL').url = "https://github.com/torrinworx/Blend_My_NFTs"
+#         row = layout.row()
+#         layout.label(text="Meta Data format:")
+
+#         row = layout.row()
+#         row.prop(mytool, "cardanoMetaDataBool")
+#         row.prop(mytool, "solanaMetaDataBool")
+#         row.prop(mytool, "erc721MetaData")
+#         self.layout.operator("refactor.batches", icon='FOLDER_REDIRECT', text="Refactor Batches & create MetaData")
+
+# # Documentation Panel:
+# class BMNFTS_PT_Documentation(bpy.types.Panel):
+#     bl_label = "Documentation"
+#     bl_idname = "BMNFTS_PT_Documentation"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
+
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+#         mytool = scene.my_tool
+
+#         row = layout.row()
+#         row.operator("wm.url_open", text="Documentation",
+#                      icon='URL').url = "https://github.com/torrinworx/Blend_My_NFTs"
 
 # # Logic Panel:
 # class BMNFTS_PT_LOGIC_Panel(bpy.types.Panel):
@@ -572,22 +540,22 @@ class BMNFTS_PT_Documentation(bpy.types.Panel):
 #         row.prop(mytool, "apiKey")
 
 
-def redraw_panel():
-    try:
-        bpy.utils.unregister_class(BMNFTS_PT_CreateData)
-    except:
-        pass
-    bpy.utils.register_class(BMNFTS_PT_CreateData)
+# def redraw_panel():
+#     try:
+#         bpy.utils.unregister_class(BMNFTS_PT_CreateData)
+#     except:
+#         pass
+#     bpy.utils.register_class(BMNFTS_PT_CreateData)
 
 
 # Register and Unregister classes from Blender:
 classes = (
     BMNFTS_PGT_MyProperties,
-    BMNFTS_PT_CreateData,
+    # BMNFTS_PT_CreateData,
     WCUSTOM_PT_PreviewNFTs,
-    BMNFTS_PT_GenerateNFTs,
-    BMNFTS_PT_Refactor,
-    BMNFTS_PT_Documentation,
+    # BMNFTS_PT_GenerateNFTs,
+    # BMNFTS_PT_Refactor,
+    # BMNFTS_PT_Documentation,
 
 
     # Other panels:
@@ -597,9 +565,10 @@ classes = (
     # BMNFTS_PT_API_Panel,
     randomizeModel,
     randomizeColor,
-    createData,
-    exportNFTs,
-    refactor_Batches,
+    createNFTRecord,
+    # createData,
+    # exportNFTs,
+    # refactor_Batches,
     randomizePreview,
     previewNFT,
 
