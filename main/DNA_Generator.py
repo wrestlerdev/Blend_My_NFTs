@@ -338,7 +338,7 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
       print(f"{bcolors.OK} Rarity is on. Weights listed in .blend will be taken into account {bcolors.RESET}")
       possibleCombinations = maxNFTs
       DNAList = Rarity_Sorter.sortRarityWeights(hierarchy, listOptionVariant, DNAList, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
-      DNAList= Outfit_Generator.GenerateOutfit(hierarchy, maxNFTs)
+      DNAList= Outfit_Generator.RandomizeFullCharacter(hierarchy, maxNFTs)
 
    if len(DNAList) < maxNFTs:
       print(f"{bcolors.ERROR} \nWARNING: \n"

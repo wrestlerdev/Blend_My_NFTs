@@ -21,7 +21,7 @@ ShoesMiddleSlots = ["KAnkle", "LFeet"]
 # A dictionary which can be called to find what slots to fill when using certian items
 ItemUsedBodySlot = {"Coats": CoatSlots, "Pants": PantsSlots, "ShoesHigh" : ShoesHighSlots, "ShoesMiddle" : ShoesMiddleSlots}
 
-def GenerateOutfit(hierarchy, maxNFTs):
+def RandomizeFullCharacter(hierarchy, maxNFTs):
     DNASet = set()
     numberToGen = maxNFTs
 
@@ -29,7 +29,8 @@ def GenerateOutfit(hierarchy, maxNFTs):
     currentFailedAttempts = 0
     while numberToGen > 0: 
 
-        SingleDNA = []
+        SingleDNA = ["0"] * len(list(hierarchy.keys()))
+        print(SingleDNA)
 
         #Create a dictionary based on current top level collections in scene that should relate to slots. Set them to be populated false
         BodySlotKeys = list(hierarchy)
@@ -38,18 +39,16 @@ def GenerateOutfit(hierarchy, maxNFTs):
 
         for slot in BodySlotKeys:
             if BodySlotsDict.get(slot):
-                SingleDNA.append("1")
+                SingleDNA[list(hierarchy.keys()).index(slot)] = "1"
             else:
                 BodySlotChildren = list(hierarchy.get(slot))
                 ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
                 ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
-
-
                 
                 #Get item metadata from object 
                 ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
                 ItemIndex = ItemMetaData["number"]
-                SingleDNA.append(str(ItemIndex))
+                SingleDNA[list(hierarchy.keys()).index(slot)] = ItemIndex
                 ItemClothingGenre = ItemMetaData["clothingGenre"]
                 
                 #loop through all slots that selected item will take up
@@ -74,7 +73,29 @@ def GenerateOutfit(hierarchy, maxNFTs):
             
     print(DNASet)
     return list(DNASet)
-            
+
+
+def RandomizeSingleDNAStrand(slot, hierarchy):
+    BodySlotChildren = list(hierarchy.get(slot))
+    ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
+    ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
+                    
+    #Get item metadata from object 
+    ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
+    ItemIndex = ItemMetaData["number"]
+    #SingleDNA.append(str(ItemIndex))
+    ItemClothingGenre = ItemMetaData["clothingGenre"]
+                    
+    #loop through all slots that selected item will take up
+    UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+    if UsedUpSlotArray:
+        for i in ItemUsedBodySlot.get(ItemClothingGenre):
+            SlotUpdateValue = {i : True}
+            #BodySlotsDict.update(SlotUpdateValue)
+        
+    bpy.data.collections.get(ItemChoosen).hide_viewport = False
+
+
 def PickWeightedDNAStrand(BodySlotChildren):
     number_List_Of_i = []
     rarity_List_Of_i = []
@@ -98,9 +119,8 @@ def PickWeightedDNAStrand(BodySlotChildren):
     elif ifZeroBool == False:
         variantByNum = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
     
-    print(int(variantByNum[0])-1)
     return (int(variantByNum[0]) -1)
 
  
 if __name__ == '__main__':
-    GenerateOutfit()
+    RandomizeFullCharacter()
