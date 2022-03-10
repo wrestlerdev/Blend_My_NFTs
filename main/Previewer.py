@@ -74,7 +74,6 @@ def show_NFT(DNA, hierarchy):
 
 
 def create_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
-   print("wow")
    # DNA_Generator.generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
    """
    Returns batchDataDictionary containing the number of NFT combinations, hierarchy, and the DNAList.
@@ -141,6 +140,7 @@ def create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
    global current_hierarchy
    current_hierarchy = hierarchy
    show_NFT(DNA, current_hierarchy)
+   fill_pointers_from_dna(DNA)
    return DNA
 
 def show_nft_from_dna(DNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
@@ -154,7 +154,7 @@ def show_nft_from_dna(DNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRari
 #  ----------------------------------------------------------------------------------
 
 
-def get_random_from_collection(coll): # doesn't respect weights or filled slots yet
+def get_random_from_collection(coll): # doesn't respect weights or filled slots
                                        # should check if from right collection
    rand_int = random.randint(0,len(coll.children)-1)
    chosen_coll = coll.children[rand_int]
@@ -165,5 +165,95 @@ def get_random_from_collection(coll): # doesn't respect weights or filled slots 
    chosen_coll.hide_viewport = False
    return chosen_coll
  
+
+
+def set_from_collection(coll, variant): # hide all in coll and show new
+   if variant in coll.children:
+      vname = variant.split('_')
+      print(vname[3])
+      DNA = ''
+      for child in coll.children:
+         child.hide_render = True
+         child.hide_viewport = True
+      new_index = int(vname[3])-1
+      coll.children[new_index].hide_render = False
+      coll.children[new_index].hide_viewport = False
+      return new_index + 1
+   return -1
+
+
+
+def collections_have_updated(slots_key, Slots): # this is called from init properties
+    if bpy.context.scene.my_tool.get(slots_key) is not None:
+        # if pointer is filled and new slot is not visible
+      coll_name, label = Slots[slots_key]
+      collections = bpy.context.scene.collection.children
+      new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
+
+      if new_dnastrand >= 0 and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
+         dna_string = bpy.context.scene.my_tool.inputDNA
+         coll_index = list(collections.keys()).index(coll_name)
+         print(coll_index)
+         DNA = dna_string.split('-') 
+         DNA[coll_index - 1] = str(new_dnastrand) # includiong script ignore
+         dna_string = '-'.join(DNA)
+
+         bpy.context.scene.my_tool.inputDNA = dna_string
+
+      else:
+         print("is not valid || clear")
+         bpy.context.scene.my_tool[slots_key] = None
+
+
+
+def fill_pointers_from_dna(DNA):
+   DNAString = DNA.split('-')
+   collections = bpy.context.scene.collection.children
+   coll_list = list(collections.keys())
+   print("-----------------")
+   for i in range(len(DNAString)):
+      strand_index = int(DNAString[i]) - 1
+      current_coll = collections[coll_list[i+1]] # i+1  bc script ignore
+      print("-----------------------------------------")
+      print(collections)
+      print("------------------------------------------")
+      coll_name = current_coll.name
+      if coll_name == "AUpperTorso":
+            bpy.context.scene.my_tool.inputUpperTorso = current_coll.children[strand_index]
+      elif coll_name == "ILowerTorso":
+            bpy.context.scene.my_tool.inputLowerTorso = current_coll.children[strand_index]
+      elif coll_name == "HHands":
+            bpy.context.scene.my_tool.inputHands = current_coll.children[strand_index]
+      elif coll_name == "JCalf":
+            bpy.context.scene.my_tool.inputCalf = current_coll.children[strand_index]
+      elif coll_name == "KAnkle":
+            bpy.context.scene.my_tool.inputAnkle = current_coll.children[strand_index]
+      elif coll_name == "LFeet":
+            bpy.context.scene.my_tool.inputFeet = current_coll.children[strand_index]
+      elif coll_name == "MNeck":
+            bpy.context.scene.my_tool.inputNeck = current_coll.children[strand_index]
+      elif coll_name == "BMiddleTorso":
+            bpy.context.scene.my_tool.inputMiddleTorso = current_coll.children[strand_index]
+      elif coll_name == "CLForeArm":
+            bpy.context.scene.my_tool.inputLForeArm = current_coll.children[strand_index]
+      elif coll_name == "DLWrist":
+            bpy.context.scene.my_tool.inputLWrist = current_coll.children[strand_index]
+      elif coll_name == "ERForeArm":
+            bpy.context.scene.my_tool.inputRForeArm = current_coll.children[strand_index]
+      elif coll_name == "FRWrist":
+            bpy.context.scene.my_tool.inputRWrist = current_coll.children[strand_index]
+      elif coll_name == "NLowerHead":
+            bpy.context.scene.my_tool.inputLowerHead = current_coll.children[strand_index]
+      elif coll_name == "OMiddleHead":
+            bpy.context.scene.my_tool.inputMiddleHead = current_coll.children[strand_index]
+      elif coll_name == "PEarings":
+            bpy.context.scene.my_tool.inputEarrings = current_coll.children[strand_index]
+      elif coll_name == "QUpperHead":
+            bpy.context.scene.my_tool.inputUpperHead = current_coll.children[strand_index]
+      elif coll_name == "RBackPack":
+            bpy.context.scene.my_tool.inputBackpack = current_coll.children[strand_index]
+
+   return
+
 if __name__ == '__main__':
    print("okay")

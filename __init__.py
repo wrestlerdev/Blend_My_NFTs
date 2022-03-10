@@ -15,9 +15,11 @@ from venv import create
 import bpy
 from bpy.app.handlers import persistent
 
+# import json
 
 import os
 import importlib
+
 
 # Import files from main directory:
 
@@ -42,6 +44,24 @@ else:
 
     from .ui_Lists import UIList
 
+Slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot"),
+    "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot"),
+    "inputLForeArm": ("CLForeArm", "Left Forearm Slot"),
+    "inputLWrist": ("DLWrist", "Left Wrist Slot"),
+    "inputRForeArm": ("ERForeArm", "Right Forearm Slot"),
+    "inputRWrist": ("FRWrist", "Right Wrist Slot"),
+    "inputHands": ("HHands", "Hands Slot"),
+    "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),
+    "inputCalf": ("JCalf", "Calf Slot"),
+    "inputAnkle": ("KAnkle", "Ankle Slot"),
+    "inputFeet": ("LFeet", "Feet Slot"),
+    "inputNeck": ("MNeck", "Neck Slot"),
+    "inputLowerHead": ("NLowerHead", "Lower Head Slot"),
+    "inputMiddleHead": ("OMiddleHead", "Mid Head Slot"),
+    "inputEarrings": ("PEarings", "Earrings Slot"),
+    "inputUpperHead": ("QUpperHead", "UpperHead Slot"),
+    "inputBackpack": ("RBackPack", "Backpack Slot")}
+    
 
 # User input Property Group:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
@@ -119,13 +139,40 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     inputDNA: bpy.props.StringProperty(name="DNA")
 
-    inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection)
-    inputLowerTorso: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection)
-    inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection)
-    inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection)
-    inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection)
-    inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection)
-    inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection)
+    inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputUpperTorso",Slots))
+    inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputMiddleTorso",Slots))
+    inputLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputLForeArm",Slots))
+    inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputLWrist",Slots))
+    inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputRForeArm",Slots))
+    inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputRWrist",Slots))
+    inputLowerTorso: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputLowerTorso",Slots))
+    inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputHands",Slots))
+    inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputCalf",Slots))
+    inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputAnkle",Slots))
+    inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputFeet",Slots))
+    inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputNeck",Slots))
+    inputLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputLowerHead",Slots))
+    inputMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputMiddleHead",Slots))
+    inputEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputEarrings",Slots))
+    inputUpperHead: bpy.props.PointerProperty(name="t",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputUpperHead",Slots))
+    inputBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputBackpack",Slots))
 
 
 def make_directories(save_path):
@@ -159,6 +206,7 @@ bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
 
 batch_json_save_path = ""
+DataDictionary = dict()
 # ------------------------------- Operators ---------------------------------------------
 
 class createNFTRecord(bpy.types.Operator):
@@ -189,7 +237,7 @@ class createNFTRecord(bpy.types.Operator):
 
 class randomizePreview(bpy.types.Operator):
     bl_idname = 'randomize.preview'
-    bl_label = 'Randomize'
+    bl_label = 'Randomize All'
     bl_description = "Create and generate random combination"
     bl_options = {"REGISTER", "UNDO"} # what do these mean btw lmao
 
@@ -204,8 +252,9 @@ class randomizePreview(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         enableRarity = bpy.context.scene.my_tool.enableRarity
         # some randomize dna code here
-        DNA = Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
-        bpy.context.scene.my_tool.inputDNA = DNA
+        DNA = Previewer.DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
+        Previewer.fill_pointers_from_dna(DNA[0])
+        bpy.context.scene.my_tool.inputDNA = DNA[0]
         return {'FINISHED'}
 
 
@@ -217,20 +266,21 @@ class previewNFT(bpy.types.Operator):
 
     def execute(self, context):
         nftName = "temp"
-        maxNFTs = 5
+        maxNFTs = 1
         nftsPerBatch = 1
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         enableRarity = bpy.context.scene.my_tool.enableRarity
         inputDNA = bpy.context.scene.my_tool.inputDNA
         if inputDNA == "":
-            print("No DNA string")
+            print()
             DNASet = Previewer.DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
-            SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
+            bpy.context.scene.my_tool.inputDNA = DNASet[0]
+            Previewer.fill_pointers_from_dna(DNASet[0])
             #Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
             #Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
         else:
             print("generating from DNA")
-            #Previewer.show_nft_from_dna(inputDNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+            Previewer.show_nft_from_dna(inputDNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
         return {"FINISHED"}
 
 
@@ -246,22 +296,19 @@ class randomizeModel(bpy.types.Operator):
     #     return {'FINISHED'}
 
     def execute(self, context):
+
         if self.collection_name != "":
-            rand_variant = Previewer.get_random_from_collection(bpy.data.collections[self.collection_name])
-            if self.collection_name == "AUpperTorso":
-                bpy.context.scene.my_tool.inputUpperTorso = rand_variant
-            elif self.collection_name == "ILowerTorso":
-                bpy.context.scene.my_tool.inputLowerTorso = rand_variant
-            elif self.collection_name == "HHands":
-                bpy.context.scene.my_tool.inputHands = rand_variant
-            elif self.collection_name == "JCalf":
-                bpy.context.scene.my_tool.inputCalf = rand_variant
-            elif self.collection_name == "KAnkle":
-                bpy.context.scene.my_tool.inputAnkle = rand_variant
-            elif self.collection_name == "LFeet":
-                bpy.context.scene.my_tool.inputFeet = rand_variant
-            elif self.collection_name == "MNeck":
-                bpy.context.scene.my_tool.inputNeck = rand_variant
+            if self.collection_name in bpy.context.scene.my_tool:
+                
+                # Blend_My_NFTs_Output = os.path.join(bpy.path.abspath(bpy.context.scene.my_tool.save_path), "Blend_My_NFTs Output", "NFT_Data")
+                # NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+                # DataDictionary = json.load(open(NFTRecord_save_path))
+                # hierarchy = DataDictionary["hierarchy"]
+                # DNAList = DataDictionary["DNAList"]
+                # variant_index = Outfit_Generator.PickWeightedDNAStrand(hierarchy.get(slot))
+                rand_variant = Previewer.get_random_from_collection(bpy.data.collections[Slots[self.collection_name][0]])
+                Previewer.collections_have_updated(Slots[self.collection_name][0], Slots)
+                bpy.context.scene.my_tool[str(self.collection_name)] = rand_variant
         return {'FINISHED'}
 
 class randomizeColor(bpy.types.Operator):
@@ -276,6 +323,16 @@ class randomizeColor(bpy.types.Operator):
         
         return {'FINISHED'}
 
+class saveNFT(bpy.types.Operator):
+    bl_idname = 'save.nft'
+    bl_label = 'Save Character'
+    bl_options = {"REGISTER", "UNDO"}
+
+
+    def execute(self, context):
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        DNASet = set(context.scene.my_tool.inputDNA)
+        SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
 
 # # Main Operators:
 # class createData(bpy.types.Operator):
@@ -370,14 +427,6 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
 
-    Slots = (("inputUpperTorso", "AUpperTorso", "Upper Torso Slot"), 
-        ("inputLowerTorso", "ILowerTorso", "Lower Torso Slot"),
-        ("inputHands", "HHands", "Hands Slot"),
-        ("inputCalf", "JCalf", "Calf Slot"),
-        ("inputAnkle", "KAnkle", "Ankle Slot"),
-        ("inputFeet", "LFeet", "Feet Slot"),
-        ("inputNeck", "MNeck", "Neck Slot"),)
-
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -397,15 +446,17 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
 
         row = layout.row()
+        self.layout.operator(saveNFT.bl_idname, text=saveNFT.bl_label)
+
+        row = layout.row()
         row.label(text='')
 
-        for name in self.Slots:
-            layout.row().label(text=name[2])
+        for name in Slots:
+            layout.row().label(text=Slots[name][1])
             row = layout.row()
-            row.prop(mytool, name[0], text="")
-            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name[1]
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
-
 
 # # Create Data Panel:
 # class BMNFTS_PT_CreateData(bpy.types.Panel):
@@ -593,7 +644,7 @@ classes = (
     # refactor_Batches,
     randomizePreview,
     previewNFT,
-
+    saveNFT,
     # UIList 1:
 
     # UIList.CUSTOM_OT_actions,
