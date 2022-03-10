@@ -21,16 +21,28 @@ ShoesMiddleSlots = ["KAnkle", "LFeet"]
 # A dictionary which can be called to find what slots to fill when using certian items
 ItemUsedBodySlot = {"Coats": CoatSlots, "Pants": PantsSlots, "ShoesHigh" : ShoesHighSlots, "ShoesMiddle" : ShoesMiddleSlots}
 
-def RandomizeFullCharacter(hierarchy, maxNFTs):
+def RandomizeFullCharacter(maxNFTs, save_path):
+
+    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
+    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+
+    DataDictionary = json.load(open(NFTRecord_save_path))
+
+    hierarchy = DataDictionary["hierarchy"]
+    DNAList = DataDictionary["DNAList"]
+
+    exsistingDNASet = set(DNAList)
     DNASet = set()
-    numberToGen = maxNFTs
+    numberToGen = int(maxNFTs)
 
     allowFailedAttempts = 50
     currentFailedAttempts = 0
     while numberToGen > 0: 
+        # for a in hierarchy:
+        #     for b in list(hierarchy.get(a)):
+        #         bpy.data.collections.get(b).hide_viewport = True
 
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
-        print(SingleDNA)
 
         #Create a dictionary based on current top level collections in scene that should relate to slots. Set them to be populated false
         BodySlotKeys = list(hierarchy)
@@ -58,10 +70,10 @@ def RandomizeFullCharacter(hierarchy, maxNFTs):
                         SlotUpdateValue = {i : True}
                         BodySlotsDict.update(SlotUpdateValue)
     
-                bpy.data.collections.get(ItemChoosen).hide_viewport = False
+                #bpy.data.collections.get(ItemChoosen).hide_viewport = False
 
         formattedDNA = '-'.join(SingleDNA)
-        if formattedDNA not in DNASet:
+        if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
             DNASet.add(formattedDNA)
             numberToGen -= 1
@@ -70,30 +82,32 @@ def RandomizeFullCharacter(hierarchy, maxNFTs):
             currentFailedAttempts += 1
             if currentFailedAttempts > allowFailedAttempts:
                 break
+    
+    
+    def RandomizeSingleDNAStrand(slot, hierarchy):
+        BodySlotChildren = list(hierarchy.get(slot))
+        ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
+        ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
+                        
+        #Get item metadata from object 
+        ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
+        ItemIndex = ItemMetaData["number"]
+        SingleDNA[list(hierarchy.keys()).index(slot)] = ItemIndex
+        ItemClothingGenre = ItemMetaData["clothingGenre"]
+                        
+        #loop through all slots that selected item will take up
+        UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+        if UsedUpSlotArray:
+            for i in ItemUsedBodySlot.get(ItemClothingGenre):
+                SlotUpdateValue = {i : True}
+                #BodySlotsDict.update(SlotUpdateValue)
+            
+        bpy.data.collections.get(ItemChoosen).hide_viewport = False
             
     print(DNASet)
     return list(DNASet)
+    
 
-
-def RandomizeSingleDNAStrand(slot, hierarchy):
-    BodySlotChildren = list(hierarchy.get(slot))
-    ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
-    ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
-                    
-    #Get item metadata from object 
-    ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
-    ItemIndex = ItemMetaData["number"]
-    #SingleDNA.append(str(ItemIndex))
-    ItemClothingGenre = ItemMetaData["clothingGenre"]
-                    
-    #loop through all slots that selected item will take up
-    UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-    if UsedUpSlotArray:
-        for i in ItemUsedBodySlot.get(ItemClothingGenre):
-            SlotUpdateValue = {i : True}
-            #BodySlotsDict.update(SlotUpdateValue)
-        
-    bpy.data.collections.get(ItemChoosen).hide_viewport = False
 
 
 def PickWeightedDNAStrand(BodySlotChildren):

@@ -295,7 +295,7 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
    DataDictionary = {}
    listOptionVariant = []
    DNAList = []
-
+   '''
    if not enableRarity:
       DNASet = set()
 
@@ -346,7 +346,7 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
             f"Only {len(DNAList)} NFT DNA were generated."
             f"Either A) Lower the number of NFTs you wish to create, or B) Increase the maximum number of possible NFTs by"
             f" creating more variants and attributes in your .blend file.{bcolors.RESET}")
-
+   '''
    # Data stored in batchDataDictionary:
    DataDictionary["numNFTsGenerated"] = len(DNAList)
    DataDictionary["hierarchy"] = hierarchy
@@ -354,13 +354,22 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    return DataDictionary, possibleCombinations, DNAList
 
-def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output):
+def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path):
    """
    Creates NFTRecord.json file and sends "batchDataDictionary" to it. NFTRecord.json is a permanent record of all DNA
    you've generated with all attribute variants. If you add new variants or attributes to your .blend file, other scripts
    need to reference this .json file to generate new DNA and make note of the new attributes and variants to prevent
    repeate DNA.
    """
+   batchList = os.listdir(batch_json_save_path)
+
+   if batchList:
+      for i in batchList:
+         batch = os.path.join(batch_json_save_path, i)
+         if os.path.exists(batch):
+            os.remove(
+               os.path.join(batch_json_save_path, i)
+            )
 
    DataDictionary, possibleCombinations, DNAList = generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
 
@@ -375,6 +384,8 @@ def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity,
 
    except:
       print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
+
+   return DataDictionary
 
 
 if __name__ == '__main__':
