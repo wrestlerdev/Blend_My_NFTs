@@ -158,8 +158,6 @@ def update_combinations(dummy1, dummy2):
 bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
 
-hierarchy = dict()
-DNAList = dict()
 batch_json_save_path = ""
 # ------------------------------- Operators ---------------------------------------------
 
@@ -180,15 +178,12 @@ class createNFTRecord(bpy.types.Operator):
         enableRarity = bpy.context.scene.my_tool.enableRarity
         inputDNA = bpy.context.scene.my_tool.inputDNA
 
-        global hierarchy
-        global DNAList
+
         global batch_json_save_path
 
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
         DataDictionary = Previewer.DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
 
-        hierarchy = DataDictionary["hierarchy"]
-        DNAList = DataDictionary["DNAList"]
         return {'FINISHED'}
 
 
@@ -227,7 +222,6 @@ class previewNFT(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         enableRarity = bpy.context.scene.my_tool.enableRarity
         inputDNA = bpy.context.scene.my_tool.inputDNA
-        print(hierarchy)
         if inputDNA == "":
             print("No DNA string")
             DNASet = Previewer.DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)

@@ -38,9 +38,9 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     allowFailedAttempts = 50
     currentFailedAttempts = 0
     while numberToGen > 0: 
-        # for a in hierarchy:
-        #     for b in list(hierarchy.get(a)):
-        #         bpy.data.collections.get(b).hide_viewport = True
+        for a in hierarchy:
+            for b in list(hierarchy.get(a)):
+                bpy.data.collections.get(b).hide_viewport = True
 
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
 
@@ -70,7 +70,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         SlotUpdateValue = {i : True}
                         BodySlotsDict.update(SlotUpdateValue)
     
-                #bpy.data.collections.get(ItemChoosen).hide_viewport = False
+                bpy.data.collections.get(ItemChoosen).hide_viewport = False
 
         formattedDNA = '-'.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
