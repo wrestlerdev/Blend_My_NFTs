@@ -138,6 +138,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    batch_json_save_path: bpy.props.StringProperty(name="Batch Save Patch")
+
+    maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1)
+
     inputDNA: bpy.props.StringProperty(name="DNA")
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
@@ -205,8 +209,6 @@ def update_combinations(dummy1, dummy2):
 
 bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
-
-batch_json_save_path = ""
 DataDictionary = dict()
 # ------------------------------- Operators ---------------------------------------------
 
@@ -227,10 +229,8 @@ class createNFTRecord(bpy.types.Operator):
         enableRarity = bpy.context.scene.my_tool.enableRarity
         inputDNA = bpy.context.scene.my_tool.inputDNA
 
-
-        global batch_json_save_path
-
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+        bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
         DataDictionary = DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
 
         return {'FINISHED'}
@@ -329,7 +329,21 @@ class saveNFT(bpy.types.Operator):
     def execute(self, context):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         DNASet = set(context.scene.my_tool.inputDNA)
+        batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
+
+class createBatch(bpy.types.Operator):
+    bl_idname = 'create.batch'
+    bl_label = "Create Batch"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        DNASet = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, save_path)
+        batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+        SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
+        return {'FINISHED'}
+
 
 # # Main Operators:
 # class createData(bpy.types.Operator):
@@ -431,6 +445,9 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
 
         row = layout.row()
         row.operator(createNFTRecord.bl_idname, text=createNFTRecord.bl_label)
+        row = layout.row()
+        row.prop(mytool, "maxNFTs")
+        row.operator(createBatch.bl_idname, text=createBatch.bl_label)
 
         row = layout.row()
         row.label(text='')
@@ -642,6 +659,7 @@ classes = (
     randomizePreview,
     previewNFT,
     saveNFT,
+    createBatch,
     # UIList 1:
 
     # UIList.CUSTOM_OT_actions,
