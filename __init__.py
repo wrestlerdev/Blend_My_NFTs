@@ -139,9 +139,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     # Custom properties
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Patch")
-
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1)
-
     inputDNA: bpy.props.StringProperty(name="DNA")
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
@@ -178,6 +176,24 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Previewer.collections_have_updated("inputUpperHead",Slots))
     inputBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputBackpack",Slots))
+
+    lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastLWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastRWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastLowerTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHands: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastCalf: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastAnkle: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastFeet: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastNeck: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
 
 def make_directories(save_path):
@@ -344,6 +360,14 @@ class createBatch(bpy.types.Operator):
         SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
         return {'FINISHED'}
 
+class loadNFT(bpy.types.Operator):
+    bl_idname = 'load.nft'
+    bl_label = "Load NFT"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self,context):
+        return {'FINISHED'}
+
 
 # # Main Operators:
 # class createData(bpy.types.Operator):
@@ -431,6 +455,28 @@ class createBatch(bpy.types.Operator):
 # ------------------------------- Panels ----------------------------------------------
 
 #Create Preview Panel
+
+class WCUSTOM_PT_CreateData(bpy.types.Panel):
+    bl_label = "Create NFTs and Data"
+    bl_idname = "WCUSTOM_PT_CreateData"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.operator(createNFTRecord.bl_idname, text=createNFTRecord.bl_label)
+        row = layout.row()
+        row.prop(mytool, "maxNFTs")
+        row.operator(createBatch.bl_idname, text=createBatch.bl_label)
+
+
+
 class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_label = "Preview NFT"
     bl_idname = "WCUSTOM_PT_PreviewNFTs"
@@ -444,15 +490,6 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         mytool = scene.my_tool
 
         row = layout.row()
-        row.operator(createNFTRecord.bl_idname, text=createNFTRecord.bl_label)
-        row = layout.row()
-        row.prop(mytool, "maxNFTs")
-        row.operator(createBatch.bl_idname, text=createBatch.bl_label)
-
-        row = layout.row()
-        row.label(text='')
-
-        row = layout.row()
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
@@ -460,10 +497,24 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
 
         row = layout.row()
-        self.layout.operator(saveNFT.bl_idname, text=saveNFT.bl_label)
+        self.layout.operator(loadNFT.bl_idname, text=loadNFT.bl_label)
 
         row = layout.row()
-        row.label(text='')
+        self.layout.operator(saveNFT.bl_idname, text=saveNFT.bl_label)
+
+       
+
+class WCUSTOM_PT_NFTSlots(bpy.types.Panel):
+    bl_label = "Customize Slots"
+    bl_idname = "WCUSTOM_PT_NFTSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
 
         for name in Slots:
             layout.row().label(text=Slots[name][1])
@@ -639,7 +690,9 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
 classes = (
     BMNFTS_PGT_MyProperties,
     # BMNFTS_PT_CreateData,
+    WCUSTOM_PT_CreateData,
     WCUSTOM_PT_PreviewNFTs,
+    WCUSTOM_PT_NFTSlots,
     # BMNFTS_PT_GenerateNFTs,
     # BMNFTS_PT_Refactor,
     # BMNFTS_PT_Documentation,
@@ -660,6 +713,7 @@ classes = (
     previewNFT,
     saveNFT,
     createBatch,
+    loadNFT,
     # UIList 1:
 
     # UIList.CUSTOM_OT_actions,

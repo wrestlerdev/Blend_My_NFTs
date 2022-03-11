@@ -27,6 +27,8 @@ class bcolors:
    ERROR = '\033[91m'  # RED
    RESET = '\033[0m'  # RESET COLOR
 
+class Last_Pointers(bpy.types.PropertyGroup):
+      lastUpperTorso: bpy.props.PointerProperty(name="", type=bpy.types.Collection)
 
 
 # def show_NFT(DNA, hierarchy):
@@ -125,12 +127,15 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
          DNA = dna_string.split('-') 
          DNA[coll_index - 1] = str(new_dnastrand) # including script ignore
          dna_string = '-'.join(DNA)
-
+         last_key = slots_key.replace("input", "last")
+         bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
          bpy.context.scene.my_tool.inputDNA = dna_string
 
       else:
          print("is not valid || clear")
+         last_key = slots_key.replace("input", "last")
          bpy.context.scene.my_tool[slots_key] = None
+         bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
 
 
 
@@ -147,38 +152,55 @@ def fill_pointers_from_dna(DNA):
 
       coll_name = current_coll.name
       if coll_name == "AUpperTorso":
+            bpy.context.scene.my_tool.lastUpperTorso = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputUpperTorso = current_coll.children[strand_index]
       elif coll_name == "ILowerTorso":
+            bpy.context.scene.my_tool.lastLowerTorso = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputLowerTorso = current_coll.children[strand_index]
       elif coll_name == "HHands":
+            bpy.context.scene.my_tool.lastHands = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputHands = current_coll.children[strand_index]
       elif coll_name == "JCalf":
+            bpy.context.scene.my_tool.lastCalf = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputCalf = current_coll.children[strand_index]
       elif coll_name == "KAnkle":
+            bpy.context.scene.my_tool.lastAnkle = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputAnkle = current_coll.children[strand_index]
       elif coll_name == "LFeet":
+            bpy.context.scene.my_tool.lastFeet = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputFeet = current_coll.children[strand_index]
       elif coll_name == "MNeck":
+            bpy.context.scene.my_tool.lastNeck = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputNeck = current_coll.children[strand_index]
       elif coll_name == "BMiddleTorso":
+            bpy.context.scene.my_tool.lastMiddleTorso = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputMiddleTorso = current_coll.children[strand_index]
       elif coll_name == "CLForeArm":
+            bpy.context.scene.my_tool.lastLForeArm = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputLForeArm = current_coll.children[strand_index]
       elif coll_name == "DLWrist":
+            bpy.context.scene.my_tool.lastLWrist = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputLWrist = current_coll.children[strand_index]
       elif coll_name == "ERForeArm":
+            bpy.context.scene.my_tool.lastRForeArm = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputRForeArm = current_coll.children[strand_index]
       elif coll_name == "FRWrist":
+            bpy.context.scene.my_tool.lastRWrist = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputRWrist = current_coll.children[strand_index]
       elif coll_name == "NLowerHead":
+            bpy.context.scene.my_tool.lastLowerHead = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputLowerHead = current_coll.children[strand_index]
       elif coll_name == "OMiddleHead":
+            bpy.context.scene.my_tool.lastMiddleHead = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputMiddleHead = current_coll.children[strand_index]
       elif coll_name == "PEarings":
+            bpy.context.scene.my_tool.lastEarrings = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputEarrings = current_coll.children[strand_index]
       elif coll_name == "QUpperHead":
+            bpy.context.scene.my_tool.lastUpperHead = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputUpperHead = current_coll.children[strand_index]
       elif coll_name == "RBackPack":
+            bpy.context.scene.my_tool.lastBackpack = current_coll.children[strand_index]
             bpy.context.scene.my_tool.inputBackpack = current_coll.children[strand_index]
 
    return
