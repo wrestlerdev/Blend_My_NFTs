@@ -20,13 +20,13 @@ from bpy.app.handlers import persistent
 import os
 import importlib
 
-
 # Import files from main directory:
 
-importList = ['Batch_Sorter', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'Previewer']
+importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'Previewer']
 
 if bpy in locals():
         importlib.reload(Previewer)
+        importlib.reload(DNA_Generator)
         importlib.reload(Batch_Sorter)
         importlib.reload(Exporter)
         importlib.reload(Batch_Refactorer)
@@ -36,6 +36,7 @@ if bpy in locals():
 else:
     from .main import \
         Previewer, \
+        DNA_Generator, \
         Batch_Sorter, \
         Exporter, \
         Batch_Refactorer, \
@@ -230,7 +231,7 @@ class createNFTRecord(bpy.types.Operator):
         global batch_json_save_path
 
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-        DataDictionary = Previewer.DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
+        DataDictionary = DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
 
         return {'FINISHED'}
 
@@ -252,7 +253,7 @@ class randomizePreview(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         enableRarity = bpy.context.scene.my_tool.enableRarity
         # some randomize dna code here
-        DNA = Previewer.DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
+        DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
         Previewer.fill_pointers_from_dna(DNA[0])
         bpy.context.scene.my_tool.inputDNA = DNA[0]
         return {'FINISHED'}
@@ -265,22 +266,18 @@ class previewNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        nftName = "temp"
         maxNFTs = 1
         nftsPerBatch = 1
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        enableRarity = bpy.context.scene.my_tool.enableRarity
         inputDNA = bpy.context.scene.my_tool.inputDNA
+
         if inputDNA == "":
-            print()
-            DNASet = Previewer.DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
+            DNASet = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
             bpy.context.scene.my_tool.inputDNA = DNASet[0]
             Previewer.fill_pointers_from_dna(DNASet[0])
-            #Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
-            #Previewer.create_preview_nft(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
         else:
             print("generating from DNA")
-            Previewer.show_nft_from_dna(inputDNA, nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+            Previewer.show_nft_from_dna(inputDNA)
         return {"FINISHED"}
 
 
