@@ -142,7 +142,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
         for attribute in attributeskeys:
             if(attributeUsedDict.get(attribute)):
-                SingleDNA[list(hierarchy.keys()).index(attribute)] = "#0#0"
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0"
                 ItemsUsed[attribute] = "Null"
             else:
                 position = attributevalues.index(hierarchy[attribute])
@@ -152,8 +152,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 print(typeChoosen + " " +  varientChoosen)
                 print(typeIndex)
                 print(varientIndex)
-                SingleDNA[list(hierarchy.keys()).index(attribute)] = "#" + str(typeIndex) + "#" + str(varientIndex)
-                ItemsUsed[attribute] = varientChoosen
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
+                VarientDict = {}
+                VarientDict[varientChoosen] = hierarchy[attribute][typeChoosen][varientChoosen]
+                ItemsUsed[attribute] = VarientDict
 
                 print(hierarchy[attribute][typeChoosen][varientChoosen])
                 bpy.data.collections.get(varientChoosen).hide_viewport = False
@@ -167,7 +169,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
            
-        formattedDNA = '-'.join(SingleDNA)
+        formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
             DNASet.add(formattedDNA)
