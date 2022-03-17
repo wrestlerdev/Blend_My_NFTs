@@ -59,9 +59,9 @@ Slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot"),
     "inputNeck": ("MNeck", "Neck Slot"),
     "inputLowerHead": ("NLowerHead", "Lower Head Slot"),
     "inputMiddleHead": ("OMiddleHead", "Mid Head Slot"),
-    "inputEarrings": ("PEarings", "Earrings Slot"),
+    "inputEarings": ("PEarings", "Earrings Slot"),
     "inputUpperHead": ("QUpperHead", "UpperHead Slot"),
-    "inputBackpack": ("RBackPack", "Backpack Slot")}
+    "inputBackPack": ("RBackPack", "Backpack Slot")}
     
 
 # User input Property Group:
@@ -140,7 +140,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Patch")
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1)
-    inputDNA: bpy.props.StringProperty(name="DNA")
+
+    lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
+    inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputUpperTorso",Slots))
@@ -170,12 +172,12 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Previewer.collections_have_updated("inputLowerHead",Slots))
     inputMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputMiddleHead",Slots))
-    inputEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Previewer.collections_have_updated("inputEarrings",Slots))
+    inputEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputEarings",Slots))
     inputUpperHead: bpy.props.PointerProperty(name="t",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputUpperHead",Slots))
-    inputBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Previewer.collections_have_updated("inputBackpack",Slots))
+    inputBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputBackPack",Slots))
 
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -191,9 +193,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastNeck: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
 
 def make_directories(save_path):
@@ -225,7 +227,6 @@ def update_combinations(dummy1, dummy2):
 
 bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
-DataDictionary = dict()
 # ------------------------------- Operators ---------------------------------------------
 
 class createNFTRecord(bpy.types.Operator):
@@ -270,7 +271,8 @@ class randomizePreview(bpy.types.Operator):
         enableRarity = bpy.context.scene.my_tool.enableRarity
         # some randomize dna code here
         DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
-        Previewer.fill_pointers_from_dna(DNA[0])
+        Previewer.fill_pointers_from_dna(DNA[0], Slots)
+        bpy.context.scene.my_tool.lastDNA = DNA[0]
         bpy.context.scene.my_tool.inputDNA = DNA[0]
         return {'FINISHED'}
 
@@ -319,9 +321,14 @@ class randomizeModel(bpy.types.Operator):
                 # hierarchy = DataDictionary["hierarchy"]
                 # DNAList = DataDictionary["DNAList"]
                 # variant_index = Outfit_Generator.PickWeightedDNAStrand(hierarchy.get(slot))
-                rand_variant = Previewer.get_random_from_collection(bpy.data.collections[Slots[self.collection_name][0]])
-                Previewer.collections_have_updated(Slots[self.collection_name][0], Slots)
-                bpy.context.scene.my_tool[str(self.collection_name)] = rand_variant
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                # save_path = bpy.context.scene.my_tool.batch_json_save_path
+                save_path = ''
+                # chosen_outfit, chosen_index = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrand(Slots[self.collection_name][0],inputDNA,save_path)
+
+                # chosen_variant = Previewer.find_in_collection(chosen_outfit, Slots[self.collection_name][0])
+                # bpy.context.scene.my_tool[str(self.collection_name)] = chosen_variant
+                # Previewer.collections_have_updated(self.collection_name, Slots) # update dna and pointerproperty
         return {'FINISHED'}
 
 class randomizeColor(bpy.types.Operator):
@@ -523,6 +530,116 @@ class WCUSTOM_PT_NFTSlots(bpy.types.Panel):
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
 
+
+# class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
+#     bl_label = "All Slots"
+#     bl_idname = "WCUSTOM_PT_ParentSlots"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region
+
+
+class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
+    bl_label = "Torso Slots"
+    bl_idname = "WCUSTOM_PT_TorsoSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+    # bl_parent_id
+
+    slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot"),
+    "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot"),
+    "inputBackPack": ("RBackPack", "Backpack Slot")}
+    # "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),}
+    
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=self.slots[name][1])
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+
+class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
+    bl_label = "Arms Slots"
+    bl_idname = "WCUSTOM_PT_ArmSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    slots = {
+    "inputRForeArm": ("ERForeArm", "Right Forearm Slot"),
+    "inputLForeArm": ("CLForeArm", "Left Forearm Slot"),
+    "inputRWrist": ("FRWrist", "Right Wrist Slot"),
+    "inputLWrist": ("DLWrist", "Left Wrist Slot"),
+    "inputHands": ("HHands", "Hands Slot"),}
+    
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=self.slots[name][1])
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+
+
+class WCUSTOM_PT_LegSlots(bpy.types.Panel):
+    bl_label = "Leg Slots"
+    bl_idname = "WCUSTOM_PT_LegSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    slots = {
+    "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),
+    "inputCalf": ("JCalf", "Calf Slot"),
+    "inputAnkle": ("KAnkle", "Ankle Slot"),
+    "inputFeet": ("LFeet", "Feet Slot"),}
+    
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=self.slots[name][1])
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+
+class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
+    bl_label = "Head Slots"
+    bl_idname = "WCUSTOM_PT_HeadSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    slots = {
+    "inputUpperHead": ("QUpperHead", "UpperHead Slot"),
+    "inputMiddleHead": ("OMiddleHead", "Mid Head Slot"),
+    "inputLowerHead": ("NLowerHead", "Lower Head Slot"),
+    "inputEarings": ("PEarings", "Earrings Slot"),
+    "inputNeck": ("MNeck", "Neck Slot"),}
+    
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=self.slots[name][1])
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
 # # Create Data Panel:
 # class BMNFTS_PT_CreateData(bpy.types.Panel):
 #     bl_label = "Create NFT Data"
@@ -692,7 +809,11 @@ classes = (
     # BMNFTS_PT_CreateData,
     WCUSTOM_PT_CreateData,
     WCUSTOM_PT_PreviewNFTs,
-    WCUSTOM_PT_NFTSlots,
+    # WCUSTOM_PT_NFTSlots,
+    WCUSTOM_PT_HeadSlots,
+    WCUSTOM_PT_TorsoSlots,
+    WCUSTOM_PT_ArmSlots,
+    WCUSTOM_PT_LegSlots,
     # BMNFTS_PT_GenerateNFTs,
     # BMNFTS_PT_Refactor,
     # BMNFTS_PT_Documentation,
@@ -710,7 +831,7 @@ classes = (
     # exportNFTs,
     # refactor_Batches,
     randomizePreview,
-    previewNFT,
+    # previewNFT,
     saveNFT,
     createBatch,
     loadNFT,
