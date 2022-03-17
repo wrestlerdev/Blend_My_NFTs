@@ -362,9 +362,9 @@ class createBatch(bpy.types.Operator):
 
     def execute(self, context):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        DNASet = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, save_path)
+        DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, save_path)
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-        SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
+        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, save_path, batch_json_save_path)
         return {'FINISHED'}
 
 class loadNFT(bpy.types.Operator):

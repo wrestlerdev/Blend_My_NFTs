@@ -13,15 +13,24 @@ from functools import partial
 
 
 # A list for each caterogry of clothing that states what slots it will fil
-CoatSlots = ["AUpperTorso", "BMiddleTorso", "CLForeArm", "ERForeArm", "MNeck"]
-LongShirtSlots = ["AUpperTorso", "BMiddleTorso", "CLForeArm", "ERForeArm"]
-PantsSlots = ["ILowerTorso", "JCalf", "KAnkle"]
-ShoesHighSlots = ["JCalf", "KAnkle", "LFeet"]
-ShoesMiddleSlots = ["KAnkle", "LFeet"]
-ShortPantsSlot = ["ILowerTorso", "JCalf"]
+CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "03-RForeArm", "Neck"]
+LongShirtSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"]
+RSleaveSlots = ["06-RWrist", "07-Hands"]
+PantsSlots = ["LowerTorso", "Calf", "Ankle"]
+ShoesHighSlots = ["Calf", "Ankle", "Feet"]
+ShoesMiddleSlots = ["Ankle", "Feet"]
+ShortPantsSlot = ["LowerTorso", "Calf"]
 
 # A dictionary which can be called to find what slots to fill when using certian items
-ItemUsedBodySlot = {"Coats": CoatSlots, "LongShirts": LongShirtSlots, "Pants": PantsSlots, "ShortPants": ShortPantsSlot, "ShoesHigh" : ShoesHighSlots, "ShoesMiddle" : ShoesMiddleSlots}
+ItemUsedBodySlot = {
+    "Coats": CoatSlots, 
+    "LongShirts": LongShirtSlots, 
+    "RSleave": RSleaveSlots,  
+    "Pants": PantsSlots, 
+    "ShortPants": ShortPantsSlot, 
+    "ShoesHigh" : ShoesHighSlots, 
+    "ShoesMiddle" : ShoesMiddleSlots
+    }
 
 def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
 
@@ -41,7 +50,7 @@ def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
 
     hierarchy = DataDictionary["hierarchy"]
     DNAList = DataDictionary["DNAList"]
-    print(CurrentDNA)
+    #print(CurrentDNA)
 
     
 
@@ -63,12 +72,12 @@ def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
         item = itemArray[index]
 
     #Get DNA strand index we want to modify
-    print( list(hierarchy.keys()).index(slot) )
+    #print( list(hierarchy.keys()).index(slot) )
 
     #Get item that is currently used
     currentChildIndex = int(SingleDNA[list(hierarchy.keys()).index(slot)]) -1
     BodySlotChildren = list(hierarchy.get(slot))
-    print(list(BodySlotChildren)[currentChildIndex])
+    #print(list(BodySlotChildren)[currentChildIndex])
 
     
     # ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
@@ -113,45 +122,56 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
     allowFailedAttempts = 50
     currentFailedAttempts = 0
+
     while numberToGen > 0: 
-        for a in hierarchy:
-            for b in list(hierarchy.get(a)):
-                bpy.data.collections.get(b).hide_viewport = True
 
+        for attribute in hierarchy:
+            for type in hierarchy[attribute]:
+                for varient in hierarchy[attribute][type]:
+                    print(varient)
+                    bpy.data.collections.get(varient).hide_viewport = True
+
+        
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
+        NFTDict = {}
+        ItemsUsed = {}
 
-        #Create a dictionary based on current top level collections in scene that should relate to slots. Set them to be populated false
-        BodySlotKeys = list(hierarchy)
-        BodySlotsDict = dict.fromkeys(BodySlotKeys, False)   
+        attributeskeys = list(hierarchy.keys())
+        attributevalues = list(hierarchy.values())
+        attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
-
-        for slot in BodySlotKeys:
-            if BodySlotsDict.get(slot):
-                SingleDNA[list(hierarchy.keys()).index(slot)] = "1"
+        for attribute in attributeskeys:
+            if(attributeUsedDict.get(attribute)):
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = "#0#0"
+                ItemsUsed[attribute] = "Null"
             else:
-                BodySlotChildren = list(hierarchy.get(slot))
-                ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
-                ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
-                
-                #Get item metadata from object 
-                ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
-                ItemIndex = ItemMetaData["number"]
-                SingleDNA[list(hierarchy.keys()).index(slot)] = ItemIndex
-                ItemClothingGenre = ItemMetaData["clothingGenre"]
+                position = attributevalues.index(hierarchy[attribute])
+                typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
+
+                varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
+                print(typeChoosen + " " +  varientChoosen)
+                print(typeIndex)
+                print(varientIndex)
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = "#" + str(typeIndex) + "#" + str(varientIndex)
+                ItemsUsed[attribute] = varientChoosen
+
+                print(hierarchy[attribute][typeChoosen][varientChoosen])
+                bpy.data.collections.get(varientChoosen).hide_viewport = False
+
+                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
                 
                 #loop through all slots that selected item will take up
                 UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
                 if UsedUpSlotArray:
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
-                        BodySlotsDict.update(SlotUpdateValue)
-    
-                bpy.data.collections.get(ItemChoosen).hide_viewport = False
-
+                        attributeUsedDict.update(SlotUpdateValue)
+           
         formattedDNA = '-'.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
             DNASet.add(formattedDNA)
+            NFTDict[formattedDNA] = ItemsUsed
             numberToGen -= 1
         else:
             print("ALL READY IN SET")
@@ -159,22 +179,19 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             if currentFailedAttempts > allowFailedAttempts:
                 break
             
-    print(DNASet)
-    return list(DNASet)
+    print(NFTDict)
+    return list(DNASet), NFTDict
     
-
-
-
-def PickWeightedDNAStrand(BodySlotChildren):
+def PickWeightedAttributeType(AttributeTypes):
     number_List_Of_i = []
     rarity_List_Of_i = []
     ifZeroBool = None
 
-    for k in BodySlotChildren:
-        number = BodySlotChildren[k]["number"]
-        number_List_Of_i.append(number)
 
-        rarity = BodySlotChildren[k]["rarity"]
+    for attributetype in AttributeTypes:
+        number_List_Of_i.append(attributetype)
+
+        rarity = attributetype.split("_")[1]
         rarity_List_Of_i.append(float(rarity))
 
     for x in rarity_List_Of_i:
@@ -184,11 +201,37 @@ def PickWeightedDNAStrand(BodySlotChildren):
             ifZeroBool = False
 
     if ifZeroBool == True:
-        variantByNum = random.choices(number_List_Of_i, k=1)
+        typeChoosen = random.choices(number_List_Of_i, k=1)
     elif ifZeroBool == False:
-        variantByNum = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
+        typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
     
-    return (int(variantByNum[0]) -1)
+    return typeChoosen[0], list(AttributeTypes.keys()).index(typeChoosen[0])
+
+
+
+def PickWeightedTypeVarient(Varients):
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+    ifZeroBool = None
+    
+    for varient in Varients:
+        number_List_Of_i.append(varient)
+
+        rarity = Varients[varient]["rarity"]
+        rarity_List_Of_i.append(float(rarity))
+
+    for x in rarity_List_Of_i:
+        if x == 0:
+            ifZeroBool = True
+        elif x != 0:
+            ifZeroBool = False
+
+    if ifZeroBool == True:
+        variantChoosen = random.choices(number_List_Of_i, k=1)
+    elif ifZeroBool == False:
+        variantChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
+    
+    return variantChoosen[0], list(Varients.keys()).index(variantChoosen[0])
 
  
 if __name__ == '__main__':

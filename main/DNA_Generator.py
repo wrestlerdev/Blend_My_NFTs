@@ -17,6 +17,10 @@ importlib.reload(Rarity_Sorter)
 from . import Outfit_Generator
 importlib.reload(Outfit_Generator)
 
+from . import NFTHirachy
+importlib.reload(NFTHirachy)
+
+
 enableGeneration = False
 colorList = []
 
@@ -40,7 +44,7 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
    Generates important variables, dictionaries, and lists needed to be stored to catalog the NFTs.
    :return: listAllCollections, attributeCollections, attributeCollections1, hierarchy, variantMetaData, possibleCombinations
    '''
-
+   
    coll = bpy.context.scene.collection
 
    try:
@@ -166,9 +170,6 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
          orderRarity = getOrder_rarity(i)
 
          if len(orderRarity) == 0:
-            print(f"{bcolors.ERROR} \nERROR: {bcolors.RESET}")
-            print(f"The collection {i} doesn't follow the naming conventions of attributes. Please move this \n"
-                  "colleciton to Script_Ignore or review proper collection format in README.md")
             return
 
          elif len(orderRarity) > 0:
@@ -361,6 +362,7 @@ def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity,
    need to reference this .json file to generate new DNA and make note of the new attributes and variants to prevent
    repeate DNA.
    """
+
    batchList = os.listdir(batch_json_save_path)
 
    if batchList:
@@ -371,7 +373,12 @@ def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity,
                os.path.join(batch_json_save_path, i)
             )
 
-   DataDictionary, possibleCombinations, DNAList = generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
+   DataDictionary = {}
+   DataDictionary["numNFTsGenerated"] = 0
+   DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
+   DataDictionary["DNAList"] = []
+
+   #DataDictionary, possibleCombinations, DNAList = generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
 
    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
 
@@ -379,8 +386,6 @@ def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity,
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
       with open(NFTRecord_save_path, 'w') as outfile:
          outfile.write(ledger + '\n')
-      print(f"{bcolors.OK}{len(DNAList)} NFT DNA saved to {NFTRecord_save_path}\n"
-            f"NFT DNA Successfully created. {bcolors.RESET}")
 
    except:
       print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
