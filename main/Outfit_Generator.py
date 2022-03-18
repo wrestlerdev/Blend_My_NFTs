@@ -1,6 +1,7 @@
 # Purpose:
 # This file generates the Outfit DNA based on a rule set
 
+from ctypes import sizeof
 import bpy
 import os
 import re
@@ -13,7 +14,7 @@ from functools import partial
 
 
 # A list for each caterogry of clothing that states what slots it will fil
-CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "03-RForeArm", "Neck"]
+CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "12-Neck"]
 LongShirtSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"]
 RSleaveSlots = ["06-RWrist", "07-Hands"]
 PantsSlots = ["LowerTorso", "Calf", "Ankle"]
@@ -117,6 +118,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     DNAList = DataDictionary["DNAList"]
 
     exsistingDNASet = set(DNAList)
+    NFTDict = {}
     DNASet = set()
     numberToGen = int(maxNFTs)
 
@@ -128,12 +130,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         for attribute in hierarchy:
             for type in hierarchy[attribute]:
                 for varient in hierarchy[attribute][type]:
-                    print(varient)
                     bpy.data.collections.get(varient).hide_viewport = True
 
         
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
-        NFTDict = {}
         ItemsUsed = {}
 
         attributeskeys = list(hierarchy.keys())
@@ -149,15 +149,14 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
 
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
-                print(typeChoosen + " " +  varientChoosen)
-                print(typeIndex)
-                print(varientIndex)
+                # print(typeChoosen + " " +  varientChoosen)
+                # print(typeIndex)
+                # print(varientIndex)
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
                 VarientDict = {}
                 VarientDict[varientChoosen] = hierarchy[attribute][typeChoosen][varientChoosen]
                 ItemsUsed[attribute] = VarientDict
 
-                print(hierarchy[attribute][typeChoosen][varientChoosen])
                 bpy.data.collections.get(varientChoosen).hide_viewport = False
 
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
@@ -172,6 +171,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
+            print(formattedDNA)
             DNASet.add(formattedDNA)
             NFTDict[formattedDNA] = ItemsUsed
             numberToGen -= 1
@@ -180,7 +180,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             currentFailedAttempts += 1
             if currentFailedAttempts > allowFailedAttempts:
                 break
-            
     print(NFTDict)
     return list(DNASet), NFTDict
     

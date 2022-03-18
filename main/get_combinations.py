@@ -138,9 +138,6 @@ def get_combinations_from_scene():
          orderRarity = getOrder_rarity(i)
 
          if len(orderRarity) == 0:
-            print(f"{bcolors.ERROR} \nERROR: {bcolors.RESET}")
-            print(f"The collection {i} doesn't follow the naming conventions of attributes. Please move this \n"
-                  "colleciton to Script_Ignore or review proper collection format in README.md")
             return
 
          elif len(orderRarity) > 0:

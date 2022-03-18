@@ -16,28 +16,17 @@ def SaveNFT(DNASetToAdd, NFTDict, save_path, batch_json_save_path):
     DataDictionary = json.load(open(NFTRecord_save_path))
     i = int(DataDictionary["numNFTsGenerated"])
     hierarchy = DataDictionary["hierarchy"]
-
+    
     for nft in NFTDict:
         singleNFT = {}
         singleNFT["DNAList"] = nft 
-        # index = 0
-
-        # chracterItemDict = {}
-        # for char in nft.split('-'):
-        #     varientArray = hierarchy.get( list(hierarchy)[index])
-
-        #     '''
-        #     Make list of all items character used
-        #     '''
-        #     chracterItemDict[list(hierarchy)[index]] = list(varientArray)[int(char) -1]
-        #     index += 1
-
         singleNFT["CharacterItems"] = NFTDict[nft]
 
         singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
         with open(os.path.join(batch_json_save_path, ("NFTNumber{}.json".format(i + 1))), "w") as outfile:
             outfile.write(singleNFTObject)
         i += 1
+
     UpdateNFTRecord(DNASetToAdd, save_path, DataDictionary, NFTRecord_save_path)
         
 
@@ -53,9 +42,6 @@ def UpdateNFTRecord(DNASetToAdd, save_path, DataDictionary, NFTRecord_save_path)
     for dna in DNASetToAdd:
         currentDNASet.append(dna)
     updatedDataDictionary["DNAList"] = currentDNASet
-
-    print(updatedDataDictionary)
-    print(currentDNASet)
 
     try:
       ledger = json.dumps(updatedDataDictionary, indent=1, ensure_ascii=True)
