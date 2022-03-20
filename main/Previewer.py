@@ -1,6 +1,7 @@
 # Purpose:
 # This file generates NFT DNA based on a .blend file scene structure and exports NFTRecord.json.
 
+import collections
 from venv import create
 from warnings import catch_warnings
 import bpy
@@ -17,7 +18,7 @@ from functools import partial
 enableGeneration = False
 colorList = []
 
-saved_hierarchy = dict()
+saved_hierarchy = collections.OrderedDict()
 
 class bcolors:
    '''
@@ -70,16 +71,32 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
    hierarchy = get_hierarchy()
 
    coll_keys = list(hierarchy.keys())
-   DNAString = DNA.split("-")
+   DNAString = DNA.split(",")
+   for attribute in hierarchy:
+      for type in hierarchy[attribute]:
+            for variant in hierarchy[attribute][type]:
+               print(variant)
+               bpy.data.collections.get(variant).hide_viewport = True
+               bpy.data.collections.get(variant).hide_render = True
    for strand in range(len(DNAString)):
-      current_coll_name = coll_keys[int(strand)]
-      current_coll = bpy.context.scene.collection.children[current_coll_name]
-      for variant in current_coll.children:
-         variant.hide_render = True
-         variant.hide_viewport = True
-      index = int(DNAString[int(strand)]) - 1
-      current_coll.children[index].hide_render = False
-      current_coll.children[index].hide_viewport = False
+
+      atttype_index, variant_index = DNAString[strand].split('-')
+      slot = list(hierarchy.items())[strand]
+
+      atttype = list(slot[1].items())[int(atttype_index)]
+      variant = list(atttype[1].items())[int(variant_index)][0]
+      bpy.data.collections[variant].hide_viewport = False
+      bpy.data.collections[variant].hide_render = False
+      # current_coll = bpy.context.scene.collection.children[slot[0]]
+      # for variant in current_coll.children:
+      #    variant.hide_render = True
+      #    variant.hide_viewport = True
+      # index = int(DNAString[int(strand)]) - 1
+      # current_coll.children[index].hide_render = False
+      # current_coll.children[index].hide_viewport = False
+
+
+      
       
 
 #  ----------------------------------------------------------------------------------
@@ -105,7 +122,6 @@ def find_in_collection(variant_name, collection_name):
 
 
 def set_from_collection(coll, variant_name): # hide all in coll and show given variant based on name
-
    if variant_name in coll.children:
       vname = variant_name.split('_')
       for child in coll.children:
@@ -128,6 +144,7 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
          dna_string = bpy.context.scene.my_tool.inputDNA
          hierarchy = get_hierarchy()
          coll_index = list(hierarchy.keys()).index(coll_name)
+
          DNA = dna_string.split('-') 
          DNA[coll_index] = str(new_dnastrand)
          dna_string = '-'.join(DNA)
@@ -159,21 +176,39 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 
 
 def fill_pointers_from_dna(DNA, Slots):
-   DNAString = DNA.split('-')
+   DNAString = DNA.split(',')
    hierarchy = get_hierarchy()
-   collections = bpy.context.scene.collection.children
-   coll_list = list(hierarchy.keys())
-   for i in range(len(DNAString)):
-      strand_index = int(DNAString[i]) - 1
-      current_coll = collections[coll_list[i]]
 
-      coll_name = current_coll.name
-      coll_name = coll_name[1:int(len(coll_name))]
+   print(DNA)
+   for i in range(len(DNAString)):
+
+      atttype_index, variant_index = DNAString[i].split('-')
+
+      # strand_index = int(DNAString[i]) - 1
+      slot = list(hierarchy.items())[i]
+      atttype = list(slot[1].items())[int(atttype_index)]
+      variant = list(atttype[1].items())[int(variant_index)][0]
+
+      print(variant)
+      print(slot[0])
+      coll_name = slot[0][3:len(slot[0])]
       last_coll_name = "last" + str(coll_name)
       input_coll_name = "input" + str(coll_name)
-      bpy.context.scene.my_tool[last_coll_name] = current_coll.children[strand_index]
-      bpy.context.scene.my_tool[input_coll_name] = current_coll.children[strand_index]
+      print(coll_name)
+      bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
+      bpy.context.scene.my_tool[input_coll_name] = bpy.data.collections[variant]
+
+      # coll_name = current_coll.name
+      # coll_name = coll_name[3:int(len(coll_name))] # CHANGE 3 IF FOLDER NAMES CHANGE
+
+      # last_coll_name = "last" + str(coll_name)
+      # input_coll_name = "input" + str(coll_name)
+      # bpy.context.scene.my_tool[last_coll_name] = current_coll.children[strand_index]
+      # bpy.context.scene.my_tool[input_coll_name] = current_coll.children[strand_index]
    return
+
+
+
 
 def get_hierarchy():
       global saved_hierarchy
@@ -182,12 +217,16 @@ def get_hierarchy():
       else:
             Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
             NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
-            DataDictionary = json.load(open(NFTRecord_save_path))
+            DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
             hierarchy = DataDictionary["hierarchy"]
             DNAList = DataDictionary["DNAList"]
             saved_hierarchy = hierarchy
             return hierarchy
    
+
+def load_in_nft(index):
+
+   return
 
 if __name__ == '__main__':
    print("okay")

@@ -45,23 +45,23 @@ else:
 
     from .ui_Lists import UIList
 
-Slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot"),
-    "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot"),
-    "inputLForeArm": ("CLForeArm", "Left Forearm Slot"),
-    "inputLWrist": ("DLWrist", "Left Wrist Slot"),
-    "inputRForeArm": ("ERForeArm", "Right Forearm Slot"),
-    "inputRWrist": ("FRWrist", "Right Wrist Slot"),
-    "inputHands": ("HHands", "Hands Slot"),
-    "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),
-    "inputCalf": ("JCalf", "Calf Slot"),
-    "inputAnkle": ("KAnkle", "Ankle Slot"),
-    "inputFeet": ("LFeet", "Feet Slot"),
-    "inputNeck": ("MNeck", "Neck Slot"),
-    "inputLowerHead": ("NLowerHead", "Lower Head Slot"),
-    "inputMiddleHead": ("OMiddleHead", "Mid Head Slot"),
-    "inputEarings": ("PEarings", "Earrings Slot"),
-    "inputUpperHead": ("QUpperHead", "UpperHead Slot"),
-    "inputBackPack": ("RBackPack", "Backpack Slot")}
+Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
+    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso Slot"),
+    "inputLForeArm": ("03-LForeArm", "Left Forearm Slot"),
+    "inputLWrist": ("04-LWrist", "Left Wrist Slot"),
+    "inputRForeArm": ("05-RForeArm", "Right Forearm Slot"),
+    "inputRWrist": ("06-RWrist", "Right Wrist Slot"),
+    "inputHands": ("07-Hands", "Hands Slot"),
+    "inputLowerTorso": ("08-LowerTorso", "Lower Torso Slot"),
+    "inputCalf": ("09-Calf", "Calf Slot"),
+    "inputAnkle": ("10-Ankle", "Ankle Slot"),
+    "inputFeet": ("11-Feet", "Feet Slot"),
+    "inputNeck": ("12-Neck", "Neck Slot"),
+    "inputLowerHead": ("13-LowerHead", "Lower Head Slot"),
+    "inputMiddleHead": ("14-MiddleHead", "Mid Head Slot"),
+    "inputEarings": ("15-Earings", "Earrings Slot"),
+    "inputUpperHead": ("16-UpperHead", "UpperHead Slot"),
+    "inputBackPack": ("17-BackPack", "Backpack Slot")}
     
 
 # User input Property Group:
@@ -271,9 +271,9 @@ class randomizePreview(bpy.types.Operator):
         enableRarity = bpy.context.scene.my_tool.enableRarity
         # some randomize dna code here
         DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
-        Previewer.fill_pointers_from_dna(DNA[0], Slots)
-        bpy.context.scene.my_tool.lastDNA = DNA[0]
-        bpy.context.scene.my_tool.inputDNA = DNA[0]
+        Previewer.fill_pointers_from_dna(DNA[0][0], Slots)
+        bpy.context.scene.my_tool.lastDNA = DNA[0][0]
+        bpy.context.scene.my_tool.inputDNA = DNA[0][0]
         return {'FINISHED'}
 
 
@@ -531,11 +531,15 @@ class WCUSTOM_PT_NFTSlots(bpy.types.Panel):
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
 
 
-# class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
-#     bl_label = "All Slots"
-#     bl_idname = "WCUSTOM_PT_ParentSlots"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region
+class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
+    bl_label = "All Slots"
+    bl_idname = "WCUSTOM_PT_ParentSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    def draw(self, context):
+        return {'FINISHED'}
 
 
 class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
@@ -544,7 +548,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
-    # bl_parent_id
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot"),
     "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot"),
@@ -569,6 +573,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
     "inputRForeArm": ("ERForeArm", "Right Forearm Slot"),
@@ -596,6 +601,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
     "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),
@@ -621,6 +627,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
     "inputUpperHead": ("QUpperHead", "UpperHead Slot"),
@@ -810,6 +817,7 @@ classes = (
     WCUSTOM_PT_CreateData,
     WCUSTOM_PT_PreviewNFTs,
     # WCUSTOM_PT_NFTSlots,
+    WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
