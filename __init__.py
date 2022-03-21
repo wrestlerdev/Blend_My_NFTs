@@ -60,7 +60,7 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
     "inputLowerHead": ("13-LowerHead", "Lower Head Slot"),
     "inputMiddleHead": ("14-MiddleHead", "Mid Head Slot"),
     "inputEarings": ("15-Earings", "Earrings Slot"),
-    "inputUpperHead": ("16-UpperHead", "UpperHead Slot"),
+    "inputUpperHead": ("16-UpperHead", "Upper Head Slot"),
     "inputBackPack": ("17-BackPack", "Backpack Slot")}
     
 
@@ -324,7 +324,7 @@ class randomizeModel(bpy.types.Operator):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 # save_path = bpy.context.scene.my_tool.batch_json_save_path
                 save_path = ''
-                # chosen_outfit, chosen_index = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrand(Slots[self.collection_name][0],inputDNA,save_path)
+                # chosen_outfit, chosen_index = DNA_Generator.Outfit_G enerator.RandomizeSingleDNAStrand(Slots[self.collection_name][0],inputDNA,save_path)
 
                 # chosen_variant = Previewer.find_in_collection(chosen_outfit, Slots[self.collection_name][0])
                 # bpy.context.scene.my_tool[str(self.collection_name)] = chosen_variant
@@ -539,7 +539,7 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
     bl_category = 'Blend_My_NFTs'
 
     def draw(self, context):
-        return {'FINISHED'}
+        self.layout.row()
 
 
 class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
@@ -550,9 +550,9 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
     bl_category = 'Blend_My_NFTs'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-    slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot"),
-    "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot"),
-    "inputBackPack": ("RBackPack", "Backpack Slot")}
+    slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot", "MOD_CLOTH"),
+    "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot", "MOD_CLOTH"),
+    "inputBackPack": ("RBackPack", "Backpack Slot", "CON_ARMATURE")}
     # "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),}
     
     def draw(self, context):
@@ -562,7 +562,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1])
+            row.label(text=self.slots[name][1], icon=self.slots[name][2])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -576,11 +576,11 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputRForeArm": ("ERForeArm", "Right Forearm Slot"),
-    "inputLForeArm": ("CLForeArm", "Left Forearm Slot"),
-    "inputRWrist": ("FRWrist", "Right Wrist Slot"),
-    "inputLWrist": ("DLWrist", "Left Wrist Slot"),
-    "inputHands": ("HHands", "Hands Slot"),}
+    "inputRForeArm": ("ERForeArm", "Right Forearm Slot", "LOOP_FORWARDS"),
+    "inputLForeArm": ("CLForeArm", "Left Forearm Slot", "LOOP_BACK"),
+    "inputRWrist": ("FRWrist", "Right Wrist Slot", "FORWARD"),
+    "inputLWrist": ("DLWrist", "Left Wrist Slot", "BACK"),
+    "inputHands": ("HHands", "Hands Slot", "VIEW_PAN"),}
     
     def draw(self, context):
         layout = self.layout
@@ -589,7 +589,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1])
+            row.label(text=self.slots[name][1], icon=self.slots[name][2])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -604,10 +604,10 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),
-    "inputCalf": ("JCalf", "Calf Slot"),
-    "inputAnkle": ("KAnkle", "Ankle Slot"),
-    "inputFeet": ("LFeet", "Feet Slot"),}
+    "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot", "OUTLINER_OB_ARMATURE"),
+    "inputCalf": ("JCalf", "Calf Slot", "LINCURVE"),
+    "inputAnkle": ("KAnkle", "Ankle Slot", "LINCURVE"),
+    "inputFeet": ("LFeet", "Feet Slot", "MOD_DYNAMICPAINT"),}
     
     def draw(self, context):
         layout = self.layout
@@ -616,7 +616,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1])
+            row.label(text=self.slots[name][1], icon=self.slots[name][2])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -630,11 +630,11 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputUpperHead": ("QUpperHead", "UpperHead Slot"),
-    "inputMiddleHead": ("OMiddleHead", "Mid Head Slot"),
-    "inputLowerHead": ("NLowerHead", "Lower Head Slot"),
-    "inputEarings": ("PEarings", "Earrings Slot"),
-    "inputNeck": ("MNeck", "Neck Slot"),}
+    "inputUpperHead": ("QUpperHead", "Upper Head Slot", "MESH_CONE"),
+    "inputMiddleHead": ("OMiddleHead", "Mid Head Slot", "HIDE_OFF"),
+    "inputLowerHead": ("NLowerHead", "Lower Head Slot", "USER"),
+    "inputEarings": ("PEarings", "Earrings Slot", "PMARKER_ACT"),
+    "inputNeck": ("MNeck", "Neck Slot", "NODE_INSERT_OFF"),}
     
     def draw(self, context):
         layout = self.layout
@@ -643,7 +643,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1])
+            row.label(text=self.slots[name][1], icon=self.slots[name][2])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -839,7 +839,7 @@ classes = (
     # exportNFTs,
     # refactor_Batches,
     randomizePreview,
-    # previewNFT,
+    previewNFT,
     saveNFT,
     createBatch,
     loadNFT,

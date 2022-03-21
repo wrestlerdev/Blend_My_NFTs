@@ -121,17 +121,30 @@ def find_in_collection(variant_name, collection_name):
       return collection.children[variant_name]
 
 
-def set_from_collection(coll, variant_name): # hide all in coll and show given variant based on name
-   if variant_name in coll.children:
-      vname = variant_name.split('_')
-      for child in coll.children:
-         child.hide_render = True
-         child.hide_viewport = True
-      coll.children[variant_name].hide_render = False
-      coll.children[variant_name].hide_viewport = False
-      # return coll.children.index(variant_name) + 1
-      return int(vname[3])
-   return -1
+def set_from_collection(slot_coll, variant_name): # hide all in coll and show given variant based on name
+   new_dna_strand = ''
+   type_index = 0
+   for type_coll in slot_coll.children:
+      if variant_name in type_coll.children:
+         type_list = list(type_coll.children)
+         variant_index = type_list.index(bpy.data.collections[variant_name])
+
+         new_dna_strand = (str(type_index) + '-' + str(variant_index))
+      else:
+         type_index += 1
+   
+   if new_dna_strand != '':
+      for type_coll in slot_coll.children:
+         for variant_coll in type_coll.children: # hide all
+            variant_coll.hide_render = True
+            variant_coll.hide_viewport = True
+      bpy.data.collections[variant_name].hide_render = False
+      bpy.data.collections[variant_name].hide_viewport = False
+
+
+   return new_dna_strand # return dna strand or empty string if not valid
+
+
 
 
 
@@ -140,14 +153,15 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
       coll_name, label = Slots[slots_key]
 
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
-      if new_dnastrand >= 0 and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
+      if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
          dna_string = bpy.context.scene.my_tool.inputDNA
          hierarchy = get_hierarchy()
          coll_index = list(hierarchy.keys()).index(coll_name)
 
-         DNA = dna_string.split('-') 
+         DNA = dna_string.split(',') 
          DNA[coll_index] = str(new_dnastrand)
-         dna_string = '-'.join(DNA)
+         dna_string = ','.join(DNA)
+
          last_key = slots_key.replace("input", "last")
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
          bpy.context.scene.my_tool.lastDNA = dna_string
