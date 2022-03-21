@@ -233,6 +233,9 @@ def update_combinations(dummy1, dummy2):
 
 bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
+
+
+
 # ------------------------------- Operators ---------------------------------------------
 
 class createNFTRecord(bpy.types.Operator):
@@ -432,85 +435,8 @@ class loadPrevNFT(bpy.types.Operator):
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
         return {'FINISHED'}
 
-# # Main Operators:
-# class createData(bpy.types.Operator):
-#     bl_idname = 'create.data'
-#     bl_label = 'Create Data'
-#     bl_description = 'Creates NFT Data. Run after any changes were made to scene.'
-#     bl_options = {"REGISTER", "UNDO"}
-
-#     def execute(self, context):
-
-#         nftName = bpy.context.scene.my_tool.nftName
-#         maxNFTs = bpy.context.scene.my_tool.collectionSize
-#         nftsPerBatch = bpy.context.scene.my_tool.nftsPerBatch
-#         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-#         enableRarity = bpy.context.scene.my_tool.enableRarity
-
-#         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-
-#         Previewer.DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output)
-#         Batch_Sorter.makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path)
-#         return {"FINISHED"}
-
-# class exportNFTs(bpy.types.Operator):
-#     bl_idname = 'exporter.nfts'
-#     bl_label = 'Export NFTs'
-#     bl_description = 'Generate and export a given batch of NFTs.'
-#     bl_options = {"REGISTER", "UNDO"}
-
-#     def execute(self, context):
-#         nftName = bpy.context.scene.my_tool.nftName
-#         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-#         batchToGenerate = bpy.context.scene.my_tool.batchToGenerate
-#         maxNFTs = bpy.context.scene.my_tool.collectionSize
-
-#         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-
-#         enableImages = bpy.context.scene.my_tool.imageBool
-#         imageFileFormat = bpy.context.scene.my_tool.imageEnum
-
-#         enableAnimations = bpy.context.scene.my_tool.animationBool
-#         animationFileFormat = bpy.context.scene.my_tool.animationEnum
-
-#         enableModelsBlender = bpy.context.scene.my_tool.modelBool
-#         modelFileFormat = bpy.context.scene.my_tool.modelEnum
 
 
-#         Exporter.render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path, nftBatch_save_path, enableImages,
-#                                       imageFileFormat, enableAnimations, animationFileFormat, enableModelsBlender,
-#                                       modelFileFormat
-#                                       )
-#         return {"FINISHED"}
-
-# class refactor_Batches(bpy.types.Operator):
-#     """Refactor your Batches? This action cannot be undone."""
-#     bl_idname = 'refactor.batches'
-#     bl_label = 'Refactor your Batches?'
-#     bl_description = 'This action cannot be undone.'
-#     bl_options = {'REGISTER', 'INTERNAL'}
-
-#     @classmethod
-#     def poll(cls, context):
-#         return True
-
-#     def execute(self, context):
-#         self.report({'INFO'}, "Batches Refactored, MetaData created!")
-
-#         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-
-#         cardanoMetaDataBool = bpy.context.scene.my_tool.cardanoMetaDataBool
-#         solanaMetaDataBool = bpy.context.scene.my_tool.solanaMetaDataBool
-#         erc721MetaData = bpy.context.scene.my_tool.erc721MetaData
-
-#         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-
-#         Batch_Refactorer.reformatNFTCollection(save_path, Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path,
-#                                                cardanoMetaDataBool, solanaMetaDataBool, erc721MetaData)
-#         return {"FINISHED"}
-
-#     def invoke(self, context, event):
-#         return context.window_manager.invoke_confirm(self, event)
 
 
 
@@ -729,99 +655,6 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
 
 
 
-# # Create Data Panel:
-# class BMNFTS_PT_CreateData(bpy.types.Panel):
-#     bl_label = "Create NFT Data"
-#     bl_idname = "BMNFTS_PT_CreateData"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-
-#         layout.label(text=f"Maximum Number Of NFTs: {combinations}")
-
-#         row = layout.row()
-#         layout.label(text="")
-
-#         row = layout.row()
-#         row.prop(mytool, "nftName")
-
-#         row = layout.row()
-#         row.prop(mytool, "collectionSize")
-
-#         row = layout.row()
-#         row.prop(mytool, "nftsPerBatch")
-
-#         row = layout.row()
-#         row.prop(mytool, "save_path")
-
-#         row = layout.row()
-#         row.prop(mytool, "enableRarity")
-
-#         row = layout.row()
-#         self.layout.operator("create.data", icon='DISCLOSURE_TRI_RIGHT', text="Create Data")
-
-
-
-# # Generate NFTs Panel:
-# class BMNFTS_PT_GenerateNFTs(bpy.types.Panel):
-#     bl_label = "Generate NFTs"
-#     bl_idname = "BMNFTS_PT_GenerateNFTs"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-
-#         row = layout.row()
-#         row.prop(mytool, "imageBool")
-#         if  bpy.context.scene.my_tool.imageBool == True:
-#             row.prop(mytool, "imageEnum")
-
-#         row = layout.row()
-#         row.prop(mytool, "animationBool")
-#         if  bpy.context.scene.my_tool.animationBool == True:
-#             row.prop(mytool, "animationEnum")
-
-#         row = layout.row()
-#         row.prop(mytool, "modelBool")
-#         if  bpy.context.scene.my_tool.modelBool == True:
-#             row.prop(mytool, "modelEnum")
-
-#         row = layout.row()
-#         row.prop(mytool, "batchToGenerate")
-
-#         row = layout.row()
-#         self.layout.operator("exporter.nfts", icon='RENDER_RESULT', text="Generate NFTs")
-
-# # Refactor Batches & create MetaData Panel:
-# class BMNFTS_PT_Refactor(bpy.types.Panel):
-#     bl_label = "Refactor Batches & create MetaData"
-#     bl_idname = "BMNFTS_PT_Refactor"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-
-#         row = layout.row()
-#         layout.label(text="Meta Data format:")
-
-#         row = layout.row()
-#         row.prop(mytool, "cardanoMetaDataBool")
-#         row.prop(mytool, "solanaMetaDataBool")
-#         row.prop(mytool, "erc721MetaData")
-#         self.layout.operator("refactor.batches", icon='FOLDER_REDIRECT', text="Refactor Batches & create MetaData")
 
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
@@ -840,75 +673,27 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
 #         row.operator("wm.url_open", text="Documentation",
 #                      icon='URL').url = "https://github.com/torrinworx/Blend_My_NFTs"
 
-#
-# # Materials Panel:
-#
-# class BMNFTS_PT_MATERIALS_Panel(bpy.types.Panel):
-#     bl_label = "Materials"
-#     bl_idname = "BMNFTS_PT_MATERIALS_Panel"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-#
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#
-# # API Panel:
-# class BMNFTS_PT_API_Panel(bpy.types.Panel):
-#     bl_label = "API"
-#     bl_idname = "BMNFTS_PT_API_Panel"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-#
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#
-#         row = layout.row()
-#         row.prop(mytool, "apiKey")
 
 
-# def redraw_panel():
-#     try:
-#         bpy.utils.unregister_class(BMNFTS_PT_CreateData)
-#     except:
-#         pass
-#     bpy.utils.register_class(BMNFTS_PT_CreateData)
 
-
-# Register and Unregister classes from Blender:
 classes = (
     BMNFTS_PGT_MyProperties,
-    # BMNFTS_PT_CreateData,
     WCUSTOM_PT_CreateData,
     WCUSTOM_PT_PreviewNFTs,
-    # WCUSTOM_PT_NFTSlots,
     WCUSTOM_PT_LoadFromFile,
     WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
     WCUSTOM_PT_LegSlots,
-    # BMNFTS_PT_GenerateNFTs,
-    # BMNFTS_PT_Refactor,
     # BMNFTS_PT_Documentation,
 
 
     # Other panels:
 
-    # BMNFTS_PT_LOGIC_Panel,
-    # BMNFTS_PT_MATERIALS_Panel,
-    # BMNFTS_PT_API_Panel,
     randomizeModel,
     randomizeColor,
     createNFTRecord,
-    # createData,
-    # exportNFTs,
-    # refactor_Batches,
     randomizePreview,
     previewNFT,
     saveNFT,
@@ -916,6 +701,8 @@ classes = (
     loadNFT,
     loadPrevNFT,
     loadNextNFT,
+
+    
     # UIList 1:
 
     # UIList.CUSTOM_OT_actions,
