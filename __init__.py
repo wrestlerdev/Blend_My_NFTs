@@ -840,18 +840,6 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
 #         row.operator("wm.url_open", text="Documentation",
 #                      icon='URL').url = "https://github.com/torrinworx/Blend_My_NFTs"
 
-# # Logic Panel:
-# class BMNFTS_PT_LOGIC_Panel(bpy.types.Panel):
-#     bl_label = "Logic"
-#     bl_idname = "BMNFTS_PT_LOGIC_Panel"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-#
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
 #
 # # Materials Panel:
 #
