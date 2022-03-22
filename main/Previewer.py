@@ -68,7 +68,7 @@ class bcolors:
 
 
 def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to hide/show DNA
-   hierarchy = get_hierarchy()
+   hierarchy = get_hierarchy_ordered()
 
    coll_keys = list(hierarchy.keys())
    DNAString = DNA.split(",")
@@ -155,7 +155,7 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
       if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
          dna_string = bpy.context.scene.my_tool.inputDNA
-         hierarchy = get_hierarchy()
+         hierarchy = get_hierarchy_ordered()
          coll_index = list(hierarchy.keys()).index(coll_name)
 
          DNA = dna_string.split(',') 
@@ -187,19 +187,52 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
    return
 
 
+def create_item_dict(DNA):
+   ohierarchy = get_hierarchy_ordered()
+   coll_keys = list(ohierarchy.keys())
+   
+   uhierarchy = get_hierarchy_unordered()
+   
+   DNAString = DNA.split(",")
+
+   item_dict = {}
+
+   for strand in range(len(DNAString)):
+      if DNAString[strand] == '0-0':
+         item_dict[coll_keys[strand]] = "Null"
+      else:
+         atttype_index, variant_index = DNAString[strand].split('-')
+         slot = list(ohierarchy.items())[strand]
+
+         atttype = list(slot[1].items())[int(atttype_index)]
+         variant = list(atttype[1].items())[int(variant_index)][0]
+         
+         variant_dict = {}
+         coll_index = coll_keys[strand]
+         # print("*****************************-----------------")
+         # print(atttype[0])
+         # print("*****************************")
+         # print(variant)
+         # print("*****************************-------------------")
+         variant_dict[variant] = uhierarchy[coll_index][atttype[0]][variant]
+
+         item_dict[coll_keys[strand]] = variant_dict
+   nft_dict = {}
+   nft_dict[DNA] = item_dict
+   return nft_dict
+
 
 
 def fill_pointers_from_dna(DNA, Slots):
    DNAString = DNA.split(',')
-   hierarchy = get_hierarchy()
-
+   ohierarchy = get_hierarchy_ordered()
    print(DNA)
    for i in range(len(DNAString)):
 
       atttype_index, variant_index = DNAString[i].split('-')
 
       # strand_index = int(DNAString[i]) - 1
-      slot = list(hierarchy.items())[i]
+      slot = list(ohierarchy.items())[i]
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
 
@@ -224,7 +257,7 @@ def fill_pointers_from_dna(DNA, Slots):
 
 
 
-def get_hierarchy():
+def get_hierarchy_ordered():
       global saved_hierarchy
       if(saved_hierarchy):
             return saved_hierarchy
@@ -238,9 +271,15 @@ def get_hierarchy():
             return hierarchy
    
 
-def load_in_nft(index):
+def get_hierarchy_unordered():
+      Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
+      NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+      DataDictionary = json.load(open(NFTRecord_save_path))
+      hierarchy = DataDictionary["hierarchy"]
 
-   return
+      return hierarchy
+
+
 
 if __name__ == '__main__':
    print("okay")

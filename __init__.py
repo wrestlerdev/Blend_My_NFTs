@@ -137,14 +137,14 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
 
-
     # Custom properties
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Patch")
-    maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1)
+    maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
 
     loadNFTIndex: bpy.props.IntProperty(name="Number to Load:", min=1, max=9999, default=1)
-    totalGenerated: bpy.props.IntProperty(name="", min=0, max=9999, default=0)
+    numGenerated = LoadNFT.get_total_DNA()
+    totalGenerated: bpy.props.IntProperty(name="", min=0, max=9999, default=numGenerated)
 
 
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
@@ -259,7 +259,13 @@ class createNFTRecord(bpy.types.Operator):
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
         DataDictionary = DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
 
+        bpy.context.scene.my_tool.totalGenerated = 0
+        bpy.context.scene.my_tool.loadNFTIndex = 1
         return {'FINISHED'}
+
+
+
+#-------------------------
 
 
 class randomizePreview(bpy.types.Operator):
@@ -300,12 +306,18 @@ class previewNFT(bpy.types.Operator):
 
         if inputDNA == "":
             DNASet = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
+            bpy.context.scene.my_tool.lastDNA = DNASet[0]
             bpy.context.scene.my_tool.inputDNA = DNASet[0]
             Previewer.fill_pointers_from_dna(DNASet[0])
         else:
             print("generating from DNA")
             Previewer.show_nft_from_dna(inputDNA)
         return {"FINISHED"}
+
+
+
+#-------------------------
+
 
 
 class randomizeModel(bpy.types.Operator):
@@ -354,6 +366,12 @@ class randomizeColor(bpy.types.Operator):
         return {'FINISHED'}
 
 
+
+
+#-------------------------
+
+
+
 class saveNFT(bpy.types.Operator):
     bl_idname = 'save.nft'
     bl_label = 'Save Character'
@@ -362,9 +380,18 @@ class saveNFT(bpy.types.Operator):
 
     def execute(self, context):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        DNASet = set(context.scene.my_tool.inputDNA)
+        DNASet = {str(context.scene.my_tool.inputDNA)}
+        print(DNASet)
+        print("gm")
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-        SaveNFTsToRecord.SaveNFT(DNASet, save_path, batch_json_save_path)
+        NFTDict = Previewer.create_item_dict(context.scene.my_tool.inputDNA)
+        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, save_path, batch_json_save_path)
+
+        numGenerated = LoadNFT.get_total_DNA()
+        bpy.context.scene.my_tool.totalGenerated = numGenerated
+        bpy.context.scene.my_tool.loadNFTIndex = numGenerated    
+        return {'FINISHED'}
+
 
 
 class createBatch(bpy.types.Operator):
@@ -380,7 +407,19 @@ class createBatch(bpy.types.Operator):
 
         numGenerated = LoadNFT.get_total_DNA()
         bpy.context.scene.my_tool.totalGenerated = numGenerated
+        bpy.context.scene.my_tool.loadNFTIndex = numGenerated
+        DNA = DNASet[len(DNASet) - 1] # show last DNA created
+
+        Previewer.show_nft_from_dna(DNA)
+        bpy.context.scene.my_tool.lastDNA = DNA
+        bpy.context.scene.my_tool.inputDNA = DNA
+        Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
+
+
+
+#-------------------------
+
 
 
 class loadNFT(bpy.types.Operator):
@@ -393,8 +432,12 @@ class loadNFT(bpy.types.Operator):
         TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
         print(DNA)
 
-        if DNA != '':
+        if bpy.context.scene.my_tool.totalGenerated > 0 and DNA != '':
             Previewer.show_nft_from_dna(DNA)
+            bpy.context.scene.my_tool.lastDNA = DNA
+            bpy.context.scene.my_tool.inputDNA = DNA
+            Previewer.fill_pointers_from_dna(DNA, Slots)
+
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
 
@@ -406,16 +449,16 @@ class loadNextNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
-        if bpy.context.scene.my_tool.loadNFTIndex < bpy.context.scene.my_tool.totalGenerated:
+        if bpy.context.scene.my_tool.totalGenerated > 0 and bpy.context.scene.my_tool.loadNFTIndex < bpy.context.scene.my_tool.totalGenerated:
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
             TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
             print(DNA)
 
-            if DNA != '':
-                Previewer.show_nft_from_dna(DNA)
-            else:
-                self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
+            Previewer.show_nft_from_dna(DNA)
+            bpy.context.scene.my_tool.lastDNA = DNA
+            bpy.context.scene.my_tool.inputDNA = DNA
+            Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 class loadPrevNFT(bpy.types.Operator):
@@ -424,15 +467,17 @@ class loadPrevNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
-        bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
-        loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-        TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
-        print(DNA)
+        if bpy.context.scene.my_tool.totalGenerated > 0 :
+            bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
+            loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
+            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
+            print(DNA)
 
-        if DNA != '':
             Previewer.show_nft_from_dna(DNA)
-        else:
-            self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
+            bpy.context.scene.my_tool.lastDNA = DNA
+            bpy.context.scene.my_tool.inputDNA = DNA
+            Previewer.fill_pointers_from_dna(DNA, Slots)
+
         return {'FINISHED'}
 
 
@@ -482,8 +527,8 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
-        row = layout.row()
-        self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
+        # row = layout.row()
+        # self.layout.operator(previewNFT.bl_idname, text=previewNFT.bl_label)
 
         row = layout.row()
         self.layout.operator(saveNFT.bl_idname, text=saveNFT.bl_label)
@@ -679,8 +724,8 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
 classes = (
     BMNFTS_PGT_MyProperties,
     WCUSTOM_PT_CreateData,
-    WCUSTOM_PT_PreviewNFTs,
     WCUSTOM_PT_LoadFromFile,
+    WCUSTOM_PT_PreviewNFTs,
     WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
@@ -695,7 +740,7 @@ classes = (
     randomizeColor,
     createNFTRecord,
     randomizePreview,
-    previewNFT,
+    # previewNFT,
     saveNFT,
     createBatch,
     loadNFT,
