@@ -14,14 +14,16 @@ from functools import partial
 
 
 # A list for each caterogry of clothing that states what slots it will fil
-CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "12-Neck"]
+CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"]
 LongShirtSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"]
 RSleaveSlots = ["06-RWrist", "07-Hands"]
-PantsSlots = ["LowerTorso", "Calf", "Ankle"]
-ShoesHighSlots = ["Calf", "Ankle", "Feet"]
-ShoesMiddleSlots = ["Ankle", "Feet"]
-ShortPantsSlot = ["LowerTorso", "Calf"]
-
+PantsSlots = ["09-PelvisThin", "10-Calf", "11-Ankle"]
+ShoesHighSlots = ["10-Calf", "11-Ankle", "12-Feet"]
+ShoesMiddleSlots = ["11-Ankle", "12-Feet"]
+ShortPantsSlot = ["09-PelvisThin", "10-Calf"]
+LongCoatsSlot = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"]
+VestHoodiesSlot = ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-BackPack"]
+ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
 # A dictionary which can be called to find what slots to fill when using certian items
 ItemUsedBodySlot = {
     "Coats": CoatSlots, 
@@ -30,7 +32,10 @@ ItemUsedBodySlot = {
     "Pants": PantsSlots, 
     "ShortPants": ShortPantsSlot, 
     "ShoesHigh" : ShoesHighSlots, 
-    "ShoesMiddle" : ShoesMiddleSlots
+    "ShoesMiddle" : ShoesMiddleSlots,
+    "LongCoats" : LongCoatsSlot,
+    "ThickShorts" : ThickShortsSlot,
+    "VestHoodie" : VestHoodiesSlot
     }
 
 def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):

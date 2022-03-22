@@ -57,8 +57,6 @@ def createHirachy():
    firstType = list(firstAttribute.values())[0]
    firstVarient = list(firstType.values())[0]
 
-   print(firstVarient)
-   print(sortedAttibutes)
    return sortedAttibutes
 
 
