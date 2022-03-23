@@ -180,8 +180,7 @@ def delete_rarity_files(save_path):
 
 def rarity_batch_property_updated():
     if(bpy.context.scene.my_tool.rarityBatchIndex != bpy.context.scene.my_tool.lastrarityBatchIndex): # to stop recursion
-        Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
-        BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
+        BatchRarity_save_path = bpy.context.scene.my_tool.rarity_json_save_path
         
         newIndex = bpy.context.scene.my_tool.rarityBatchIndex
         rarityBatches = len(os.listdir(BatchRarity_save_path))
