@@ -24,6 +24,12 @@ ShortPantsSlot = ["09-PelvisThin", "10-Calf"]
 LongCoatsSlot = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"]
 VestHoodiesSlot = ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-BackPack"]
 ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
+
+cols = {
+    "a" : [(0.00000, 0.04706, 0.03529), (0.64706, 0.41569, 0.21176), (0.84706, 0.81176, 0.78039), (0.84706, 0.65490, 0.58431), (0.54902,0.00784,0.00784)],
+    "b" : [(0.62745,0.76471,0.84706), (0.13333,0.35686,0.44706), (0.19608,0.24706,0.00392), (0.84706,0.46667,0.38039), (0.74902,0.26667,0.26667)],
+    "c" : [(0.31373,0.70588,0.74902), (0.84706,0.63922,0.01569), (0.74902,0.49020,0.01176), (0.74902,0.35686,0.01176), (0.64706,0.48235,0.33725)]
+}
 # A dictionary which can be called to find what slots to fill when using certian items
 ItemUsedBodySlot = {
     "Coats": CoatSlots, 
@@ -36,7 +42,8 @@ ItemUsedBodySlot = {
     "LongCoats" : LongCoatsSlot,
     "ThickShorts" : ThickShortsSlot,
     "VestHoodie" : VestHoodiesSlot
-    }
+}
+
 
 def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
 
@@ -145,6 +152,9 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributevalues = list(hierarchy.values())
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
+        letterstyles = 'abc'
+        style = cols[random.choice(letterstyles)]
+
         for attribute in attributeskeys:
             if(attributeUsedDict.get(attribute)):
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0"
@@ -163,6 +173,13 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 ItemsUsed[attribute] = VarientDict
 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False
+                chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
+
+                col = style[random.randrange(0, len(style) ) ]
+                col = (random.random(), random.random(), random.random())
+                for child in chidlrenObjs:
+                    ob = bpy.data.objects[child.name]
+                    ob["TestColor"] = col
 
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
                 
