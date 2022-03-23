@@ -79,7 +79,7 @@ def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
             for v in variants:
                 rarity = hierarchy[slot][type][v]["rarity"]
                 # print(str(v) + ", rarity: " + str(rarity))
-                variant_dict[v] = int(rarity)
+                variant_dict[v] = int(float(rarity))
 
             type_dict[type] = {"type_rarity" : type_rarity, "variants" : variant_dict}
         slot_dict[slot] = type_dict
@@ -179,12 +179,14 @@ def delete_rarity_files(save_path):
 
 
 def rarity_batch_property_updated():
-    Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
-    BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
-    
-    newIndex = bpy.context.scene.my_tool.rarityBatchIndex
-    rarityBatches = len(os.listdir(BatchRarity_save_path))
-    if newIndex > rarityBatches:
-        bpy.context.scene.my_tool.rarityBatchIndex = rarityBatches
+    if(bpy.context.scene.my_tool.rarityBatchIndex != bpy.context.scene.my_tool.lastrarityBatchIndex): # to stop recursion
+        Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
+        BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
+        
+        newIndex = bpy.context.scene.my_tool.rarityBatchIndex
+        rarityBatches = len(os.listdir(BatchRarity_save_path))
+        if newIndex > rarityBatches:
+            bpy.context.scene.my_tool.rarityBatchIndex = rarityBatches
+            bpy.context.scene.my_tool.lastrarityBatchIndex = rarityBatches
 
     return

@@ -57,16 +57,17 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
     "inputRForeArm": ("05-RForeArm", "Right Forearm Slot"),
     "inputRWrist": ("06-RWrist", "Right Wrist Slot"),
     "inputHands": ("07-Hands", "Hands Slot"),
-    "inputLowerTorso": ("08-LowerTorso", "Lower Torso Slot"),
-    "inputCalf": ("09-Calf", "Calf Slot"),
-    "inputAnkle": ("10-Ankle", "Ankle Slot"),
-    "inputFeet": ("11-Feet", "Feet Slot"),
-    "inputNeck": ("12-Neck", "Neck Slot"),
-    "inputLowerHead": ("13-LowerHead", "Lower Head Slot"),
-    "inputMiddleHead": ("14-MiddleHead", "Mid Head Slot"),
-    "inputEarings": ("15-Earings", "Earrings Slot"),
-    "inputUpperHead": ("16-UpperHead", "Upper Head Slot"),
-    "inputBackPack": ("17-BackPack", "Backpack Slot")}
+    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick Slot"),
+    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin Slot"),
+    "inputCalf": ("10-Calf", "Calf Slot"),
+    "inputAnkle": ("11-Ankle", "Ankle Slot"),
+    "inputFeet": ("12-Feet", "Feet Slot"),
+    "inputNeck": ("13-Neck", "Neck Slot"),
+    "inputLowerHead": ("14-LowerHead", "Lower Head Slot"),
+    "inputMiddleHead": ("15-MiddleHead", "Mid Head Slot"),
+    "inputEarings": ("16-Earings", "Earrings Slot"),
+    "inputUpperHead": ("17-UpperHead", "Upper Head Slot"),
+    "inputBackPack": ("18-BackPack", "Backpack Slot")}
     
 
 # User input Property Group:
@@ -131,6 +132,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         ]
     )
 
+
     cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
     solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
     erc721MetaData: bpy.props.BoolProperty(name="ERC721")
@@ -150,7 +152,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     totalGenerated: bpy.props.IntProperty(name="", min=0, max=9999, default=numGenerated)
 
     rarityBatchIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.rarity_batch_property_updated())
-    raritySaveIndex : bpy.props.IntProperty(name="Batch to Save As", min=1, max=10, default=2)
+    lastrarityBatchIndex: bpy.props.IntProperty(default=1)
 
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
     inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
@@ -167,8 +169,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Previewer.collections_have_updated("inputRForeArm",Slots))
     inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputRWrist",Slots))
-    inputLowerTorso: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Previewer.collections_have_updated("inputLowerTorso",Slots))
+    inputPelvisThick: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputPelvisThick",Slots))
+    inputPelvisThin: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputPelvisThin",Slots))
     inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputHands",Slots))
     inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
@@ -196,7 +200,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastLWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastRWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastLowerTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastPelvisThick: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastPelvisThin: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastHands: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastCalf: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastAnkle: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -272,7 +277,6 @@ class createNFTRecord(bpy.types.Operator):
         bpy.context.scene.my_tool.loadNFTIndex = 1
 
         bpy.context.scene.my_tool.rarityBatchIndex = 1
-        bpy.context.scene.my_tool.raritySaveIndex = 2
 
         LoadNFT.delete_rarity_files(BatchRarity_save_path)
         NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
@@ -657,10 +661,9 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
     bl_category = 'Blend_My_NFTs'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-    slots = {"inputUpperTorso": ("AUpperTorso", "Upper Torso Slot", "MOD_CLOTH"),
-    "inputMiddleTorso": ("BMiddleTorso", "Mid Torso Slot", "MOD_CLOTH"),
-    "inputBackPack": ("RBackPack", "Backpack Slot", "CON_ARMATURE")}
-    # "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot"),}
+    slots = {"inputUpperTorso": ("MOD_CLOTH"),
+    "inputMiddleTorso": ("MOD_CLOTH"),
+    "inputBackPack": ("CON_ARMATURE")}
     
     def draw(self, context):
         layout = self.layout
@@ -669,7 +672,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1], icon=self.slots[name][2])
+            row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -683,11 +686,11 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputRForeArm": ("ERForeArm", "Right Forearm Slot", "LOOP_FORWARDS"),
-    "inputLForeArm": ("CLForeArm", "Left Forearm Slot", "LOOP_BACK"),
-    "inputRWrist": ("FRWrist", "Right Wrist Slot", "FORWARD"),
-    "inputLWrist": ("DLWrist", "Left Wrist Slot", "BACK"),
-    "inputHands": ("HHands", "Hands Slot", "VIEW_PAN"),}
+    "inputRForeArm": ("LOOP_FORWARDS"),
+    "inputLForeArm": ("LOOP_BACK"),
+    "inputRWrist": ("FORWARD"),
+    "inputLWrist": ("BACK"),
+    "inputHands": ("VIEW_PAN"),}
     
     def draw(self, context):
         layout = self.layout
@@ -696,7 +699,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1], icon=self.slots[name][2])
+            row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -711,10 +714,11 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputLowerTorso": ("ILowerTorso", "Lower Torso Slot", "OUTLINER_OB_ARMATURE"),
-    "inputCalf": ("JCalf", "Calf Slot", "LINCURVE"),
-    "inputAnkle": ("KAnkle", "Ankle Slot", "LINCURVE"),
-    "inputFeet": ("LFeet", "Feet Slot", "MOD_DYNAMICPAINT"),}
+    "inputPelvisThick": ("OUTLINER_OB_ARMATURE"),
+    "inputPelvisThin": ("HANDLE_ALIGNED"),
+    "inputCalf": ("LINCURVE"),
+    "inputAnkle": ("LINCURVE"),
+    "inputFeet": ("MOD_DYNAMICPAINT"),}
     
     def draw(self, context):
         layout = self.layout
@@ -723,7 +727,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1], icon=self.slots[name][2])
+            row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -737,11 +741,11 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputUpperHead": ("QUpperHead", "Upper Head Slot", "MESH_CONE"),
-    "inputMiddleHead": ("OMiddleHead", "Mid Head Slot", "HIDE_OFF"),
-    "inputLowerHead": ("NLowerHead", "Lower Head Slot", "USER"),
-    "inputEarings": ("PEarings", "Earrings Slot", "PMARKER_ACT"),
-    "inputNeck": ("MNeck", "Neck Slot", "NODE_INSERT_OFF"),}
+    "inputUpperHead": ("MESH_CONE"),
+    "inputMiddleHead": ("HIDE_OFF"),
+    "inputLowerHead": ("USER"),
+    "inputEarings": ("PMARKER_ACT"),
+    "inputNeck": ("NODE_INSERT_OFF"),}
     
     def draw(self, context):
         layout = self.layout
@@ -750,7 +754,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=self.slots[name][1], icon=self.slots[name][2])
+            row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
@@ -808,7 +812,6 @@ class WCUSTOM_PT_EditRarity(bpy.types.Panel):
         row.prop(mytool, "rarityBatchIndex")
 
         row = layout.row()
-        # row.prop(mytool, "raritySaveIndex")
         row.operator(loadRarity.bl_idname, text=loadRarity.bl_label)
         # row.operator(createRarityBatch.bl_idname, text=createRarityBatch.bl_label)
         row.operator(saveRarityBatch.bl_idname, text=saveRarityBatch.bl_label)
