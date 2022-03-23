@@ -10,10 +10,13 @@ bl_info = {
 
 # Import handling:
 
+from ast import Load
 from cgitb import text
+from msilib.schema import Property
 from venv import create
 import bpy
 from bpy.app.handlers import persistent
+from rna_prop_ui import PropertyPanel
 
 # import json
 
@@ -146,6 +149,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     numGenerated = LoadNFT.get_total_DNA()
     totalGenerated: bpy.props.IntProperty(name="", min=0, max=9999, default=numGenerated)
 
+    rarityBatchIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.rarity_batch_property_updated())
+    raritySaveIndex : bpy.props.IntProperty(name="Batch to Save As", min=1, max=10, default=2)
 
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
     inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
@@ -207,6 +212,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 def make_directories(save_path):
     Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
     batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data")
+    BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
+
 
     nftBatch_save_path = os.path.join(save_path, "Blend_My_NFTs Output", "Generated NFT Batches")
 
@@ -215,8 +222,10 @@ def make_directories(save_path):
     if not os.path.exists(batch_json_save_path):
         os.makedirs(batch_json_save_path)
     if not os.path.exists(nftBatch_save_path):
-        os.makedirs(nftBatch_save_path)
-    return Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path
+        os.makedirs(nftBatch_save_path)    
+    if not os.path.exists(BatchRarity_save_path):
+        os.makedirs(BatchRarity_save_path)
+    return Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path, BatchRarity_save_path
 
 # Update NFT count:
 combinations: int = 0
@@ -255,12 +264,19 @@ class createNFTRecord(bpy.types.Operator):
         enableRarity = bpy.context.scene.my_tool.enableRarity
         inputDNA = bpy.context.scene.my_tool.inputDNA
 
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path, BatchRarity_save_path = make_directories(save_path)
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
         DataDictionary = DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
 
         bpy.context.scene.my_tool.totalGenerated = 0
         bpy.context.scene.my_tool.loadNFTIndex = 1
+
+        bpy.context.scene.my_tool.rarityBatchIndex = 1
+        bpy.context.scene.my_tool.raritySaveIndex = 2
+
+        LoadNFT.delete_rarity_files(BatchRarity_save_path)
+        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+        LoadNFT.make_rarity_dict_from_NFTRecord(1, NFTRecord_save_path, BatchRarity_save_path)
         return {'FINISHED'}
 
 
@@ -481,6 +497,73 @@ class loadPrevNFT(bpy.types.Operator):
         return {'FINISHED'}
 
 
+#-------------------------------
+
+
+class loadRarity(bpy.types.Operator):
+    bl_idname = 'load.rarity'
+    bl_label = "Load Batch Rarity JSON"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+
+        Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
+        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+        BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
+        try:
+            index = bpy.context.scene.my_tool.rarityBatchIndex
+            rdict = LoadNFT.load_rarity_batch_dict( index, BatchRarity_save_path)
+            LoadNFT.update_collection_rarity_property(rdict, NFTRecord_save_path)
+        except:
+            self.report({"ERROR"}, "This is not a valid batch" )
+
+        # LoadNFT.make_rarity_dict_from_NFTRecord(1, NFTRecord_save_path, Blend_My_NFTs_Output)
+        # LoadNFT.get_rarity_batch_dict(1, Blend_My_NFTs_Output)
+
+        return {'FINISHED'}
+
+
+
+
+
+class saveRarityBatch(bpy.types.Operator):
+    bl_idname = 'save.raritybatch'
+    bl_label = "Save Rarity JSON"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
+        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+        BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
+
+        # LoadNFT.load_in_Rarity_file()
+        # LoadNFT.create_rarity_dict()
+        index = bpy.context.scene.my_tool.rarityBatchIndex
+        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, BatchRarity_save_path)
+
+        # bpy.context.scene.my_tool.rarityBatchIndex = index + 1
+        return {'FINISHED'}
+
+
+
+class saveNewRarityBatch(bpy.types.Operator):
+    bl_idname = 'save.newraritybatch'
+    bl_label = "Save as New Rarity JSON"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
+        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+        BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
+
+        # LoadNFT.load_in_Rarity_file()
+        # LoadNFT.create_rarity_dict()
+        index = len(os.listdir(BatchRarity_save_path)) + 1
+        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, BatchRarity_save_path)
+
+        bpy.context.scene.my_tool.rarityBatchIndex = index
+        return {'FINISHED'}
+
 
 
 
@@ -697,10 +780,101 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         return
 
 
+class GU_PT_collection_custom_properties(bpy.types.Panel, PropertyPanel):
+    _context_path = "collection"
+    _property_type = bpy.types.Collection
+    bl_label = "Custom Properties"
+    bl_idname = "GU_PT_collection_custom_properties"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "collection"
 
 
 
 
+class WCUSTOM_PT_EditRarity(bpy.types.Panel):
+    bl_label = "Rarity Editor"
+    bl_idname = "WCUSTOM_PT_EditRarity"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "rarityBatchIndex")
+
+        row = layout.row()
+        # row.prop(mytool, "raritySaveIndex")
+        row.operator(loadRarity.bl_idname, text=loadRarity.bl_label)
+        # row.operator(createRarityBatch.bl_idname, text=createRarityBatch.bl_label)
+        row.operator(saveRarityBatch.bl_idname, text=saveRarityBatch.bl_label)
+        row.operator(saveNewRarityBatch.bl_idname, text=saveNewRarityBatch.bl_label)
+
+
+
+
+# class WCUSTOM_PT_RarityTypeSub(bpy.types.Panel):
+#     bl_label = "Type"
+#     bl_idname = "WCUSTOM_PT_RarityTypeSub"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
+
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+#         mytool = scene.my_tool
+#         row = layout.row()
+#         row.label(text="this contains all types")
+
+# class WCUSTOM_PT_RarityModelSub(bpy.types.Panel):
+#     bl_label = "Model"
+#     bl_idname = "WCUSTOM_PT_RarityModelSub"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
+
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+#         mytool = scene.my_tool
+#         row = layout.row()
+#         # row.label(text="okay")
+
+# class WCUSTOM_PT_RarityVariantSub(bpy.types.Panel):
+#     bl_label = "Variant"
+#     bl_idname = "WCUSTOM_PT_RarityVariantSub"
+#     bl_space_type = 'VIEW_3D'
+#     bl_region_type = 'UI'
+#     bl_category = 'Blend_My_NFTs'
+#     rarity = 20
+#     r_id = "a"
+#     bpy.types.Object.help = bpy.props.IntProperty()
+#     # bpy.data.objects.new(r_id, bpy.props.IntProperty())
+#     bpy.types.Scene[r_id]= bpy.props.IntProperty()  
+#     # bpy.context.scene[r_id] = bpy.props.IntProperty()
+#     # bpy.types.Object[r_id] = bpy.props.StringProperty()
+#     okay : bpy.props.StringProperty()
+
+#     def invoke(self, context):
+#         self.okay.add()
+#         return {'RUNNING_MODAL'}
+
+#     def draw(self, context):
+#         layout = self.layout
+#         scene = context.scene
+
+#         row = layout.row()
+#         row.label(text=str(self.rarity))
+#         # layout.prop(self.okay, self.okay)
+#         # row.prop(context.object, "newrarity")
+#         row.prop(context.object, "help")
+
+        
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
 #     bl_label = "Documentation"
@@ -724,6 +898,7 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
 classes = (
     BMNFTS_PGT_MyProperties,
     WCUSTOM_PT_CreateData,
+    WCUSTOM_PT_EditRarity,
     WCUSTOM_PT_LoadFromFile,
     WCUSTOM_PT_PreviewNFTs,
     WCUSTOM_PT_ParentSlots,
@@ -731,10 +906,18 @@ classes = (
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
     WCUSTOM_PT_LegSlots,
+    GU_PT_collection_custom_properties,
+    # WCUSTOM_PT_PanelTest,
+    # WCUSTOM_PT_RarityTypeSub,
+    # WCUSTOM_PT_RarityModelSub,
     # BMNFTS_PT_Documentation,
 
 
     # Other panels:
+
+    loadRarity,
+    saveRarityBatch,
+    saveNewRarityBatch,
 
     randomizeModel,
     randomizeColor,
@@ -746,6 +929,8 @@ classes = (
     loadNFT,
     loadPrevNFT,
     loadNextNFT,
+
+
 
     
     # UIList 1:
@@ -768,6 +953,51 @@ def register():
 
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=BMNFTS_PGT_MyProperties)
 
+
+
+
+    # hierarchy = LoadNFT.load_in_Rarity_file()
+
+    # for i in ["01-UpperTorso"]:
+    #     # type2 = hierarchy[i]
+
+    #     id = f"WCUSTOM_PT_RarityTypeSub_1"
+    #     panel =  type(id,
+    #     (WCUSTOM_PT_RarityTypeSub, bpy.types.Panel, ),
+    #     {"bl_idname" : id,
+    #     "bl_parent_id" : "WCUSTOM_PT_RarityEditor",
+    #     "bl_label" : i}
+    #         )    
+    #     bpy.utils.register_class(panel)
+
+    #     types = list(hierarchy[i].keys())
+
+    #     for j in types:
+    #         id = "WCUSTOM_PT_RarityModelSub_" + str(types.index(j))
+    #         panel =  type(id,
+    #         (WCUSTOM_PT_RarityModelSub, bpy.types.Panel, ),
+    #         {"bl_idname" : id,
+    #         "bl_parent_id" : "WCUSTOM_PT_RarityTypeSub_1",
+    #         "bl_label" : j}
+    #             )    
+    #         bpy.utils.register_class(panel)
+
+    #         # variants = list(types[j].keys())
+    #         variants = list(hierarchy[i][j].keys())
+
+    #         for k in variants:
+    #             id = "WCUSTOM_PT_RarityVariantSub_" + str(types.index(j)) + '_' + str(variants.index(k))
+    #             panel =  type(id,
+    #             (WCUSTOM_PT_RarityVariantSub, bpy.types.Panel, ),
+    #             {"bl_idname" : id,
+    #             "bl_parent_id" : ("WCUSTOM_PT_RarityModelSub_" + str(types.index(j))),
+    #             "bl_label" : k,
+    #             "r_id" : "r" + str(k),
+    #             "rarity": hierarchy[i][j][k]["rarity"]}
+    #             )    
+    #             bpy.utils.register_class(panel)
+
+   
     # UIList1:
 
     # bpy.types.Scene.custom = bpy.props.CollectionProperty(type=UIList.CUSTOM_PG_objectCollection)
