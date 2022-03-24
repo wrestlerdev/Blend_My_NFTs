@@ -274,6 +274,7 @@ class createNFTRecord(bpy.types.Operator):
 
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path, BatchRarity_save_path = make_directories(save_path)
         NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+        DataDictionary = DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
 
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
         bpy.context.scene.my_tool.rarity_json_save_path = BatchRarity_save_path
@@ -323,7 +324,7 @@ class randomizeModel(bpy.types.Operator):
 
         if self.collection_name != "":
             if self.collection_name in bpy.context.scene.my_tool:
-                
+                print(self.collection_name)
                 # Blend_My_NFTs_Output = os.path.join(bpy.path.abspath(bpy.context.scene.my_tool.save_path), "Blend_My_NFTs Output", "NFT_Data")
                 # NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
                 # DataDictionary = json.load(open(NFTRecord_save_path))
@@ -333,7 +334,7 @@ class randomizeModel(bpy.types.Operator):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 # save_path = bpy.context.scene.my_tool.batch_json_save_path
                 save_path = ''
-                # chosen_outfit, chosen_index = DNA_Generator.Outfit_G enerator.RandomizeSingleDNAStrand(Slots[self.collection_name][0],inputDNA,save_path)
+                DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrand(self.collection_name,inputDNA,save_path)
 
                 # chosen_variant = Previewer.find_in_collection(chosen_outfit, Slots[self.collection_name][0])
                 # bpy.context.scene.my_tool[str(self.collection_name)] = chosen_variant

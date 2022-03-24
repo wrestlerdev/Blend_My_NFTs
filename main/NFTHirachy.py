@@ -30,7 +30,7 @@ def createHirachy():
    for key in sortedAttributeKeys:
       sortedAttibutes[key] = unsortedttributeList[key]
 
-#loop through all atributes in scene
+   #loop through all atributes in scene
    for attribute in sortedAttibutes:
       unsortedAttributeType = {}
       _attributeTypes = bpy.data.collections[attribute].children

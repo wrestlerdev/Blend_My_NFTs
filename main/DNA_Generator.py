@@ -355,7 +355,7 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    return DataDictionary, possibleCombinations, DNAList
 
-def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path):
+def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path):
    """
    Creates NFTRecord.json file and sends "batchDataDictionary" to it. NFTRecord.json is a permanent record of all DNA
    you've generated with all attribute variants. If you add new variants or attributes to your .blend file, other scripts
@@ -379,8 +379,6 @@ def send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity,
    DataDictionary["DNAList"] = []
 
    #DataDictionary, possibleCombinations, DNAList = generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
-
-   NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
