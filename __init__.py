@@ -274,7 +274,7 @@ class createNFTRecord(bpy.types.Operator):
 
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path, BatchRarity_save_path = make_directories(save_path)
         NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
-
+        DataDictionary = DNA_Generator.send_To_Record_JSON(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity, Blend_My_NFTs_Output, batch_json_save_path)
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
         bpy.context.scene.my_tool.rarity_json_save_path = BatchRarity_save_path
         bpy.context.scene.my_tool.NFTRecord_save_path = NFTRecord_save_path
