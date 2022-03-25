@@ -64,12 +64,15 @@ ItemUsedBodySlot = {
 def RandomizeSingleDNAStrandColor(inputSlot, CurrentDNA, save_path):
 
     col = (random.random(), random.random(), random.random())
-    #col = (random.random(), random.random(), random.random())
-    chidlrenObjs = bpy.data.collections.get(inputSlot).objects
+    print(inputSlot.name)
+    col = (random.random(), random.random(), random.random())
+    chidlrenObjs = bpy.data.collections.get(inputSlot.name).objects
 
     for child in chidlrenObjs:
-        ob = bpy.data.objects[child.name]
-        ob["TestColor"] = col
+        obj = bpy.data.objects[child.name]
+        obj["TestColor"] = col
+        
+        obj.hide_viewport = False
     return "hello"
 
 def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):

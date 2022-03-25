@@ -358,7 +358,7 @@ class randomizeColor(bpy.types.Operator):
             inputDNA = bpy.context.scene.my_tool.inputDNA
             # save_path = bpy.context.scene.my_tool.batch_json_save_path
             save_path = ''
-            bpy.context.scene.my_tool.inputDNA = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandColor(bpy.context.scene.my_tool[self.collection_name],inputDNA,save_path)
+            DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandColor(bpy.context.scene.my_tool[self.collection_name],inputDNA,save_path)
         
         return {'FINISHED'}
 
