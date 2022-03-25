@@ -67,7 +67,8 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
     "inputMiddleHead": ("15-MiddleHead", "Mid Head Slot"),
     "inputEarings": ("16-Earings", "Earrings Slot"),
     "inputUpperHead": ("17-UpperHead", "Upper Head Slot"),
-    "inputBackPack": ("18-BackPack", "Backpack Slot")}
+    "inputBackPack": ("18-BackPack", "Backpack Slot"),
+    "inputBackground": ("19-Background", "Background Slot")}
     
 
 # User input Property Group:
@@ -196,6 +197,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Previewer.collections_have_updated("inputUpperHead",Slots))
     inputBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputBackPack",Slots))
+    inputBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputBackground",Slots))
 
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -215,6 +218,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
 
 def make_directories(save_path):
@@ -708,6 +712,32 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
 
 
+class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
+    bl_label = "Other Slots"
+    bl_idname = "WCUSTOM_PT_OtherSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+
+    slots = {"inputBackground": ("NODE_TEXTURE")}
+
+    
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+
+
+#-----------------------------------------------------------------------
+
 class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
     bl_label = "Load from File"
     bl_idname = "WCUSTOM_PT_LoadFromFile"
@@ -857,6 +887,7 @@ classes = (
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
     WCUSTOM_PT_LegSlots,
+    WCUSTOM_PT_OtherSlots,
     GU_PT_collection_custom_properties,
     # WCUSTOM_PT_RarityTypeSub,
     # WCUSTOM_PT_RarityModelSub,

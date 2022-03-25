@@ -12,6 +12,8 @@ import random
 import importlib
 from functools import partial
 
+col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green" : "COLOR_04",
+         "blue" : "COLOR_05", "purple" : "COLOR_06", "pink" : "COLOR_07", "brown" : "COLOR_08"}
 
 
 def read_DNAList_from_file(index):
@@ -32,7 +34,6 @@ def get_total_DNA():
     DataDictionary = json.load(open(NFTRecord_save_path))
     DNAList = DataDictionary["DNAList"]
     return len(DNAList)
-
 
 
 # def load_in_Rarity_file():
@@ -57,7 +58,6 @@ def create_rarity_dict():
 
 
 def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
-
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
@@ -75,13 +75,14 @@ def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
 
             type_rarity = type.split('_') # gets type rarity from collection name atm
             type_rarity = int(type_rarity[1])
-
+            total_rarity = 0
             for v in variants:
                 rarity = hierarchy[slot][type][v]["rarity"]
+
                 # print(str(v) + ", rarity: " + str(rarity))
                 variant_dict[v] = int(float(rarity))
-
-            type_dict[type] = {"type_rarity" : type_rarity, "variants" : variant_dict}
+                total_rarity += int(float(rarity))
+            type_dict[type] = {"type_rarity" : type_rarity, "variant_total" : total_rarity,  "variants" : variant_dict}
         slot_dict[slot] = type_dict
     rarity_dict = slot_dict
 
@@ -91,6 +92,9 @@ def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
 
     with open(os.path.join('', (RarityBatch_save_path)), "w") as outfile:
         outfile.write(rarity_dict_object)
+
+    update_collection_rarity_property(rarity_dict, NFTRecord_save_path)
+
     return
 
 
@@ -103,8 +107,9 @@ def load_rarity_batch_dict(index, save_path):
     return RarityDict
 
 
-def update_collection_rarity_property(RarityDict, NFTRecord_save_path):
 
+
+def update_collection_rarity_property(RarityDict, NFTRecord_save_path):
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
@@ -114,15 +119,16 @@ def update_collection_rarity_property(RarityDict, NFTRecord_save_path):
         for type in types:
             variants = list(hierarchy[slot][type].keys())
             type_coll = bpy.data.collections[type]
-            type_coll["rarity"] =  int(RarityDict[slot][type]["type_rarity"])
-
+            type_rarity = int(RarityDict[slot][type]["type_rarity"])
+            type_coll["rarity"] =  type_rarity
+            update_rarity_color(type, type_rarity)
 
             for v in variants:
                 rarity = RarityDict[slot][type]["variants"][v]
                 var_coll = bpy.data.collections[v]
                 var_coll["rarity"] = int(rarity)
+                update_rarity_color(v, int(float(rarity)))
                 # print(str(v) + ", rarity: " + str(rarity))
-
     return
 
 def save_collection_rarity_property(index, NFTRecord_save_path, save_path):
@@ -141,24 +147,27 @@ def save_collection_rarity_property(index, NFTRecord_save_path, save_path):
         for type in types:
             variant_dict = {}
             variants = list(hierarchy[slot][type].keys())
+            total_rarity = 0
 
             type_coll = bpy.data.collections[type]
             type_rarity = type_coll["rarity"]
+            update_rarity_color(type, type_rarity)
 
             for v in variants:
                 var_coll = bpy.data.collections[v]
                 # print(str(v) + ", rarity: " + str(rarity))
                 variant_dict[v] = var_coll["rarity"]
+                update_rarity_color(v, int(float(var_coll["rarity"])))
+                total_rarity += int(float(var_coll["rarity"]))
 
-            type_dict[type] = {"type_rarity" : type_rarity, "variants" : variant_dict}
+
+            type_dict[type] = {"type_rarity" : type_rarity, "variant_total" : total_rarity,  "variants" : variant_dict}
         slot_dict[slot] = type_dict
     rarity_dict = slot_dict
     # rarity_dict["variants"] = variant_dict
     # print(rarity_dict)
 
-
     RarityBatch_save_path = os.path.join(save_path, 'RarityBatch{}.json'.format(index))
-
 
     rarity_dict_object = json.dumps(rarity_dict, indent=1, ensure_ascii=True)
     with open(os.path.join('', (RarityBatch_save_path)), "w") as outfile:
@@ -187,5 +196,25 @@ def rarity_batch_property_updated():
         if newIndex > rarityBatches:
             bpy.context.scene.my_tool.rarityBatchIndex = rarityBatches
             bpy.context.scene.my_tool.lastrarityBatchIndex = rarityBatches
+
+    return
+
+
+
+def update_rarity_color(coll_name, rarity):
+    if rarity > 80:
+        bpy.data.collections[coll_name].color_tag = col["brown"]
+    elif rarity > 60:
+        bpy.data.collections[coll_name].color_tag = col["blue"]
+    elif rarity > 40:
+        bpy.data.collections[coll_name].color_tag = col["green"]
+    elif rarity > 20:
+        bpy.data.collections[coll_name].color_tag = col["orange"]
+    elif rarity > 0:
+        bpy.data.collections[coll_name].color_tag = col["yellow"]
+    else:
+        bpy.data.collections[coll_name].color_tag = col["red"]
+
+
 
     return

@@ -242,6 +242,7 @@ def fill_pointers_from_dna(DNA, Slots):
       last_coll_name = "last" + str(coll_name)
       input_coll_name = "input" + str(coll_name)
       print(coll_name)
+      # variant = variant[3:len(variant)]
       bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
       bpy.context.scene.my_tool[input_coll_name] = bpy.data.collections[variant]
 
