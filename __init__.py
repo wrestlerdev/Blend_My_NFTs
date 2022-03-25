@@ -67,7 +67,8 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
     "inputMiddleHead": ("15-MiddleHead", "Mid Head Slot"),
     "inputEarings": ("16-Earings", "Earrings Slot"),
     "inputUpperHead": ("17-UpperHead", "Upper Head Slot"),
-    "inputBackPack": ("18-BackPack", "Backpack Slot")}
+    "inputBackPack": ("18-BackPack", "Backpack Slot"),
+    "inputBackground": ("19-Background", "Background Slot")}
     
 
 # User input Property Group:
@@ -196,6 +197,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Previewer.collections_have_updated("inputUpperHead",Slots))
     inputBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Previewer.collections_have_updated("inputBackPack",Slots))
+    inputBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Previewer.collections_have_updated("inputBackground",Slots))
 
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -215,6 +218,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
 
 def make_directories(save_path):
@@ -525,6 +529,14 @@ class saveNewRarityBatch(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class assetlibTest(bpy.types.Operator):
+    bl_idname = 'assetlib.test'
+    bl_label = "Asset Library"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+
+        return {'FINISHED'}
 
 
 
@@ -592,7 +604,7 @@ class WCUSTOM_PT_NFTSlots(bpy.types.Panel):
             row = layout.row()
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
@@ -628,7 +640,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
             row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_label = "Arms Slots"
@@ -655,7 +667,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
             row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 class WCUSTOM_PT_LegSlots(bpy.types.Panel):
@@ -683,7 +695,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
             row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_label = "Head Slots"
@@ -710,8 +722,34 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
             row.label(text=Slots[name][1], icon=self.slots[name])
             row.prop(mytool, name, text="")
             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label)
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
+
+class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
+    bl_label = "Other Slots"
+    bl_idname = "WCUSTOM_PT_OtherSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+
+    slots = {"inputBackground": ("NODE_TEXTURE")}
+
+    
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+
+
+#-----------------------------------------------------------------------
 
 class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
     bl_label = "Load from File"
@@ -734,6 +772,10 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         row = layout.row()
         row.operator(loadPrevNFT.bl_idname, text=loadPrevNFT.bl_label)
         row.operator(loadNextNFT.bl_idname, text=loadNextNFT.bl_label)
+
+        
+        row = layout.row()
+        row.operator(assetlibTest.bl_idname, text=assetlibTest.bl_label)
         return
 
 
@@ -769,7 +811,6 @@ class WCUSTOM_PT_EditRarity(bpy.types.Panel):
         row.operator(loadRarity.bl_idname, text=loadRarity.bl_label)
         row.operator(saveRarityBatch.bl_idname, text=saveRarityBatch.bl_label)
         row.operator(saveNewRarityBatch.bl_idname, text=saveNewRarityBatch.bl_label)
-
 
 
 
@@ -862,6 +903,7 @@ classes = (
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
     WCUSTOM_PT_LegSlots,
+    WCUSTOM_PT_OtherSlots,
     GU_PT_collection_custom_properties,
     # WCUSTOM_PT_RarityTypeSub,
     # WCUSTOM_PT_RarityModelSub,
@@ -883,7 +925,7 @@ classes = (
     loadNFT,
     loadPrevNFT,
     loadNextNFT,
-
+    assetlibTest,
 
 
     
