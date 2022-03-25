@@ -22,11 +22,15 @@ TShirtsSlot = ["01-UpperTorso", "02-MiddleTorso"]
 LongShirtSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"]
 LSleaveSlots = ["03-LForeArm", "04-LWrist", "07-Hands"]
 RSleaveSlots = ["05-RForeArm", "06-RWrist", "07-Hands"]
-PantsSlots = ["09-PelvisThin", "10-Calf", "11-Ankle"]
+ThickPantsSlots = ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"]
+ThinPantsSlots = ["09-PelvisThin", "10-Calf", "11-Ankle"]
 ShoesHighSlots = ["10-Calf", "11-Ankle", "12-Feet"]
 ShoesMiddleSlots = ["11-Ankle", "12-Feet"]
-ShortPantsSlot = ["09-PelvisThin", "10-Calf"]
+ThickQuarterPantsSlot = ["08-PelvisThick", "09-PelvisThin", "10-Calf"]
+ThinQuarterPantsSlot = ["09-PelvisThin", "10-Calf"]
 ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
+ThinShortsSlot = ["09-PelvisThin"]
+NeckWearSlots = ["13-Neck"]
 
 cols = {
     "a" : [(0.00000, 0.04706, 0.03529), (0.64706, 0.41569, 0.21176), (0.84706, 0.81176, 0.78039), (0.84706, 0.65490, 0.58431), (0.54902,0.00784,0.00784)],
@@ -44,17 +48,31 @@ ItemUsedBodySlot = {
     "VestHoodie" : VestHoodiesSlot,
     "CropShirts" : CropShirtsSlot,
     "TShirts" : TShirtsSlot,
-    "ThickShorts" : ThickShortsSlot, 
+    "Shorts" : ThinShortsSlot,
     "LSleave": LSleaveSlots,
     "RSleave": RSleaveSlots,  
-    "Pants": PantsSlots, 
-    "ShortPants": ShortPantsSlot, 
+    "ThickPants": ThickPantsSlots, 
+    "QuaterPants": ThickQuarterPantsSlot,
+    "ThickShorts" : ThickShortsSlot,
+    "ThinPants" : ThinPantsSlots,
+    "ThinShorts" : ThinShortsSlot, 
     "ShoesHigh" : ShoesHighSlots, 
-    "ShoesMiddle" : ShoesMiddleSlots
+    "ShoesMiddle" : ShoesMiddleSlots,
+    "NeckWear" : NeckWearSlots
 }
 
+def RandomizeSingleDNAStrandColor(inputSlot, CurrentDNA, save_path):
 
-def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
+    col = (random.random(), random.random(), random.random())
+    #col = (random.random(), random.random(), random.random())
+    chidlrenObjs = bpy.data.collections.get(inputSlot).objects
+
+    for child in chidlrenObjs:
+        ob = bpy.data.objects[child.name]
+        ob["TestColor"] = col
+    return "hello"
+
+def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
 
     #go through entire DNA and populate diction of used body slots
     #Create a dictionary based on current top level collections in scene that should relate to slots. Set them to be populated false  
@@ -80,9 +98,12 @@ def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
     attributevalues = list(hierarchy.values())
     attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
-
+    attributes = {}
+    indexToEdit = -1
+    currentVarient = ''
     DNAString = CurrentDNA.split(",")
     for strand in range(len(DNAString)):
+        
 
         atttype_index, variant_index = DNAString[strand].split('-')
         slot = list(hierarchy.items())[strand]
@@ -90,58 +111,46 @@ def RandomizeSingleDNAStrand(slot, CurrentDNA, save_path):
         atttype = list(slot[1].items())[int(atttype_index)]
         variant = list(atttype[1].items())[int(variant_index)][0]
 
-        ItemClothingGenre = list(atttype[1].items())[int(variant_index)][1]["clothingGenre"]
-        print(ItemClothingGenre)
-               
-        #loop through all slots that selected item will take up
-        UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-        if UsedUpSlotArray:
-            for i in ItemUsedBodySlot.get(ItemClothingGenre):
-                SlotUpdateValue = {i : True}
-                attributeUsedDict.update(SlotUpdateValue)
 
+        slotName = list(atttype[1].items())[int(variant_index)][1]["slotName"]
+        formatedSlot = str(inputSlot).split("input", 2)[1]
+        if(slotName != formatedSlot):
+            #loop through all slots that selected item will take up
+            ItemClothingGenre = list(atttype[1].items())[int(variant_index)][1]["clothingGenre"]
+            UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+            if UsedUpSlotArray:
+                for i in ItemUsedBodySlot.get(ItemClothingGenre):
+                    SlotUpdateValue = {i : True}
+                    attributeUsedDict.update(SlotUpdateValue)
+        else:
+            attributes = slot
+            indexToEdit =  strand
+            currentVarient = variant
     print(attributeUsedDict)
-        
-        # bpy.data.collections[variant].hide_viewport = False
-        # bpy.data.collections[variant].hide_render = False
-    
-    # for i in range(len(list(hierarchy)) ):
-    #     #Get the name of the body slot
-    #     currentSlot = list(hierarchy)[i]
-
-    #     #find index of child we want to get body slot using current DNA
-    #     index = int(SingleDNA[i])
-    #     index -= 1 
-
-    #     #get the name of that item
-    #     itemArray = list(hierarchy.get(currentSlot))
-    #     item = itemArray[index]
-
-    #Get DNA strand index we want to modify
-    #print( list(hierarchy.keys()).index(slot) )
-
-    #Get item that is currently used
-    # currentChildIndex = int(SingleDNA[list(hierarchy.keys()).index(slot)]) -1
-    # BodySlotChildren = list(hierarchy.get(slot))
-    #print(list(BodySlotChildren)[currentChildIndex])
-
-    
-    # ItemIndexChoosen = PickWeightedDNAStrand(hierarchy.get(slot))
-    # ItemChoosen = list(BodySlotChildren)[ItemIndexChoosen]
-                    
-    # #Get item metadata from object 
-    # ItemMetaData = hierarchy.get(slot).get(ItemChoosen)
-    # ItemIndex = ItemMetaData["number"]
-    # SingleDNA[list(hierarchy.keys()).index(slot)] = ItemIndex
-    # ItemClothingGenre = ItemMetaData["clothingGenre"]
-                    
-    # #loop through all slots that selected item will take up
-    # UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-    # if UsedUpSlotArray:
-    #     for i in ItemUsedBodySlot.get(ItemClothingGenre):
-    #         SlotUpdateValue = {i : True}
-    #         #BodySlotsDict.update(SlotUpdateValue)           
-    # #bpy.data.collections.get(ItemChoosen).hide_viewport = False
+    attempts = 100
+    while attempts > 0:
+        typeChoosen, typeIndex = PickWeightedAttributeType(attributes[1])
+        varientChoosen, varientIndex = PickWeightedTypeVarient(attributes[1][typeChoosen])
+        print(varientChoosen)
+        if(varientChoosen != currentVarient):
+            willItemFit =  True
+            ItemClothingGenre = hierarchy[attributes[0]][typeChoosen][varientChoosen]["clothingGenre"]
+            UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+            if UsedUpSlotArray:
+                for i in UsedUpSlotArray:
+                    if attributeUsedDict.get(i):
+                        willItemFit = False
+            if(willItemFit):       
+                print(varientChoosen)
+                DNAString[indexToEdit] = str(typeIndex) + "-" + str(varientIndex)
+                FormattedDNA = ','.join(DNAString)
+                print(FormattedDNA)
+                bpy.data.collections[currentVarient].hide_viewport = True
+                bpy.data.collections[varientChoosen].hide_viewport = False
+                return FormattedDNA
+        #print(currentVarient)
+        attempts -= 1
+    return CurrentDNA
 
 def setBodySlotsValue(ItemClothingGenre, ValueToSet):
     #loop through all slots that selected item will take up
@@ -186,17 +195,22 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         letterstyles = 'abc'
-        style = copy.deepcopy( cols[random.choice(letterstyles)] )
+        styleChoice = random.choice(letterstyles)
+        style = copy.deepcopy( cols[random.choice(styleChoice)] )
         maincolor = (0.0, 0.0, 0.0)
         secondarycolor = (0.0, 0.0, 0.0)
+        mainColorIndex = -1
+        SecondaryColorIndex = -1
         if( random.random() > .05 ):
-            maincolor = style.pop(0)
-            index = random.randrange(0, len(style))
-            secondarycolor = style.pop(index)
+            mainColorIndex = 0
+            maincolor = style.pop(mainColorIndex)
+            SecondaryColorIndex = random.randrange(0, len(style))
+            secondarycolor = style.pop(SecondaryColorIndex)
         else:
-            secondarycolor = style.pop(0)
-            index = random.randrange(0, len(style))
-            maincolor = style.pop(index)
+            SecondaryColorIndex = 0
+            secondarycolor = style.pop(SecondaryColorIndex)
+            mainColorIndex = random.randrange(0, len(style))
+            maincolor = style.pop(mainColorIndex)
 
         
         for child in bpy.data.collections.get("Kae").objects:
@@ -210,31 +224,33 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         for attribute in attributeskeys:
             if(attributeUsedDict.get(attribute)):
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0"
-                ItemsUsed[attribute] = "Null"
+                
+                typeChoosen = list(hierarchy[attribute])[0]
+                ItemsUsed[attribute] = list( hierarchy[attribute][typeChoosen].values())[0]
+
             else:
                 position = attributevalues.index(hierarchy[attribute])
                 typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
-
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 # print(typeChoosen + " " +  varientChoosen)
                 # print(typeIndex)
                 # print(varientIndex)
-                SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
-                VarientDict = {}
-                VarientDict[varientChoosen] = hierarchy[attribute][typeChoosen][varientChoosen]
-                ItemsUsed[attribute] = VarientDict
+
 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False
                 chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
 
                 col = (0.0, 0.0, 0.0)
-
+                colIndex = -1
                 if(attribute == "01-UpperTorso"):
                     col =  maincolor
+                    colIndex = mainColorIndex
                 elif(attribute == "08-PelvisThick" or attribute == "08-PelvisThick"):
                     col = secondarycolor
+                    colIndex = SecondaryColorIndex
                 elif(attribute == "17-UpperHead"):
-                    col = haircols[random.randrange(0, len(haircols) ) ]
+                    colIndex = random.randrange(0, len(haircols) ) 
+                    col = haircols[colIndex]
                 else:  
                     col = style[random.randrange(0, len(style) ) ]
                     #col = (random.random(), random.random(), random.random())
@@ -242,6 +258,12 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 for child in chidlrenObjs:
                     ob = bpy.data.objects[child.name]
                     ob["TestColor"] = col
+
+                #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + str(styleChoice) + str(colIndex)
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
+                VarientDict = {}
+                VarientDict[varientChoosen] = hierarchy[attribute][typeChoosen][varientChoosen]
+                ItemsUsed[attribute] = VarientDict
 
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
                 
