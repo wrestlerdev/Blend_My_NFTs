@@ -52,7 +52,7 @@ ItemUsedBodySlot = {
     "LSleave": LSleaveSlots,
     "RSleave": RSleaveSlots,  
     "ThickPants": ThickPantsSlots, 
-    "QuaterPants": ThickQuarterPantsSlot,
+    "ThickQuaterPants": ThickQuarterPantsSlot,
     "ThickShorts" : ThickShortsSlot,
     "ThinPants" : ThinPantsSlots,
     "ThinShorts" : ThinShortsSlot, 
