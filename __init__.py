@@ -17,6 +17,7 @@ from venv import create
 import bpy
 from bpy.app.handlers import persistent
 from rna_prop_ui import PropertyPanel
+import time
 
 # import json
 
@@ -535,7 +536,37 @@ class assetlibTest(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        start = time.process_time()
+        prefs = bpy.context.preferences
+        filepaths = prefs.filepaths
+        asset_libraries = filepaths.asset_libraries
+        asset_library = asset_libraries[1]
+        library_path = (asset_library.path)
 
+        # files = [file for file in os.listdir(library_path) if file.endswith(".blend")]
+        # print(files)
+        # objects = []
+        inner_path = 'Collection'
+        import_file = 'kae_rig_bounds_v09_02.blend'
+        # for blend in files:
+        #     blend_path = os.path.join(path, blend)
+        #     print(blend_path)
+        #     with bpy.data.libraries.load(blend_path) as (data_from, data_to):
+        #         for d in data_from.objects:
+        #             objects.append(d)
+        coll_name = 'Imported'
+        coll = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[coll_name]                    
+        bpy.context.view_layer.active_layer_collection = coll
+
+        DNA = bpy.context.scene.my_tool.inputDNA
+        new_path = os.path.join(library_path, import_file, inner_path)
+
+        # Previewer.assettest(DNA, library_path, inner_path, coll_name, Slots)
+        
+        Previewer.assettest2(DNA, new_path, coll_name)
+        # print(bpy.context.object)
+        # bpy.ops.asset.open_containing_blend_file()
+        print(time.process_time() - start)
         return {'FINISHED'}
 
 
@@ -774,8 +805,8 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         row.operator(loadNextNFT.bl_idname, text=loadNextNFT.bl_label)
 
         
-        row = layout.row()
-        row.operator(assetlibTest.bl_idname, text=assetlibTest.bl_label)
+        # row = layout.row()
+        # row.operator(assetlibTest.bl_idname, text=assetlibTest.bl_label)
         return
 
 

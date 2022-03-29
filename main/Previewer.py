@@ -282,5 +282,102 @@ def get_hierarchy_unordered():
 
 
 
+
+def assettest(DNA, library_path, inner_path, coll_name, Slot):
+
+   coll = bpy.data.collections[coll_name]
+
+   for child in coll.children:
+      for obj in child.objects:
+         bpy.data.objects.remove(obj)
+      # coll.objects.unlink(coll.objects.get(obj))
+      bpy.data.collections.remove(child)
+
+
+   asset_name = 'Hands_Gloves_Mittens_2_20'
+                 
+   hierarchy = get_hierarchy_ordered()
+
+   DNAString = DNA.split(",")
+   slot_keys = list(Slot.keys())
+
+   for strand in range(len(DNAString)):
+      file_path = str(Slot[slot_keys[strand]][0]) + ".blend"
+      new_path = os.path.join(library_path, file_path, inner_path)
+
+      atttype_index, variant_index = DNAString[strand].split('-')
+      slot = list(hierarchy.items())[strand]
+
+      atttype = list(slot[1].items())[int(atttype_index)]
+      variant = list(atttype[1].items())[int(variant_index)][0]
+
+      asset_name = variant
+
+      asset_path = os.path.join(new_path, asset_name)
+
+      bpy.ops.wm.append(filepath=asset_path, directory=new_path,
+                 filename=asset_name)
+
+      # bpy.data.collections[variant].hide_viewport = False
+      # bpy.data.collections[variant].hide_render = False
+
+
+   for colls in bpy.data.collections["Imported"].children:
+      colls.hide_viewport = False
+      colls.hide_render = False
+      print(colls)
+
+   return
+
+
+def assettest2(DNA, file_path, coll_name):
+
+   coll = bpy.data.collections[coll_name]
+
+   for child in coll.children:
+      for obj in child.objects:
+         bpy.data.objects.remove(obj)
+      # coll.objects.unlink(coll.objects.get(obj))
+      bpy.data.collections.remove(child)
+
+
+   asset_name = 'Hands_Gloves_Mittens_2_20'
+                 
+   hierarchy = get_hierarchy_ordered()
+
+   DNAString = DNA.split(",")
+
+   for strand in range(len(DNAString)):
+
+      atttype_index, variant_index = DNAString[strand].split('-')
+      slot = list(hierarchy.items())[strand]
+
+      atttype = list(slot[1].items())[int(atttype_index)]
+      variant = list(atttype[1].items())[int(variant_index)][0]
+
+      asset_name = variant
+
+      asset_path = os.path.join(file_path, asset_name)
+
+      bpy.ops.wm.append(filepath=asset_path, directory=file_path,
+                 filename=asset_name)
+
+      # bpy.data.collections[variant].hide_viewport = False
+      # bpy.data.collections[variant].hide_render = False
+
+
+   for colls in bpy.data.collections["Imported"].children:
+      colls.hide_viewport = False
+      colls.hide_render = False
+      print(colls)
+
+
+
+
+
+   return
+
+
+
 if __name__ == '__main__':
    print("okay")

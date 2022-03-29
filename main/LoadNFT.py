@@ -16,7 +16,7 @@ col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green"
          "blue" : "COLOR_05", "purple" : "COLOR_06", "pink" : "COLOR_07", "brown" : "COLOR_08"}
 
 
-def read_DNAList_from_file(index):
+def read_DNAList_from_file(index): # return DNA as string
     Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
     NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
     DataDictionary = json.load(open(NFTRecord_save_path))
@@ -28,7 +28,7 @@ def read_DNAList_from_file(index):
     else:
         return len(DNAList), ''
 
-def get_total_DNA():
+def get_total_DNA(): # get number of saved DNAs
     Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
     NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
     DataDictionary = json.load(open(NFTRecord_save_path))
@@ -48,13 +48,6 @@ def get_total_DNA():
 
 #     print()
 #     return hierarchy
-
-
-def create_rarity_dict():
-    print("hm")
-    collection = bpy.data.collections["09-Calf"]
-    collection["well"] = 5.0
-    return
 
 
 def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
@@ -132,7 +125,6 @@ def update_collection_rarity_property(RarityDict, NFTRecord_save_path):
     return
 
 def save_collection_rarity_property(index, NFTRecord_save_path, save_path):
-
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
@@ -196,7 +188,6 @@ def rarity_batch_property_updated():
         if newIndex > rarityBatches:
             bpy.context.scene.my_tool.rarityBatchIndex = rarityBatches
             bpy.context.scene.my_tool.lastrarityBatchIndex = rarityBatches
-
     return
 
 
@@ -214,7 +205,5 @@ def update_rarity_color(coll_name, rarity):
         bpy.data.collections[coll_name].color_tag = col["yellow"]
     else:
         bpy.data.collections[coll_name].color_tag = col["red"]
-
-
-
     return
+
