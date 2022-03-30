@@ -252,10 +252,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 bpy.data.collections.get(varientChoosen).hide_viewport = False
                 chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
 
-                colIndex = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
+                ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
 
-                #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + str(ColorGen.styleChoice) + str(colIndex)
-                SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
+                #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
                 VarientDict = {}
                 VarientDict[varientChoosen] = hierarchy[attribute][typeChoosen][varientChoosen]
                 ItemsUsed[attribute] = VarientDict
@@ -336,5 +336,7 @@ def PickWeightedTypeVarient(Varients):
     return variantChoosen[0], list(Varients.keys()).index(variantChoosen[0])
 
  
+#ColorStyle-1-1-textureSet-ColorR-COlorG-ColorB
+
 if __name__ == '__main__':
     RandomizeFullCharacter()
