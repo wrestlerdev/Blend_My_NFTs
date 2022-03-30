@@ -13,12 +13,14 @@ import json
 import random
 import importlib
 from functools import partial
+from mathutils import Color
 
 
 enableGeneration = False
 colorList = []
 
 saved_hierarchy = collections.OrderedDict()
+
 
 class bcolors:
    '''
@@ -80,42 +82,64 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                bpy.data.collections.get(variant).hide_render = True
    for strand in range(len(DNAString)):
 
-      atttype_index, variant_index = DNAString[strand].split('-')
+      DNASplit = DNAString[strand].split('-')
+      atttype_index = DNASplit[0]
+      variant_index = DNASplit[1]
+
       slot = list(hierarchy.items())[strand]
 
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
+
+      if len(DNASplit) > 2:
+         col_style = DNASplit[2]
+         hex_01 = DNASplit[3]
+         hex_02 = DNASplit[4]
+         hex_03 = DNASplit[5]
+
+         meshes = bpy.data.collections.get(variant).objects
+         print("*********************************")
+         for mesh in meshes:
+            print(mesh.name)
+            obj = bpy.data.objects[mesh.name]
+            col_01 = Color(HexToRGB(hex_01))
+            col_02 = Color(HexToRGB(hex_02))
+            col_03 = Color(HexToRGB(hex_03))
+            obj["TestColor"] = col_01
+            obj["R"] = col_01
+            obj["G"] = col_02
+            obj["B"] = col_03
+            print(col_01)
+
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
-      # current_coll = bpy.context.scene.collection.children[slot[0]]
-      # for variant in current_coll.children:
-      #    variant.hide_render = True
-      #    variant.hide_viewport = True
-      # index = int(DNAString[int(strand)]) - 1
-      # current_coll.children[index].hide_render = False
-      # current_coll.children[index].hide_viewport = False
+      
 
-
+def HexToRGB(hex):
+   string = hex.lstrip('#')
+   rgb255 = tuple( int(string[i:i+2], 16) for i in (0,2,4) )
+   rgb = tuple( (float(x) /255) for x in rgb255)
+   return rgb
       
       
 
 #  ----------------------------------------------------------------------------------
 
 
-def get_random_from_collection(coll): # doesn't respect weights or filled slots
-                                       # should check if from right collection
-                                       # should set new dna too
-   rand_int = random.randint(0,len(coll.children)-1)
-   chosen_coll = coll.children[rand_int]
-   for child in coll.children:
-      child.hide_render = True
-      child.hide_viewport = True
-   chosen_coll.hide_render = False
-   chosen_coll.hide_viewport = False
-   return chosen_coll
+# def get_random_from_collection(coll): # doesn't respect weights or filled slots
+#                                        # should check if from right collection
+#                                        # should set new dna too
+#    rand_int = random.randint(0,len(coll.children)-1)
+#    chosen_coll = coll.children[rand_int]
+#    for child in coll.children:
+#       child.hide_render = True
+#       child.hide_viewport = True
+#    chosen_coll.hide_render = False
+#    chosen_coll.hide_viewport = False
+#    return chosen_coll
  
 
-def find_in_collection(variant_name, collection_name):
+def find_in_collection(variant_name, collection_name): # redundant?
       collection = bpy.context.scene.collection.children[collection_name]
       set_from_collection(collection, variant_name)
       return collection.children[variant_name]
@@ -190,18 +214,19 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 def create_item_dict(DNA):
    ohierarchy = get_hierarchy_ordered()
    coll_keys = list(ohierarchy.keys())
-   
    uhierarchy = get_hierarchy_unordered()
-   
    DNAString = DNA.split(",")
-
    item_dict = {}
 
    for strand in range(len(DNAString)):
       if DNAString[strand] == '0-0':
          item_dict[coll_keys[strand]] = "Null"
       else:
-         atttype_index, variant_index = DNAString[strand].split('-')
+         DNASplit = DNAString[strand].split('-')
+         atttype_index = DNASplit[0]
+         variant_index = DNASplit[1]
+
+
          slot = list(ohierarchy.items())[strand]
 
          atttype = list(slot[1].items())[int(atttype_index)]
@@ -209,11 +234,6 @@ def create_item_dict(DNA):
          
          variant_dict = {}
          coll_index = coll_keys[strand]
-         # print("*****************************-----------------")
-         # print(atttype[0])
-         # print("*****************************")
-         # print(variant)
-         # print("*****************************-------------------")
          variant_dict[variant] = uhierarchy[coll_index][atttype[0]][variant]
 
          item_dict[coll_keys[strand]] = variant_dict
@@ -229,7 +249,10 @@ def fill_pointers_from_dna(DNA, Slots):
    print(DNA)
    for i in range(len(DNAString)):
 
-      atttype_index, variant_index = DNAString[i].split('-')
+
+      DNASplit = DNAString[i].split('-')
+      atttype_index = DNASplit[0]
+      variant_index = DNASplit[1]
 
       # strand_index = int(DNAString[i]) - 1
       slot = list(ohierarchy.items())[i]
@@ -242,17 +265,9 @@ def fill_pointers_from_dna(DNA, Slots):
       last_coll_name = "last" + str(coll_name)
       input_coll_name = "input" + str(coll_name)
       print(coll_name)
-      # variant = variant[3:len(variant)]
       bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
       bpy.context.scene.my_tool[input_coll_name] = bpy.data.collections[variant]
 
-      # coll_name = current_coll.name
-      # coll_name = coll_name[3:int(len(coll_name))] # CHANGE 3 IF FOLDER NAMES CHANGE
-
-      # last_coll_name = "last" + str(coll_name)
-      # input_coll_name = "input" + str(coll_name)
-      # bpy.context.scene.my_tool[last_coll_name] = current_coll.children[strand_index]
-      # bpy.context.scene.my_tool[input_coll_name] = current_coll.children[strand_index]
    return
 
 

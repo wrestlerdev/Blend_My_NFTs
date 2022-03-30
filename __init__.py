@@ -561,9 +561,9 @@ class assetlibTest(bpy.types.Operator):
         DNA = bpy.context.scene.my_tool.inputDNA
         new_path = os.path.join(library_path, import_file, inner_path)
 
-        # Previewer.assettest(DNA, library_path, inner_path, coll_name, Slots)
+        Previewer.assettest(DNA, library_path, inner_path, coll_name, Slots)
         
-        Previewer.assettest2(DNA, new_path, coll_name)
+        # Previewer.assettest2(DNA, new_path, coll_name)
         # print(bpy.context.object)
         # bpy.ops.asset.open_containing_blend_file()
         print(time.process_time() - start)
