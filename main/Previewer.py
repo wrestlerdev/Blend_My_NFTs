@@ -78,8 +78,8 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       for type in hierarchy[attribute]:
             for variant in hierarchy[attribute][type]:
                print(variant)
-               bpy.data.collections.get(variant).hide_viewport = True
-               bpy.data.collections.get(variant).hide_render = True
+               bpy.data.collections[variant].hide_viewport = True
+               bpy.data.collections[variant].hide_render = True
    for strand in range(len(DNAString)):
 
       DNASplit = DNAString[strand].split('-')
@@ -110,6 +110,8 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
             obj["G"] = col_02
             obj["B"] = col_03
             print(col_01)
+            obj.hide_viewport = False
+
 
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
@@ -126,34 +128,32 @@ def HexToRGB(hex):
 #  ----------------------------------------------------------------------------------
 
 
-# def get_random_from_collection(coll): # doesn't respect weights or filled slots
-#                                        # should check if from right collection
-#                                        # should set new dna too
-#    rand_int = random.randint(0,len(coll.children)-1)
-#    chosen_coll = coll.children[rand_int]
-#    for child in coll.children:
-#       child.hide_render = True
-#       child.hide_viewport = True
-#    chosen_coll.hide_render = False
-#    chosen_coll.hide_viewport = False
-#    return chosen_coll
- 
-
-def find_in_collection(variant_name, collection_name): # redundant?
-      collection = bpy.context.scene.collection.children[collection_name]
-      set_from_collection(collection, variant_name)
-      return collection.children[variant_name]
-
 
 def set_from_collection(slot_coll, variant_name): # hide all in coll and show given variant based on name
    new_dna_strand = ''
    type_index = 0
+
+   lastDNA = bpy.context.scene.my_tool.lastDNA
+   DNAString = lastDNA.split(",")
+
+   hierarchy = get_hierarchy_unordered()
+   attributeskeys = list(hierarchy.keys())
+   index = attributeskeys.index(slot_coll.name)
+   DNAStrand = DNAString[index]
+   DNASplit = DNAStrand.split('-')
+   last_color = DNASplit[2:]
+   print(last_color)
+
    for type_coll in slot_coll.children:
       if variant_name in type_coll.children:
          type_list = list(type_coll.children)
          variant_index = type_list.index(bpy.data.collections[variant_name])
 
-         new_dna_strand = (str(type_index) + '-' + str(variant_index))
+         dna_string = [str(type_index), str(variant_index)]
+         dna_string += last_color
+
+         new_dna_strand = '-'.join(dna_string)
+         print(new_dna_strand)
       else:
          type_index += 1
    
@@ -162,6 +162,16 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
          for variant_coll in type_coll.children: # hide all
             variant_coll.hide_render = True
             variant_coll.hide_viewport = True
+
+      meshes = bpy.data.collections.get(variant_name).objects
+      for mesh in meshes:
+         obj = bpy.data.objects[mesh.name]
+         obj["TestColor"] = HexToRGB(last_color[1])
+         obj["R"] = HexToRGB(last_color[1])
+         obj["G"] = HexToRGB(last_color[2])
+         obj["B"] = HexToRGB(last_color[3])
+         obj.hide_viewport = False
+
       bpy.data.collections[variant_name].hide_render = False
       bpy.data.collections[variant_name].hide_viewport = False
 
@@ -175,6 +185,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
 def collections_have_updated(slots_key, Slots): # this is called from init properties
     if bpy.context.scene.my_tool.get(slots_key) is not None:
       coll_name, label = Slots[slots_key]
+
 
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
       if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
@@ -201,13 +212,18 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
    if DNA != lastDNA:
       DNA = DNA.replace('"', '')
-      try:
-         show_nft_from_dna(DNA)
-         bpy.context.scene.my_tool.lastDNA = DNA
-         bpy.context.scene.my_tool.inputDNA = DNA
-         fill_pointers_from_dna(DNA, DNA)
-      except:
-         print("this is not a valid dna string")
+      show_nft_from_dna(DNA)
+      bpy.context.scene.my_tool.lastDNA = DNA
+      bpy.context.scene.my_tool.inputDNA = DNA
+      fill_pointers_from_dna(DNA, DNA)
+
+      # try:
+      #    show_nft_from_dna(DNA)
+      #    bpy.context.scene.my_tool.lastDNA = DNA
+      #    bpy.context.scene.my_tool.inputDNA = DNA
+      #    fill_pointers_from_dna(DNA, DNA)
+      # except:
+      #    print("this is not a valid dna string")
    return
 
 

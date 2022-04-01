@@ -341,9 +341,6 @@ class randomizeModel(bpy.types.Operator):
                 save_path = ''
                 bpy.context.scene.my_tool.inputDNA = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandMesh(self.collection_name,inputDNA,save_path)
 
-                # chosen_variant = Previewer.find_in_collection(chosen_outfit, Slots[self.collection_name][0])
-                # bpy.context.scene.my_tool[str(self.collection_name)] = chosen_variant
-                # Previewer.collections_have_updated(self.collection_name, Slots) # update dna and pointerproperty
         return {'FINISHED'}
 
 
@@ -358,8 +355,12 @@ class randomizeColor(bpy.types.Operator):
             print("this should rando color sometime")
             inputDNA = bpy.context.scene.my_tool.inputDNA
             # save_path = bpy.context.scene.my_tool.batch_json_save_path
+            inputSlot = self.collection_name
+            slotCollection = Slots[inputSlot][0]
             save_path = ''
-            DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandColor(bpy.context.scene.my_tool[self.collection_name],inputDNA,save_path)
+            DNA = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandColor(inputSlot, slotCollection, inputDNA,save_path)
+            bpy.context.scene.my_tool.inputDNA = DNA
+
         
         return {'FINISHED'}
 

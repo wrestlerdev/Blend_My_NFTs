@@ -82,19 +82,50 @@ ItemUsedBodySlot = {
     "NeckWear" : NeckWearSlots
 }
 
-def RandomizeSingleDNAStrandColor(inputSlot, CurrentDNA, save_path):
+def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
+    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
+    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    DataDictionary = json.load(open(NFTRecord_save_path))
 
-    col = (random.random(), random.random(), random.random())
-    print(inputSlot.name)
-    col = (random.random(), random.random(), random.random())
-    chidlrenObjs = bpy.data.collections.get(inputSlot.name).objects
+    hierarchy = DataDictionary["hierarchy"]
+    attributeskeys = list(hierarchy.keys())
+    index = attributeskeys.index(slot_coll)
 
-    for child in chidlrenObjs:
-        obj = bpy.data.objects[child.name]
-        obj["TestColor"] = col
-        
-        obj.hide_viewport = False
-    return "hello"
+    DNAString = CurrentDNA.split(",")
+    DNASplit = DNAString[index].split('-')
+
+    newDNASplit = [DNASplit[0], DNASplit[1]]
+
+    if len(DNASplit) > 2:
+        newDNASplit.append(DNASplit[2])
+        slot = bpy.context.scene.my_tool[inputSlot]
+
+        col = (random.random(), random.random(), random.random())
+        print(slot.name)
+        col = (random.random(), random.random(), random.random())
+
+        chidlrenObjs = bpy.data.collections.get(slot.name).objects
+        # hexCodes = ColorGen.PickOutfitColors(slot_coll, chidlrenObjs)
+        for child in chidlrenObjs:
+            obj = bpy.data.objects[child.name]
+            obj["TestColor"] = col
+            obj["R"] = col
+            
+            obj.hide_viewport = False
+            hex = ColorGen.RGBtoHex((col))
+            print(hex)
+            newDNASplit.extend([hex, DNASplit[4], DNASplit[5]])
+
+        newDNAStrand = '-'.join(newDNASplit)
+        newDNAString = copy.deepcopy(DNAString)
+        newDNAString[index] = newDNAStrand
+        newDNA = ','.join(newDNAString)
+        print(newDNAStrand)
+        return newDNA
+
+    return CurrentDNA
+
+
 
 def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
 
@@ -118,8 +149,11 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
     DNAString = CurrentDNA.split(",")
     for strand in range(len(DNAString)):
         
+        DNASplit = DNAString[strand].split('-')
+        atttype_index = DNASplit[0]
+        variant_index = DNASplit[1]
 
-        atttype_index, variant_index = DNAString[strand].split('-')
+
         slot = list(hierarchy.items())[strand]
 
         atttype = list(slot[1].items())[int(atttype_index)]
@@ -140,6 +174,8 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
             attributes = slot
             indexToEdit =  strand
             currentVarient = variant
+            last_color = DNASplit[2:]
+
     attempts = 100
     while attempts > 0:
         typeChoosen, typeIndex = PickWeightedAttributeType(attributes[1])
@@ -153,7 +189,11 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                     if attributeUsedDict.get(i):
                         willItemFit = False
             if(willItemFit):       
-                DNAString[indexToEdit] = str(typeIndex) + "-" + str(varientIndex)
+                DNAStrand = [str(typeIndex), str(varientIndex)]
+                DNAStrand += last_color
+                newDNAString = '-'.join(DNAStrand)
+                # DNAString[indexToEdit] = str(typeIndex) + '-' + str(varientIndex)
+                DNAString[indexToEdit] = newDNAString
                 FormattedDNA = ','.join(DNAString)
                 bpy.data.collections[currentVarient].hide_viewport = True
                 bpy.data.collections[varientChoosen].hide_viewport = False
