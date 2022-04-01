@@ -330,14 +330,7 @@ class randomizeModel(bpy.types.Operator):
         if self.collection_name != "":
             if self.collection_name in bpy.context.scene.my_tool:
                 print(self.collection_name)
-                # Blend_My_NFTs_Output = os.path.join(bpy.path.abspath(bpy.context.scene.my_tool.save_path), "Blend_My_NFTs Output", "NFT_Data")
-                # NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
-                # DataDictionary = json.load(open(NFTRecord_save_path))
-                # hierarchy = DataDictionary["hierarchy"]
-                # DNAList = DataDictionary["DNAList"]
-                # variant_index = Outfit_Generator.PickWeightedDNAStrand(hierarchy.get(slot))
                 inputDNA = bpy.context.scene.my_tool.inputDNA
-                # save_path = bpy.context.scene.my_tool.batch_json_save_path
                 save_path = ''
                 bpy.context.scene.my_tool.inputDNA = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandMesh(self.collection_name,inputDNA,save_path)
 
@@ -354,7 +347,6 @@ class randomizeColor(bpy.types.Operator):
         if self.collection_name != "":
             print("this should rando color sometime")
             inputDNA = bpy.context.scene.my_tool.inputDNA
-            # save_path = bpy.context.scene.my_tool.batch_json_save_path
             inputSlot = self.collection_name
             slotCollection = Slots[inputSlot][0]
             save_path = ''
@@ -379,7 +371,6 @@ class saveNFT(bpy.types.Operator):
     def execute(self, context):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         DNASet = {str(context.scene.my_tool.inputDNA)}
-        print(DNASet)
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDict = Previewer.create_item_dict(context.scene.my_tool.inputDNA)
@@ -426,7 +417,6 @@ class loadNFT(bpy.types.Operator):
     def execute(self,context):
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
         TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
-        print(DNA)
 
         if len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) > 0 and DNA != '':
             Previewer.show_nft_from_dna(DNA)
@@ -450,7 +440,6 @@ class loadNextNFT(bpy.types.Operator):
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
             TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
-            print(DNA)
 
             Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
@@ -468,7 +457,6 @@ class loadPrevNFT(bpy.types.Operator):
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
             TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
-            print(DNA)
 
             Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
