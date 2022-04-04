@@ -41,7 +41,7 @@ def createHirachy():
          
 
          for j in range(len(_varients)):
-            Varients[_varients[j].name] = attributeData(_varients[j].name)
+            Varients[_varients[j].name] = attributeData(_varients[j])
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -60,7 +60,8 @@ def createHirachy():
    return sortedAttibutes
 
 
-def attributeData(attributeVariant):
+def attributeData(attributeVariantColl):
+   attributeVariant = attributeVariantColl.name
    eachObject={}
    """
    Creates a dictionary of each attribute
@@ -94,6 +95,8 @@ def attributeData(attributeVariant):
    elif len(orderRarity) > 0:
       number = orderRarity[0]
       rarity = orderRarity[1]
+      if attributeVariantColl['rarity'] is not None:
+         rarity = str(attributeVariantColl['rarity'])
       color = "0"
 
       slotName = name[0]

@@ -83,8 +83,7 @@ ItemUsedBodySlot = {
 }
 
 def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
-    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
     DataDictionary = json.load(open(NFTRecord_save_path))
 
     hierarchy = DataDictionary["hierarchy"]
@@ -128,11 +127,10 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
 
 
 def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
-
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
-    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
 
     DataDictionary = json.load(open(NFTRecord_save_path))
+    RarityDictionary = json.load(open(bpy.context.scene.my_tool.Rarity_save_path))
 
     hierarchy = DataDictionary["hierarchy"]
     DNAList = DataDictionary["DNAList"]
@@ -178,7 +176,7 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
 
     attempts = 100
     while attempts > 0:
-        typeChoosen, typeIndex = PickWeightedAttributeType(attributes[1])
+        typeChoosen, typeIndex = PickWeightedAttributeType(attributes[1], RarityDictionary[attributes[0]])
         varientChoosen, varientIndex = PickWeightedTypeVarient(attributes[1][typeChoosen])
         if(varientChoosen != currentVarient):
             willItemFit =  True
@@ -212,9 +210,8 @@ def setBodySlotsValue(ItemClothingGenre, ValueToSet):
 
 
 def RandomizeFullCharacter(maxNFTs, save_path):
-
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
-    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
+    RarityDictionary = json.load(open(bpy.context.scene.my_tool.Rarity_save_path))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
 
@@ -282,7 +279,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
             else:
                 position = attributevalues.index(hierarchy[attribute])
-                typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
+                typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute], RarityDictionary[attribute])
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 # print(typeChoosen + " " +  varientChoosen)
                 # print(typeIndex)
@@ -324,7 +321,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     print(NFTDict)
     return list(DNASet), NFTDict
     
-def PickWeightedAttributeType(AttributeTypes):
+def PickWeightedAttributeType(AttributeTypes, TypesRarity):
     number_List_Of_i = []
     rarity_List_Of_i = []
     ifZeroBool = None
@@ -333,7 +330,8 @@ def PickWeightedAttributeType(AttributeTypes):
     for attributetype in AttributeTypes:
         number_List_Of_i.append(attributetype)
 
-        rarity = attributetype.split("_")[1]
+        # rarity = attributetype.split("_")[1]
+        rarity = TypesRarity[attributetype]["type_rarity"]
         rarity_List_Of_i.append(float(rarity))
 
     for x in rarity_List_Of_i:

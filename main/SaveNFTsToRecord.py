@@ -9,9 +9,7 @@ import random
 
 
 def SaveNFT(DNASetToAdd, NFTDict, save_path, batch_json_save_path):
-    
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
-    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
 
     DataDictionary = json.load(open(NFTRecord_save_path))
     i = int(DataDictionary["numNFTsGenerated"])

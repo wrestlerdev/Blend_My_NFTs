@@ -365,13 +365,13 @@ def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path):
 
    batchList = os.listdir(batch_json_save_path)
 
-   if batchList:
-      for i in batchList:
-         batch = os.path.join(batch_json_save_path, i)
-         if os.path.exists(batch):
-            os.remove(
-               os.path.join(batch_json_save_path, i)
-            )
+   # if batchList:
+   #    for i in batchList:
+   #       batch = os.path.join(batch_json_save_path, i)
+   #       if os.path.exists(batch):
+   #          os.remove(
+   #             os.path.join(batch_json_save_path, i)
+   #          )
 
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0

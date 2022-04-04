@@ -17,8 +17,7 @@ col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green"
 
 
 def read_DNAList_from_file(index): # return DNA as string
-    Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
-    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
     DataDictionary = json.load(open(NFTRecord_save_path))
     DNAList = DataDictionary["DNAList"]
 
@@ -29,8 +28,7 @@ def read_DNAList_from_file(index): # return DNA as string
         return len(DNAList), ''
 
 def get_total_DNA(): # get number of saved DNAs
-    Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
-    NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+    NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
     DataDictionary = json.load(open(NFTRecord_save_path))
     DNAList = DataDictionary["DNAList"]
     return len(DNAList)
@@ -49,8 +47,20 @@ def get_total_DNA(): # get number of saved DNAs
 #     print()
 #     return hierarchy
 
+def init_batch(batch_data_path):
+    delete_batch_files(batch_data_path)
 
-def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
+    if not os.path.exists(batch_data_path):
+        os.makedirs(batch_data_path)
+
+    first_batch_path = os.path.join(batch_data_path, "Batch_1")
+    if not os.path.exists(first_batch_path):
+        os.makedirs(first_batch_path)
+    
+    return
+
+
+def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, batch_save_path):
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
@@ -81,20 +91,20 @@ def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, save_path):
 
     rarity_dict_object = json.dumps(rarity_dict, indent=1, ensure_ascii=True)
 
-    RarityBatch_save_path = os.path.join(save_path, 'RarityBatch{}.json'.format(index))
+    first_batch_save_path = os.path.join(batch_save_path, "Batch_1",'RarityBatch{}.json'.format(index))
 
-    with open(os.path.join('', (RarityBatch_save_path)), "w") as outfile:
+    with open(os.path.join('', (first_batch_save_path)), "w") as outfile:
         outfile.write(rarity_dict_object)
 
     update_collection_rarity_property(rarity_dict, NFTRecord_save_path)
-
     return
 
 
 
 def load_rarity_batch_dict(index, save_path):
-    RarityBatch_save_path = os.path.join(save_path, 'RarityBatch{}.json'.format(index))
-    RarityDict = json.load(open(RarityBatch_save_path))
+    batch_save_path = os.path.join(save_path, 'Batch_{}'.format(index))
+    rarity_save_path = os.path.join(batch_save_path,'RarityBatch{}.json'.format(index))
+    RarityDict = json.load(open(rarity_save_path))
     print(RarityDict)
 
     return RarityDict
@@ -124,7 +134,13 @@ def update_collection_rarity_property(RarityDict, NFTRecord_save_path):
                 # print(str(v) + ", rarity: " + str(rarity))
     return
 
-def save_collection_rarity_property(index, NFTRecord_save_path, save_path):
+
+def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
+    dir_name = 'Batch_' + str(index)
+    dir_path = os.path.join(batch_path, dir_name)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
@@ -158,36 +174,45 @@ def save_collection_rarity_property(index, NFTRecord_save_path, save_path):
     rarity_dict = slot_dict
     # rarity_dict["variants"] = variant_dict
     # print(rarity_dict)
-
-    RarityBatch_save_path = os.path.join(save_path, 'RarityBatch{}.json'.format(index))
+    current_batch_path = os.path.join(batch_path, 'Batch_{}'.format(index))
+    rarity_save_path = os.path.join(current_batch_path, 'RarityBatch{}.json'.format(index))
 
     rarity_dict_object = json.dumps(rarity_dict, indent=1, ensure_ascii=True)
-    with open(os.path.join('', (RarityBatch_save_path)), "w") as outfile:
+    with open(os.path.join('', (rarity_save_path)), "w") as outfile:
         outfile.write(rarity_dict_object)
 
     return
 
 
 
-def delete_rarity_files(save_path):
-    batches = os.listdir(save_path)
+def delete_batch_files(batch_path):
+    batches = os.listdir(batch_path)
     for i in batches:
-        batch = os.path.join(save_path, i)
+        batch = os.path.join(batch_path, i)
         if os.path.exists(batch):
-            
-            os.remove(os.path.join(save_path, i))
+            try:
+                # os.remove(os.path.join(batch_path, i))
+                items = os.listdir(os.path.join(batch_path, i))
+                for item in items:
+                    os.remove(os.path.join(batch_path, i, item))
+                os.rmdir(os.path.join(batch_path, i))
+            except:
+                print("can't delete >:^(")
+
     return
 
 
-def rarity_batch_property_updated():
-    if(bpy.context.scene.my_tool.rarityBatchIndex != bpy.context.scene.my_tool.lastrarityBatchIndex): # to stop recursion
-        BatchRarity_save_path = bpy.context.scene.my_tool.rarity_json_save_path
+def batch_property_updated():
+    if(bpy.context.scene.my_tool.BatchIndex != bpy.context.scene.my_tool.lastBatchIndex): # to stop recursion
+
+        BatchRarity_save_path = bpy.context.scene.my_tool.batch_json_save_path
         
-        newIndex = bpy.context.scene.my_tool.rarityBatchIndex
+        newIndex = bpy.context.scene.my_tool.BatchIndex
         rarityBatches = len(os.listdir(BatchRarity_save_path))
         if newIndex > rarityBatches:
-            bpy.context.scene.my_tool.rarityBatchIndex = rarityBatches
-            bpy.context.scene.my_tool.lastrarityBatchIndex = rarityBatches
+            bpy.context.scene.my_tool.BatchIndex = rarityBatches
+            bpy.context.scene.my_tool.lastBatchIndex = rarityBatches
+
     return
 
 
@@ -207,3 +232,18 @@ def update_rarity_color(coll_name, rarity):
         bpy.data.collections[coll_name].color_tag = col["red"]
     return
 
+
+def update_current_batch(index, batch_path): # updates current batch record path to new batch record
+    new_path = ("Batch_" + str(index))
+    new_path = os.path.join(batch_path, new_path)
+    new_record_path = os.path.join(new_path, ("NFTRecord{}.json".format(index)))
+    new_rarity_path = os.path.join(new_path, ("RarityBatch{}.json".format(index)))
+    bpy.context.scene.my_tool.NFTRecord_save_path = new_record_path
+    bpy.context.scene.my_tool.Rarity_save_path = new_rarity_path
+
+
+    new_batch_path = os.path.join(batch_path, 'Batch_{}'.format(index))
+    if not os.path.exists(new_batch_path):
+        os.makedirs(new_batch_path)
+        return
+    return

@@ -147,8 +147,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     # Custom properties
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Path")
-    rarity_json_save_path: bpy.props.StringProperty(name="Rarity Save Path")
     NFTRecord_save_path: bpy.props.StringProperty(name="Rarity Save Path")
+    Rarity_save_path: bpy.props.StringProperty(name="Rarity Save Path")
 
 
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
@@ -156,8 +156,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     loadNFTIndex: bpy.props.IntProperty(name="Number to Load:", min=1, max=9999, default=1)
 
 
-    rarityBatchIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.rarity_batch_property_updated())
-    lastrarityBatchIndex: bpy.props.IntProperty(default=1)
+    BatchIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.batch_property_updated())
+    lastBatchIndex: bpy.props.IntProperty(default=1)
 
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
     inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
@@ -227,7 +227,6 @@ def make_directories(save_path):
     batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data")
     BatchRarity_save_path = os.path.join(Blend_My_NFTs_Output, "Rarity_Data")
 
-
     nftBatch_save_path = os.path.join(save_path, "Blend_My_NFTs Output", "Generated NFT Batches")
 
     if not os.path.exists(Blend_My_NFTs_Output):
@@ -236,9 +235,9 @@ def make_directories(save_path):
         os.makedirs(batch_json_save_path)
     if not os.path.exists(nftBatch_save_path):
         os.makedirs(nftBatch_save_path)    
-    if not os.path.exists(BatchRarity_save_path):
-        os.makedirs(BatchRarity_save_path)
-    return Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path, BatchRarity_save_path
+    # if not os.path.exists(BatchRarity_save_path):
+    #     os.makedirs(BatchRarity_save_path)
+    return Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path
 
 # Update NFT count:
 combinations: int = 0
@@ -260,9 +259,9 @@ bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
 # ------------------------------- Operators ---------------------------------------------
 
-class createNFTRecord(bpy.types.Operator):
+class initializeRecord(bpy.types.Operator):
     bl_idname = 'create.record'
-    bl_label = 'Create NFT Record'
+    bl_label = 'Reinitialize'
     bl_description = "This will reinitialize the entire NFT ledger. Are you sure?"
     bl_options = {"REGISTER", "INTERNAL"}
 
@@ -270,27 +269,26 @@ class createNFTRecord(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        nftName = "temp"
-        maxNFTs = bpy.context.scene.my_tool.collectionSize
-        nftsPerBatch = 1
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        enableRarity = bpy.context.scene.my_tool.enableRarity
-        inputDNA = bpy.context.scene.my_tool.inputDNA
 
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path, BatchRarity_save_path = make_directories(save_path)
-        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
-        DataDictionary = DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
+        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "NFTRecord1.json")
+        Rarity_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "RarityBatch1.json")
 
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
-        bpy.context.scene.my_tool.rarity_json_save_path = BatchRarity_save_path
         bpy.context.scene.my_tool.NFTRecord_save_path = NFTRecord_save_path
+        bpy.context.scene.my_tool.Rarity_save_path = Rarity_save_path
 
 
         bpy.context.scene.my_tool.loadNFTIndex = 1
-        bpy.context.scene.my_tool.rarityBatchIndex = 1
+        bpy.context.scene.my_tool.BatchIndex = 1
 
-        LoadNFT.delete_rarity_files(BatchRarity_save_path)
-        LoadNFT.make_rarity_dict_from_NFTRecord(1, NFTRecord_save_path, BatchRarity_save_path)
+        LoadNFT.init_batch(batch_json_save_path)
+        DataDictionary = DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
+
+        LoadNFT.make_rarity_dict_from_NFTRecord(1, NFTRecord_save_path, batch_json_save_path)
+
+        LoadNFT.update_current_batch(1, batch_json_save_path)
         return {'FINISHED'}
 
 
@@ -374,7 +372,10 @@ class saveNFT(bpy.types.Operator):
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDict = Previewer.create_item_dict(context.scene.my_tool.inputDNA)
-        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, save_path, batch_json_save_path)
+        index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
+
+        nft_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index))
+        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, save_path, nft_save_path)
 
         numGenerated = LoadNFT.get_total_DNA()
         bpy.context.scene.my_tool.loadNFTIndex = numGenerated    
@@ -384,7 +385,7 @@ class saveNFT(bpy.types.Operator):
 
 class createBatch(bpy.types.Operator):
     bl_idname = 'create.batch'
-    bl_label = "Create Batch"
+    bl_label = "Create NFTs"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -469,16 +470,18 @@ class loadPrevNFT(bpy.types.Operator):
 #-------------------------------
 
 
-class loadRarity(bpy.types.Operator):
-    bl_idname = 'load.rarity'
-    bl_label = "Load Batch Rarity JSON"
+class loadBatch(bpy.types.Operator):
+    bl_idname = 'load.batch'
+    bl_label = "Load Batch"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
+        batch_path = bpy.context.scene.my_tool.batch_json_save_path
         try:
-            index = bpy.context.scene.my_tool.rarityBatchIndex
-            rdict = LoadNFT.load_rarity_batch_dict( index, bpy.context.scene.my_tool.rarity_json_save_path)
+            index = bpy.context.scene.my_tool.BatchIndex
+            rdict = LoadNFT.load_rarity_batch_dict( index, batch_path)
+            LoadNFT.update_current_batch(index, batch_path)
             LoadNFT.update_collection_rarity_property(rdict, NFTRecord_save_path)
         except:
             self.report({"ERROR"}, "This is not a valid batch" )
@@ -489,35 +492,48 @@ class loadRarity(bpy.types.Operator):
 
 
 
-class saveRarityBatch(bpy.types.Operator):
-    bl_idname = 'save.raritybatch'
-    bl_label = "Save Rarity JSON"
+class saveBatch(bpy.types.Operator):
+    bl_idname = 'save.batch'
+    bl_label = "Save Batch"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+
+        index = bpy.context.scene.my_tool.BatchIndex
+
+        LoadNFT.update_current_batch(index, batch_json_save_path)
+
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
+        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
 
-        index = bpy.context.scene.my_tool.rarityBatchIndex
-        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, bpy.context.scene.my_tool.rarity_json_save_path)
-
+        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
         return {'FINISHED'}
 
 
 
-class saveNewRarityBatch(bpy.types.Operator):
-    bl_idname = 'save.newraritybatch'
-    bl_label = "Save as New Rarity JSON"
+class saveNewBatch(bpy.types.Operator):
+    bl_idname = 'save.newbatch'
+    bl_label = "Save as New Batch"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+        index = len(os.listdir(batch_json_save_path)) + 1
+        
+        LoadNFT.update_current_batch(index, batch_json_save_path)
+
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
+        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
+        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
 
-        index = len(os.listdir(bpy.context.scene.my_tool.rarity_json_save_path)) + 1
-        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, bpy.context.scene.my_tool.rarity_json_save_path)
-
-        bpy.context.scene.my_tool.rarityBatchIndex = index
+        bpy.context.scene.my_tool.BatchIndex = index
         return {'FINISHED'}
 
+
+
+
+#----------------------------------------------------------------
 
 class assetlibTest(bpy.types.Operator):
     bl_idname = 'assetlib.test'
@@ -565,9 +581,9 @@ class assetlibTest(bpy.types.Operator):
 
 #Create Preview Panel
 
-class WCUSTOM_PT_CreateData(bpy.types.Panel):
+class WCUSTOM_PT_FCreateData(bpy.types.Panel):
     bl_label = "Create NFTs and Data"
-    bl_idname = "WCUSTOM_PT_CreateData"
+    bl_idname = "WCUSTOM_PT_FCreateData"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Blend_My_NFTs'
@@ -578,8 +594,7 @@ class WCUSTOM_PT_CreateData(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        row = layout.row()
-        row.operator(createNFTRecord.bl_idname, text=createNFTRecord.bl_label)
+
         row = layout.row()
         row.prop(mytool, "maxNFTs")
         row.operator(createBatch.bl_idname, text=createBatch.bl_label)
@@ -784,7 +799,10 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         mytool = scene.my_tool
 
         row = layout.row()
-        row.label(text="Current Generated: " + str(len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path))))
+        index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+
+        row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 2))
         row = layout.row()
         row.prop(mytool, "loadNFTIndex")
         row.operator(loadNFT.bl_idname, text=loadNFT.bl_label)
@@ -811,8 +829,8 @@ class GU_PT_collection_custom_properties(bpy.types.Panel, PropertyPanel):
 
 
 
-class WCUSTOM_PT_EditRarity(bpy.types.Panel):
-    bl_label = "Rarity Editor"
+class WCUSTOM_PT_EditBatch(bpy.types.Panel):
+    bl_label = "Batch Editor"
     bl_idname = "WCUSTOM_PT_EditRarity"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -823,14 +841,17 @@ class WCUSTOM_PT_EditRarity(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
         row = layout.row()
-        row.label(text="Current Batches Generated: {}".format(len(os.listdir(bpy.context.scene.my_tool.rarity_json_save_path))))
+        if os.path.exists(bpy.context.scene.my_tool.batch_json_save_path):
+            row.label(text="Current Batches Generated: {}".format(len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path))))
         row = layout.row()
-        row.prop(mytool, "rarityBatchIndex")
+        row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+        row = layout.row()
+        row.prop(mytool, "BatchIndex")
 
         row = layout.row()
-        row.operator(loadRarity.bl_idname, text=loadRarity.bl_label)
-        row.operator(saveRarityBatch.bl_idname, text=saveRarityBatch.bl_label)
-        row.operator(saveNewRarityBatch.bl_idname, text=saveNewRarityBatch.bl_label)
+        row.operator(loadBatch.bl_idname, text=loadBatch.bl_label)
+        row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
+        row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
 
 
 
@@ -913,9 +934,12 @@ class WCUSTOM_PT_EditRarity(bpy.types.Panel):
 
 
 classes = (
+
+    #Panels
+
     BMNFTS_PGT_MyProperties,
-    WCUSTOM_PT_CreateData,
-    WCUSTOM_PT_EditRarity,
+    WCUSTOM_PT_EditBatch,
+    WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_LoadFromFile,
     WCUSTOM_PT_PreviewNFTs,
     WCUSTOM_PT_ParentSlots,
@@ -930,15 +954,15 @@ classes = (
     # BMNFTS_PT_Documentation,
 
 
-    # Other panels:
+    # Operators:
 
-    loadRarity,
-    saveRarityBatch,
-    saveNewRarityBatch,
+    loadBatch,
+    saveBatch,
+    saveNewBatch,
 
     randomizeModel,
     randomizeColor,
-    createNFTRecord,
+    initializeRecord,
     randomizePreview,
     saveNFT,
     createBatch,

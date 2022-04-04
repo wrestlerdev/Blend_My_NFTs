@@ -245,8 +245,7 @@ def get_hierarchy_ordered():
       if(saved_hierarchy):
             return saved_hierarchy
       else:
-            Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
-            NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+            NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
             DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
             hierarchy = DataDictionary["hierarchy"]
             DNAList = DataDictionary["DNAList"]
@@ -255,8 +254,7 @@ def get_hierarchy_ordered():
    
 
 def get_hierarchy_unordered():
-      Blend_My_NFTs_Output = os.path.join("Blend_My_NFTs Output", "NFT_Data")
-      NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
+      NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
       DataDictionary = json.load(open(NFTRecord_save_path))
       hierarchy = DataDictionary["hierarchy"]
 
