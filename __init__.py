@@ -389,10 +389,11 @@ class createBatch(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-        DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, save_path)
+        index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+        DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, nft_save_path)
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, save_path, batch_json_save_path)
+        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, nft_save_path, batch_json_save_path)
 
         numGenerated = LoadNFT.get_total_DNA()
         bpy.context.scene.my_tool.loadNFTIndex = numGenerated
@@ -418,8 +419,9 @@ class loadNFT(bpy.types.Operator):
     def execute(self,context):
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
         TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
-
-        if len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) > 0 and DNA != '':
+        index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+        if len(os.listdir(nft_save_path)) > 2 and DNA != '':
             Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
             bpy.context.scene.my_tool.inputDNA = DNA
@@ -436,7 +438,11 @@ class loadNextNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
-        nftnum = len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path))
+        index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+
+        nftnum = len(os.listdir(nft_save_path)) - 2
+        print(nftnum)
         if  nftnum > 0 and bpy.context.scene.my_tool.loadNFTIndex < nftnum:
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
@@ -454,7 +460,9 @@ class loadPrevNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
-        if len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) > 0 :
+        index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+        if len(os.listdir(nft_save_path)) > 2 :
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
             TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)

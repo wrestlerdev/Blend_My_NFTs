@@ -95,10 +95,14 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
 
     newDNASplit = [DNASplit[0], DNASplit[1]]
 
-    if len(DNASplit) > 2:
-        newDNASplit.append(DNASplit[2])
-        slot = bpy.context.scene.my_tool[inputSlot]
+    if not (newDNASplit[0] == 0 and newDNASplit[1] == 0): # if not null
+        if len(DNASplit) > 2: # append color style
+            newDNASplit.append(DNASplit[2])
+        else:
+            newDNASplit.append(get_style())
 
+
+        slot = bpy.context.scene.my_tool[inputSlot]
         col = (random.random(), random.random(), random.random())
         print(slot.name)
         col = (random.random(), random.random(), random.random())
@@ -112,8 +116,12 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
             
             obj.hide_viewport = False
             hex = ColorGen.RGBtoHex((col))
-            print(hex)
-            newDNASplit.extend([hex, DNASplit[4], DNASplit[5]])
+
+
+            if len(DNASplit) > 2:
+                newDNASplit.extend([hex, DNASplit[4], DNASplit[5]])
+            else:
+                newDNASplit.extend([hex, hex, hex])
 
         newDNAStrand = '-'.join(newDNASplit)
         newDNAString = copy.deepcopy(DNAString)
@@ -123,6 +131,14 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
         return newDNA
 
     return CurrentDNA
+
+
+def get_style(): # placeholder
+    style = 'a'
+    return style
+
+def get_rando_color(): # placeholder
+    return get_style(), '#FFFFFF', '#FFFFFF', '#FFFFFF'
 
 
 
@@ -172,7 +188,10 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
             attributes = slot
             indexToEdit =  strand
             currentVarient = variant
-            last_color = DNASplit[2:]
+            if len(DNASplit) > 2:
+                last_color = DNASplit[2:] # get last used colour from dna
+            else:
+                last_color = get_rando_color()
 
     attempts = 100
     while attempts > 0:
@@ -188,7 +207,8 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                         willItemFit = False
             if(willItemFit):       
                 DNAStrand = [str(typeIndex), str(varientIndex)]
-                DNAStrand += last_color
+                if typeIndex != 0 or varientIndex != 0: # if is not a null block
+                    DNAStrand += last_color
                 newDNAString = '-'.join(DNAStrand)
                 # DNAString[indexToEdit] = str(typeIndex) + '-' + str(varientIndex)
                 DNAString[indexToEdit] = newDNAString
