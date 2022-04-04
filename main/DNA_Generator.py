@@ -355,7 +355,7 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    return DataDictionary, possibleCombinations, DNAList
 
-def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path):
+def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, rarity_from_name):
    """
    Creates NFTRecord.json file and sends "batchDataDictionary" to it. NFTRecord.json is a permanent record of all DNA
    you've generated with all attribute variants. If you add new variants or attributes to your .blend file, other scripts
@@ -375,7 +375,7 @@ def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path):
 
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
-   DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
+   DataDictionary["hierarchy"] = NFTHirachy.createHirachy(rarity_from_name)
    DataDictionary["DNAList"] = []
 
    #DataDictionary, possibleCombinations, DNAList = generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)

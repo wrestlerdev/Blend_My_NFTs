@@ -91,7 +91,7 @@ def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, batch_save_path)
 
     rarity_dict_object = json.dumps(rarity_dict, indent=1, ensure_ascii=True)
 
-    first_batch_save_path = os.path.join(batch_save_path, "Batch_1",'RarityBatch{}.json'.format(index))
+    first_batch_save_path = os.path.join(batch_save_path, "Batch_1",'_RarityBatch{}.json'.format(index))
 
     with open(os.path.join('', (first_batch_save_path)), "w") as outfile:
         outfile.write(rarity_dict_object)
@@ -103,7 +103,7 @@ def make_rarity_dict_from_NFTRecord(index, NFTRecord_save_path, batch_save_path)
 
 def load_rarity_batch_dict(index, save_path):
     batch_save_path = os.path.join(save_path, 'Batch_{}'.format(index))
-    rarity_save_path = os.path.join(batch_save_path,'RarityBatch{}.json'.format(index))
+    rarity_save_path = os.path.join(batch_save_path,'_RarityBatch{}.json'.format(index))
     RarityDict = json.load(open(rarity_save_path))
     print(RarityDict)
 
@@ -175,7 +175,7 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
     # rarity_dict["variants"] = variant_dict
     # print(rarity_dict)
     current_batch_path = os.path.join(batch_path, 'Batch_{}'.format(index))
-    rarity_save_path = os.path.join(current_batch_path, 'RarityBatch{}.json'.format(index))
+    rarity_save_path = os.path.join(current_batch_path, '_RarityBatch{}.json'.format(index))
 
     rarity_dict_object = json.dumps(rarity_dict, indent=1, ensure_ascii=True)
     with open(os.path.join('', (rarity_save_path)), "w") as outfile:
@@ -236,8 +236,8 @@ def update_rarity_color(coll_name, rarity):
 def update_current_batch(index, batch_path): # updates current batch record path to new batch record
     new_path = ("Batch_" + str(index))
     new_path = os.path.join(batch_path, new_path)
-    new_record_path = os.path.join(new_path, ("NFTRecord{}.json".format(index)))
-    new_rarity_path = os.path.join(new_path, ("RarityBatch{}.json".format(index)))
+    new_record_path = os.path.join(new_path, ("_NFTRecord{}.json".format(index)))
+    new_rarity_path = os.path.join(new_path, ("_RarityBatch{}.json".format(index)))
     bpy.context.scene.my_tool.NFTRecord_save_path = new_record_path
     bpy.context.scene.my_tool.Rarity_save_path = new_rarity_path
 

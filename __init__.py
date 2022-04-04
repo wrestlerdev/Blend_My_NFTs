@@ -272,8 +272,8 @@ class initializeRecord(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
 
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "NFTRecord1.json")
-        Rarity_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "RarityBatch1.json")
+        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "_NFTRecord1.json")
+        Rarity_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "_RarityBatch1.json")
 
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
         bpy.context.scene.my_tool.NFTRecord_save_path = NFTRecord_save_path
@@ -284,7 +284,7 @@ class initializeRecord(bpy.types.Operator):
         bpy.context.scene.my_tool.BatchIndex = 1
 
         LoadNFT.init_batch(batch_json_save_path)
-        DataDictionary = DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
+        DataDictionary = DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, True)
 
         LoadNFT.make_rarity_dict_from_NFTRecord(1, NFTRecord_save_path, batch_json_save_path)
 
@@ -512,7 +512,7 @@ class saveBatch(bpy.types.Operator):
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
-        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
+        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, False)
 
         LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
         return {'FINISHED'}
@@ -531,7 +531,7 @@ class saveNewBatch(bpy.types.Operator):
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
-        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path)
+        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, False)
         LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
 
         bpy.context.scene.my_tool.BatchIndex = index

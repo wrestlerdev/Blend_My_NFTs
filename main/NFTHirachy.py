@@ -9,7 +9,8 @@ import importlib
 from functools import partial
 
 
-def createHirachy():
+def createHirachy(rarity_from_name):
+   # rarity_from_name = bool whether rarity in new heirarchy should use either 'collection custom property rarity' or 'collection name rarity'
    unsortedttributeList = {} 
    coll = bpy.context.scene.collection.children
    
@@ -41,7 +42,7 @@ def createHirachy():
          
 
          for j in range(len(_varients)):
-            Varients[_varients[j].name] = attributeData(_varients[j])
+            Varients[_varients[j].name] = attributeData(_varients[j], rarity_from_name)
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -60,7 +61,7 @@ def createHirachy():
    return sortedAttibutes
 
 
-def attributeData(attributeVariantColl):
+def attributeData(attributeVariantColl, rarity_from_name):
    attributeVariant = attributeVariantColl.name
    eachObject={}
    """
@@ -95,7 +96,7 @@ def attributeData(attributeVariantColl):
    elif len(orderRarity) > 0:
       number = orderRarity[0]
       rarity = orderRarity[1]
-      if attributeVariantColl['rarity'] is not None:
+      if not rarity_from_name and attributeVariantColl['rarity'] is not None:
          rarity = str(attributeVariantColl['rarity'])
       color = "0"
 

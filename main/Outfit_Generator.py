@@ -347,24 +347,34 @@ def PickWeightedAttributeType(AttributeTypes, TypesRarity):
     ifZeroBool = None
 
 
+    # for attributetype in AttributeTypes:
+    #     number_List_Of_i.append(attributetype)
+
+    #     # rarity = attributetype.split("_")[1]
+    #     rarity = TypesRarity[attributetype]["type_rarity"]
+    #     rarity_List_Of_i.append(float(rarity))
+
+    # for x in rarity_List_Of_i:
+    #     if x == 0:
+    #         ifZeroBool = True
+    #     elif x != 0:
+    #         ifZeroBool = False
+
+    # if ifZeroBool == True:
+    #     typeChoosen = random.choices(number_List_Of_i, k=1)
+    # elif ifZeroBool == False:
+    #     typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)     
+
     for attributetype in AttributeTypes:
-        number_List_Of_i.append(attributetype)
-
         # rarity = attributetype.split("_")[1]
-        rarity = TypesRarity[attributetype]["type_rarity"]
-        rarity_List_Of_i.append(float(rarity))
+        rarity = float(TypesRarity[attributetype]["type_rarity"])
+        variants_total = float(TypesRarity[attributetype]["variant_total"]) # check if variants weight added up > 0
+        if rarity > 0.0 and variants_total > 0.0:
+            number_List_Of_i.append(attributetype)
+            rarity_List_Of_i.append(float(rarity))
 
-    for x in rarity_List_Of_i:
-        if x == 0:
-            ifZeroBool = True
-        elif x != 0:
-            ifZeroBool = False
+    typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
 
-    if ifZeroBool == True:
-        typeChoosen = random.choices(number_List_Of_i, k=1)
-    elif ifZeroBool == False:
-        typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
-    
     return typeChoosen[0], list(AttributeTypes.keys()).index(typeChoosen[0])
 
 
@@ -375,22 +385,13 @@ def PickWeightedTypeVarient(Varients):
     ifZeroBool = None
     
     for varient in Varients:
-        number_List_Of_i.append(varient)
+        rarity = float(Varients[varient]["rarity"])
+        if rarity > 0.0:
+            number_List_Of_i.append(varient)
+            rarity_List_Of_i.append(float(rarity))
 
-        rarity = Varients[varient]["rarity"]
-        rarity_List_Of_i.append(float(rarity))
+    variantChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)    
 
-    for x in rarity_List_Of_i:
-        if x == 0:
-            ifZeroBool = True
-        elif x != 0:
-            ifZeroBool = False
-
-    if ifZeroBool == True:
-        variantChoosen = random.choices(number_List_Of_i, k=1)
-    elif ifZeroBool == False:
-        variantChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
-    
     return variantChoosen[0], list(Varients.keys()).index(variantChoosen[0])
 
  
