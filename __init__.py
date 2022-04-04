@@ -392,8 +392,7 @@ class createBatch(bpy.types.Operator):
         index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
         DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, nft_save_path)
-        batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, nft_save_path, batch_json_save_path)
+        SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, nft_save_path, nft_save_path)
 
         numGenerated = LoadNFT.get_total_DNA()
         bpy.context.scene.my_tool.loadNFTIndex = numGenerated
