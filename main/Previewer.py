@@ -20,7 +20,7 @@ enableGeneration = False
 colorList = []
 
 saved_hierarchy = collections.OrderedDict()
-
+characters = ['Rem', 'Nef', 'Kae']
 
 class bcolors:
    '''
@@ -39,6 +39,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
 
    coll_keys = list(hierarchy.keys())
    DNAString = DNA.split(",")
+   character = DNAString.pop(0)
    for attribute in hierarchy:
       for type in hierarchy[attribute]:
             for variant in hierarchy[attribute][type]:
@@ -54,13 +55,23 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
 
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
-
+      
+      char_variant = bpy.data.collections[variant].children
+         
       if len(DNASplit) > 2:
          hex_01 = DNASplit[3]
          hex_02 = DNASplit[4]
          hex_03 = DNASplit[5]
 
-         meshes = bpy.data.collections.get(variant).objects
+         if char_variant:
+            for child in char_variant:
+               if child.name.split('_')[-1] == character:
+                  meshes = child.objects
+                  child.hide_viewport = False
+               else:
+                  child.hide_viewport = True
+         else:
+            meshes = bpy.data.collections.get(variant).objects
          for mesh in meshes:
             obj = bpy.data.objects[mesh.name]
             col_01 = Color(HexToRGB(hex_01))
@@ -75,7 +86,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
 
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
-      
+
 
 def HexToRGB(hex):
    string = hex.lstrip('#')
@@ -95,6 +106,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
 
    lastDNA = bpy.context.scene.my_tool.lastDNA
    DNAString = lastDNA.split(",")
+   character = DNAString.pop(0)
 
    hierarchy = get_hierarchy_unordered()
    attributeskeys = list(hierarchy.keys())
@@ -151,7 +163,8 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
          coll_index = list(hierarchy.keys()).index(coll_name)
 
          DNA = dna_string.split(',') 
-         DNA[coll_index] = str(new_dnastrand)
+
+         DNA[coll_index + 1] = str(new_dnastrand)
          dna_string = ','.join(DNA)
 
          last_key = slots_key.replace("input", "last")
@@ -169,10 +182,6 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
    if DNA != lastDNA:
       DNA = DNA.replace('"', '')
-      # show_nft_from_dna(DNA)
-      # bpy.context.scene.my_tool.lastDNA = DNA
-      # bpy.context.scene.my_tool.inputDNA = DNA
-      # fill_pointers_from_dna(DNA, DNA)
       try:
          show_nft_from_dna(DNA)
          bpy.context.scene.my_tool.lastDNA = DNA
@@ -188,6 +197,8 @@ def create_item_dict(DNA):
    coll_keys = list(ohierarchy.keys())
    uhierarchy = get_hierarchy_unordered()
    DNAString = DNA.split(",")
+   character = DNAString.pop(0)
+
    item_dict = {}
 
    for strand in range(len(DNAString)):
@@ -217,6 +228,9 @@ def create_item_dict(DNA):
 
 def fill_pointers_from_dna(DNA, Slots):
    DNAString = DNA.split(',')
+   character = DNAString.pop(0)
+   show_character(character)
+   
    ohierarchy = get_hierarchy_ordered()
    for i in range(len(DNAString)):
 
@@ -352,6 +366,13 @@ def assettest2(DNA, file_path, coll_name):
 
    return
 
+
+def show_character(char_name):
+   for c in characters:
+        if char_name == c:
+            bpy.data.collections[c].hide_viewport = False
+        else:
+            bpy.data.collections[c].hide_viewport = True
 
 
 if __name__ == '__main__':

@@ -91,6 +91,7 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
     index = attributeskeys.index(slot_coll)
 
     DNAString = CurrentDNA.split(",")
+    character = DNAString.pop(0)
     DNASplit = DNAString[index].split('-')
 
     newDNASplit = [DNASplit[0], DNASplit[1]]
@@ -107,7 +108,14 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
         print(slot.name)
         col = (random.random(), random.random(), random.random())
 
-        chidlrenObjs = bpy.data.collections.get(slot.name).objects
+        childrenColls = slot.children
+        if childrenColls:
+            for childColl in childrenColls:
+                if childColl.name.split('_')[-1] == character:
+                    chidlrenObjs = childColl.objects
+                    break
+        else:
+            chidlrenObjs = slot.objects
         # hexCodes = ColorGen.PickOutfitColors(slot_coll, chidlrenObjs)
         for child in chidlrenObjs:
             obj = bpy.data.objects[child.name]
@@ -126,6 +134,8 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
         newDNAStrand = '-'.join(newDNASplit)
         newDNAString = copy.deepcopy(DNAString)
         newDNAString[index] = newDNAStrand
+
+        newDNAString.insert(0, character)
         newDNA = ','.join(newDNAString)
         print(newDNAStrand)
         return newDNA
@@ -161,6 +171,8 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
     indexToEdit = -1
     currentVarient = ''
     DNAString = CurrentDNA.split(",")
+    character = DNAString.pop(0)
+
     for strand in range(len(DNAString)):
         
         DNASplit = DNAString[strand].split('-')
@@ -212,9 +224,17 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                 newDNAString = '-'.join(DNAStrand)
                 # DNAString[indexToEdit] = str(typeIndex) + '-' + str(varientIndex)
                 DNAString[indexToEdit] = newDNAString
+                DNAString.insert(0, character)
                 FormattedDNA = ','.join(DNAString)
                 bpy.data.collections[currentVarient].hide_viewport = True
                 bpy.data.collections[varientChoosen].hide_viewport = False
+                charVariants = bpy.data.collections[varientChoosen].children
+                if charVariants: # check if character variants for a mesh exists
+                    for charVar in charVariants:
+                        if charVar.name.split('_')[-1] == character:
+                            charVar.hide_viewport = False
+                        else:
+                            charVar.hide_viewport = True
                 return FormattedDNA
         #print(currentVarient)
         attempts -= 1
@@ -253,6 +273,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 for varient in hierarchy[attribute][type]:
                     bpy.data.collections.get(varient).hide_viewport = True
 
+
         
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
         ItemsUsed = {}
@@ -261,7 +282,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributevalues = list(hierarchy.values())
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
-        ColorGen.SetUpCharacterStyle()
+        character = PickCharacter()
+        ColorGen.SetUpCharacterStyle(character)
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -288,7 +310,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         #     obj["metallic"] = random.random()
         #     obj.hide_viewport = False
         
-         
 
         for attribute in attributeskeys:
             if(attributeUsedDict.get(attribute)):
@@ -304,11 +325,19 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 # print(typeChoosen + " " +  varientChoosen)
                 # print(typeIndex)
                 # print(varientIndex)
-
+                char_variants = bpy.data.collections.get(varientChoosen).children
+                if char_variants:
+                    for char_coll in char_variants:
+                        char_name = char_coll.name.split('_')[-1]
+                        if char_name == character:
+                            char_coll.hide_viewport = False
+                            chidlrenObjs = char_coll.objects
+                        else:
+                            char_coll.hide_viewport = True
+                else:
+                    chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False
-                chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
-
                 ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
 
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
@@ -325,7 +354,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
-           
+        SingleDNA.insert(0,character)
+        
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
@@ -391,10 +421,29 @@ def PickWeightedTypeVarient(Varients):
             rarity_List_Of_i.append(float(rarity))
 
     variantChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)    
-
+    # charVariants = bpy.data.collections[variantChoosen[0]].children
+    # if charVariants:
+    #     for child in charVariants:
+    #         if child.name.split('_')[-1] == character:
+    #             return child.name, list(Varients.keys()).index(variantChoosen[0])
+    # else:
     return variantChoosen[0], list(Varients.keys()).index(variantChoosen[0])
 
  
+def PickCharacter(default_char=''):
+    characters = ['Rem', 'Nef', 'Kae']
+    if default_char == '':
+        char = random.choice(characters)
+    else:
+        char = default_char
+
+    for c in characters:
+        if char == c:
+            bpy.data.collections[c].hide_viewport = False
+        else:
+            bpy.data.collections[c].hide_viewport = True
+    return char
+
 #ColorStyle-1-1-textureSet-ColorR-COlorG-ColorB
 
 if __name__ == '__main__':

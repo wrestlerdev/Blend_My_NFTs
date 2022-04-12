@@ -270,7 +270,7 @@ class initializeRecord(bpy.types.Operator):
 
     def execute(self, context):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-
+        print(save_path)
         Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
         NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "_NFTRecord1.json")
         Rarity_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "_RarityBatch1.json")

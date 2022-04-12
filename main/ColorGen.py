@@ -150,7 +150,7 @@ mainColorIndex = -1
 SecondaryColorIndex = -1
 
 
-def SetUpCharacterStyle():
+def SetUpCharacterStyle(Character):
     global style, styleChoice
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
@@ -174,8 +174,7 @@ def SetUpCharacterStyle():
         #maincolor = style.pop(mainColorIndex)
         maincolor = style[mainColorIndex]
 
-    
-    for child in bpy.data.collections.get("Kae").objects:
+    for child in bpy.data.collections.get(Character).objects:
         obj = bpy.data.objects[child.name]
         obj["TestColor"] = skincols[random.randrange(len(skincols))]
         obj["metallic"] = random.random()
@@ -201,7 +200,7 @@ def PickOutfitColors(attribute, chidlrenObjs):
         colIndex = random.randrange(0, len(style) ) 
         col = style[colIndex]
         #col = (random.random(), random.random(), random.random())
-
+    
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
         c = Color()

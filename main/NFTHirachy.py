@@ -96,7 +96,7 @@ def attributeData(attributeVariantColl, rarity_from_name):
    elif len(orderRarity) > 0:
       number = orderRarity[0]
       rarity = orderRarity[1]
-      if not rarity_from_name and attributeVariantColl['rarity'] is not None:
+      if not rarity_from_name and attributeVariantColl.get('rarity') is not None:
          rarity = str(attributeVariantColl['rarity'])
       color = "0"
 

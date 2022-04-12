@@ -158,15 +158,27 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
             total_rarity = 0
 
             type_coll = bpy.data.collections[type]
-            type_rarity = type_coll["rarity"]
+            if type_coll.get('rarity') is not None:
+                type_rarity = type_coll["rarity"]
+            else:
+                rarity = type.split('_')[4]
+                type_rarity = rarity
+                type_coll["rarity"] = rarity
             update_rarity_color(type, type_rarity)
 
             for v in variants:
                 var_coll = bpy.data.collections[v]
                 # print(str(v) + ", rarity: " + str(rarity))
-                variant_dict[v] = var_coll["rarity"]
-                update_rarity_color(v, int(float(var_coll["rarity"])))
-                total_rarity += int(float(var_coll["rarity"]))
+                if var_coll.get('rarity') is not None:
+                    variant_dict[v] = var_coll["rarity"]
+                    update_rarity_color(v, int(float(var_coll["rarity"])))
+                    total_rarity += int(float(var_coll["rarity"]))
+                else:   
+                    v_rarity = v.split('_')[4]
+                    var_coll['rarity'] = int(v_rarity)
+                    variant_dict[v] = v_rarity # TODO
+                    update_rarity_color(v, int(v_rarity))
+                    total_rarity += int(v_rarity)
 
 
             type_dict[type] = {"type_rarity" : type_rarity, "variant_total" : total_rarity,  "variants" : variant_dict}
