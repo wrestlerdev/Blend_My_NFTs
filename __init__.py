@@ -538,6 +538,22 @@ class saveNewBatch(bpy.types.Operator):
         return {'FINISHED'}
 
 
+#----------------------------------------------------------------
+
+
+class swapCharacter(bpy.types.Operator):
+    bl_idname = 'change.char'
+    bl_label = "Choose"
+    bl_options = {"REGISTER", "UNDO"}
+    character_name: bpy.props.StringProperty(default="Kae")
+
+    def execute(self, context):
+        DNA = bpy.context.scene.my_tool.inputDNA
+        DNAString = DNA.split(',')
+        DNAString[0] = self.character_name
+        DNA = ','.join(DNAString)
+        bpy.context.scene.my_tool.inputDNA = DNA
+        return {'FINISHED'}
 
 
 #----------------------------------------------------------------
@@ -657,7 +673,14 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
     bl_category = 'Blend_My_NFTs'
 
     def draw(self, context):
-        self.layout.row()
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.operator(swapCharacter.bl_idname, text='Kae').character_name = 'Kae'
+        row.operator(swapCharacter.bl_idname, text='Nef').character_name = 'Nef'
+        row.operator(swapCharacter.bl_idname, text='Rem').character_name = 'Rem'
 
 
 class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
@@ -976,6 +999,7 @@ classes = (
     loadNFT,
     loadPrevNFT,
     loadNextNFT,
+    swapCharacter,
     assetlibTest,
 
 
