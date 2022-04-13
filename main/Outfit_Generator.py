@@ -126,10 +126,10 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
             hex = ColorGen.RGBtoHex((col))
 
 
-            if len(DNASplit) > 2:
-                newDNASplit.extend([hex, DNASplit[4], DNASplit[5]])
-            else:
-                newDNASplit.extend([hex, hex, hex])
+        if len(DNASplit) > 2:
+            newDNASplit.extend([hex, DNASplit[4], DNASplit[5]])
+        else:
+            newDNASplit.extend([hex, hex, hex])
 
         newDNAStrand = '-'.join(newDNASplit)
         newDNAString = copy.deepcopy(DNAString)

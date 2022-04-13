@@ -259,3 +259,14 @@ def update_current_batch(index, batch_path): # updates current batch record path
         os.makedirs(new_batch_path)
         return
     return
+
+
+
+def check_if_paths_exist(batch_num=1):
+    # return
+    if bpy.context.scene.my_tool.Rarity_save_path == '':
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
+        bpy.context.scene.my_tool.batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data")
+        bpy.context.scene.my_tool.NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_{}".format(batch_num), "_NFTRecord{}.json".format(batch_num))
+        bpy.context.scene.my_tool.Rarity_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_{}".format(batch_num), "_RarityBatch.json".format(batch_num))

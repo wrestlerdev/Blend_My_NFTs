@@ -149,7 +149,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Path")
     NFTRecord_save_path: bpy.props.StringProperty(name="Rarity Save Path")
     Rarity_save_path: bpy.props.StringProperty(name="Rarity Save Path")
-
+    root_dir:bpy.props.StringProperty(name="Root Directory")
 
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
 
@@ -310,6 +310,7 @@ class randomizePreview(bpy.types.Operator):
         maxNFTs = bpy.context.scene.my_tool.collectionSize
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         # some randomize dna code here
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
         Previewer.fill_pointers_from_dna(DNA[0][0], Slots)
         bpy.context.scene.my_tool.lastDNA = DNA[0][0]
@@ -327,7 +328,7 @@ class randomizeModel(bpy.types.Operator):
 
         if self.collection_name != "":
             if self.collection_name in bpy.context.scene.my_tool:
-                print(self.collection_name)
+                LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 save_path = ''
                 bpy.context.scene.my_tool.inputDNA = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandMesh(self.collection_name,inputDNA,save_path)
@@ -343,7 +344,7 @@ class randomizeColor(bpy.types.Operator):
 
     def execute(self, context):
         if self.collection_name != "":
-            print("this should rando color sometime")
+            LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
             inputDNA = bpy.context.scene.my_tool.inputDNA
             inputSlot = self.collection_name
             slotCollection = Slots[inputSlot][0]
@@ -367,6 +368,7 @@ class saveNFT(bpy.types.Operator):
 
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         DNASet = {str(context.scene.my_tool.inputDNA)}
 
@@ -389,6 +391,7 @@ class createBatch(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
         DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, nft_save_path)
@@ -416,6 +419,7 @@ class loadNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
         TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
         index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
@@ -437,6 +441,7 @@ class loadNextNFT(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
 
@@ -453,12 +458,14 @@ class loadNextNFT(bpy.types.Operator):
             Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
+
 class loadPrevNFT(bpy.types.Operator):
     bl_idname = 'prev.nft'
     bl_label = "Load Previous"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
         if len(os.listdir(nft_save_path)) > 2 :
@@ -483,6 +490,7 @@ class loadBatch(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
         batch_path = bpy.context.scene.my_tool.batch_json_save_path
         try:
@@ -505,10 +513,9 @@ class saveBatch(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-
         index = bpy.context.scene.my_tool.BatchIndex
-
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
         NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
@@ -525,6 +532,8 @@ class saveNewBatch(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchIndex)
+
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         index = len(os.listdir(batch_json_save_path)) + 1
         
@@ -555,6 +564,28 @@ class swapCharacter(bpy.types.Operator):
         bpy.context.scene.my_tool.inputDNA = DNA
         return {'FINISHED'}
 
+
+
+class chooseRootFolder(bpy.types.Operator):
+    bl_idname = 'choose.root'
+    bl_label = 'Choose Root Folder'
+    bl_options = {"REGISTER", "UNDO"}
+    filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
+    filter_glob: bpy.props.StringProperty(default ='',options = {'HIDDEN'})
+
+    @classmethod
+    def poll(cls, context):
+        return context.object is not None
+
+    def execute(self, context):
+        print(self.filepath)
+        bpy.context.scene.my_tool.root_dir = self.filepath
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.filepath = ""
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
 #----------------------------------------------------------------
 
@@ -832,7 +863,10 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         index = str(bpy.context.scene.my_tool.NFTRecord_save_path)[-6]
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
 
-        row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 2))
+        if os.path.exists(nft_save_path):
+            row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 2))
+        else:
+            print()
         row = layout.row()
         row.prop(mytool, "loadNFTIndex")
         row.operator(loadNFT.bl_idname, text=loadNFT.bl_label)
@@ -883,6 +917,25 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
 
+
+
+
+
+class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
+    bl_label = "Root Directory"
+    bl_idname = "WCUSTOM_PT_ARootDirectory"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Blend_My_NFTs'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "root_dir")
+        row.operator(chooseRootFolder.bl_idname, text=chooseRootFolder.bl_label)
 
 
 # class WCUSTOM_PT_RarityTypeSub(bpy.types.Panel):
@@ -968,6 +1021,7 @@ classes = (
     #Panels
 
     BMNFTS_PGT_MyProperties,
+    WCUSTOM_PT_ARootDirectory,
     WCUSTOM_PT_EditBatch,
     WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_LoadFromFile,
@@ -1000,6 +1054,7 @@ classes = (
     loadPrevNFT,
     loadNextNFT,
     swapCharacter,
+    chooseRootFolder,
     assetlibTest,
 
 
