@@ -42,7 +42,7 @@ def createHirachy(rarity_from_name):
          
 
          for j in range(len(_varients)):
-            Varients[_varients[j].name] = attributeData(_varients[j], rarity_from_name)
+            Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i], rarity_from_name)
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -61,7 +61,7 @@ def createHirachy(rarity_from_name):
    return sortedAttibutes
 
 
-def attributeData(attributeVariantColl, rarity_from_name):
+def attributeData(attributeVariantColl, attributeTypeColl, rarity_from_name):
    attributeVariant = attributeVariantColl.name
    eachObject={}
    """
@@ -96,7 +96,9 @@ def attributeData(attributeVariantColl, rarity_from_name):
    elif len(orderRarity) > 0:
       number = orderRarity[0]
       rarity = orderRarity[1]
+      type_rarity = attributeTypeColl.name.split('_')[-1]
       if not rarity_from_name and attributeVariantColl.get('rarity') is not None:
+         type_rarity = str(attributeTypeColl['rarity'])
          rarity = str(attributeVariantColl['rarity'])
       color = "0"
 
@@ -104,5 +106,6 @@ def attributeData(attributeVariantColl, rarity_from_name):
       clothingGenre = name[1]
       clothingItem = name[2]
       
-      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "number": number, "rarity": rarity, "color": color}
+      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem,
+                     "number": number, "rarity": rarity, "type_rarity": type_rarity,"color": color}
    return eachObject

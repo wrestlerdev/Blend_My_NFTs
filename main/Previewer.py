@@ -255,24 +255,29 @@ def fill_pointers_from_dna(DNA, Slots):
 
 
 def get_hierarchy_ordered():
-      global saved_hierarchy
-      if(saved_hierarchy):
-            return saved_hierarchy
-      else:
-            NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
-            DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
-            hierarchy = DataDictionary["hierarchy"]
-            DNAList = DataDictionary["DNAList"]
-            saved_hierarchy = hierarchy
-            return hierarchy
-   
+   global saved_hierarchy
+   if(saved_hierarchy):
+      return saved_hierarchy
+   else:
+      index = bpy.context.scene.my_tool.CurrentBatchIndex
+      batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+      NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))
+
+      DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
+      hierarchy = DataDictionary["hierarchy"]
+      DNAList = DataDictionary["DNAList"]
+      saved_hierarchy = hierarchy
+      return hierarchy
+
 
 def get_hierarchy_unordered():
-      NFTRecord_save_path = bpy.context.scene.my_tool.NFTRecord_save_path
-      DataDictionary = json.load(open(NFTRecord_save_path))
-      hierarchy = DataDictionary["hierarchy"]
+   index = bpy.context.scene.my_tool.CurrentBatchIndex
+   batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))      
+   DataDictionary = json.load(open(NFTRecord_save_path))
+   hierarchy = DataDictionary["hierarchy"]
 
-      return hierarchy
+   return hierarchy
 
 
 
