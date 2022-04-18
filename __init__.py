@@ -147,7 +147,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     # Custom properties
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Path")
-    NFTRecord_save_path: bpy.props.StringProperty(name="Rarity Save Path")
+
     root_dir:bpy.props.StringProperty(name="Root Directory")
 
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
@@ -420,10 +420,10 @@ class loadNFT(bpy.types.Operator):
     def execute(self,context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-        TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
-        if len(os.listdir(nft_save_path)) > 2 and DNA != '':
+        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
+        TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
+        if TotalDNA > 0 and DNA != '':
             Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
             bpy.context.scene.my_tool.inputDNA = DNA
@@ -441,15 +441,15 @@ class loadNextNFT(bpy.types.Operator):
 
     def execute(self,context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
 
-        nftnum = len(os.listdir(nft_save_path)) - 2
+        nftnum = len(os.listdir(nft_save_path)) - 1
         print(nftnum)
         if  nftnum > 0 and bpy.context.scene.my_tool.loadNFTIndex < nftnum:
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
+            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
@@ -465,12 +465,12 @@ class loadPrevNFT(bpy.types.Operator):
 
     def execute(self,context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
-        if len(os.listdir(nft_save_path)) > 2 :
+        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
+        if len(os.listdir(nft_save_path)) > 1 :
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(loadNFTIndex - 1)
+            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
@@ -898,7 +898,7 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
 
         if os.path.exists(nft_save_path):
-            row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 2))
+            row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 1))
         else:
             print()
         row = layout.row()
@@ -940,7 +940,9 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         mytool = scene.my_tool
         row = layout.row()
         if os.path.exists(bpy.context.scene.my_tool.batch_json_save_path):
-            row.label(text="Current Batches Generated: {}".format(len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path))))
+            row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path))))
+        else:
+            row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
         row = layout.row()
         row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
         row = layout.row()

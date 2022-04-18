@@ -9,8 +9,8 @@ import random
 
 
 def SaveNFT(DNASetToAdd, NFTDict, save_path, batch_json_save_path):
-    index = bpy.context.scene.my_tool.CurrentBatchIndex
-    NFTRecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))
+    batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
+    NFTRecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index), "_NFTRecord{}.json".format(batch_index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
     i = int(DataDictionary["numNFTsGenerated"])
@@ -22,7 +22,7 @@ def SaveNFT(DNASetToAdd, NFTDict, save_path, batch_json_save_path):
         singleNFT["CharacterItems"] = NFTDict[nft]
 
         singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
-        with open(os.path.join(batch_json_save_path, ("NFTNumber{}.json".format(i + 1))), "w") as outfile:
+        with open(os.path.join(batch_json_save_path, ("NFT_Batch{}Num{}.json".format(batch_index, i + 1))), "w") as outfile:
             outfile.write(singleNFTObject)
         i += 1
 
