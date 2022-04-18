@@ -159,6 +159,7 @@ def SetUpCharacterStyle(Character):
     style = copy.deepcopy( cols[random.choice(styleChoice)] )
 
 
+
     if( random.random() > .05 ):
         mainColorIndex = 0
         #maincolor = style.pop(mainColorIndex)
@@ -185,6 +186,15 @@ def PickOutfitColors(attribute, chidlrenObjs):
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
 
+    save_path = "E:/BlenderAddons/addons/Blend_My_NFTs-main/Blend_My_NFTs Output/NFT_Data/Batch_Data/Batch_1/Textures"
+    batchList = os.listdir(save_path)
+    selectedTextureSet = random.randrange(0, len(batchList))
+    textureSetPath = os.path.join(save_path, batchList[selectedTextureSet])
+    #textureSetPath = textureSetPath.replace('\\', '/')
+    textureFiles = os.listdir(textureSetPath)
+    file = os.path.join(textureSetPath, textureFiles[0])
+    file = file.replace('\\', '/')
+
     col = (0.0, 0.0, 0.0)
     colIndex = -1
     if(attribute == "01-UpperTorso"):
@@ -203,6 +213,26 @@ def PickOutfitColors(attribute, chidlrenObjs):
     
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
+
+        newImage = bpy.data.images.load(file, check_existing=True)
+
+        material_slots = obj.material_slots
+        for m in material_slots:
+            #material = m.material
+            material = bpy.data.materials['Master']
+            material.use_nodes = True
+            matcopy = material.copy()
+            m.material = matcopy
+            #m.material = bpy.data.materials['Test_02']
+            # get the nodes
+            
+
+            for node in material.node_tree.nodes:
+                if (node.label == "Albedo"):
+                    node.image = newImage
+
+
+
         c = Color()
         c.hsv = col[0], col[1], col[2]
         obj["TestColor"] = (c.r, c.g, c.b)
@@ -218,6 +248,18 @@ def PickOutfitColors(attribute, chidlrenObjs):
         hexCodes[0] = RGBtoHex((colors[0]))
         hexCodes[1] = RGBtoHex((colors[1]))
         hexCodes[2] = RGBtoHex((colors[2]))
+
+    # for block in bpy.data.materials:
+    #     if block.users == 0:
+    #         bpy.data.materials.remove(block)
+
+    # for block in bpy.data.textures:
+    #     if block.users == 0:
+    #         bpy.data.textures.remove(block)
+
+    # for block in bpy.data.images:
+    #     if block.users == 0:
+    #         bpy.data.images.remove(block)
     return hexCodes
 
 def RGBtoHex(vals, rgbtype=1):

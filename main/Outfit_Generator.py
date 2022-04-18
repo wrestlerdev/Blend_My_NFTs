@@ -272,6 +272,17 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     currentFailedAttempts = 0
 
     while numberToGen > 0: 
+        # bpy.ops.outliner.orphans_purge()
+        # coll = bpy.data.collections.get("NFTHolder")
+        # # if it doesn't exist create it
+        # if coll is None:
+        #     coll = bpy.data.collections.new("NFTHolder")
+        #     bpy.data.collections["Script_Ignore"].children.link(coll)
+
+        # for child in bpy.data.collections["NFTHolder"].children:
+        #     for obj in child.objects:
+        #         bpy.data.objects.remove(obj, do_unlink=True)
+        #     bpy.data.collections.remove(child)
 
         for attribute in hierarchy:
             for type in hierarchy[attribute]:
@@ -342,7 +353,43 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 else:
                     chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
 
-                bpy.data.collections.get(varientChoosen).hide_viewport = False
+                #bpy.data.collections.get(varientChoosen).hide_viewport = False
+
+                #deselt all 
+                #bpy.ops.object.select_all(action='DESELECT')
+
+                #bpy.data.collections.get(varientChoosen).select_set(True)
+                # cc = bpy.data.collections.new(varientChoosen + "_TEMP")
+                # bpy.data.collections["NFTHolder"].children.link(cc)
+                # for child in chidlrenObjs:
+                #     new_object =  child.copy()
+                #     cc.objects.link(new_object)
+
+                # copiedChidlrenObjs = cc.objects
+                #bpy.context.scene.collection.children.link(cc)
+
+                #bpy.data.objects[varientChoosen].select_set(True)
+                # bpy.ops.object.duplicate()
+
+                # nullCol = bpy.context.selected_objects
+
+                # bpy.ops.object.duplicates_make_real()
+                # bpy.ops.object.make_local(type='SELECT_OBDATA_MATERIAL')
+
+                # #get selected
+                # children = bpy.context.selected_objects
+                # for child in children: 
+                #     print (children)
+                #     bpy.data.collections["NFTHolder"].objects.link(child)
+                #     bpy.context.scene.collection.objects.unlink(child)
+
+
+                # bpy.ops.object.select_all(action='DESELECT')
+                # #delele null collection 
+                # nullCol[0].select_set(True)
+                # print(nullCol[0])
+                # bpy.ops.object.delete()
+
                 ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
 
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
@@ -364,7 +411,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
-            print(formattedDNA)
             DNASet.add(formattedDNA)
             NFTDict[formattedDNA] = ItemsUsed
             numberToGen -= 1
@@ -373,7 +419,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             currentFailedAttempts += 1
             if currentFailedAttempts > allowFailedAttempts:
                 break
-    print(NFTDict)
     return list(DNASet), NFTDict
     
 def PickWeightedAttributeType(AttributeTypes):
