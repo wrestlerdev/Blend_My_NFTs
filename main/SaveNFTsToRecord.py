@@ -6,7 +6,7 @@ import bpy
 import os
 import json
 import random
-
+import shutil
 
 def SaveNFT(DNASetToAdd, NFTDict, batch_json_save_path, batch_index):
     NFTRecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index), "_NFTRecord{}.json".format(batch_index))
@@ -119,6 +119,34 @@ def UpdateSingleNFTFiles(DNAToDelete, DNA_index, save_path, batch_index):
         old_nft_save_path = os.path.join(save_path, "NFT_Batch{}Num{}.json".format(batch_index, i))
         new_nft_save_path = os.path.join(save_path, "NFT_Batch{}Num{}.json".format(batch_index, i-1))
         os.rename(old_nft_save_path, new_nft_save_path)
+    return
+
+
+def CreateSlotsFolderHierarchy(save_path):
+    input_path = os.path.join(save_path, "INPUT")
+    if os.path.exists(input_path):
+        try:
+            shutil.rmtree(input_path)
+        except OSError as e:
+            print ("Error: %s - %s." % (e.filename, e.strerror))
+
+    os.makedirs(input_path)
+
+    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_1", "_NFTRecord1.json")
+    DataDictionary = json.load(open(NFTRecord_save_path))
+    hierarchy = DataDictionary["hierarchy"]
+
+    h_keys = list(hierarchy.keys())
+    for attribute in h_keys:
+        att_path = os.path.join(input_path, attribute)
+        os.makedirs(att_path)
+        for type in list(hierarchy[attribute].keys()):
+            type_path = os.path.join(att_path, type)
+            os.makedirs(type_path)
+            for variant in list(hierarchy[attribute][type].keys()):
+                variant_path = os.path.join(type_path, variant)
+                os.makedirs(variant_path)
     return
 
 

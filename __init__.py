@@ -681,6 +681,23 @@ class loadDirectory(bpy.types.Operator):
         return {'FINISHED'}
         
 
+
+class createSlotFolders(bpy.types.Operator):
+    bl_idname = 'create.slotfolers'
+    bl_label = 'Create Slot Folders'
+    bl_description = 'This will override the current folder which cannot be undone. Are you sure?'
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+
+    def execute(self, context):
+        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
+        SaveNFTsToRecord.CreateSlotsFolderHierarchy(folder_dir)
+
+        return {'FINISHED'}
+
         
 #----------------------------------------------------------------
 
@@ -1041,6 +1058,9 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
+        row = layout.row()
+        row = layout.row()
+        row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
 
 # class WCUSTOM_PT_RarityTypeSub(bpy.types.Panel):
 #     bl_label = "Type"
@@ -1162,6 +1182,7 @@ classes = (
     chooseRootFolder,
     loadDirectory,
     deleteNFT,
+    createSlotFolders,
     assetlibTest,
 
 
