@@ -130,6 +130,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    if new_dna_strand != '':
       for type_coll in slot_coll.children:
          for variant_coll in type_coll.children: # hide all
+
             variant_coll.hide_render = True
             variant_coll.hide_viewport = True
 
@@ -142,8 +143,18 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
          obj["B"] = HexToRGB(last_color[3])
          obj.hide_viewport = False
 
-      bpy.data.collections[variant_name].hide_render = False
-      bpy.data.collections[variant_name].hide_viewport = False
+      variant_coll = bpy.data.collections[variant_name]
+      variant_coll.hide_render = False
+      variant_coll.hide_viewport = False
+
+      if variant_coll.children:
+         for child in variant_coll.children:
+            if child.name.split('_')[-1] == character:
+               meshes = child.objects
+               child.hide_viewport = False
+            else:
+               child.hide_viewport = True
+
 
    return new_dna_strand # return dna strand or empty string if not valid
 
