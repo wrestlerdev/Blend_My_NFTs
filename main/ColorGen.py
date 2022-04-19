@@ -185,8 +185,10 @@ def PickOutfitColors(attribute, chidlrenObjs):
     global style, styleChoice
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
-
-    save_path = "E:/BlenderAddons/addons/Blend_My_NFTs-main/Blend_My_NFTs Output/NFT_Data/Batch_Data/Batch_1/Textures"
+    
+    # save_path = "E:/BlenderAddons/addons/Blend_My_NFTs-main/Blend_My_NFTs Output/NFT_Data/Batch_Data/Batch_1/Textures"
+    save_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "INPUT", "Textures")
+    save_path = os.path.abspath(save_path)
     batchList = os.listdir(save_path)
     selectedTextureSet = random.randrange(0, len(batchList))
     textureSetPath = os.path.join(save_path, batchList[selectedTextureSet])
@@ -194,7 +196,7 @@ def PickOutfitColors(attribute, chidlrenObjs):
     textureFiles = os.listdir(textureSetPath)
     file = os.path.join(textureSetPath, textureFiles[0])
     file = file.replace('\\', '/')
-
+    print(textureFiles[0])
     col = (0.0, 0.0, 0.0)
     colIndex = -1
     if(attribute == "01-UpperTorso"):
@@ -211,10 +213,10 @@ def PickOutfitColors(attribute, chidlrenObjs):
         col = style[colIndex]
         #col = (random.random(), random.random(), random.random())
     
+    newImage = bpy.data.images.load(file, check_existing=True)
+    
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
-
-        newImage = bpy.data.images.load(file, check_existing=True)
 
         material_slots = obj.material_slots
         for m in material_slots:
@@ -228,7 +230,7 @@ def PickOutfitColors(attribute, chidlrenObjs):
             
 
             for node in material.node_tree.nodes:
-                if (node.label == "Albedo"):
+                if (node.label == "Diffuse"):
                     node.image = newImage
 
 

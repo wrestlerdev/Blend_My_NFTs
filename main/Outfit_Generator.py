@@ -353,7 +353,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 else:
                     chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
 
-                #bpy.data.collections.get(varientChoosen).hide_viewport = False
+                bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
 
                 #deselt all 
                 #bpy.ops.object.select_all(action='DESELECT')
@@ -419,6 +419,12 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             currentFailedAttempts += 1
             if currentFailedAttempts > allowFailedAttempts:
                 break
+
+
+    for m in bpy.data.materials: # purge all unused materials for now
+        if m.users == 0 and m.name != 'Master':
+            bpy.data.materials.remove(m)
+
     return list(DNASet), NFTDict
     
 def PickWeightedAttributeType(AttributeTypes):

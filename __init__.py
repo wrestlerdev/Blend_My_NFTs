@@ -229,8 +229,8 @@ def make_directories(save_path):
         os.makedirs(Blend_My_NFTs_Output)
     if not os.path.exists(batch_json_save_path):
         os.makedirs(batch_json_save_path)
-    if not os.path.exists(nftBatch_save_path):
-        os.makedirs(nftBatch_save_path)    
+    # if not os.path.exists(nftBatch_save_path):
+    #     os.makedirs(nftBatch_save_path)    
 
     return Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path
 

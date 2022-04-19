@@ -124,13 +124,19 @@ def UpdateSingleNFTFiles(DNAToDelete, DNA_index, save_path, batch_index):
 
 def CreateSlotsFolderHierarchy(save_path):
     input_path = os.path.join(save_path, "INPUT")
-    if os.path.exists(input_path):
+
+    texture_path = os.path.join(input_path, "Textures")
+    if not os.path.exists(texture_path):
+        os.makedirs(texture_path)
+
+    slots_path = os.path.join(input_path, "Slots")
+    if os.path.exists(slots_path):
         try:
-            shutil.rmtree(input_path)
+            shutil.rmtree(slots_path)
         except OSError as e:
             print ("Error: %s - %s." % (e.filename, e.strerror))
 
-    os.makedirs(input_path)
+    os.makedirs(slots_path)
 
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_1", "_NFTRecord1.json")
@@ -139,7 +145,7 @@ def CreateSlotsFolderHierarchy(save_path):
 
     h_keys = list(hierarchy.keys())
     for attribute in h_keys:
-        att_path = os.path.join(input_path, attribute)
+        att_path = os.path.join(slots_path, attribute)
         os.makedirs(att_path)
         for type in list(hierarchy[attribute].keys()):
             type_path = os.path.join(att_path, type)
