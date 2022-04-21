@@ -36,6 +36,8 @@ ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
 ThinShortsSlot = ["09-PelvisThin"]
 NeckWearSlots = ["13-Neck"]
 
+
+
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
 #     "a" : [(0.00000, 0.04706, 0.03529), (0.64706, 0.41569, 0.21176), (0.84706, 0.81176, 0.78039), (0.84706, 0.65490, 0.58431), (0.54902,0.00784,0.00784)],
@@ -80,6 +82,31 @@ ItemUsedBodySlot = {
     "ShoesHigh" : ShoesHighSlots, 
     "ShoesMiddle" : ShoesMiddleSlots,
     "NeckWear" : NeckWearSlots
+}
+
+# Metadata attributes:
+MetadataAttributeDict = {
+    new_key: new_val
+    for keys, new_val in [(['Null', 'Nulll'], "Null"),
+                         (['Coats','TShirts','LongShirts', 'LongCoats', 'VestHoodie', 'CropShirts'], "Tops"),
+                         (["ThickShorts", "Shorts", "ThickPants", "ThickQuaterPants", "ThinPants", "ThinShorts"], "Bottoms"),
+                         (["NeckWear", "LSleave", "RSleave", "Gloves", "Mask", "Glasses", "EaringSmall"], "Accessories"),
+                         (["ShoesHigh", "ShoesMiddle", "ShoesLow"], "Shoes"),
+                         (["HairLong", "HairShort"], "Hairstyle"),
+                         (["Plane"], "Background"),
+                         (["Pack"], "Backpack")]
+    for new_key in keys
+}
+
+MetadataAttributeOrder = {
+    "Tops" : 1,
+    "Bottoms" : 2,
+    "Shoes" : 3,
+    "Hairstyle" : 0,
+    "Accessories" : 4,
+    "Background" : 6,
+    "Character" : -1,
+    "Backpack" : 5
 }
 
 def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
@@ -425,8 +452,55 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         if m.users == 0 and m.name != 'Master':
             bpy.data.materials.remove(m)
 
+    returnERC721MetaDataCustomTest("test", list(DNASet)[0], hierarchy, MetadataAttributeDict)
+
     return list(DNASet), NFTDict
     
+
+
+def returnERC721MetaDataCustomTest(name, DNA, hierarchy, MetaDataAtt):
+    metaDataDictErc721 = {
+        # "name": name,
+        "name": "Kae #0257",
+        "description": "This is a test meta data file",
+        "image": "Link to IPFS?",
+        "attributes": None,
+    }
+
+    attributes = []
+
+    DNAString = DNA.split(",")
+    character = DNAString.pop(0)
+    metaDataDictErc721["name"] = str(character + ": #0123")
+
+    attributes.append({"trait_type": "Character", "value": character})
+    for strand in range(len(DNAString)):
+        DNASplit = DNAString[strand].split('-')
+        atttype_index = DNASplit[0]
+        variant_index = DNASplit[1]
+
+        slot = list(hierarchy.items())[strand]
+
+        atttype = list(slot[1].items())[int(atttype_index)]
+        variant = list(atttype[1].items())[int(variant_index)][0]
+
+        attribute_type = "{} {} v0{}".format(variant.split('_')[1], variant.split('_')[2], variant.split('_')[3])
+        attribute = MetaDataAtt[variant.split('_')[1]]
+        print("{}: {}".format(attribute, attribute_type))
+        if attribute != "Null":
+            dict = {"trait_type": attribute, "value": attribute_type}
+        # print(attibute)
+            attributes.append(dict)
+    
+    attributes = sorted(attributes, key = lambda i:MetadataAttributeOrder[i["trait_type"]])
+    metaDataDictErc721["attributes"] = attributes
+    metaDataObj = json.dumps(metaDataDictErc721, indent=1, ensure_ascii=True)
+    with open("TestMetaData.json", "w") as outfile:
+            outfile.write(metaDataObj)
+    return metaDataDictErc721
+
+
+
 def PickWeightedAttributeType(AttributeTypes):
     number_List_Of_i = []
     rarity_List_Of_i = []
