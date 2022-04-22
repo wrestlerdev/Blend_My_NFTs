@@ -37,9 +37,9 @@ class bcolors:
 def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
 
-   coll_keys = list(hierarchy.keys())
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
+   show_character(character)
    for attribute in hierarchy:
       for type in hierarchy[attribute]:
             for variant in hierarchy[attribute][type]:
@@ -68,8 +68,10 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                if child.name.split('_')[-1] == character:
                   meshes = child.objects
                   child.hide_viewport = False
+                  child.hide_render = False
                else:
                   child.hide_viewport = True
+                  child.hide_render = True
          else:
             meshes = bpy.data.collections.get(variant).objects
          for mesh in meshes:
@@ -82,6 +84,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
             obj["G"] = col_02
             obj["B"] = col_03
             obj.hide_viewport = False
+            obj.hide_render = False
 
 
       bpy.data.collections[variant].hide_viewport = False
@@ -142,6 +145,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
          obj["G"] = HexToRGB(last_color[2])
          obj["B"] = HexToRGB(last_color[3])
          obj.hide_viewport = False
+         obj.hide_render = False
 
       variant_coll = bpy.data.collections[variant_name]
       variant_coll.hide_render = False
@@ -152,8 +156,10 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
             if child.name.split('_')[-1] == character:
                meshes = child.objects
                child.hide_viewport = False
+               child.hide_render = False
             else:
                child.hide_viewport = True
+               child.hide_render = True
 
 
    return new_dna_strand # return dna strand or empty string if not valid
@@ -387,8 +393,10 @@ def show_character(char_name):
    for c in characters:
         if char_name == c:
             bpy.data.collections[c].hide_viewport = False
+            bpy.data.collections[c].hide_render = False
         else:
             bpy.data.collections[c].hide_viewport = True
+            bpy.data.collections[c].hide_render = True
 
 
 if __name__ == '__main__':

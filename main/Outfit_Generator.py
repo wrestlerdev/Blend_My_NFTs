@@ -153,6 +153,7 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
             obj["R"] = col
             
             obj.hide_viewport = False
+            obj.hide_render = False
             hex = ColorGen.RGBtoHex((col))
 
 
@@ -258,14 +259,18 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                 DNAString.insert(0, character)
                 FormattedDNA = ','.join(DNAString)
                 bpy.data.collections[currentVarient].hide_viewport = True
+                bpy.data.collections[currentVarient].hide_render = True
                 bpy.data.collections[varientChoosen].hide_viewport = False
+                bpy.data.collections[varientChoosen].hide_render = False
                 charVariants = bpy.data.collections[varientChoosen].children
                 if charVariants: # check if character variants for a mesh exists
                     for charVar in charVariants:
                         if charVar.name.split('_')[-1] == character:
                             charVar.hide_viewport = False
+                            charVar.hide_render = False
                         else:
                             charVar.hide_viewport = True
+                            charVar.hide_render = True
                 return FormattedDNA
         #print(currentVarient)
         attempts -= 1
@@ -315,6 +320,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             for type in hierarchy[attribute]:
                 for varient in hierarchy[attribute][type]:
                     bpy.data.collections.get(varient).hide_viewport = True
+                    bpy.data.collections.get(varient).hide_render = True
 
 
         
@@ -374,13 +380,16 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         char_name = char_coll.name.split('_')[-1]
                         if char_name == character:
                             char_coll.hide_viewport = False
+                            char_coll.hide_render = False
                             chidlrenObjs = char_coll.objects
                         else:
                             char_coll.hide_viewport = True
+                            char_coll.hide_render = True
                 else:
                     chidlrenObjs = bpy.data.collections.get(varientChoosen).objects
 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
+                bpy.data.collections.get(varientChoosen).hide_render = False # CHECK THIS
 
                 #deselt all 
                 #bpy.ops.object.select_all(action='DESELECT')
@@ -486,10 +495,8 @@ def returnERC721MetaDataCustomTest(name, DNA, hierarchy, MetaDataAtt):
 
         attribute_type = "{} {} v0{}".format(variant.split('_')[1], variant.split('_')[2], variant.split('_')[3])
         attribute = MetaDataAtt[variant.split('_')[1]]
-        print("{}: {}".format(attribute, attribute_type))
         if attribute != "Null":
             dict = {"trait_type": attribute, "value": attribute_type}
-        # print(attibute)
             attributes.append(dict)
     
     attributes = sorted(attributes, key = lambda i:MetadataAttributeOrder[i["trait_type"]])
@@ -570,8 +577,10 @@ def PickCharacter(default_char=''):
     for c in characters:
         if char == c:
             bpy.data.collections[c].hide_viewport = False
+            bpy.data.collections[c].hide_render = False
         else:
             bpy.data.collections[c].hide_viewport = True
+            bpy.data.collections[c].hide_render = True
     return char
 
 #ColorStyle-1-1-textureSet-ColorR-COlorG-ColorB

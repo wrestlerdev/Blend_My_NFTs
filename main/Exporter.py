@@ -6,7 +6,10 @@ import bpy
 import os
 import time
 import json
+import importlib
 
+from . import Previewer
+importlib.reload(Previewer)
 
 enableGeneration = False
 colorList = []
@@ -230,6 +233,46 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
     print(f"\nAll NFTs successfully generated and sent to {nftBatch_save_path}")
     print("Completed all renders in Batch{}.json in ".format(batchToGenerate) + "%.4f seconds" % (time.time() - time_start_1) + "\n")
+
+
+
+def render_nft_batch_custom(save_path, batch_num, image_file_format, transparency, nft_range):
+    imageFolder = os.path.join(save_path, "OUTPUT")
+    if not os.path.exists(imageFolder):
+        os.makedirs(imageFolder)
+
+    batch_path = os.path.join(save_path, "NFT_Data", "Batch_Data", "Batch_{}".format(batch_num))
+    # for i in len(os.listdir(batch_path)) - 1:
+    for i in range(nft_range[0], nft_range[1] + 1):
+        if transparency:
+            color_mode = 'RGBA'
+        else:
+            color_mode = 'RGB'
+        render_nft_single_custom(imageFolder, batch_path, batch_num, i, image_file_format, color_mode)
+    return
+
+
+
+def render_nft_single_custom(folder_path, batch_path, batch_num, nft_num, image_file_format, color_mode):
+    bpy.context.scene.my_tool.nftsRendered += 1
+    num = bpy.context.scene.my_tool.nftsRendered
+    
+    print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(num))
+    nft_name = "SAE #{:04d}".format(bpy.context.scene.my_tool.nftsRendered)
+
+    image_path = os.path.join(folder_path, "Batch_{}".format(batch_num), nft_name)
+
+    json_path = os.path.join(batch_path, "NFT_Batch{}Num{}.json". format(batch_num, nft_num))
+    SingleDict = json.load(open(json_path))
+    DNA = SingleDict["DNAList"]
+
+    Previewer.show_nft_from_dna(DNA)
+
+    bpy.context.scene.render.filepath = image_path
+    bpy.context.scene.render.image_settings.file_format = image_file_format
+    bpy.context.scene.render.image_settings.color_mode = color_mode
+    bpy.ops.render.render(write_still=True)
+    return
 
 
 if __name__ == '__main__':

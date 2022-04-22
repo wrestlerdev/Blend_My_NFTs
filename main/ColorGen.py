@@ -180,6 +180,7 @@ def SetUpCharacterStyle(Character):
         obj["TestColor"] = skincols[random.randrange(len(skincols))]
         obj["metallic"] = random.random()
         obj.hide_viewport = False
+        obj.hide_render = False
 
 def PickOutfitColors(attribute, chidlrenObjs):
     global style, styleChoice
@@ -245,12 +246,68 @@ def PickOutfitColors(attribute, chidlrenObjs):
         obj["G"] = colors[1]
         obj["B"] = colors[2]
         obj.hide_viewport = False
+        obj.hide_render = False
 
         hexCodes = [None] * 3
         hexCodes[0] = RGBtoHex((colors[0]))
         hexCodes[1] = RGBtoHex((colors[1]))
         hexCodes[2] = RGBtoHex((colors[2]))
 
+
+    # c = Color()
+    # c.hsv = col[0], col[1], col[2]
+    # #colors = MonocromaticColor(col, random.uniform(0,1))
+    # colors = AnalagousColor(col, random.uniform(0.075,0.35))
+    # #colors = SplitComplmentaryColor(col, random.uniform(0.1,0.3) )
+    # print("------------------")
+    # newImage = bpy.data.images.load(file, check_existing=True)
+    # for child in chidlrenObjs:
+    #     print(child)
+    #     obj = bpy.data.objects[child.name]
+
+    #     obj["TestColor"] = (c.r, c.g, c.b)
+
+    #     obj["R"] = colors[0]
+    #     obj["G"] = colors[1]
+    #     obj["B"] = colors[2]
+    #     obj.hide_viewport = False
+    #     obj.hide_render = False
+        
+
+    #     material_slots = obj.material_slots
+    #     for m in material_slots:
+    #         #material = m.material
+    #         material = bpy.data.materials['Master']
+    #         material.use_nodes = True
+    #         matcopy = material.copy()
+    #         m.material = matcopy
+    #         #m.material = bpy.data.materials['Test_02']
+    #         # get the nodes
+    #         print(m)
+    #         # print(c)
+    #         for node in material.node_tree.nodes:
+    #             print(c)
+    #             if (node.label == "Diffuse"):
+    #                 node.image = newImage
+    #             elif node.label == "RTint":
+    #                 node.outputs["Value"].default_value = c.r
+    #             elif node.label == "GTint":
+    #                 node.outputs["Value"].default_value = c.g
+    #             elif node.label == "BTint":
+    #                 node.outputs["Value"].default_value = c.b
+
+
+    # hexCodes = [None] * 3
+    # hexCodes[0] = RGBtoHex((colors[0]))
+    # hexCodes[1] = RGBtoHex((colors[1]))
+    # hexCodes[2] = RGBtoHex((colors[2]))
+
+
+
+
+
+
+    
     # for block in bpy.data.materials:
     #     if block.users == 0:
     #         bpy.data.materials.remove(block)
