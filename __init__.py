@@ -225,8 +225,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
 def make_directories(save_path):
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
-    batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data")
+    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
+    batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "OUTPUT")
 
     nftBatch_save_path = os.path.join(save_path, "Blend_My_NFTs Output", "Generated NFT Batches")
 
@@ -265,6 +265,7 @@ class initializeRecord(bpy.types.Operator):
     bl_description = "This will reinitialize the entire NFT ledger. Are you sure?"
     bl_options = {"REGISTER", "INTERNAL"}
 
+
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
 
@@ -278,18 +279,19 @@ class initializeRecord(bpy.types.Operator):
         else:
             save_path = bpy.context.scene.my_tool.root_dir
         print(save_path)
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-        NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "Batch_Data", "Batch_1", "_NFTRecord1.json")
+        Blend_My_NFTs_Output, output_save_path, nftBatch_save_path = make_directories(save_path)
 
-        bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
+        first_nftrecord_save_path = os.path.join(output_save_path, "Batch_{:03d}".format(1), "_NFTRecord{:03d}.json".format(1))
+
+        bpy.context.scene.my_tool.batch_json_save_path = output_save_path
 
         bpy.context.scene.my_tool.loadNFTIndex = 1
         bpy.context.scene.my_tool.BatchSliderIndex = 1
 
-        LoadNFT.init_batch(batch_json_save_path)
-        DataDictionary = DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, True)
+        LoadNFT.init_batch(output_save_path)
+        DataDictionary = DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path, output_save_path, True)
 
-        LoadNFT.update_current_batch(1, batch_json_save_path)
+        LoadNFT.update_current_batch(1, output_save_path)
         return {'FINISHED'}
 
 
@@ -369,9 +371,9 @@ class saveNewNFT(bpy.types.Operator):
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDict = Exporter.Previewer.create_item_dict(context.scene.my_tool.inputDNA)
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
+        index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
 
-        nft_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index))
+        nft_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
         SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, nft_save_path, index)
 
         numGenerated = LoadNFT.get_total_DNA()
@@ -387,8 +389,8 @@ class createBatch(bpy.types.Operator):
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+        index = bpy.context.scene.my_tool.CurrentBatchIndex
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
         DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, nft_save_path)
         SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, nft_save_path, index)
 
@@ -416,9 +418,9 @@ class loadNFT(bpy.types.Operator):
     def execute(self,context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
+        batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
         TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         if TotalDNA > 0 and DNA != '':
             Exporter.Previewer.show_nft_from_dna(DNA)
             bpy.context.scene.my_tool.lastDNA = DNA
@@ -437,8 +439,8 @@ class loadNextNFT(bpy.types.Operator):
 
     def execute(self,context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
+        batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
 
         nftnum = len(os.listdir(nft_save_path)) - 1
         print(nftnum)
@@ -461,8 +463,8 @@ class loadPrevNFT(bpy.types.Operator):
 
     def execute(self,context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
+        batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         if len(os.listdir(nft_save_path)) > 1 :
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
@@ -491,10 +493,10 @@ class saveCurrentNFT(bpy.types.Operator):
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDict = Exporter.Previewer.create_item_dict(DNA)
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
+        index = bpy.context.scene.my_tool.CurrentBatchIndex
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
 
-        nft_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index))
+        nft_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
         SaveNFTsToRecord.OverrideNFT(DNA, NFTDict, nft_save_path, index, loadNFTIndex)
         return {'FINISHED'}
 
@@ -511,8 +513,8 @@ class deleteNFT(bpy.types.Operator):
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        batch_index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index))
+        batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
         TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
         
@@ -546,7 +548,7 @@ class loadBatch(bpy.types.Operator):
         batch_path = bpy.context.scene.my_tool.batch_json_save_path
         try:
             LoadNFT.update_current_batch(index, batch_path)
-            NFTRecord_save_path = os.path.join(batch_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))
+            NFTRecord_save_path = os.path.join(batch_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
             bpy.context.scene.my_tool.loadNFTIndex = 1
@@ -574,7 +576,7 @@ class saveBatch(bpy.types.Operator):
         index = bpy.context.scene.my_tool.BatchSliderIndex
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
-        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))
+        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, False)
 
         LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
@@ -595,7 +597,7 @@ class saveNewBatch(bpy.types.Operator):
         
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
-        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))
+        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, False)
         LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
 
@@ -654,13 +656,19 @@ class loadDirectory(bpy.types.Operator):
         if path != '':
             if os.path.exists(path):
                 Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(path)
-                NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(1), "_NFTRecord{}.json".format(1))
+                batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
+                NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord{:03d}.json".format(1))
                 bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
 
                 bpy.context.scene.my_tool.CurrentBatchIndex = 1
                 bpy.context.scene.my_tool.loadNFTIndex = 1
                 bpy.context.scene.my_tool.BatchSliderIndex = 1
-                LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+                if os.path.exists(batch_path):
+                    LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+                else:
+                    LoadNFT.init_batch(batch_json_save_path)
+                    DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, True)
+                    LoadNFT.update_current_batch(1, batch_json_save_path)
             else:
                 print("oh no")
         else:
@@ -668,7 +676,7 @@ class loadDirectory(bpy.types.Operator):
             save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
             Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
             bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
-            NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(1), "_NFTRecord{}.json".format(1))
+            NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord{:03d}.json".format(1))
 
             bpy.context.scene.my_tool.CurrentBatchIndex = 1
             bpy.context.scene.my_tool.loadNFTIndex = 1
@@ -708,12 +716,15 @@ class renderBatch(bpy.types.Operator):
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
         blend_path = os.path.abspath(bpy.context.scene.my_tool.root_dir)
         blend_path = os.path.join(blend_path, "Blend_My_NFTs Output")
-        batch_path = os.path.join(blend_path, "NFT_Data", "Batch_Data", "Batch_{}".format(render_batch_num))
-        record_path = os.path.join(batch_path, "_NFTRecord{}.json".format(render_batch_num))
+        batch_path = os.path.join(blend_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
+        record_path = os.path.join(batch_path, "_NFTRecord{:03d}.json".format(render_batch_num))
         # bpy.context.scene.my_tool.nftsRendered = 0
         if os.path.exists(record_path):
+            bpy.context.scene.render.engine = 'BLENDER_EEVEE'
             
             imageEnum = bpy.context.scene.my_tool.imageEnum
+            imageBool = bpy.context.scene.my_tool.imageBool
+            animationBool = bpy.context.scene.my_tool.animationBool
             if imageEnum == 'PNG':
                 transparency = bpy.context.scene.my_tool.PNGTransparency
             else:
@@ -728,7 +739,16 @@ class renderBatch(bpy.types.Operator):
                 if range_start <= batch_count:
                     range = [range_start, range_end]
 
-            Exporter.render_nft_batch_custom(blend_path, render_batch_num, imageEnum, transparency, range)
+            file_formats = []
+            if imageBool:
+                file_formats.append(imageEnum)
+            if animationBool:
+                file_formats.append("MP4")
+
+            if file_formats:
+                Exporter.render_nft_batch_custom(blend_path, render_batch_num, file_formats, range, transparency)
+            else:
+                self.report({"ERROR"}, "Failed: No output render types selected :(")
         else:
             self.report({"ERROR"}, "Failed: This Batch does not exist")
         return {'FINISHED'}
@@ -1000,8 +1020,8 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         mytool = scene.my_tool
 
         row = layout.row()
-        index = str(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
+        index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
 
         if os.path.exists(nft_save_path):
             row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 1))
@@ -1102,16 +1122,21 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         row.prop(mytool, "BatchRenderIndex")
         
         row = layout.row()
-        row.prop(mytool, "imageEnum")
+        row.prop(mytool, "imageBool")
+        row.prop(mytool, "animationBool")
+        if mytool.imageBool:
+            row = layout.row()
+            row.prop(mytool, "imageEnum")
+
+            row = layout.row()
+
+            if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
+                row.label(text="")
+                row.prop(mytool, "PNGTransparency")
 
         row = layout.row()
-        if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
-            row.label(text="")
-            row.prop(mytool, "PNGTransparency")
-
-        row = layout.row()
-        batch_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "NFT_Data", "Batch_Data", 
-                                                                        "Batch_{}".format(mytool.BatchRenderIndex))
+        batch_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "OUTPUT", 
+                                                                        "Batch_{:03d}".format(mytool.BatchRenderIndex))
         if os.path.exists(batch_path):
             batch_count = len(os.listdir(batch_path)) - 1
             row.label(text="Number in batch: {}".format(batch_count))

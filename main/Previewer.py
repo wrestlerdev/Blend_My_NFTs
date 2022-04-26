@@ -278,7 +278,7 @@ def get_hierarchy_ordered():
    else:
       index = bpy.context.scene.my_tool.CurrentBatchIndex
       batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-      NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))
+      NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
 
       DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
       hierarchy = DataDictionary["hierarchy"]
@@ -290,7 +290,7 @@ def get_hierarchy_ordered():
 def get_hierarchy_unordered():
    index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord{}.json".format(index))      
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))      
    DataDictionary = json.load(open(NFTRecord_save_path))
    hierarchy = DataDictionary["hierarchy"]
 

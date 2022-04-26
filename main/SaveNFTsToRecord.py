@@ -9,9 +9,10 @@ import random
 import shutil
 
 def SaveNFT(DNASetToAdd, NFTDict, batch_json_save_path, batch_index):
-    NFTRecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index), "_NFTRecord{}.json".format(batch_index))
+    single_record_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord{:03d}.json".format(batch_index))
+    master_record_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, 'NFTRecord.json')
 
-    DataDictionary = json.load(open(NFTRecord_save_path))
+    DataDictionary = json.load(open(single_record_path))
     i = int(DataDictionary["numNFTsGenerated"])
     hierarchy = DataDictionary["hierarchy"]
     
@@ -21,14 +22,16 @@ def SaveNFT(DNASetToAdd, NFTDict, batch_json_save_path, batch_index):
         singleNFT["CharacterItems"] = NFTDict[nft]
 
         singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
-        with open(os.path.join(batch_json_save_path, ("NFT_Batch{}Num{}.json".format(batch_index, i + 1))), "w") as outfile:
+        if not os.path.exists(os.path.join(batch_json_save_path, "NFT_{:04d}".format(i + 1))):
+            os.mkdir(os.path.join(batch_json_save_path, "NFT_{:04d}".format(i + 1)))
+        with open(os.path.join(batch_json_save_path, "NFT_{:04d}".format(i + 1), ("Batch_{:03d}_NFT_{:04d}.json".format(batch_index, i + 1))), "w") as outfile:
             outfile.write(singleNFTObject)
         i += 1
 
-    UpdateNFTRecord(DNASetToAdd, DataDictionary, NFTRecord_save_path)
+    UpdateNFTRecord(DNASetToAdd, DataDictionary, single_record_path)
         
 
-def UpdateNFTRecord(DNASetToAdd, DataDictionary, NFTRecord_save_path):
+def UpdateNFTRecord(DNASetToAdd, DataDictionary, single_record_path):
     print("This should updated record.json with new nft DNA and number")
 
     currentNFTNumber = DataDictionary["numNFTsGenerated"]
@@ -43,7 +46,7 @@ def UpdateNFTRecord(DNASetToAdd, DataDictionary, NFTRecord_save_path):
 
     try:
       ledger = json.dumps(updatedDataDictionary, indent=1, ensure_ascii=True)
-      with open(NFTRecord_save_path, 'w') as outfile:
+      with open(single_record_path, 'w') as outfile:
         outfile.write(ledger + '\n')
         print("Success update .json file")
 
@@ -52,7 +55,7 @@ def UpdateNFTRecord(DNASetToAdd, DataDictionary, NFTRecord_save_path):
 
 
 def OverrideNFT(DNAToAdd, NFTDict, batch_json_save_path, batch_index, nft_index):
-    NFTRecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index), "_NFTRecord{}.json".format(batch_index))
+    NFTRecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord{:03d}.json".format(batch_index))
     DataDictionary = json.load(open(NFTRecord_save_path))
     updatedDictionary = {}
     updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
@@ -75,13 +78,13 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_json_save_path, batch_index, nft_index)
     singleNFT["CharacterItems"] = NFTDict[DNAToAdd]
 
     singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
-    with open(os.path.join(batch_json_save_path, ("NFT_Batch{}Num{}.json".format(batch_index, nft_index))), "w") as outfile:
+    with open(os.path.join(batch_json_save_path, "NFT_{:04d}".format(nft_index), ("Batch_{:03d}_NFT_{:04d}.json".format(batch_index, nft_index))), "w") as outfile:
             outfile.write(singleNFTObject)
 
 
 
 def DeleteNFT(DNAToDelete, save_path, batch_index):
-    NFTRecord_save_path = os.path.join(save_path, "_NFTRecord{}.json".format(batch_index))
+    NFTRecord_save_path = os.path.join(save_path, "_NFTRecord{:03d}.json".format(batch_index))
     DataDictionary = json.load(open(NFTRecord_save_path))
 
     updatedDictionary = {}
@@ -101,7 +104,7 @@ def DeleteNFT(DNAToDelete, save_path, batch_index):
             with open(NFTRecord_save_path, 'w') as outfile:
                 outfile.write(ledger + '\n')
                 print("Success update .json file")
-            UpdateSingleNFTFiles(DNAToDelete, DNA_index, save_path, batch_index)
+            UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index)
         except:
             print("Failed to update .json file")
 
@@ -110,15 +113,20 @@ def DeleteNFT(DNAToDelete, save_path, batch_index):
     return DNA_index
 
 
-def UpdateSingleNFTFiles(DNAToDelete, DNA_index, save_path, batch_index):
+def UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index):
     total_nfts = len(os.listdir(save_path)) - 1 # TODO
-    nft_save_path = os.path.join(save_path, "NFT_Batch{}Num{}.json".format(batch_index, DNA_index))
-    os.remove(nft_save_path)
+    nft_save_path = os.path.join(save_path, "NFT_{:04d}".format(DNA_index))
+    shutil.rmtree(nft_save_path)
+    for i in range(DNA_index + 1, total_nfts + 1): # nfts from records should not be deleted after rendering starts
+        old_nft_save_path = os.path.join(save_path, "NFT_{:04d}".format(i), "Batch_{:03d}_NFT_{:04d}.json".format( batch_index, i))
+        new_nft_save_path = os.path.join(save_path, "NFT_{:04d}".format(i-1), "Batch_{:03d}_NFT_{:04d}.json".format( batch_index, i-1))
+        new_folder_path = os.path.join(save_path, "NFT_{:04d}".format(i-1))
 
-    for i in range(DNA_index + 1, total_nfts + 1):
-        old_nft_save_path = os.path.join(save_path, "NFT_Batch{}Num{}.json".format(batch_index, i))
-        new_nft_save_path = os.path.join(save_path, "NFT_Batch{}Num{}.json".format(batch_index, i-1))
+        os.mkdir(new_folder_path)
+        
         os.rename(old_nft_save_path, new_nft_save_path)
+
+        shutil.rmtree(os.path.join(save_path, "NFT_{:04d}".format(i)))
     return
 
 
