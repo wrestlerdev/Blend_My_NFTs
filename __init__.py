@@ -680,7 +680,7 @@ class loadDirectory(bpy.types.Operator):
 
 class createSlotFolders(bpy.types.Operator):
     bl_idname = 'create.slotfolers'
-    bl_label = 'Create Slot Folders'
+    bl_label = 'Create Slot Folders (TEMP)'
     bl_description = 'This will override the current folder which cannot be undone. Are you sure?'
     bl_options = {"REGISTER", "UNDO"}
 
@@ -692,6 +692,21 @@ class createSlotFolders(bpy.types.Operator):
         folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
         SaveNFTsToRecord.CreateSlotsFolderHierarchy(folder_dir)
 
+        return {'FINISHED'}
+
+class organizeScene(bpy.types.Operator):
+    bl_idname = 'create.organizescene'
+    bl_label = 'Organize Scene'
+    bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
+    bl_options = {"REGISTER", "UNDO"}
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+
+    def execute(self, context):
+        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
+        SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
         return {'FINISHED'}
 
         
@@ -1080,6 +1095,9 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
 
+
+        row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
+
         row = layout.row()
         row.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
@@ -1265,6 +1283,7 @@ classes = (
     loadDirectory,
     deleteNFT,
     createSlotFolders,
+    organizeScene,
     renderBatch,
     assetlibTest,
 

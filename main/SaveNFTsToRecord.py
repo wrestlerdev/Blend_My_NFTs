@@ -143,6 +143,8 @@ def CreateSlotsFolderHierarchy(save_path):
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
+
+
     h_keys = list(hierarchy.keys())
     for attribute in h_keys:
         att_path = os.path.join(slots_path, attribute)
@@ -153,7 +155,69 @@ def CreateSlotsFolderHierarchy(save_path):
             for variant in list(hierarchy[attribute][type].keys()):
                 variant_path = os.path.join(type_path, variant)
                 os.makedirs(variant_path)
+                os.makedirs(variant_path + "\Textures")
     return
+
+def SearchForTexturesAndCreateDuplicates(save_path):
+    slots_path = os.path.join(save_path, "INPUT")
+    slots_path = os.path.join(slots_path, "Slots")
+    
+    for slot in os.listdir(slots_path):
+        type_path = os.path.join(slots_path, slot)
+        for type in os.listdir(type_path):
+            varient_path = os.path.join(type_path, type)
+            for varient in os.listdir(varient_path):
+                texture_path = os.path.join(varient_path, varient)
+                texture_path = os.path.join(texture_path, "Textures")
+                
+                for col in bpy.data.collections[varient].children:
+                
+                    for obj in col.objects:
+                        bpy.data.objects.remove(obj, do_unlink=True)
+                        
+                    bpy.data.collections.remove(col)
+
+                for texture in os.listdir(texture_path):
+                    print(texture)
+                    print(varient)
+                    collection = bpy.data.collections.new(varient + texture)
+                    bpy.data.collections[varient].children.link(collection)
+                    for child in bpy.data.collections[varient].objects:
+                        print(child.name)
+                        ob = bpy.data.objects[child.name].copy()
+                        collection.objects.link(ob)
+
+                        material_slots = ob.material_slots
+                        for m in material_slots:
+                            #material = m.material
+                            material = bpy.data.materials['Master']
+                            material.use_nodes = True
+                            matcopy = material.copy()
+                            m.material = matcopy
+                            #m.material = bpy.data.materials['Test_02']
+                            # get the nodes
+                            
+
+                            for node in material.node_tree.nodes:
+                                if (node.label == "Diffuse"):
+                                    texture_set = os.path.join(texture_path, texture)
+                                    for tex in os.listdir(texture_set):
+                                        if "_D_" in tex:
+                                            file = file = os.path.join(texture_set, tex)
+                                            file = file.replace('\\', '/')
+                                            newImage = bpy.data.images.load(file, check_existing=True)
+                                            node.image = newImage
+
+
+                        # textureFiles = os.listdir(textureSetPath)
+                        # file = os.path.join(textureSetPath, textureFiles[0])
+                        # file = file.replace('\\', '/')
+                        # print(textureFiles[0])
+
+                        
+
+
+
 
 
 def SaveBlenderFile():
