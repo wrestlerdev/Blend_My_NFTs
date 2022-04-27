@@ -187,17 +187,6 @@ def PickOutfitColors(attribute, chidlrenObjs):
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
     
-    # save_path = "E:/BlenderAddons/addons/Blend_My_NFTs-main/Blend_My_NFTs Output/NFT_Data/Batch_Data/Batch_1/Textures"
-    save_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "INPUT", "Textures")
-    save_path = os.path.abspath(save_path)
-    batchList = os.listdir(save_path)
-    selectedTextureSet = random.randrange(0, len(batchList))
-    textureSetPath = os.path.join(save_path, batchList[selectedTextureSet])
-    #textureSetPath = textureSetPath.replace('\\', '/')
-    textureFiles = os.listdir(textureSetPath)
-    file = os.path.join(textureSetPath, textureFiles[0])
-    file = file.replace('\\', '/')
-    print(textureFiles[0])
     col = (0.0, 0.0, 0.0)
     colIndex = -1
     if(attribute == "01-UpperTorso"):
@@ -214,27 +203,8 @@ def PickOutfitColors(attribute, chidlrenObjs):
         col = style[colIndex]
         #col = (random.random(), random.random(), random.random())
     
-    newImage = bpy.data.images.load(file, check_existing=True)
-    
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
-
-        material_slots = obj.material_slots
-        for m in material_slots:
-            #material = m.material
-            material = bpy.data.materials['Master']
-            material.use_nodes = True
-            matcopy = material.copy()
-            m.material = matcopy
-            #m.material = bpy.data.materials['Test_02']
-            # get the nodes
-            
-
-            for node in material.node_tree.nodes:
-                if (node.label == "Diffuse"):
-                    node.image = newImage
-
-
 
         c = Color()
         c.hsv = col[0], col[1], col[2]
@@ -247,6 +217,22 @@ def PickOutfitColors(attribute, chidlrenObjs):
         obj["B"] = colors[2]
         obj.hide_viewport = False
         obj.hide_render = False
+
+        material_slots = obj.material_slots
+        for m in material_slots:
+            #material = m.material
+            material = bpy.data.materials['Master']
+            material.use_nodes = True
+            matcopy = material.copy()
+            m.material = matcopy
+            #m.material = bpy.data.materials['Test_02']
+            # get the nodes
+            
+            for node in material.node_tree.nodes:
+                if (node.label == "RTint"):
+                    node.color = colors[0]
+
+
 
         hexCodes = [None] * 3
         hexCodes[0] = RGBtoHex((colors[0]))
@@ -322,7 +308,7 @@ def PickOutfitColors(attribute, chidlrenObjs):
     return hexCodes
 
 def RGBtoHex(vals, rgbtype=1):
-  """Converts RGB values in a variety of formats to Hex values.
+    """Converts RGB values in a variety of formats to Hex values.
 
      @param  vals     An RGB/RGBA tuple
      @param  rgbtype  Valid valus are:
@@ -330,16 +316,16 @@ def RGBtoHex(vals, rgbtype=1):
                         256 - Inputs are in the range 0 to 255
 
      @return A hex string in the form '#RRGGBB' or '#RRGGBBAA'
-"""
+    """
 
-  if len(vals)!=3 and len(vals)!=4:
-    raise Exception("RGB or RGBA inputs to RGBtoHex must have three or four elements!")
-  if rgbtype!=1 and rgbtype!=256:
-    raise Exception("rgbtype must be 1 or 256!")
+    if len(vals)!=3 and len(vals)!=4:
+        raise Exception("RGB or RGBA inputs to RGBtoHex must have three or four elements!")
+    if rgbtype!=1 and rgbtype!=256:
+        raise Exception("rgbtype must be 1 or 256!")
 
-  #Convert from 0-1 RGB/RGBA to 0-255 RGB/RGBA
-  if rgbtype==1:
-    vals = [255*x for x in vals]
+    #Convert from 0-1 RGB/RGBA to 0-255 RGB/RGBA
+    if rgbtype==1:
+        vals = [255*x for x in vals]
 
-  #Ensure values are rounded integers, convert to hex, and concatenate
-  return '#' + ''.join(['{:02X}'.format(int(round(x))) for x in vals])
+    #Ensure values are rounded integers, convert to hex, and concatenate
+    return '#' + ''.join(['{:02X}'.format(int(round(x))) for x in vals])

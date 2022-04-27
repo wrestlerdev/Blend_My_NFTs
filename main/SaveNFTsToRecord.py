@@ -228,6 +228,7 @@ def CreateSlotsFolderHierarchy(save_path):
                 variant_path = os.path.join(type_path, variant)
                 os.makedirs(variant_path)
                 os.makedirs(variant_path + "\Textures")
+                os.makedirs(variant_path + "\Textures\A")
     return
 
 def SearchForTexturesAndCreateDuplicates(save_path):
@@ -242,52 +243,71 @@ def SearchForTexturesAndCreateDuplicates(save_path):
                 texture_path = os.path.join(varient_path, varient)
                 texture_path = os.path.join(texture_path, "Textures")
                 
+                Kae = None
+                Nef = None
+                Rem =  None
+
                 for col in bpy.data.collections[varient].children:
-                
-                    for obj in col.objects:
-                        bpy.data.objects.remove(obj, do_unlink=True)
-                        
-                    bpy.data.collections.remove(col)
+                    name = col.name.rpartition('_')[2]
+                    if name in ['Kae','Nef', 'Rem']:
+                        if name == "Kae": 
+                            Kae =  col
+                        elif name == "Nef":
+                            Nef = col
+                        elif name == "Rem":
+                            Rem = col
+                    else:
+                        for obj in col.objects:
+                            bpy.data.objects.remove(obj, do_unlink=True)                       
+                        bpy.data.collections.remove(col)
 
                 for texture in os.listdir(texture_path):
                     print(texture)
                     print(varient)
-                    collection = bpy.data.collections.new(varient + texture)
+                    splitName = varient.rpartition('_')
+                    collection = bpy.data.collections.new(splitName[0] + texture + splitName[1] + splitName[2])
                     bpy.data.collections[varient].children.link(collection)
-                    for child in bpy.data.collections[varient].objects:
-                        print(child.name)
-                        ob = bpy.data.objects[child.name].copy()
-                        collection.objects.link(ob)
+                    texture_set = os.path.join(texture_path, texture)
+                    if bpy.data.collections.get(varient + "_Kae" ) != None:
+                        DuplicateChildrenMaterials(bpy.data.collections[varient + "_Kae" ], collection, texture_set)
+                    if bpy.data.collections.get(varient + "_Nef" ) != None:
+                        DuplicateChildrenMaterials(bpy.data.collections[varient + "_Nef" ], collection, texture_set)
+                    if bpy.data.collections.get(varient + "_Rem" ) != None:
+                        DuplicateChildrenMaterials(bpy.data.collections[varient + "_Rem" ], collection, texture_set)
 
-                        material_slots = ob.material_slots
-                        for m in material_slots:
-                            #material = m.material
-                            material = bpy.data.materials['Master']
-                            material.use_nodes = True
-                            matcopy = material.copy()
-                            m.material = matcopy
-                            #m.material = bpy.data.materials['Test_02']
-                            # get the nodes
-                            
+def DuplicateChildrenMaterials(originalCollection, newParentCollection, texture_set):
+    collection = bpy.data.collections.new(newParentCollection.name + originalCollection.name.rpartition('_')[1] + originalCollection.name.rpartition('_')[2] )
+    bpy.data.collections[newParentCollection.name].children.link(collection)
+    for child in originalCollection.objects:
+        print(child.name)
+        ob = bpy.data.objects[child.name].copy()
+        collection.objects.link(ob)
 
-                            for node in material.node_tree.nodes:
-                                if (node.label == "Diffuse"):
-                                    texture_set = os.path.join(texture_path, texture)
-                                    for tex in os.listdir(texture_set):
-                                        if "_D_" in tex:
-                                            file = file = os.path.join(texture_set, tex)
-                                            file = file.replace('\\', '/')
-                                            newImage = bpy.data.images.load(file, check_existing=True)
-                                            node.image = newImage
-
-
-                        # textureFiles = os.listdir(textureSetPath)
-                        # file = os.path.join(textureSetPath, textureFiles[0])
-                        # file = file.replace('\\', '/')
-                        # print(textureFiles[0])
-
-                        
-
+        material_slots = ob.material_slots
+        for m in material_slots:
+            #material = m.material
+            material = bpy.data.materials['Master']
+            material.use_nodes = True
+            matcopy = material.copy()
+            m.material = matcopy
+            #m.material = bpy.data.materials['Test_02']
+            # get the nodes
+            
+            for node in material.node_tree.nodes:
+                if (node.label == "Diffuse"):
+                    for tex in os.listdir(texture_set):
+                        if "_D_" in tex:
+                            file = file = os.path.join(texture_set, tex)
+                            print(file)
+                            file = file.replace('\\', '/')
+                            print(file)
+                            newImage = bpy.data.images.load(file, check_existing=True)
+                            node.image = newImage
+                        elif "_N_" in tex:
+                            file = file = os.path.join(texture_set, tex)
+                            file = file.replace('\\', '/')
+                            newImage = bpy.data.images.load(file, check_existing=True)
+                            node.image = newImage
 
 
 

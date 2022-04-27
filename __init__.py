@@ -642,9 +642,9 @@ class chooseRootFolder(bpy.types.Operator):
     filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
     filter_glob: bpy.props.StringProperty(default ='',options = {'HIDDEN'})
 
-    @classmethod
-    def poll(cls, context):
-        return context.object is not None
+    # @classmethod
+    # def poll(cls, context):
+    #     return context.object is not None
 
     def execute(self, context):
         print(self.filepath)
