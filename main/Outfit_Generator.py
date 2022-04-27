@@ -112,7 +112,7 @@ MetadataAttributeOrder = {
 def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
 
@@ -186,7 +186,7 @@ def get_rando_color(): # placeholder
 def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
 
@@ -288,7 +288,7 @@ def setBodySlotsValue(ItemClothingGenre, ValueToSet):
 def RandomizeFullCharacter(maxNFTs, save_path):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
 

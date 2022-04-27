@@ -391,5 +391,22 @@ def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, rarity_from_n
    return DataDictionary
 
 
+
+def set_up_master_Record(save_path):
+   DataDictionary = {}
+   DataDictionary["DNAList"] = []
+   DataDictionary["numNFTsGenerated"] = 0
+
+   try:
+      ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
+      with open(save_path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+
+   except:
+      print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {save_path}\n {bcolors.RESET}")
+
+   return
+
+
 if __name__ == '__main__':
    send_To_Record_JSON()

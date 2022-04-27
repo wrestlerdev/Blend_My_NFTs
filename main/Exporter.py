@@ -238,6 +238,10 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
     folder = os.path.join(save_path, "OUTPUT")
+    master_record_path = os.path.join(folder, "_NFTRecord.json")
+    MasterDictionary = json.load(open(master_record_path))
+    totalDNAList = MasterDictionary["DNAList"]
+
     if not os.path.exists(folder):
         os.makedirs(folder)
 
@@ -252,7 +256,7 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 else:
                     color_mode = 'RGB'
                 start_time = time.time()
-                render_nft_single_custom(folder, batch_path, batch_num, i, file_format, color_mode)
+                render_nft_single_custom(folder, batch_path, batch_num, i, file_format, color_mode, totalDNAList)
                 print(f"{bcolors.OK}Time taken: {bcolors.RESET}" + "{:.2f}".format(time.time() - start_time))
 
 
@@ -261,25 +265,28 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
             bpy.context.scene.camera = bpy.data.objects[camera_name]
             for i in range(nft_range[0], nft_range[1] + 1):
                 start_time = time.time()
-                render_nft_single_video(folder, batch_path, batch_num, i, file_format)
+                render_nft_single_video(folder, batch_path, batch_num, i, file_format, totalDNAList)
                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time.time() - start_time))
+
+    print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
 
     return
 
 
 
-def render_nft_single_custom(folder_path, batch_path, batch_num, nft_num, image_file_format, color_mode):
-    bpy.context.scene.my_tool.nftsRendered += 1 # TODO: link this to master record
-    num = bpy.context.scene.my_tool.nftsRendered
-    
-    print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(num))
-    nft_name = "SAE #{:04d}".format(bpy.context.scene.my_tool.nftsRendered)
+def render_nft_single_custom(folder_path, batch_path, batch_num, nft_num, image_file_format, color_mode, totalDNAList):
+    file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
+    json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
 
-    image_path = os.path.join(folder_path, "Batch_{:03d}".format(batch_num), "Batch_{:03d}_NFT_{:04d}".format(batch_num, nft_num), nft_name)
-
-    json_path = os.path.join(batch_path, "Batch_{:03d}_NFT_{:04d}", "Batch_{:03d}_NFT_{:04d}.json". format(batch_num, nft_num))
     SingleDict = json.load(open(json_path))
+
     DNA = SingleDict["DNAList"]
+    total_index = totalDNAList.index(DNA) + 1
+    
+    print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+    nft_name = "SAE #{:04d}".format(total_index)
+
+    image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
 
     Previewer.show_nft_from_dna(DNA)
 
@@ -292,18 +299,20 @@ def render_nft_single_custom(folder_path, batch_path, batch_num, nft_num, image_
 
 
 
-def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_format):
-    bpy.context.scene.my_tool.nftsRendered += 1 # TODO: link this to master record
-    num = bpy.context.scene.my_tool.nftsRendered
-
-    print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(num))
-    nft_name = "SAE #{:04d}.mp4".format(bpy.context.scene.my_tool.nftsRendered)
-
-    video_path = os.path.join(folder_path, "Batch_{:03d}".format(batch_num), "Batch_{:03d}_NFT_{:04d}". format(batch_num, nft_num), nft_name)
-    json_path = os.path.join(batch_path, "Batch_{:03d}_NFT_{:04d}.json". format(batch_num, nft_num))
+def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_format, totalDNAList):
+    file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
+    json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
 
     SingleDict = json.load(open(json_path))
     DNA = SingleDict["DNAList"]
+    total_index = totalDNAList.index(DNA) + 1
+
+    print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+    nft_name = "SAE #{:04d}.mp4".format(total_index)
+
+    video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
+
+
     Previewer.show_nft_from_dna(DNA)
 
     bpy.context.scene.render.filepath = video_path
