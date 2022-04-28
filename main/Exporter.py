@@ -249,7 +249,12 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
     for file_format in file_formats:
         if file_format in ['PNG', 'JPEG']:
             camera_name = "CameraStill"
-            bpy.context.scene.camera = bpy.data.objects[camera_name]
+            if bpy.data.objects.get(camera_name) is not None:
+                bpy.context.scene.camera = bpy.data.objects[camera_name]
+            else:
+                print("Cannot find camera of name 'CameraStill', will continue with current camera")
+                if bpy.context.scene.camera is None:
+                    print("Camera does not exist in scene, please make one :^(")
             for i in range(nft_range[0], nft_range[1] + 1):
                 if transparency:
                     color_mode = 'RGBA'
@@ -262,7 +267,12 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
 
         elif file_format in ['MP4']:
             camera_name = "CameraVideo"
-            bpy.context.scene.camera = bpy.data.objects[camera_name]
+            if bpy.data.objects.get(camera_name) is not None:
+                bpy.context.scene.camera = bpy.data.objects[camera_name]
+            else:
+                print("Cannot find camera of name 'CameraVideo', will continue with current camera")
+                if bpy.context.scene.camera is None:
+                    print("Camera does not exist in scene, please make one :^(")
             for i in range(nft_range[0], nft_range[1] + 1):
                 start_time = time.time()
                 render_nft_single_video(folder, batch_path, batch_num, i, file_format, totalDNAList)
@@ -275,7 +285,6 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time.time() - start_time))
 
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
-
     return
 
 
@@ -316,20 +325,16 @@ def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_fo
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
     nft_name = "SAE #{:04d}.mp4".format(total_index)
 
-    video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
-
-
     Previewer.show_nft_from_dna(DNA)
 
+    video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
     bpy.context.scene.render.filepath = video_path
 
     if file_format == 'MP4':
         bpy.context.scene.render.image_settings.file_format = "FFMPEG"
-
         bpy.context.scene.render.ffmpeg.format = 'MPEG4'
         bpy.context.scene.render.ffmpeg.codec = 'H264'
         bpy.ops.render.render(animation=True)
-
     return
 
 def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_format, totalDNAList):

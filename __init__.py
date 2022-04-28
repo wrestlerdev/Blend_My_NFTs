@@ -10,10 +10,6 @@ bl_info = {
 
 # Import handling:
 
-from ast import Load
-from cgitb import text
-from msilib.schema import Property
-from venv import create
 import bpy
 from bpy.app.handlers import persistent
 from rna_prop_ui import PropertyPanel
@@ -301,11 +297,13 @@ class initializeRecord(bpy.types.Operator):
         bpy.context.scene.my_tool.BatchSliderIndex = 1
 
         LoadNFT.init_batch(output_save_path)
-        DataDictionary = DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path, output_save_path, True)
+        DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path, output_save_path, True)
 
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
 
         LoadNFT.update_current_batch(1, output_save_path)
+
+        LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
         return {'FINISHED'}
 
 
@@ -567,6 +565,10 @@ class loadBatch(bpy.types.Operator):
         index = bpy.context.scene.my_tool.BatchSliderIndex
         LoadNFT.check_if_paths_exist(index)
         batch_path = bpy.context.scene.my_tool.batch_json_save_path
+        if len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) - 1 < index:
+            self.report({"ERROR"}, "This is not a valid batch" )
+            return {'FINISHED'}
+
         try:
             LoadNFT.update_current_batch(index, batch_path)
             NFTRecord_save_path = os.path.join(batch_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
@@ -676,33 +678,32 @@ class loadDirectory(bpy.types.Operator):
         path = bpy.context.scene.my_tool.root_dir
         if path != '':
             if os.path.exists(path):
-                Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(path)
-                batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
-                NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(1))
-                bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
-
-                bpy.context.scene.my_tool.CurrentBatchIndex = 1
-                bpy.context.scene.my_tool.loadNFTIndex = 1
-                bpy.context.scene.my_tool.BatchSliderIndex = 1
-                if os.path.exists(batch_path):
-                    LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
-                else:
-                    LoadNFT.init_batch(batch_json_save_path)
-                    DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, True)
-                    LoadNFT.update_current_batch(1, batch_json_save_path)
+                save_path = path
             else:
                 print("oh no")
+                return {'FINISHED'}
         else:
             print("is empty")
             save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
-            Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
-            bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
-            NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
 
-            bpy.context.scene.my_tool.CurrentBatchIndex = 1
-            bpy.context.scene.my_tool.loadNFTIndex = 1
-            bpy.context.scene.my_tool.BatchSliderIndex = 1
+        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+        batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
+        NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(1))
+        master_nftrecord_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
+        bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
+
+        bpy.context.scene.my_tool.CurrentBatchIndex = 1
+        bpy.context.scene.my_tool.loadNFTIndex = 1
+        bpy.context.scene.my_tool.BatchSliderIndex = 1
+        if os.path.exists(batch_path):
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+        else:
+            LoadNFT.init_batch(batch_json_save_path)
+            DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, True)
+            DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
+            LoadNFT.update_current_batch(1, batch_json_save_path)
+            LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+            
         return {'FINISHED'}
         
 
@@ -767,7 +768,7 @@ class renderBatch(bpy.types.Operator):
             else:
                 transparency = False
             batch_count = len(os.listdir(batch_path)) - 1
-            range = [1, batch_count]
+            range = []
             if not bpy.context.scene.my_tool.renderFullBatch:
                 if bpy.context.scene.my_tool.rangeBool:
                     size = bpy.context.scene.my_tool.renderSectionSize
@@ -781,7 +782,6 @@ class renderBatch(bpy.types.Operator):
                     range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
                     if range_start <= batch_count and range_end >= range_start:
                         range = [range_start, range_end]
-
             file_formats = []
             if imageBool:
                 file_formats.append(imageEnum)
@@ -791,7 +791,10 @@ class renderBatch(bpy.types.Operator):
                 file_formats.append(modelEnum)
 
             if file_formats:
-                Exporter.render_nft_batch_custom(blend_path, render_batch_num, file_formats, range, transparency)
+                if range:
+                    Exporter.render_nft_batch_custom(blend_path, render_batch_num, file_formats, range, transparency)
+                else:
+                    self.report({"ERROR"}, "Failed: Invalid range")
             else:
                 self.report({"ERROR"}, "Failed: No output render types selected :(")
         else:
@@ -1145,8 +1148,6 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
 
-
-
         row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
 
 
@@ -1234,7 +1235,6 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     row.label(text="Render range: {} ~ {}".format(range_start, range_end))
                 else:
                     row.label(text="Render total: {}".format(range_end - range_start + 1))
-
 
             row = layout.row()
             if mytool.rangeBool:
