@@ -354,11 +354,12 @@ def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_fo
     for i in dnaDictionary:
         coll = list(dnaDictionary[i].keys())[0]
         print(coll)
-        for obj in bpy.data.collections[coll].all_objects:
-            obj.select_set(True)
+        #for obj in bpy.data.collections[coll].all_objects:
+        #     obj.select_set(True)
 
-    # for obj in bpy.data.collections['Script_Ignore'].all_objects:
-    #     obj.select_set(True)
+    char_variant = DNA.partition(',')[0]
+    for obj in bpy.data.collections[char_variant].all_objects:
+        obj.select_set(True)
 
     if file_format == 'GLB':
         bpy.ops.export_scene.gltf(filepath=f"{modelPath}.glb",
