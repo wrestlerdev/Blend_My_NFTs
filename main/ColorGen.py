@@ -129,15 +129,15 @@ def SplitComplmentaryColor(col, split):
 
     c0 = Color()
     c0.hsv = (h1, col[1], 1)
-    colors[0] = (c0.r, c0.g, c0.b)
+    colors[0] = (c0.r, c0.g, c0.b, 1)
     
     c1 = Color()
     c1.hsv = (h2, col[1], 1)
-    colors[1] = (c1.r, c1.g, c1.b)
+    colors[1] = (c1.r, c1.g, c1.b, 1)
     
     c2 = Color()
     c2.hsv = (h3, col[1], 1)
-    colors[2] = (c2.r, c2.g, c2.b)
+    colors[2] = (c2.r, c2.g, c2.b, 1)
     return colors
 
 style = []
@@ -202,7 +202,6 @@ def PickOutfitColors(attribute, chidlrenObjs):
         colIndex = random.randrange(0, len(style) ) 
         col = style[colIndex]
         #col = (random.random(), random.random(), random.random())
-    
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
 
@@ -221,7 +220,7 @@ def PickOutfitColors(attribute, chidlrenObjs):
         material_slots = obj.material_slots
         for m in material_slots:
             #material = m.material
-            material = bpy.data.materials['Master']
+            material = bpy.data.materials['MasterV01']
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
@@ -230,69 +229,17 @@ def PickOutfitColors(attribute, chidlrenObjs):
             
             for node in material.node_tree.nodes:
                 if (node.label == "RTint"):
-                    node.color = colors[0]
+                    node.outputs["Color"].default_value = (0, 0, 0, 1)
+                if (node.label == "GTint"):
+                    node.outputs["Color"].default_value = (0, 0, 0, 1)
+                if (node.label == "BTint"):
+                    node.outputs["Color"].default_value = (0, 0, 0, 1)
 
 
-
-        hexCodes = [None] * 3
-        hexCodes[0] = RGBtoHex((colors[0]))
-        hexCodes[1] = RGBtoHex((colors[1]))
-        hexCodes[2] = RGBtoHex((colors[2]))
-
-
-    # c = Color()
-    # c.hsv = col[0], col[1], col[2]
-    # #colors = MonocromaticColor(col, random.uniform(0,1))
-    # colors = AnalagousColor(col, random.uniform(0.075,0.35))
-    # #colors = SplitComplmentaryColor(col, random.uniform(0.1,0.3) )
-    # print("------------------")
-    # newImage = bpy.data.images.load(file, check_existing=True)
-    # for child in chidlrenObjs:
-    #     print(child)
-    #     obj = bpy.data.objects[child.name]
-
-    #     obj["TestColor"] = (c.r, c.g, c.b)
-
-    #     obj["R"] = colors[0]
-    #     obj["G"] = colors[1]
-    #     obj["B"] = colors[2]
-    #     obj.hide_viewport = False
-    #     obj.hide_render = False
-        
-
-    #     material_slots = obj.material_slots
-    #     for m in material_slots:
-    #         #material = m.material
-    #         material = bpy.data.materials['Master']
-    #         material.use_nodes = True
-    #         matcopy = material.copy()
-    #         m.material = matcopy
-    #         #m.material = bpy.data.materials['Test_02']
-    #         # get the nodes
-    #         print(m)
-    #         # print(c)
-    #         for node in material.node_tree.nodes:
-    #             print(c)
-    #             if (node.label == "Diffuse"):
-    #                 node.image = newImage
-    #             elif node.label == "RTint":
-    #                 node.outputs["Value"].default_value = c.r
-    #             elif node.label == "GTint":
-    #                 node.outputs["Value"].default_value = c.g
-    #             elif node.label == "BTint":
-    #                 node.outputs["Value"].default_value = c.b
-
-
-    # hexCodes = [None] * 3
-    # hexCodes[0] = RGBtoHex((colors[0]))
-    # hexCodes[1] = RGBtoHex((colors[1]))
-    # hexCodes[2] = RGBtoHex((colors[2]))
-
-
-
-
-
-
+    hexCodes = [None] * 3
+    hexCodes[0] = RGBtoHex((colors[0]))
+    hexCodes[1] = RGBtoHex((colors[1]))
+    hexCodes[2] = RGBtoHex((colors[2]))
     
     # for block in bpy.data.materials:
     #     if block.users == 0:
