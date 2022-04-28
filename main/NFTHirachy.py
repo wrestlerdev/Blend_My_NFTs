@@ -40,9 +40,15 @@ def createHirachy(rarity_from_name):
          Varients = {}
          _varients = bpy.data.collections[_attributeTypes[i].name].children
          
-
          for j in range(len(_varients)):
-            Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i], rarity_from_name)
+            Textures = {}
+            _textures = _varients[j].children
+
+            for k in range(len(_textures)):
+               Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i], rarity_from_name)
+
+            Varients[_varients[j].name] = Textures
+
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -61,8 +67,9 @@ def createHirachy(rarity_from_name):
    return sortedAttibutes
 
 
-def attributeData(attributeVariantColl, attributeTypeColl, rarity_from_name):
+def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl, rarity_from_name):
    attributeVariant = attributeVariantColl.name
+   attributeTexture = attributeTextureColl.name
    eachObject={}
    """
    Creates a dictionary of each attribute
@@ -72,7 +79,7 @@ def attributeData(attributeVariantColl, attributeTypeColl, rarity_from_name):
       """
       Returns the name of "i" attribute name, attribute genre, attribute variant
       """
-      name = i.split("_")[:3]
+      name = i.split("_")[:4]
       return name
 
    def getOrder_rarity(i):
@@ -87,8 +94,8 @@ def attributeData(attributeVariantColl, attributeTypeColl, rarity_from_name):
       return list(a)
       
 
-   name = getName(attributeVariant)
-   orderRarity = getOrder_rarity(attributeVariant)
+   name = getName(attributeTexture)
+   orderRarity = getOrder_rarity(attributeTexture)
 
    if len(orderRarity) == 0:
       return
@@ -97,15 +104,19 @@ def attributeData(attributeVariantColl, attributeTypeColl, rarity_from_name):
       number = orderRarity[0]
       rarity = orderRarity[1]
       type_rarity = attributeTypeColl.name.split('_')[-1]
+      texture_rarity = "25"
       if not rarity_from_name and attributeVariantColl.get('rarity') is not None:
          type_rarity = str(attributeTypeColl['rarity'])
          rarity = str(attributeVariantColl['rarity'])
+         if attributeTextureColl.get('rarity') is not None:
+            texture_rarity = str(attributeTextureColl['rarity'])
       color = "0"
-
       slotName = name[0]
       clothingGenre = name[1]
       clothingItem = name[2]
+      textureSet = ''. join(i for i in (name[3]) if not i.isdigit())
       
-      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem,
-                     "number": number, "rarity": rarity, "type_rarity": type_rarity,"color": color}
+      
+      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingVersion": number,
+                     "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": rarity, "type_rarity": type_rarity}
    return eachObject

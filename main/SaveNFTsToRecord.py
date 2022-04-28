@@ -2,7 +2,6 @@
 # This file sorts the NFT DNA from NFTRecord.json and exports it to a given number of Batch#.json files set by nftsPerBatch
 # in config.py.
 
-from doctest import master
 import bpy
 import os
 import json
@@ -36,6 +35,7 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
 
     if uniqueDNASetToAdd:
         UpdateNFTRecord(uniqueDNASetToAdd, DataDictionary, single_record_path, master_record_save_path)
+        print("{} NFTs have been saved (ノಠ vಠ)ノ彡( {}o)". format(len(uniqueDNASetToAdd), "o°"*len(uniqueDNASetToAdd)))
         return True
     else:
         print("ERROR: This NFT(s) already exists")
@@ -256,10 +256,10 @@ def SearchForTexturesAndCreateDuplicates(save_path):
                             Nef = col
                         elif name == "Rem":
                             Rem = col
-                    else:
+                    else:                    
                         for obj in col.objects:
-                            bpy.data.objects.remove(obj, do_unlink=True)                       
-                        bpy.data.collections.remove(col)
+                            bpy.data.objects.remove(obj, do_unlink=True)
+                    bpy.data.collections.remove(col)
 
                 for texture in os.listdir(texture_path):
                     print(texture)

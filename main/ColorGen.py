@@ -188,6 +188,8 @@ def PickOutfitColors(attribute, chidlrenObjs):
     global mainColorIndex, SecondaryColorIndex
     
     col = (0.0, 0.0, 0.0)
+    colw = (1.0,1.0,1.0)
+    hexCodes = [RGBtoHex(colw)] * 3
     colIndex = -1
     if(attribute == "01-UpperTorso"):
         col =  maincolor

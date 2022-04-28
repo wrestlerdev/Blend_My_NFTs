@@ -61,16 +61,25 @@ def update_collection_rarity_property(NFTRecord_save_path):
         types = list(hierarchy[slot].keys())
         for type in types:
             variants = list(hierarchy[slot][type].keys())
+            first_texture = list(hierarchy[slot][type][variants[0]].keys())[0]
             type_coll = bpy.data.collections[type]
-            type_rarity = hierarchy[slot][type][variants[0]]["type_rarity"]
+            type_rarity = hierarchy[slot][type][variants[0]][first_texture]["type_rarity"]
             type_coll["rarity"] =  int(float(type_rarity))
             update_rarity_color(type, type_rarity)
 
             for v in variants:
-                rarity = hierarchy[slot][type][v]["rarity"]
+                first_texture = list(hierarchy[slot][type][v].keys())[0]
+                variant_rarity = hierarchy[slot][type][v][first_texture]["variant_rarity"]
                 var_coll = bpy.data.collections[v]
-                var_coll["rarity"] = int(float(rarity))
-                update_rarity_color(v, int(float(rarity)))
+                var_coll["rarity"] = int(float(variant_rarity))
+                update_rarity_color(v, int(float(variant_rarity)))
+
+                textures = list(hierarchy[slot][type][v].keys())
+                for texture in textures:
+                    texture_rarity = hierarchy[slot][type][v][texture]["texture_rarity"]
+                    tex_coll = bpy.data.collections[texture]
+                    tex_coll["rarity"] = int(float(texture_rarity))
+                    update_rarity_color(texture, int(float(texture_rarity)))
     return
 
 
@@ -90,6 +99,7 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
             variant_dict = {}
             variants = list(hierarchy[slot][type].keys())
             total_rarity = 0
+            # first_texture = list(hierarchy[slot][type][variants[0]].keys())[0]
 
             type_coll = bpy.data.collections[type]
             if type_coll.get('rarity') is not None:
@@ -113,6 +123,17 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
                     variant_dict[v] = v_rarity # TODO
                     update_rarity_color(v, int(v_rarity))
                     total_rarity += int(v_rarity)
+
+                textures = list(hierarchy[slot][type][v].keys())
+                for tex in textures:
+                    tex_coll = bpy.data.collections[tex]
+                    if tex_coll.get('rarity') is not None:
+                        tex_rarity = int((float(tex_coll["rarity"])))
+                    else:
+                        tex_rarity = int(float(hierarchy[slot][type][v][tex]["texture_rarity"]))
+                        tex_coll['rarity'] = int(tex_rarity)
+                    update_rarity_color(tex, tex_rarity)
+
     return
 
 
