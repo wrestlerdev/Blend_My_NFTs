@@ -45,6 +45,12 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
             for variant in hierarchy[attribute][type]:
                bpy.data.collections[variant].hide_viewport = True
                bpy.data.collections[variant].hide_render = True
+               char_var = variant + '_' + character
+
+               if bpy.data.collections.get(char_var) is not None:
+                  bpy.data.collections.get(char_var).hide_viewport = True
+                  bpy.data.collections.get(char_var).hide_render = True
+
                for texture in hierarchy[attribute][type][variant]:
                   bpy.data.collections[texture].hide_viewport = True
                   bpy.data.collections[texture].hide_render = True
@@ -62,9 +68,10 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       texture_children = bpy.data.collections[texture].children
          
       if len(DNASplit) > 3:
-         hex_01 = DNASplit[3]
-         hex_02 = DNASplit[4]
-         hex_03 = DNASplit[5]
+         style = DNASplit[3]
+         hex_01 = DNASplit[4]
+         hex_02 = DNASplit[5]
+         hex_03 = DNASplit[6]
 
          if texture_children:
             for child in texture_children:
@@ -77,6 +84,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                   child.hide_render = True
          else:
             meshes = bpy.data.collections.get(texture).objects
+
          for mesh in meshes:
             obj = bpy.data.objects[mesh.name]
             col_01 = Color(HexToRGB(hex_01))
@@ -144,7 +152,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    DNASplit = DNAStrand.split('-')
    last_color = DNASplit[3:]
    if not last_color:
-      last_color = ["#FFFFFF"] * 3 #CHECK THIS
+      last_color = ['a'].append(["#FFFFFF"] * 3) #CHECK THIS
 
    for type_coll in slot_coll.children:
       if variant_name in type_coll.children:
@@ -244,13 +252,17 @@ def collections_have_updated(slots_key, Slots): # this is called from init prope
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
    if DNA != lastDNA:
       DNA = DNA.replace('"', '')
-      try:
-         show_nft_from_dna(DNA)
-         bpy.context.scene.my_tool.lastDNA = DNA
-         bpy.context.scene.my_tool.inputDNA = DNA
-         fill_pointers_from_dna(DNA, DNA)
-      except:
-         print("this is not a valid dna string")
+      show_nft_from_dna(DNA)
+      bpy.context.scene.my_tool.lastDNA = DNA
+      bpy.context.scene.my_tool.inputDNA = DNA
+      fill_pointers_from_dna(DNA, DNA)
+      # try:
+      #    show_nft_from_dna(DNA)
+      #    bpy.context.scene.my_tool.lastDNA = DNA
+      #    bpy.context.scene.my_tool.inputDNA = DNA
+      #    fill_pointers_from_dna(DNA, DNA)
+      # except:
+      #    print("this is not a valid dna string")
    return
 
 
@@ -271,7 +283,7 @@ def create_item_dict(DNA):
          atttype_index = DNASplit[0]
          variant_index = DNASplit[1]
          texture_index = DNASplit[2]
-
+         color = '' #TODO: add color to single record
 
          slot = list(ohierarchy.items())[strand]
 

@@ -8,6 +8,7 @@ import random
 import importlib
 from functools import partial
 
+characters = ["Kae", "Nef", "Rem"]
 
 def createHirachy(rarity_from_name):
    # rarity_from_name = bool whether rarity in new heirarchy should use either 'collection custom property rarity' or 'collection name rarity'
@@ -45,7 +46,8 @@ def createHirachy(rarity_from_name):
             _textures = _varients[j].children
 
             for k in range(len(_textures)):
-               Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i], rarity_from_name)
+               if not _textures[k].name.split('_')[-1] in characters: # check if char variation mesh
+                  Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i], rarity_from_name)
 
             Varients[_varients[j].name] = Textures
 
@@ -92,6 +94,10 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       del a[0] #Remove Genre Name
       del a[0] #Remove ItemName Name
       return list(a)
+
+   def get_textureSet():
+      textureSet = ''. join(i for i in (name[3]) if not i.isdigit())
+      return textureSet
       
 
    name = getName(attributeTexture)
@@ -114,7 +120,7 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       slotName = name[0]
       clothingGenre = name[1]
       clothingItem = name[2]
-      textureSet = ''. join(i for i in (name[3]) if not i.isdigit())
+      textureSet = get_textureSet()
       
       
       eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingVersion": number,

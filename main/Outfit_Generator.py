@@ -36,7 +36,7 @@ ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
 ThinShortsSlot = ["09-PelvisThin"]
 NeckWearSlots = ["13-Neck"]
 
-
+Characters = ["Kae" ,"Nef", "Rem"]
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
@@ -322,13 +322,20 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     bpy.data.collections.get(varient).hide_viewport = True
                     bpy.data.collections.get(varient).hide_render = True
 
+                    for char in Characters:
+                        char_var = varient + '_' + char
+                        if bpy.data.collections.get(char_var) is not None:
+                            bpy.data.collections.get(char_var).hide_viewport = True
+                            bpy.data.collections.get(char_var).hide_render = True
+
                     for texture in hierarchy[attribute][type][varient]:
                         bpy.data.collections.get(texture).hide_viewport = True
                         bpy.data.collections.get(texture).hide_render = True
+
                         
                     for varient_mesh in bpy.data.collections[varient].objects: # placeholder
                         varient_mesh.hide_render = True
-                        varient_mesh.hide_viewport = False
+                        varient_mesh.hide_viewport = False # CHECK THIS
                         # should this hide viewport
 
 
@@ -398,7 +405,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                             char_coll.hide_viewport = True
                             char_coll.hide_render = True
                 else:
-                    chidlrenObjs = bpy.data.collections.get(textureChoosen).objects
+                    chidlrenObjs = bpy.data.collections.get(textureChoosen).objects # CHECK THIS
 
                 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
@@ -406,6 +413,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
                 bpy.data.collections.get(textureChoosen).hide_viewport = False # CHECK THIS
                 bpy.data.collections.get(textureChoosen).hide_render = False # CHECK THIS
+
+                
+
+
                 #deselt all 
                 #bpy.ops.object.select_all(action='DESELECT')
 
@@ -476,7 +487,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
 
     for m in bpy.data.materials: # purge all unused materials for now
-        if m.users == 0 and m.name != 'Master':
+        if m.users == 0 and m.name != 'MasterV01':
             bpy.data.materials.remove(m)
 
     returnERC721MetaDataCustomTest("test", list(DNASet)[0], hierarchy, MetadataAttributeDict)
@@ -597,7 +608,8 @@ def PickWeightedTextureVarient(Textures):
     for texture in Textures:
         print(Textures[texture])
         rarity = float(Textures[texture]["texture_rarity"])
-        if rarity > 0.0:
+        t_last_string = str(Textures[texture]).split('_')[-1]
+        if rarity > 0.0 and t_last_string not in Characters:
             number_List_Of_i.append(texture)
             rarity_List_Of_i.append(float(rarity))
 

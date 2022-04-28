@@ -555,6 +555,10 @@ class loadBatch(bpy.types.Operator):
         index = bpy.context.scene.my_tool.BatchSliderIndex
         LoadNFT.check_if_paths_exist(index)
         batch_path = bpy.context.scene.my_tool.batch_json_save_path
+        if len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) - 1 < index:
+            self.report({"ERROR"}, "This is not a valid batch" )
+            return {'FINISHED'}
+
         try:
             LoadNFT.update_current_batch(index, batch_path)
             NFTRecord_save_path = os.path.join(batch_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
@@ -683,14 +687,12 @@ class loadDirectory(bpy.types.Operator):
         bpy.context.scene.my_tool.BatchSliderIndex = 1
         if os.path.exists(batch_path):
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
-            print("aw shucks")
         else:
             LoadNFT.init_batch(batch_json_save_path)
             DNA_Generator.send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, True)
             DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
             LoadNFT.update_current_batch(1, batch_json_save_path)
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
-            print("heck")
             
         return {'FINISHED'}
         
