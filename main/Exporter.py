@@ -268,6 +268,12 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 render_nft_single_video(folder, batch_path, batch_num, i, file_format, totalDNAList)
                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time.time() - start_time))
 
+        elif file_format in ['FBX', 'GLB']:
+            for i in range(nft_range[0], nft_range[1] + 1):
+                start_time = time.time()
+                render_nft_single_model(folder, batch_path, batch_num, i, file_format, totalDNAList)
+                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time.time() - start_time))
+
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
 
     return
@@ -324,6 +330,70 @@ def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_fo
         bpy.context.scene.render.ffmpeg.codec = 'H264'
         bpy.ops.render.render(animation=True)
 
+    return
+
+def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_format, totalDNAList):
+    file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
+    json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
+    
+    print(f"{bcolors.OK}Generating 3D Model{bcolors.RESET}")
+
+
+    SingleDict = json.load(open(json_path))
+    dnaDictionary = SingleDict["CharacterItems"]
+
+    DNA = SingleDict["DNAList"]
+    total_index = totalDNAList.index(DNA) + 1
+    nft_name = "SAE_#{:04d}".format(total_index)
+    modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
+
+    Previewer.show_nft_from_dna(DNA)
+    # if not os.path.exists(modelFolder):
+    #     os.makedirs(modelFolder)
+
+    for i in dnaDictionary:
+        coll = list(dnaDictionary[i].keys())[0]
+        print(coll)
+        #for obj in bpy.data.collections[coll].all_objects:
+        #     obj.select_set(True)
+
+    char_variant = DNA.partition(',')[0]
+    for obj in bpy.data.collections[char_variant].all_objects:
+        obj.select_set(True)
+
+    if file_format == 'GLB':
+        bpy.ops.export_scene.gltf(filepath=f"{modelPath}.glb",
+                                    check_existing=True,
+                                    export_format='GLB',
+                                    use_selection=True)
+    if file_format == 'GLTF_SEPARATE':
+        bpy.ops.export_scene.gltf(filepath=f"{modelPath}",
+                                    check_existing=True,
+                                    export_format='GLTF_SEPARATE',
+                                    use_selection=True)
+    if file_format == 'GLTF_EMBEDDED':
+        bpy.ops.export_scene.gltf(filepath=f"{modelPath}.gltf",
+                                    check_existing=True,
+                                    export_format='GLTF_EMBEDDED',
+                                    use_selection=True)
+    elif file_format == 'FBX':
+        bpy.ops.export_scene.fbx(filepath=f"{modelPath}.fbx",
+                                    check_existing=True,
+                                    use_selection=True)
+    elif file_format == 'OBJ':
+        bpy.ops.export_scene.obj(filepath=f"{modelPath}.obj",
+                                    check_existing=True,
+                                    use_selection=True)
+    elif file_format == 'X3D':
+        bpy.ops.export_scene.x3d(filepath=f"{modelPath}.x3d",
+                                    check_existing=True,
+                                    use_selection=True)
+    elif file_format == 'STL':
+        bpy.ops.export_mesh.stl(filepath=f"{modelPath}.stl",
+                                check_existing=True,
+                                use_selection=True)
+    elif file_format == 'VOX':
+        bpy.ops.export_vox.some_data(filepath=f"{modelPath}.vox")
     return
 
 if __name__ == '__main__':

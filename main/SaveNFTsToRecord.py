@@ -286,7 +286,7 @@ def DuplicateChildrenMaterials(originalCollection, newParentCollection, texture_
         material_slots = ob.material_slots
         for m in material_slots:
             #material = m.material
-            material = bpy.data.materials['Master']
+            material = bpy.data.materials['MasterV01']
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy

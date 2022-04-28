@@ -143,6 +143,16 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     # Custom properties
+    characterEnum: bpy.props.EnumProperty(
+        name="Enums for character", 
+        description="select which character is being used", 
+        items=[
+            ('Kae', 'Kae', 'Kae'),
+            ('Nef', 'Nef', 'Nef'),
+            ('Rem','Rem', 'Rem' ),
+        ]
+    )
+
     renderPrefix: bpy.props.StringProperty(name="Output Prefix:", default="SAE #")
 
     renderFullBatch: bpy.props.BoolProperty(name= "Render Full Batch", default=True)
@@ -750,6 +760,8 @@ class renderBatch(bpy.types.Operator):
             imageEnum = bpy.context.scene.my_tool.imageEnum
             imageBool = bpy.context.scene.my_tool.imageBool
             animationBool = bpy.context.scene.my_tool.animationBool
+            modelBool = bpy.context.scene.my_tool.modelBool
+            modelEnum = bpy.context.scene.my_tool.modelEnum
             if imageEnum == 'PNG':
                 transparency = bpy.context.scene.my_tool.PNGTransparency
             else:
@@ -775,6 +787,8 @@ class renderBatch(bpy.types.Operator):
                 file_formats.append(imageEnum)
             if animationBool:
                 file_formats.append("MP4")
+            if modelBool:
+                file_formats.append(modelEnum)
 
             if file_formats:
                 Exporter.render_nft_batch_custom(blend_path, render_batch_num, file_formats, range, transparency)
@@ -1171,6 +1185,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "imageBool")
         row.prop(mytool, "animationBool")
+        row.prop(mytool, "modelBool")
         if mytool.imageBool:
             row = layout.row()
             row.prop(mytool, "imageEnum")
@@ -1180,6 +1195,10 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
                 row.label(text="")
                 row.prop(mytool, "PNGTransparency")
+        if mytool.modelBool:
+            row = layout.row()
+            row.prop(mytool, "modelEnum")
+            row = layout.row()
 
         row = layout.row()
         batch_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "OUTPUT", 
