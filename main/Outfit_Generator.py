@@ -461,7 +461,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         attributeUsedDict.update(SlotUpdateValue)
 
 
-            ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
+            #ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
+            ColorID = ['#111111'] * 3
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), ColorGen.styleChoice, ColorID[0], ColorID[1], ColorID[2]])
 
             # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
