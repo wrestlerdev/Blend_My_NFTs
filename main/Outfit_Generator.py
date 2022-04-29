@@ -467,7 +467,12 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
             #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
             TextureVarientDict = {}
-            TextureVarientDict[textureChoosen] = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]
+            current_entry = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]
+            current_entry["color_style"] = ColorGen.styleChoice
+            current_entry["color_primary"] = ColorID[0]
+            current_entry["color_secondary"] = ColorID[1]
+            current_entry["color_tertiary"] = ColorID[2]
+            TextureVarientDict[textureChoosen] = current_entry
             ItemsUsed[attribute] = TextureVarientDict
 
                 
