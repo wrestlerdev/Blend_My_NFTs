@@ -11,10 +11,11 @@ import json
 import random
 import importlib
 from functools import partial
-from mathutils import Color
 
 from . import ColorGen
 importlib.reload(ColorGen)
+
+from . import config
 
 
 # A list for each caterogry of clothing that states what slots it will fil
@@ -35,8 +36,6 @@ ThinQuarterPantsSlot = ["09-PelvisThin", "10-Calf"]
 ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
 ThinShortsSlot = ["09-PelvisThin"]
 NeckWearSlots = ["13-Neck"]
-
-Characters = ["Kae" ,"Nef", "Rem"]
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
@@ -322,7 +321,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     bpy.data.collections.get(varient).hide_viewport = True
                     bpy.data.collections.get(varient).hide_render = True
 
-                    for char in Characters:
+                    for char in config.Characters:
                         char_var = varient + '_' + char
                         if bpy.data.collections.get(char_var) is not None:
                             bpy.data.collections.get(char_var).hide_viewport = True
@@ -615,7 +614,7 @@ def PickWeightedTextureVarient(Textures):
         print(Textures[texture])
         rarity = float(Textures[texture]["texture_rarity"])
         t_last_string = str(Textures[texture]).split('_')[-1]
-        if rarity > 0.0 and t_last_string not in Characters:
+        if rarity > 0.0 and t_last_string not in config.Characters:
             number_List_Of_i.append(texture)
             rarity_List_Of_i.append(float(rarity))
 
@@ -627,13 +626,12 @@ def PickWeightedTextureVarient(Textures):
 
  
 def PickCharacter(default_char=''):
-    characters = ['Rem', 'Nef', 'Kae']
     if default_char == '':
-        char = random.choice(characters)
+        char = random.choice(config.Characters)
     else:
         char = default_char
 
-    for c in characters:
+    for c in config.Characters:
         if char == c:
             bpy.data.collections[c].hide_viewport = False
             bpy.data.collections[c].hide_render = False

@@ -19,7 +19,7 @@ import time
 
 import os
 import importlib
-
+from .main import config
 # Import files from main directory:
 
 importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
@@ -139,15 +139,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     # Custom properties
-    characterEnum: bpy.props.EnumProperty(
-        name="Enums for character", 
-        description="select which character is being used", 
-        items=[
-            ('Kae', 'Kae', 'Kae'),
-            ('Nef', 'Nef', 'Nef'),
-            ('Rem','Rem', 'Rem' ),
-        ]
-    )
 
     renderPrefix: bpy.props.StringProperty(name="Output Prefix:", default="SAE #")
 
