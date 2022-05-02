@@ -297,9 +297,6 @@ class initializeRecord(bpy.types.Operator):
         LoadNFT.update_current_batch(1, output_save_path)
 
         LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
-
-        output_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
-        Exporter.clear_all_export_data(output_save_path, output_path)
         return {'FINISHED'}
 
 
@@ -863,6 +860,30 @@ class moveDataToLocal(bpy.types.Operator):
 
 #----------------------------------------------------------------
 
+class purgeData(bpy.types.Operator):
+    bl_idname = 'purge.datas'
+    bl_label = 'Purge Data?'
+    bl_description = 'This will purge mesh, material and collection data'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        objs = [o for o in bpy.data.objects if not o.users_scene]
+        bpy.data.batch_remove(objs)
+
+        mats = [m for m in bpy.data.materials if m.users == 0 and m.name != 'MasterV01']
+        bpy.data.batch_remove(mats)
+
+        colls = [c for c in bpy.data.collections if c.users == 0]
+        bpy.data.batch_remove(colls)
+        return {'FINISHED'}
+
+
+
+#----------------------------------------------------------------
+
 class assetlibTest(bpy.types.Operator):
     bl_idname = 'assetlib.test'
     bl_label = "Asset Library"
@@ -1349,6 +1370,19 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+        row = layout.row()
+        row.label(text="Collections:")
+        row = layout.row()
+        row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
+        row = layout.row()
+        row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
+        row = layout.row()
+        row.operator(createCharacterCollections.bl_idname, text=createCharacterCollections.bl_label)
+        row = layout.row()
+
+        row.label(text="Clean up:")
+        row = layout.row()
+        row.operator(purgeData.bl_idname, text=purgeData.bl_label)
 
 
 
@@ -1484,6 +1518,7 @@ classes = (
     moveDataToLocal,
     assetlibTest,
 
+    purgeData,
 
     
     # UIList 1:
