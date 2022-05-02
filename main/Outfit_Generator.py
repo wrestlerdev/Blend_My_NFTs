@@ -272,7 +272,6 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                             charVar.hide_viewport = True
                             charVar.hide_render = True
                 return FormattedDNA
-        #print(currentVarient)
         attempts -= 1
     return CurrentDNA
 
@@ -391,7 +390,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
-                print(textureChoosen)
 
                 char_variants = bpy.data.collections.get(textureChoosen).children
                 if char_variants:
@@ -405,7 +403,9 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                             char_coll.hide_viewport = True
                             char_coll.hide_render = True
                 else:
-                    chidlrenObjs = bpy.data.collections.get(textureChoosen).objects # CHECK THIS
+                    chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
+                    for obj in chidlrenObjs:
+                        print(obj.name) 
 
                 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
@@ -414,43 +414,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 bpy.data.collections.get(textureChoosen).hide_viewport = False # CHECK THIS
                 bpy.data.collections.get(textureChoosen).hide_render = False # CHECK THIS
 
-                
-
-
-                #deselt all 
-                #bpy.ops.object.select_all(action='DESELECT')
-
-                #bpy.data.collections.get(varientChoosen).select_set(True)
-                # cc = bpy.data.collections.new(varientChoosen + "_TEMP")
-                # bpy.data.collections["NFTHolder"].children.link(cc)
-                # for child in chidlrenObjs:
-                #     new_object =  child.copy()
-                #     cc.objects.link(new_object)
-
-                # copiedChidlrenObjs = cc.objects
-                #bpy.context.scene.collection.children.link(cc)
-
-                #bpy.data.objects[varientChoosen].select_set(True)
-                # bpy.ops.object.duplicate()
-
-                # nullCol = bpy.context.selected_objects
-
-                # bpy.ops.object.duplicates_make_real()
-                # bpy.ops.object.make_local(type='SELECT_OBDATA_MATERIAL')
-
-                # #get selected
-                # children = bpy.context.selected_objects
-                # for child in children: 
-                #     print (children)
-                #     bpy.data.collections["NFTHolder"].objects.link(child)
-                #     bpy.context.scene.collection.objects.unlink(child)
-
-
-                # bpy.ops.object.select_all(action='DESELECT')
-                # #delele null collection 
-                # nullCol[0].select_set(True)
-                # print(nullCol[0])
-                # bpy.ops.object.delete()
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]["clothingGenre"]
                 
                 #loop through all slots that selected item will take up
@@ -460,9 +423,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
 
-
-            #ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
-            ColorID = ['#111111'] * 3
+            ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
+            #ColorID = ['#111111'] * 3
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), ColorGen.styleChoice, ColorID[0], ColorID[1], ColorID[2]])
 
             # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
