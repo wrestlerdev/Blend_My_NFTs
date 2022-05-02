@@ -297,6 +297,9 @@ class initializeRecord(bpy.types.Operator):
         LoadNFT.update_current_batch(1, output_save_path)
 
         LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
+
+        output_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+        Exporter.clear_all_export_data(output_save_path, output_path)
         return {'FINISHED'}
 
 

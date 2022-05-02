@@ -404,9 +404,23 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
     return
 
 
+def clear_all_export_data(record_path, local_output_path):
+    if not os.path.exists(local_output_path):
+        return
+    if os.path.abspath(record_path) == os.path.abspath(local_output_path):
+        return
+    
+    for dir in os.listdir(local_output_path):
+        new_path = os.path.join(local_output_path, dir)
+        if os.path.isdir(new_path):
+            shutil.rmtree(new_path)
+        else:
+            os.remove(new_path)
+    return
+
 
 def export_record_data(record_batch_root, local_batch_root):
-    if record_batch_root == local_batch_root:
+    if os.path.abspath(record_batch_root) == os.path.abspath(local_batch_root):
         print("This is the same folder lol")
         return
     # if os.path.exists(local_batch_root):
@@ -455,8 +469,6 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root):   # de
                 if str(new_local_path).lower().endswith('.json'):
                     os.remove(new_local_path)
                     print(new_local_path)
-
-## don't forget to delete on reinitialize?
 
 
 if __name__ == '__main__':
