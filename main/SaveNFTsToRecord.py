@@ -7,6 +7,8 @@ import os
 import json
 import random
 import shutil
+from . import config
+
 
 def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_record_save_path):
     single_record_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
@@ -231,6 +233,38 @@ def CreateSlotsFolderHierarchy(save_path):
                 os.makedirs(variant_path + "\Textures\A")
     return
 
+
+def SearchForMeshesAndCreateCharacterDuplicates(record_save_path):
+    DataDictionary = json.load(open(record_save_path))
+    hierarchy = DataDictionary["hierarchy"]
+
+    slots = list(hierarchy.keys())
+    for slot in slots:
+        types = list(hierarchy[slot].keys())
+        for type in types:
+            variants = list(hierarchy[slot][type].keys())
+            for variant in variants:
+                kae_variant = variant + "_" + config.Characters[0]
+                if bpy.data.collections.get(kae_variant) is None:
+                    original_meshes = bpy.data.collections[variant].objects
+                    for character in config.Characters:
+                        char_coll_name = variant + '_' + character
+                        char_coll = bpy.data.collections.new(char_coll_name)
+                        bpy.data.collections[variant].children.link(char_coll)
+                        print(original_meshes)
+                        for mesh in original_meshes:
+                            new_mesh = bpy.data.objects[mesh.name].copy()
+                            char_coll.objects.link(new_mesh)
+                            mat_slots = new_mesh.material_slots
+                            for m in mat_slots:
+                                material = bpy.data.materials['MasterV01']
+                                material.use_nodes = True
+                    for og_mesh in original_meshes:
+                        og_mesh.hide_render = True
+                        og_mesh.hide_viewport = True
+    return
+
+
 def SearchForTexturesAndCreateDuplicates(save_path):
     slots_path = os.path.join(save_path, "INPUT")
     slots_path = os.path.join(slots_path, "Slots")
@@ -249,7 +283,7 @@ def SearchForTexturesAndCreateDuplicates(save_path):
 
                 for col in bpy.data.collections[varient].children:
                     name = col.name.rpartition('_')[2]
-                    if name in ['Kae','Nef', 'Rem']:
+                    if name in config.Characters:
                         if name == "Kae": 
                             Kae =  col
                         elif name == "Nef":
@@ -259,21 +293,20 @@ def SearchForTexturesAndCreateDuplicates(save_path):
                     else:                    
                         for obj in col.objects:
                             bpy.data.objects.remove(obj, do_unlink=True)
-                    bpy.data.collections.remove(col)
+                        bpy.data.collections.remove(col)
 
                 for texture in os.listdir(texture_path):
                     print(texture)
                     print(varient)
                     splitName = varient.rpartition('_')
-                    collection = bpy.data.collections.new(splitName[0] + texture + splitName[1] + splitName[2])
+                    texture_collection_name = splitName[0] + texture + splitName[1] + splitName[2]
+                    collection = bpy.data.collections.new(texture_collection_name)
                     bpy.data.collections[varient].children.link(collection)
                     texture_set = os.path.join(texture_path, texture)
-                    if bpy.data.collections.get(varient + "_Kae" ) != None:
-                        DuplicateChildrenMaterials(bpy.data.collections[varient + "_Kae" ], collection, texture_set)
-                    if bpy.data.collections.get(varient + "_Nef" ) != None:
-                        DuplicateChildrenMaterials(bpy.data.collections[varient + "_Nef" ], collection, texture_set)
-                    if bpy.data.collections.get(varient + "_Rem" ) != None:
-                        DuplicateChildrenMaterials(bpy.data.collections[varient + "_Rem" ], collection, texture_set)
+                    for character in config.Characters:
+                        if bpy.data.collections.get(varient + "_" + character ) != None:
+                            DuplicateChildrenMaterials(bpy.data.collections[varient + "_" + character ], collection, texture_set)
+
 
 def DuplicateChildrenMaterials(originalCollection, newParentCollection, texture_set):
     collection = bpy.data.collections.new(newParentCollection.name + originalCollection.name.rpartition('_')[1] + originalCollection.name.rpartition('_')[2] )

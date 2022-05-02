@@ -299,7 +299,8 @@ def render_nft_single_custom(folder_path, batch_path, batch_num, nft_num, image_
     total_index = totalDNAList.index(DNA) + 1
     
     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
-    nft_name = "SAE #{:04d}".format(total_index)
+    name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+    nft_name = name_prefix + "{:04d}".format(total_index)
 
     image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
 
@@ -323,7 +324,8 @@ def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_fo
     total_index = totalDNAList.index(DNA) + 1
 
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
-    nft_name = "SAE #{:04d}.mp4".format(total_index)
+    name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+    nft_name = name_prefix + "{:04d}.mp4".format(total_index)
 
     Previewer.show_nft_from_dna(DNA)
 
@@ -350,7 +352,8 @@ def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_fo
 
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
-    nft_name = "SAE_#{:04d}".format(total_index)
+    name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+    nft_name = name_prefix + "{:04d}".format(total_index)
     modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
 
     Previewer.show_nft_from_dna(DNA)

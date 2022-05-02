@@ -8,7 +8,8 @@ import random
 import importlib
 from functools import partial
 
-characters = ["Kae", "Nef", "Rem"]
+from . import config
+
 
 def createHirachy(rarity_from_name):
    # rarity_from_name = bool whether rarity in new heirarchy should use either 'collection custom property rarity' or 'collection name rarity'
@@ -46,7 +47,7 @@ def createHirachy(rarity_from_name):
             _textures = _varients[j].children
 
             for k in range(len(_textures)):
-               if not _textures[k].name.split('_')[-1] in characters: # check if char variation mesh
+               if not _textures[k].name.split('_')[-1] in config.Characters: # check if char variation mesh
                   Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i], rarity_from_name)
 
             Varients[_varients[j].name] = Textures

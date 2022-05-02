@@ -14,13 +14,12 @@ import random
 import importlib
 from functools import partial
 from mathutils import Color
-
+from . import config
 
 enableGeneration = False
 colorList = []
 
 saved_hierarchy = collections.OrderedDict()
-characters = ['Rem', 'Nef', 'Kae']
 
 class bcolors:
    '''
@@ -363,7 +362,7 @@ def get_hierarchy_unordered():
 
 
 def show_character(char_name):
-   for c in characters:
+   for c in config.Characters:
         if char_name == c:
             bpy.data.collections[c].hide_viewport = False
             bpy.data.collections[c].hide_render = False

@@ -19,7 +19,7 @@ import time
 
 import os
 import importlib
-
+from .main import config
 # Import files from main directory:
 
 importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
@@ -139,15 +139,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     # Custom properties
-    characterEnum: bpy.props.EnumProperty(
-        name="Enums for character", 
-        description="select which character is being used", 
-        items=[
-            ('Kae', 'Kae', 'Kae'),
-            ('Nef', 'Nef', 'Nef'),
-            ('Rem','Rem', 'Rem' ),
-        ]
-    )
 
     renderPrefix: bpy.props.StringProperty(name="Output Prefix:", default="SAE #")
 
@@ -739,7 +730,25 @@ class organizeScene(bpy.types.Operator):
         SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
         return {'FINISHED'}
 
-        
+
+class createCharacterCollections(bpy.types.Operator):
+    bl_idname = 'create.charcolls'
+    bl_label = 'Organize Character Collections'
+    bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
+    bl_options = {"REGISTER", "UNDO"}
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+
+    def execute(self, context):
+        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
+        record_path = os.path.join(folder_dir, "OUTPUT", "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
+        SaveNFTsToRecord.SearchForMeshesAndCreateCharacterDuplicates(record_path)
+        return {'FINISHED'}
+       
+
+
 #----------------------------------------------------------------
 
 
@@ -1149,6 +1158,7 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
 
         row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
+        row.operator(createCharacterCollections.bl_idname, text=createCharacterCollections.bl_label)
 
 
 
@@ -1374,6 +1384,7 @@ classes = (
     deleteNFT,
     createSlotFolders,
     organizeScene,
+    createCharacterCollections,
     renderBatch,
     assetlibTest,
 
