@@ -140,6 +140,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    separateExportPath: bpy.props.StringProperty(name="Directory")
+
     renderPrefix: bpy.props.StringProperty(name="Output Prefix:", default="SAE #")
 
     renderFullBatch: bpy.props.BoolProperty(name= "Render Full Batch", default=True)
@@ -150,7 +152,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     PNGTransparency: bpy.props.BoolProperty(name= 'Transparency', default=True)
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Path")
-    root_dir:bpy.props.StringProperty(name="Root Directory")
+    root_dir: bpy.props.StringProperty(name="Root Directory")
 
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
     loadNFTIndex: bpy.props.IntProperty(name="Number to Load:", min=1, max=9999, default=1)
@@ -760,10 +762,12 @@ class renderBatch(bpy.types.Operator):
     
     def execute(self, context):
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
-        blend_path = os.path.abspath(bpy.context.scene.my_tool.root_dir)
-        blend_path = os.path.join(blend_path, "Blend_My_NFTs Output")
-        batch_path = os.path.join(blend_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
+        export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        export_path = os.path.join(export_path, "Blend_My_NFTs Output")
+        batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
+
+
         if os.path.exists(record_path):
             bpy.context.scene.render.engine = 'BLENDER_EEVEE'
             
@@ -801,7 +805,7 @@ class renderBatch(bpy.types.Operator):
 
             if file_formats:
                 if range:
-                    Exporter.render_nft_batch_custom(blend_path, render_batch_num, file_formats, range, transparency)
+                    Exporter.render_nft_batch_custom(export_path, render_batch_num, file_formats, range, transparency)
                 else:
                     self.report({"ERROR"}, "Failed: Invalid range")
             else:
@@ -811,6 +815,47 @@ class renderBatch(bpy.types.Operator):
         return {'FINISHED'}
 
 
+
+class chooseExportFolder(bpy.types.Operator):
+    bl_idname = 'choose.export'
+    bl_label = 'Choose Export Folder'
+    bl_options = {"REGISTER", "UNDO"}
+    filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
+    filter_glob: bpy.props.StringProperty(default ='',options = {'HIDDEN'})
+
+    # @classmethod
+    # def poll(cls, context):
+    #     return context.object is not None
+
+    def execute(self, context):
+        print(self.filepath)
+        bpy.context.scene.my_tool.separateExportPath = self.filepath
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.filepath = ""
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
+
+class moveDataToLocal(bpy.types.Operator):
+    bl_idname = 'move.datalocal'
+    bl_label = "Copy Record Data"
+    bl_description = "this will overwrite files from u sure?"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        bath_path_end = os.path.join("Blend_My_NFTs Output", "OUTPUT")
+        record_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), bath_path_end)
+        local_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bath_path_end)
+
+        Exporter.export_record_data(record_save_path, local_save_path)
+        return {'FINISHED'}
 
 
 #----------------------------------------------------------------
@@ -866,7 +911,7 @@ class WCUSTOM_PT_FCreateData(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_FCreateData"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -886,7 +931,7 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_PreviewNFTs"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -909,7 +954,7 @@ class WCUSTOM_PT_NFTSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_NFTSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -929,7 +974,7 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_ParentSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -945,7 +990,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_TorsoSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {"inputUpperTorso": ("MOD_CLOTH"),
@@ -968,7 +1013,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_ArmSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
@@ -994,7 +1039,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_LegSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
@@ -1020,7 +1065,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_HeadSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
@@ -1046,7 +1091,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_OtherSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
     slots = {"inputBackground": ("NODE_TEXTURE")}
     
@@ -1069,7 +1114,7 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_LoadFromFile"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -1112,7 +1157,7 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_EditRarity"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -1139,7 +1184,7 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
     bl_idname = "WCUSTOM_PT_ARootDirectory"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Blend_My_NFTs'
+    bl_category = 'GENERATION'
 
     def draw(self, context):
         layout = self.layout
@@ -1164,12 +1209,12 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
 
 #-----------------------------------------------------------------------
 
-class WCUSTOM_PT_Render(bpy.types.Panel):
-    bl_label = "Render NFTs"
-    bl_idname = "WCUSTOM_PT_Render"
+class WCUSTOM_PT_OutputSettings(bpy.types.Panel):
+    bl_label = "Export Settings"
+    bl_idname = "WCUSTOM_PT_OutputSettings"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = 'Exporting'
+    bl_category = 'EXPORTING'
 
     def draw(self, context):
         layout = self.layout
@@ -1177,87 +1222,131 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         mytool = scene.my_tool
 
         row = layout.row()
-        row.label(text="WARNING:")
-        row = layout.row()
-        row.label(text="Only render once all NFTs have been generated and finalized.")
-        row = layout.row()
-        row.label(text="")
+        row.prop(mytool, "separateExportPath")
+        row.operator(chooseExportFolder.bl_idname, text=chooseExportFolder.bl_label)
 
         row = layout.row()
-        row.prop(mytool, "renderPrefix")
-        row = layout.row()
-        row.label(text="Output example:")
-        row.label(text="{}0123.png".format(mytool.renderPrefix))
-        row.label(text="")
-
-        row = layout.row()
-        row.prop(mytool, "BatchRenderIndex")
-        
-        row = layout.row()
-        row.prop(mytool, "imageBool")
-        row.prop(mytool, "animationBool")
-        row.prop(mytool, "modelBool")
-        if mytool.imageBool:
-            row = layout.row()
-            row.prop(mytool, "imageEnum")
+        row.operator(moveDataToLocal.bl_idname, text=moveDataToLocal.bl_label)
+        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+        if os.path.exists(export_path):
 
             row = layout.row()
-
-            if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
-                row.label(text="")
-                row.prop(mytool, "PNGTransparency")
-        if mytool.modelBool:
+            row.prop(mytool, "renderPrefix")
             row = layout.row()
-            row.prop(mytool, "modelEnum")
+            row.label(text="Output example:")
+            row.label(text="{}0123.png".format(mytool.renderPrefix))
+            row.label(text="")
+            row = layout.row()
             row = layout.row()
 
-        row = layout.row()
-        batch_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "OUTPUT", 
-                                                                        "Batch_{:03d}".format(mytool.BatchRenderIndex))
-        if os.path.exists(batch_path):
-            batch_count = len(os.listdir(batch_path)) - 1
-            row.label(text="Number in batch: {}".format(batch_count))
-        else:
-            batch_count = 0
-            row.label(text='')
-        row.prop(mytool, "renderFullBatch")
 
 
-        if not bpy.context.scene.my_tool.renderFullBatch:
+
+class WCUSTOM_PT_Render(bpy.types.Panel):
+    bl_label = "Render NFTs"
+    bl_idname = "WCUSTOM_PT_Render"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'EXPORTING'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+        if os.path.exists(export_path):
+
             row = layout.row()
-            size = bpy.context.scene.my_tool.renderSectionSize
-            index = bpy.context.scene.my_tool.renderSectionIndex
+            row.label(text="WARNING:")
+            row = layout.row()
+            row.label(text="Only render once all NFTs have been generated and finalized.")
+            row = layout.row()
+            row.label(text="")
+
+            row = layout.row()
+            row.prop(mytool, "BatchRenderIndex")
             
-            if mytool.rangeBool:
-                range_start = size * (index - 1) + 1
-                range_end = min(size * (index), batch_count)
-            else:
-                range_start = mytool.renderSectionIndex
-                range_end = min(mytool.renderSectionSize, batch_count)
+            row = layout.row()
+            row.prop(mytool, "imageBool")
+            row.prop(mytool, "animationBool")
+            row.prop(mytool, "modelBool")
+            if mytool.imageBool:
+                row = layout.row()
+                row.prop(mytool, "imageEnum")
+
+                row = layout.row()
+
+                if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
+                    row.label(text="")
+                    row.prop(mytool, "PNGTransparency")
+            if mytool.modelBool:
+                row = layout.row()
+                row.prop(mytool, "modelEnum")
+                row = layout.row()
 
             row = layout.row()
-            row.prop(mytool, "rangeBool")
-
-            if range_start > batch_count or range_start > range_end:
-                row.label(text="Render range: Out of range")
+            batch_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT", 
+                                                                            "Batch_{:03d}".format(mytool.BatchRenderIndex))
+            if os.path.exists(batch_path):
+                batch_count = len(os.listdir(batch_path)) - 1
+                row.label(text="Number in batch: {}".format(batch_count))
             else:
+                batch_count = 0
+                row.label(text='')
+            row.prop(mytool, "renderFullBatch")
+
+
+            if not bpy.context.scene.my_tool.renderFullBatch:
+                row = layout.row()
+                size = bpy.context.scene.my_tool.renderSectionSize
+                index = bpy.context.scene.my_tool.renderSectionIndex
+                
                 if mytool.rangeBool:
-                    row.label(text="Render range: {} ~ {}".format(range_start, range_end))
+                    range_start = size * (index - 1) + 1
+                    range_end = min(size * (index), batch_count)
                 else:
-                    row.label(text="Render total: {}".format(range_end - range_start + 1))
+                    range_start = mytool.renderSectionIndex
+                    range_end = min(mytool.renderSectionSize, batch_count)
+
+                row = layout.row()
+                row.prop(mytool, "rangeBool")
+
+                if range_start > batch_count or range_start > range_end:
+                    row.label(text="Render range: Out of range")
+                else:
+                    if mytool.rangeBool:
+                        row.label(text="Render range: {} ~ {}".format(range_start, range_end))
+                    else:
+                        row.label(text="Render total: {}".format(range_end - range_start + 1))
+
+                row = layout.row()
+                if mytool.rangeBool:
+                    row.prop(mytool, "renderSectionIndex")
+                    row.prop(mytool, "renderSectionSize")
+                else:
+                    row.prop(mytool, "renderSectionIndex", text="Range Start")
+                    row.prop(mytool, "renderSectionSize", text="Range End")
 
             row = layout.row()
-            if mytool.rangeBool:
-                row.prop(mytool, "renderSectionIndex")
-                row.prop(mytool, "renderSectionSize")
-            else:
-                row.prop(mytool, "renderSectionIndex", text="Range Start")
-                row.prop(mytool, "renderSectionSize", text="Range End")
+            row = layout.row()
+            row.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
-        row = layout.row()
-        row = layout.row()
+#------------------------------------
 
-        row.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
+
+class WCUSTOM_PT_Initialize(bpy.types.Panel):
+    bl_label = "Render NFTs"
+    bl_idname = "WCUSTOM_PT_Initialize"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'SET UP'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
 
 
 
@@ -1344,6 +1433,7 @@ classes = (
     #Panels
 
     BMNFTS_PGT_MyProperties,
+    WCUSTOM_PT_Initialize,
     WCUSTOM_PT_ARootDirectory,
     WCUSTOM_PT_EditBatch,
     WCUSTOM_PT_FCreateData,
@@ -1356,6 +1446,7 @@ classes = (
     WCUSTOM_PT_LegSlots,
     WCUSTOM_PT_OtherSlots,
     GU_PT_collection_custom_properties,
+    WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
     # WCUSTOM_PT_RarityTypeSub,
     # WCUSTOM_PT_RarityModelSub,
@@ -1386,6 +1477,8 @@ classes = (
     organizeScene,
     createCharacterCollections,
     renderBatch,
+    chooseExportFolder,
+    moveDataToLocal,
     assetlibTest,
 
 
