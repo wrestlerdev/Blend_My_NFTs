@@ -82,7 +82,8 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                   child.hide_viewport = True
                   child.hide_render = True
          else:
-            meshes = bpy.data.collections.get(texture).objects
+            meshes = bpy.data.collections.get(list(variant)[0]).objects
+            #meshes = bpy.data.collections.get(texture).objects
 
          for mesh in meshes:
             obj = bpy.data.objects[mesh.name]

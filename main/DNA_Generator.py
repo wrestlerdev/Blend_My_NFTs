@@ -277,7 +277,7 @@ def returnData(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
             Remove Color code so blender recognises the collection
             """
             i = stripColorFromName(i)
-         bpy.data.collections[i].hide_render = toggle
+         #bpy.data.collections[i].hide_render = toggle
          bpy.data.collections[i].hide_viewport = toggle
       cameraToggle(i)
 

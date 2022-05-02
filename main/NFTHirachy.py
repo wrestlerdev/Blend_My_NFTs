@@ -1,3 +1,4 @@
+from pickle import NONE
 import bpy
 import os
 import re
@@ -77,7 +78,7 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
    """
    Creates a dictionary of each attribute
    """
-   
+
    def getName(i):
       """
       Returns the name of "i" attribute name, attribute genre, attribute variant
@@ -87,13 +88,34 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
 
    def getOrder_rarity(i):
       """
-      Returns the "order", "rarity" and "color" (if enabled) of i attribute variant in a list
+      Returns the "order", "type_rarity", varient_rarity and texture rarity
       """
-      x = re.sub(r'[a-zA-Z]', "", i)
-      a = x.split("_")
-      del a[0] #Remove Attribute Name
-      del a[0] #Remove Genre Name
-      del a[0] #Remove ItemName Name
+      print(i.rsplit('_', 1))
+      a = [''] * 4
+      a[0] = i.rsplit('_', 1)[1]
+      
+      if(attributeTypeColl.get('rarity') is not NONE):
+         a[1] = attributeTypeColl.get('rarity')
+      else:
+         attributeTypeColl['rarity'] = 50
+
+      if(attributeVariantColl.get('rarity') is not NONE):
+         a[2] = attributeVariantColl.get('rarity')
+      else:
+         attributeVariantColl['rarity'] = 50
+
+      if(attributeTextureColl.get('rarity') is not NONE):
+         a[3] = attributeTextureColl.get('rarity')
+      else:
+         attributeTextureColl['rarity'] = 50
+      
+      
+
+      # x = re.sub(r'[a-zA-Z]', "", i)
+      # a = x.split("_")
+      # del a[0] #Remove Attribute Name
+      # del a[0] #Remove Genre Name
+      # del a[0] #Remove ItemName Name
       return list(a)
 
    def get_textureSet():
@@ -109,21 +131,22 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
 
    elif len(orderRarity) > 0:
       number = orderRarity[0]
-      rarity = orderRarity[1]
-      type_rarity = attributeTypeColl.name.split('_')[-1]
-      texture_rarity = "25"
-      if not rarity_from_name and attributeVariantColl.get('rarity') is not None:
-         type_rarity = str(attributeTypeColl['rarity'])
-         rarity = str(attributeVariantColl['rarity'])
-         if attributeTextureColl.get('rarity') is not None:
-            texture_rarity = str(attributeTextureColl['rarity'])
-      color = "0"
       slotName = name[0]
       clothingGenre = name[1]
       clothingItem = name[2]
       textureSet = get_textureSet()
+
+      if(clothingGenre != "Null"):
+         type_rarity = orderRarity[1]
+         variant_rarity = orderRarity[2]
+         texture_rarity = orderRarity[3]
+      else:
+         type_rarity = 0.0
+         variant_rarity = 0.0
+         texture_rarity = 0.0
+
       
       
       eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingVersion": number,
-                     "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": rarity, "type_rarity": type_rarity}
+                     "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": variant_rarity, "type_rarity": type_rarity}
    return eachObject
