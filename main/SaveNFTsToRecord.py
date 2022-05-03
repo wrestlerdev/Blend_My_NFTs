@@ -170,9 +170,9 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
             ledger = json.dumps(updatedMasterDictionary, indent=1, ensure_ascii=True)
             with open(master_record_save_path, 'w') as outfile:
                 outfile.write(ledger + '\n')
-                print("Success update {}".format(updatedMasterDictionary))
+                print("Success update {}".format(master_record_save_path))
         except:
-            print("Failed to update .json file")
+            print("Failed to update {}".format(master_record_save_path))
 
     else:
         print("smth went wrong :^(")

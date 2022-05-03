@@ -118,13 +118,13 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         description="Select 3D Model file format", 
         items=[
             ('GLB', '.glb', 'Export NFT as .glb'),
-            ('GLTF_SEPARATE', '.gltf + .bin + textures', 'Export NFT as .gltf with separated textures in .bin + textures.'),
-            ('GLTF_EMBEDDED', '.gltf', 'Export NFT as embedded .gltf file that contains textures.'),
+            # ('GLTF_SEPARATE', '.gltf + .bin + textures', 'Export NFT as .gltf with separated textures in .bin + textures.'),
+            # ('GLTF_EMBEDDED', '.gltf', 'Export NFT as embedded .gltf file that contains textures.'),
             ('FBX', '.fbx', 'Export NFT as .fbx'),
-            ('OBJ', '.obj', 'Export NFT as .obj'),
-            ('X3D', '.x3d', 'Export NFT as .x3d'),
-            ('STL', '.stl', 'Export NFT as .stl'),
-            ('VOX', '.vox (Experimental)', 'Export NFT as .vox, requires the voxwriter add on: https://github.com/Spyduck/voxwriter')
+            # ('OBJ', '.obj', 'Export NFT as .obj'),
+            # ('X3D', '.x3d', 'Export NFT as .x3d'),
+            # ('STL', '.stl', 'Export NFT as .stl'),
+            # ('VOX', '.vox (Experimental)', 'Export NFT as .vox, requires the voxwriter add on: https://github.com/Spyduck/voxwriter')
         ]
     )
 
@@ -1283,9 +1283,11 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-
+        
         export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
         if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
+            batches_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+            batch_path = os.path.join(batches_path, "Batch_{:03d}".format(mytool.BatchRenderIndex))
 
             row = layout.row()
             row.label(text="WARNING:")
@@ -1294,6 +1296,9 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row = layout.row()
             row.label(text="")
 
+            batch_count = len(os.listdir(batches_path)) - 1
+            row = layout.row()
+            row.label(text="Total Batches: {}".format(batch_count))            
             row = layout.row()
             row.prop(mytool, "BatchRenderIndex")
             
@@ -1303,28 +1308,32 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.prop(mytool, "modelBool")
             if mytool.imageBool:
                 row = layout.row()
-                row.prop(mytool, "imageEnum")
-
+                row.label(text="Image Type:")
+                row.prop(mytool, "imageEnum", expand=True)
                 row = layout.row()
 
                 if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
                     row.label(text="")
-                    row.prop(mytool, "PNGTransparency")
+                    row.label(text="")
+                    row.prop(mytool, "PNGTransparency",toggle=1)
+                    row = layout.row()
             if mytool.modelBool:
                 row = layout.row()
-                row.prop(mytool, "modelEnum")
+                row.label(text="Model Type:")
+                row.prop(mytool, "modelEnum", expand=True)
                 row = layout.row()
 
             row = layout.row()
-            batch_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT", 
-                                                                            "Batch_{:03d}".format(mytool.BatchRenderIndex))
+            row.label(text='')
+            row = layout.row()
+
             if os.path.exists(batch_path):
                 batch_count = len(next(os.walk(batch_path))[1])
                 row.label(text="Number in batch: {}".format(batch_count))
             else:
                 batch_count = 0
-                row.label(text='')
-            row.prop(mytool, "renderFullBatch")
+                row.label(text="This batch doesn't exist")
+            row.prop(mytool, "renderFullBatch",toggle=-1)
 
 
             if not bpy.context.scene.my_tool.renderFullBatch:
