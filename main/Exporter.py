@@ -478,13 +478,12 @@ def clear_all_export_data(record_path, local_output_path):
 
 def export_record_data(record_batch_root, local_batch_root):
     if os.path.abspath(record_batch_root) == os.path.abspath(local_batch_root):
-        print("This is the same folder lol")
-        return
+        return False
     # if os.path.exists(local_batch_root):
     #     shutil.rmtree(local_batch_root)
     recurse_copy_data('', record_batch_root, local_batch_root)
     recurse_delete_data('', record_batch_root, local_batch_root)
-    return
+    return True
 
 
 def recurse_copy_data(batch_path, record_batch_root, local_batch_root):

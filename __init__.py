@@ -857,7 +857,9 @@ class moveDataToLocal(bpy.types.Operator):
         record_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), bath_path_end)
         local_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bath_path_end)
 
-        Exporter.export_record_data(record_save_path, local_save_path)
+        success = Exporter.export_record_data(record_save_path, local_save_path)
+        if not success:
+            self.report({"ERROR"}, "Failed: pls choose a different folder from the root folder")
         return {'FINISHED'}
 
 
@@ -1256,7 +1258,7 @@ class WCUSTOM_PT_OutputSettings(bpy.types.Panel):
         row = layout.row()
         row.operator(moveDataToLocal.bl_idname, text=moveDataToLocal.bl_label)
         export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
-        if os.path.exists(export_path):
+        if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
 
             row = layout.row()
             row.prop(mytool, "renderPrefix")
@@ -1283,7 +1285,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         mytool = scene.my_tool
 
         export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
-        if os.path.exists(export_path):
+        if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
 
             row = layout.row()
             row.label(text="WARNING:")
