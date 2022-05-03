@@ -85,6 +85,8 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
             meshes = bpy.data.collections.get(list(variant)[0]).objects
             #meshes = bpy.data.collections.get(texture).objects
 
+         set_armature_for_meshes(character, meshes)
+
          for mesh in meshes:
             obj = bpy.data.objects[mesh.name]
             col_01 = Color(HexToRGB(hex_01))
@@ -283,7 +285,6 @@ def create_item_dict(DNA):
          atttype_index = DNASplit[0]
          variant_index = DNASplit[1]
          texture_index = DNASplit[2]
-         color = '' #TODO: add color to single record
 
          slot = list(ohierarchy.items())[strand]
 
@@ -334,6 +335,22 @@ def fill_pointers_from_dna(DNA, Slots):
 
 
 
+def set_armature_for_meshes(character, meshes):
+   armature_name = "armature_" + str(character).lower()
+   if bpy.data.objects.get(armature_name) is not None:
+      for mesh in meshes:
+         if mesh.modifiers:
+               for mod in mesh.modifiers:
+                  if mod.type == 'ARMATURE':
+                     print(mesh)
+                     mod.object = bpy.data.objects[armature_name]
+         else:
+            mod = mesh.modifiers.new(name='armature', type='ARMATURE')
+            mod.object = bpy.data.objects[armature_name]
+   else:
+      print("Armature '{}' does not exist atm".format(armature_name))
+
+
 
 def get_hierarchy_ordered():
    global saved_hierarchy
@@ -346,7 +363,6 @@ def get_hierarchy_ordered():
 
       DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
       hierarchy = DataDictionary["hierarchy"]
-      DNAList = DataDictionary["DNAList"]
       saved_hierarchy = hierarchy
       return hierarchy
 
@@ -370,7 +386,6 @@ def show_character(char_name):
         else:
             bpy.data.collections[c].hide_viewport = True
             bpy.data.collections[c].hide_render = True
-
 
 
 

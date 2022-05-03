@@ -842,7 +842,7 @@ class chooseExportFolder(bpy.types.Operator):
 class moveDataToLocal(bpy.types.Operator):
     bl_idname = 'move.datalocal'
     bl_label = "Copy Record Data"
-    bl_description = "this will overwrite files from u sure?"
+    bl_description = "this will overwrite files, u sure?"
     bl_options = {'REGISTER', 'UNDO'}
 
     
