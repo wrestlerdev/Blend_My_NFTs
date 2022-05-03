@@ -196,42 +196,125 @@ def UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index):
     return
 
 
+def delete_hierarchy(parent_col):
+    # Go over all the objects in the hierarchy like @zeffi suggested:
+    def get_child_names(obj):
+        for child in obj.children:
+            if child.name != "Script_Ignore":
+                if child.children:
+                    get_child_names(child)
+                for obj in child.objects:
+                    bpy.data.objects.remove(obj, do_unlink=True)       
+                bpy.data.collections.remove(child)
+    
+
+
+    get_child_names(parent_col)
+
+
 def CreateSlotsFolderHierarchy(save_path):
-    input_path = os.path.join(save_path, "INPUT")
 
-    texture_path = os.path.join(input_path, "Textures")
-    if not os.path.exists(texture_path):
-        os.makedirs(texture_path)
+    delete_hierarchy(bpy.context.scene.collection)
+    bpy.ops.outliner.orphans_purge()
 
-    slots_path = os.path.join(input_path, "Slots")
-    if os.path.exists(slots_path):
-        try:
-            shutil.rmtree(slots_path)
-        except OSError as e:
-            print ("Error: %s - %s." % (e.filename, e.strerror))
+    holder = bpy.data.collections.new("Holder")
+    bpy.context.scene.collection.children.link(holder)
 
-    os.makedirs(slots_path)
+    slots_path = CheckAndFormatPath(save_path)
+    for slot in os.listdir(slots_path):
+        type_path = CheckAndFormatPath(slots_path, slot)
+        if type_path != "":
+            slot_coll = bpy.data.collections.new(slot)
+            bpy.context.scene.collection.children.link(slot_coll)
+            for type in os.listdir(type_path):                
+                varient_path = CheckAndFormatPath(type_path, type)
+                if varient_path != "":
+                    type_coll = bpy.data.collections.new(type)
+                    slot_coll.children.link(type_coll)
+                    for varient in os.listdir(varient_path):             
+                        item_path = CheckAndFormatPath(varient_path, varient)
+                        if item_path != "":
+                            varient_coll = bpy.data.collections.new(varient)
+                            type_coll.children.link(varient_coll)
 
-    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
-    DataDictionary = json.load(open(NFTRecord_save_path))
-    hierarchy = DataDictionary["hierarchy"]
+                            for file in os.listdir(item_path):
+                                if file.rpartition('.')[2] == "blend":
+                                    directory = os.path.join(item_path, file, "Collection")
+                                    directory = directory.replace('\\', '/')
+                                    for char in ["Kae", "Nef", "Rem"]:
+                                        file_path = ""
+                                        file_path = os.path.join(directory, char)
+                                        file_path = file_path.replace('\\', '/')
+                                        print(directory)
+                                        print(file_path)
+                                        #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
+                                        layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
+                                        bpy.context.view_layer.active_layer_collection = layer_collection
+
+                                        bpy.ops.wm.append(filepath=file_path, directory=directory, filename=char, active_collection=True, autoselect=True )
+
+                                        for obj in bpy.context.selected_objects:
+                                            varient_coll.objects.link(obj)
+                                            
 
 
 
-    h_keys = list(hierarchy.keys())
-    for attribute in h_keys:
-        att_path = os.path.join(slots_path, attribute)
-        os.makedirs(att_path)
-        for type in list(hierarchy[attribute].keys()):
-            type_path = os.path.join(att_path, type)
-            os.makedirs(type_path)
-            for variant in list(hierarchy[attribute][type].keys()):
-                variant_path = os.path.join(type_path, variant)
-                os.makedirs(variant_path)
-                os.makedirs(variant_path + "\Textures")
-                os.makedirs(variant_path + "\Textures\A")
+                            # texture_path = CheckAndFormatPath(item_path, "Textures")
+                            # if(texture_path != ""):
+                            #     print( os.listdir(texture_path) )
+                            # else:
+                            #     print("No Textures")
+
+                            
+
+
+
+    # input_path = os.path.join(save_path, "INPUT")
+
+    # texture_path = os.path.join(input_path, "Textures")
+    # if not os.path.exists(texture_path):
+    #     os.makedirs(texture_path)
+
+    # slots_path = os.path.join(input_path, "Slots")
+    # if os.path.exists(slots_path):
+    #     try:
+    #         shutil.rmtree(slots_path)
+    #     except OSError as e:
+    #         print ("Error: %s - %s." % (e.filename, e.strerror))
+
+    # os.makedirs(slots_path)
+
+    # batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    # NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
+    # DataDictionary = json.load(open(NFTRecord_save_path))
+    # hierarchy = DataDictionary["hierarchy"]
+
+
+
+    # h_keys = list(hierarchy.keys())
+    # for attribute in h_keys:
+    #     att_path = os.path.join(slots_path, attribute)
+    #     os.makedirs(att_path)
+    #     for type in list(hierarchy[attribute].keys()):
+    #         type_path = os.path.join(att_path, type)
+    #         os.makedirs(type_path)
+    #         for variant in list(hierarchy[attribute][type].keys()):
+    #             variant_path = os.path.join(type_path, variant)
+    #             os.makedirs(variant_path)
+    #             os.makedirs(variant_path + "\Textures")
+    #             os.makedirs(variant_path + "\Textures\A")
     return
+
+def CheckAndFormatPath(path, pathTojoin = ""):
+    if pathTojoin != "" :
+        path = os.path.join(path, pathTojoin)
+
+    new_path = path.replace('\\', '/')
+
+    if not os.path.exists(new_path):
+        return ""
+
+    return new_path
 
 
 def SearchForMeshesAndCreateCharacterDuplicates(record_save_path):
