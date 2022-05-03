@@ -451,7 +451,7 @@ class loadNextNFT(bpy.types.Operator):
         batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
 
-        nftnum = len(os.listdir(nft_save_path)) - 1
+        nftnum = len(next(os.walk(nft_save_path))[1])
         print(nftnum)
         if  nftnum > 0 and bpy.context.scene.my_tool.loadNFTIndex < nftnum:
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
@@ -558,7 +558,7 @@ class loadBatch(bpy.types.Operator):
         index = bpy.context.scene.my_tool.BatchSliderIndex
         LoadNFT.check_if_paths_exist(index)
         batch_path = bpy.context.scene.my_tool.batch_json_save_path
-        if len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) - 1 < index:
+        if len(next(os.walk(batch_path))[1]) < index:
             self.report({"ERROR"}, "This is not a valid batch" )
             return {'FINISHED'}
 
@@ -780,7 +780,7 @@ class renderBatch(bpy.types.Operator):
                 transparency = bpy.context.scene.my_tool.PNGTransparency
             else:
                 transparency = False
-            batch_count = len(os.listdir(batch_path)) - 1
+            batch_count = len(next(os.walk(batch_path))[1])
             range = []
             if not bpy.context.scene.my_tool.renderFullBatch:
                 if bpy.context.scene.my_tool.rangeBool:
@@ -795,6 +795,9 @@ class renderBatch(bpy.types.Operator):
                     range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
                     if range_start <= batch_count and range_end >= range_start:
                         range = [range_start, range_end]
+            else:
+                range = [1, batch_count]
+
             file_formats = []
             if imageBool:
                 file_formats.append(imageEnum)
@@ -1150,7 +1153,7 @@ class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
 
         if os.path.exists(nft_save_path):
-            row.label(text="Current Generated: " + str(len(os.listdir(nft_save_path)) - 1))
+            row.label(text="Current Generated: " + str(len(next(os.walk(nft_save_path))[1])))
         else:
             print()
         row = layout.row()
@@ -1189,7 +1192,8 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         mytool = scene.my_tool
         row = layout.row()
         if os.path.exists(bpy.context.scene.my_tool.batch_json_save_path):
-            row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(os.listdir(bpy.context.scene.my_tool.batch_json_save_path)) - 1))
+            batch_path = bpy.context.scene.my_tool.batch_json_save_path
+            row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(os.listdir(batch_path)) - 1))
         else:
             row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
         row = layout.row()
@@ -1313,7 +1317,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             batch_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT", 
                                                                             "Batch_{:03d}".format(mytool.BatchRenderIndex))
             if os.path.exists(batch_path):
-                batch_count = len(os.listdir(batch_path)) - 1
+                batch_count = len(next(os.walk(batch_path))[1])
                 row.label(text="Number in batch: {}".format(batch_count))
             else:
                 batch_count = 0
