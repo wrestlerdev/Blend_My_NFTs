@@ -1288,13 +1288,13 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
             batches_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
             batch_path = os.path.join(batches_path, "Batch_{:03d}".format(mytool.BatchRenderIndex))
-
-            row = layout.row()
+            box = layout.box()
+            boxbox = box.box()
+            row = boxbox.row()
             row.label(text="WARNING:")
-            row = layout.row()
+            row = box.row()
             row.label(text="Only render once all NFTs have been generated and finalized.")
-            row = layout.row()
-            row.label(text="")
+            layout.separator()
 
             batch_count = len(os.listdir(batches_path)) - 1
             row = layout.row()
@@ -1302,29 +1302,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row = layout.row()
             row.prop(mytool, "BatchRenderIndex")
             
-            row = layout.row()
-            row.prop(mytool, "imageBool")
-            row.prop(mytool, "animationBool")
-            row.prop(mytool, "modelBool")
-            if mytool.imageBool:
-                row = layout.row()
-                row.label(text="Image Type:")
-                row.prop(mytool, "imageEnum", expand=True)
-                row = layout.row()
 
-                if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
-                    row.label(text="")
-                    row.label(text="")
-                    row.prop(mytool, "PNGTransparency",toggle=1)
-                    row = layout.row()
-            if mytool.modelBool:
-                row = layout.row()
-                row.label(text="Model Type:")
-                row.prop(mytool, "modelEnum", expand=True)
-                row = layout.row()
-
-            row = layout.row()
-            row.label(text='')
             row = layout.row()
 
             if os.path.exists(batch_path):
@@ -1334,7 +1312,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                 batch_count = 0
                 row.label(text="This batch doesn't exist")
             row.prop(mytool, "renderFullBatch",toggle=-1)
-
+            layout.separator()
 
             if not bpy.context.scene.my_tool.renderFullBatch:
                 row = layout.row()
@@ -1368,8 +1346,31 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     row.prop(mytool, "renderSectionSize", text="Range End")
 
             row = layout.row()
+
             row = layout.row()
-            row.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
+            row.prop(mytool, "imageBool")
+            row.prop(mytool, "animationBool")
+            row.prop(mytool, "modelBool")
+            if mytool.imageBool:
+                row = layout.row()
+                row.label(text="Image Type:")
+                row.prop(mytool, "imageEnum", expand=True)
+                row = layout.row()
+
+                if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
+                    row.label(text="")
+                    row.label(text="")
+                    row.prop(mytool, "PNGTransparency",toggle=1)
+                    row = layout.row()
+            if mytool.modelBool:
+                row = layout.row()
+                row.label(text="Model Type:")
+                row.prop(mytool, "modelEnum", expand=True)
+                row = layout.row()
+
+            layout.separator()
+
+            layout.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 #------------------------------------
 
