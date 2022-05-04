@@ -321,6 +321,7 @@ class randomizePreview(bpy.types.Operator):
 class randomizeModel(bpy.types.Operator):
     bl_idname = 'randomize.model'
     bl_label = 'Randomize Model'
+    bl_description = "Randomize model of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
 
@@ -337,6 +338,7 @@ class randomizeModel(bpy.types.Operator):
 class randomizeColor(bpy.types.Operator):
     bl_idname = 'randomize.color'
     bl_label = 'Randomize Color/Texture'
+    bl_description = "Randomize color of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
 
@@ -351,6 +353,21 @@ class randomizeColor(bpy.types.Operator):
             bpy.context.scene.my_tool.inputDNA = DNA
         return {'FINISHED'}
 
+
+class clearSlots(bpy.types.Operator):
+    bl_idname = 'clear.slots'
+    bl_label = 'Clear All Slots'
+    bl_description = ''
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        lastDNA = bpy.context.scene.my_tool.inputDNA
+        DNASplit = lastDNA.split(',')
+        character = DNASplit.pop(0)
+        DNA = Exporter.Previewer.get_null_dna(character)
+        print(DNA)
+        bpy.context.scene.my_tool.inputDNA = DNA
+        return {'FINISHED'}
 
 
 #-------------------------
@@ -1014,9 +1031,13 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
         row = layout.row()
-        row.operator(swapCharacter.bl_idname, text='Kae').character_name = 'Kae'
         row.operator(swapCharacter.bl_idname, text='Nef').character_name = 'Nef'
+        row.operator(swapCharacter.bl_idname, text='Kae').character_name = 'Kae'
         row.operator(swapCharacter.bl_idname, text='Rem').character_name = 'Rem'
+
+        row = layout.row()
+        row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
+        
 
 class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
     bl_label = "Torso Slots"
@@ -1447,6 +1468,7 @@ classes = (
     saveNewBatch,
     randomizeModel,
     randomizeColor,
+    clearSlots,
     initializeRecord,
     randomizePreview,
     saveNewNFT,

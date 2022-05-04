@@ -446,7 +446,7 @@ def send_to_export_log(batch_path, batch_num, record_name, nft_name, file_type, 
     return
 
 
-
+ 
 def return_export_log_data(batch_path, batch_num, file_format):
     log_name = "LOG_Batch_{:03d}_{}.json".format(batch_num, file_format)
     path = os.path.join(batch_path, log_name)

@@ -19,7 +19,6 @@ from . import config
 enableGeneration = False
 colorList = []
 
-saved_hierarchy = collections.OrderedDict()
 
 class bcolors:
    '''
@@ -106,18 +105,29 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       bpy.data.collections[texture].hide_viewport = False
       bpy.data.collections[texture].hide_render = False
 
+#------------------------------------------------------------------------------------
 
+def get_null_dna(character="Kae"):
+   hierarchy = get_hierarchy_unordered()
+   DNASplit = [character]
+   for slot in list(hierarchy.keys()):
+      color = '-a-#FFFFFF-#FFFFFF-#FFFFFF'
+      null_strand = '0-0-0'
+      DNASplit.append(null_strand + color)
+      # DNASplit.append(null_strand)
+   DNA = ','.join(DNASplit)
+   return DNA
 
 #  ----------------------------------------------------------------------------------
 
 
 
 def set_from_collection(slot_coll, variant_name): # hide all in coll and show given variant based on name
-   if str(variant_name.split('_')[-2]).isnumeric():
+   if str(variant_name.split('_')[-1]).isnumeric(): # CHECK THIS
       print("this is a variant")
       texture_variant = 'A' # default texture is first set
       variant_string = variant_name.split('_')
-      variant_string[-2] = str(variant_string[-2]) + 'A'
+      variant_string[-1] = str(variant_string[-1]) + 'A'
       texture_name = '_'.join(variant_string)
 
    else: # get variant name by stripping out texture
@@ -149,7 +159,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    if not last_color:
       last_color = ['a'].append(["#FFFFFF"] * 3) # CHECK THIS || what color should be added in instead
 
-   for type_coll in slot_coll.children:
+   for type_coll in slot_coll.children: # get type,variant,texture index by going through collection hierarchy
       if variant_name in type_coll.children:
          var_coll = bpy.data.collections[variant_name]
          type_list = list(type_coll.children)
@@ -165,7 +175,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
          type_index += 1
          # stop putting a break here lmao
    
-   if new_dna_strand != '':
+   if new_dna_strand != '': # true if indices were found previously
       for type_coll in slot_coll.children:
          for variant_coll in type_coll.children: # hide all
             variant_coll.hide_render = True
@@ -210,30 +220,50 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
 
 
 def pointers_have_updated(slots_key, Slots): # this is called from init properties if pointerproperty updates
-    if bpy.context.scene.my_tool.get(slots_key) is not None:
-      coll_name, label = Slots[slots_key]
+   last_key = slots_key.replace("input", "last")
+   coll_name, label = Slots[slots_key]
+   if bpy.context.scene.my_tool.get(slots_key) is not None: # pointer has been filled
 
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
       if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
-         dna_string = bpy.context.scene.my_tool.inputDNA
-         hierarchy = get_hierarchy_ordered()
-         coll_index = list(hierarchy.keys()).index(coll_name)
-
-         DNA = dna_string.split(',') 
-
-         DNA[coll_index + 1] = str(new_dnastrand)
-         dna_string = ','.join(DNA)
-
-         last_key = slots_key.replace("input", "last")
+         dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
+         
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
          bpy.context.scene.my_tool.lastDNA = dna_string
          bpy.context.scene.my_tool.inputDNA = dna_string
-
       else:
          print("is not valid || clear")
-         last_key = slots_key.replace("input", "last")
          bpy.context.scene.my_tool[slots_key] = None
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
+   else:
+      last_variant = bpy.context.scene.my_tool.get(last_key)
+      last_type = last_variant.name.split('_')[1]
+      if last_type not in ['Null', 'Nulll']: # gets null variant then fills pointer with it
+         coll = bpy.data.collections[coll_name]
+         null_type_coll = coll.children[0]
+         null_var_coll = null_type_coll.children[0]
+         new_dnastrand = set_from_collection(coll, null_var_coll.name)
+         if new_dnastrand != '':
+            dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
+
+            bpy.context.scene.my_tool[slots_key] = null_var_coll
+            bpy.context.scene.my_tool[last_key] = null_var_coll
+            bpy.context.scene.my_tool.lastDNA = dna_string
+
+      else: # will refill pointer with null
+         bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
+
+
+
+def update_DNA_with_strand(new_dnastrand, coll_name):
+   dna_string = bpy.context.scene.my_tool.inputDNA
+   hierarchy = get_hierarchy_ordered()
+   coll_index = list(hierarchy.keys()).index(coll_name)
+   DNA = dna_string.split(',') 
+   DNA[coll_index + 1] = str(new_dnastrand)
+   dna_string = ','.join(DNA)
+   return dna_string
+
 
 
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
@@ -277,7 +307,6 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
       input_coll_name = "input" + str(coll_name)
       bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[texture]
       bpy.context.scene.my_tool[input_coll_name] = bpy.data.collections[texture]
-
    return
 
 
@@ -346,18 +375,13 @@ def set_armature_for_meshes(character, meshes):
 
 
 def get_hierarchy_ordered():
-   global saved_hierarchy
-   if(saved_hierarchy):
-      return saved_hierarchy
-   else:
-      index = bpy.context.scene.my_tool.CurrentBatchIndex
-      batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-      NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
-
-      DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
-      hierarchy = DataDictionary["hierarchy"]
-      saved_hierarchy = hierarchy
-      return hierarchy
+   index = bpy.context.scene.my_tool.CurrentBatchIndex
+   batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+   DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
+   hierarchy = DataDictionary["hierarchy"]
+   hierarchy
+   return hierarchy
 
 
 def get_hierarchy_unordered():
@@ -366,9 +390,7 @@ def get_hierarchy_unordered():
    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))      
    DataDictionary = json.load(open(NFTRecord_save_path))
    hierarchy = DataDictionary["hierarchy"]
-
    return hierarchy
-
 
 
 def show_character(char_name):
@@ -379,7 +401,6 @@ def show_character(char_name):
         else:
             bpy.data.collections[c].hide_viewport = True
             bpy.data.collections[c].hide_render = True
-
 
 
 def HexToRGB(hex):
