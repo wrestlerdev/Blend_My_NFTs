@@ -213,7 +213,7 @@ def delete_hierarchy(parent_col):
 
 
 def CreateSlotsFolderHierarchy(save_path):
-
+    #Clears scene and delets all hirachy except for ignore folder
     delete_hierarchy(bpy.context.scene.collection)
     bpy.ops.outliner.orphans_purge()
 
@@ -224,11 +224,20 @@ def CreateSlotsFolderHierarchy(save_path):
     for slot in os.listdir(slots_path):
         type_path = CheckAndFormatPath(slots_path, slot)
         if type_path != "":
+            #Create slot type collection and link to scene
             slot_coll = bpy.data.collections.new(slot)
             bpy.context.scene.collection.children.link(slot_coll)
+            slot_col_null = bpy.data.collections.new("00_" + slot.partition('-')[2] + "_Null" )
+            slot_coll.children.link(slot_col_null)
+            for char in ["Kae", "Nef", "Rem"]:
+                varient_coll_char = bpy.data.collections.new(slot_col_null.name.partition('_')[2] + "_Null_" + char)
+                slot_col_null.children.link(varient_coll_char)
+
+
             for type in os.listdir(type_path):                
                 varient_path = CheckAndFormatPath(type_path, type)
                 if varient_path != "":
+                    #create varient collection and link to slot
                     type_coll = bpy.data.collections.new(type)
                     slot_coll.children.link(type_coll)
                     for varient in os.listdir(varient_path):             
@@ -241,69 +250,79 @@ def CreateSlotsFolderHierarchy(save_path):
                                 if file.rpartition('.')[2] == "blend":
                                     directory = os.path.join(item_path, file, "Collection")
                                     directory = directory.replace('\\', '/')
+                                    characterCollectionDict = {}
                                     for char in ["Kae", "Nef", "Rem"]:
+                                        varient_coll_char = bpy.data.collections.new(varient + "_" + char)
+                                        varient_coll.children.link(varient_coll_char)
+                                        characterCollectionDict[char] = varient_coll_char
                                         file_path = ""
                                         file_path = os.path.join(directory, char)
                                         file_path = file_path.replace('\\', '/')
                                         print(directory)
-                                        print(file_path)
+                                        print(file_path) 
                                         #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
                                         layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
                                         bpy.context.view_layer.active_layer_collection = layer_collection
 
                                         bpy.ops.wm.append(filepath=file_path, directory=directory, filename=char, active_collection=True, autoselect=True )
 
+                                        #goes through the temp holder collection created and finds children imported and unlink objs from them
                                         for obj in bpy.context.selected_objects:
-                                            varient_coll.objects.link(obj)
-                                            
+                                            varient_coll_char.objects.link(obj)
 
+                                    texture_path = CheckAndFormatPath(item_path, "Textures")
+                                    if(texture_path != ""):
+                                        for texture_set in os.listdir(texture_path):
+                                            varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set)
+                                            varient_coll.children.link(varient_texture_set)
+                                            for char in list(characterCollectionDict.keys()):
+                                                col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
+                                                varient_texture_set.children.link(col)
+                                                for child in characterCollectionDict[char].objects:
+                                                    new_object = child.copy()                                                
+                                                    col.objects.link(new_object)
+                                                    set_path = CheckAndFormatPath(texture_path, texture_set)
+                                                    if(set_path != ""):
+                                                        SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
+                                    else:
+                                        print("No Textures")
 
+    for child_col in holder.children:
+        for child_obj in child_col.objects:
+            child_col.objects.unlink(child_obj)
+        bpy.data.collections.remove(child_col)                                    
+    bpy.data.collections.remove(holder)
 
-                            # texture_path = CheckAndFormatPath(item_path, "Textures")
-                            # if(texture_path != ""):
-                            #     print( os.listdir(texture_path) )
-                            # else:
-                            #     print("No Textures")
-
-                            
-
-
-
-    # input_path = os.path.join(save_path, "INPUT")
-
-    # texture_path = os.path.join(input_path, "Textures")
-    # if not os.path.exists(texture_path):
-    #     os.makedirs(texture_path)
-
-    # slots_path = os.path.join(input_path, "Slots")
-    # if os.path.exists(slots_path):
-    #     try:
-    #         shutil.rmtree(slots_path)
-    #     except OSError as e:
-    #         print ("Error: %s - %s." % (e.filename, e.strerror))
-
-    # os.makedirs(slots_path)
-
-    # batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    # NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
-    # DataDictionary = json.load(open(NFTRecord_save_path))
-    # hierarchy = DataDictionary["hierarchy"]
-
-
-
-    # h_keys = list(hierarchy.keys())
-    # for attribute in h_keys:
-    #     att_path = os.path.join(slots_path, attribute)
-    #     os.makedirs(att_path)
-    #     for type in list(hierarchy[attribute].keys()):
-    #         type_path = os.path.join(att_path, type)
-    #         os.makedirs(type_path)
-    #         for variant in list(hierarchy[attribute][type].keys()):
-    #             variant_path = os.path.join(type_path, variant)
-    #             os.makedirs(variant_path)
-    #             os.makedirs(variant_path + "\Textures")
-    #             os.makedirs(variant_path + "\Textures\A")
     return
+
+def SetUpObjectMaterialsAndTextures(obj, texture_path):
+    material_slots = obj.material_slots
+    for m in material_slots:
+        #material = m.material
+        m.link = 'OBJECT' 
+        material = bpy.data.materials['MasterV01']
+        material.use_nodes = True
+        matcopy = material.copy()
+        m.material = matcopy
+        #m.material = bpy.data.materials['Test_02']
+        # get the nodes
+        
+        for node in matcopy.node_tree.nodes:
+            if (node.label == "Diffuse"):
+                print( os.listdir(texture_path) )
+                for tex in os.listdir(texture_path):
+                    if "_D_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        print(file)
+                        file = file.replace('\\', '/')
+                        print(file)
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+                    elif "_N_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('\\', '/')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
 
 def CheckAndFormatPath(path, pathTojoin = ""):
     if pathTojoin != "" :
