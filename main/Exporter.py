@@ -257,6 +257,7 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
     for i in range(nft_range[0], nft_range[1] + 1):
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
         json_path = os.path.join(batch_path, "NFT_{:04d}".format(i), file_name)
+
         for file_format in file_formats:
             if file_format in ['PNG', 'JPEG']:
                 camera_name = "CameraStill"
@@ -264,8 +265,6 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                     bpy.context.scene.camera = bpy.data.objects[camera_name]
                 else:
                     print("Cannot find camera of name 'CameraStill', will continue with current camera")
-                    if bpy.context.scene.camera is None:
-                        print("Camera does not exist in scene, please make one :^(")
                 if transparency:
                     color_mode = 'RGBA'
                 else:
@@ -283,8 +282,6 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                     bpy.context.scene.camera = bpy.data.objects[camera_name]
                 else:
                     print("Cannot find camera of name 'CameraVideo', will continue with current camera")
-                    if bpy.context.scene.camera is None:
-                        print("Camera does not exist in scene, please make one :^(")
                 start_time = time.time()
                 nft_name, render_passed = render_nft_single_video(batch_path, batch_num, i, file_format, totalDNAList)
                 time_taken = time.time() - start_time
@@ -302,6 +299,7 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
 
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
     return
+
 
 
 
@@ -338,8 +336,8 @@ def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDN
     SingleDict = json.load(open(json_path))
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
-
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+
     name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
     nft_name = name_prefix + "{:04d}.mp4".format(total_index)
     Previewer.show_nft_from_dna(DNA)
@@ -368,8 +366,8 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
 
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
-
     print(f"{bcolors.OK}Generating 3D Model: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+
     name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
     nft_name = name_prefix + "{:04d}".format(total_index)
     modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
@@ -461,7 +459,7 @@ def return_export_log_data(batch_path, batch_num, file_format):
 
 # ---------------------------- Exporting out record data to local directory -------------------------------------------
 
-def clear_all_export_data(record_path, local_output_path):
+def clear_all_export_data(record_path, local_output_path): # clear all nft, record, render data from export dir
     if not os.path.exists(local_output_path):
         return
     if os.path.abspath(record_path) == os.path.abspath(local_output_path):
@@ -476,17 +474,19 @@ def clear_all_export_data(record_path, local_output_path):
     return
 
 
-def export_record_data(record_batch_root, local_batch_root):
+def export_record_data(record_batch_root, local_batch_root): # copy all record data to export dir
+                                                            # keep any currently existing render data in export dir unless NFT count < render index
     if os.path.abspath(record_batch_root) == os.path.abspath(local_batch_root):
         return False
     # if os.path.exists(local_batch_root):
     #     shutil.rmtree(local_batch_root)
+    clear_all_export_data(record_batch_root, local_batch_root) # CHECK THIS
     recurse_copy_data('', record_batch_root, local_batch_root)
-    recurse_delete_data('', record_batch_root, local_batch_root)
+    # recurse_delete_data('', record_batch_root, local_batch_root)
     return True
 
 
-def recurse_copy_data(batch_path, record_batch_root, local_batch_root):
+def recurse_copy_data(batch_path, record_batch_root, local_batch_root): # copies only json files
     local_path = os.path.join(local_batch_root, batch_path)
     record_path = os.path.join(record_batch_root, batch_path)
 
@@ -507,8 +507,8 @@ def recurse_copy_data(batch_path, record_batch_root, local_batch_root):
     return
 
 
-def recurse_delete_data(batch_path, record_batch_root, local_batch_root):   # delete nfts that exist in local but don't exist in record folder
-    local_path = os.path.join(local_batch_root, batch_path)                 # leaves rendered outputs
+def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # delete nfts that exist in local but don't exist in record folder
+    local_path = os.path.join(local_batch_root, batch_path)               # leaves rendered outputs
     record_path = os.path.join(record_batch_root, batch_path)
 
     for dir in os.listdir(local_path):

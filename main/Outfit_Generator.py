@@ -177,7 +177,7 @@ def get_style(): # placeholder
     style = 'a'
     return style
 
-def get_rando_color(): # placeholder
+def get_rando_color(): # TODO placeholder
     return get_style(), '#FFFFFF', '#FFFFFF', '#FFFFFF'
 
 
@@ -333,7 +333,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         
                     for varient_mesh in bpy.data.collections[varient].objects: # placeholder
                         varient_mesh.hide_render = True
-                        varient_mesh.hide_viewport = False # CHECK THIS
+                        varient_mesh.hide_viewport = True # CHECK THIS
                         # should this hide viewport
 
 
@@ -406,23 +406,19 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for obj in chidlrenObjs:
                         print(obj.name) 
 
-
                 armature_name = "armature_" + str(character).lower()
                 if bpy.data.objects.get(armature_name) is not None:
                     for obj in chidlrenObjs:
                         if obj.modifiers:
                             for mod in obj.modifiers:
                                 if mod.type == 'ARMATURE':
-                                    print(obj)
                                     mod.object = bpy.data.objects[armature_name]
                         else:
                             mod = obj.modifiers.new(name='armature', type='ARMATURE')
                             mod.object = bpy.data.objects[armature_name]
-                else:
-                    print("Armature '{}' does not exist atm".format(armature_name))
+                # else:
+                    # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
                 
-
-
                 bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
                 bpy.data.collections.get(varientChoosen).hide_render = False # CHECK THIS
 

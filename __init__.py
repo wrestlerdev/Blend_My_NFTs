@@ -165,43 +165,43 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Exporter.Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputUpperTorso",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso",Slots))
     inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputMiddleTorso",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso",Slots))
     inputLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputLForeArm",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLForeArm",Slots))
     inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputLWrist",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist",Slots))
     inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputRForeArm",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm",Slots))
     inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputRWrist",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRWrist",Slots))
     inputPelvisThick: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputPelvisThick",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick",Slots))
     inputPelvisThin: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputPelvisThin",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThin",Slots))
     inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputHands",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHands",Slots))
     inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputCalf",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputCalf",Slots))
     inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputAnkle",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAnkle",Slots))
     inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputFeet",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFeet",Slots))
     inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputNeck",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputNeck",Slots))
     inputLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputLowerHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead",Slots))
     inputMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputMiddleHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead",Slots))
     inputEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputEarings",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings",Slots))
     inputUpperHead: bpy.props.PointerProperty(name="t",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputUpperHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead",Slots))
     inputBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputBackPack",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackPack",Slots))
     inputBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.collections_have_updated("inputBackground",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
 
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -228,16 +228,12 @@ def make_directories(save_path):
     Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
     batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "OUTPUT")
 
-    nftBatch_save_path = os.path.join(save_path, "Blend_My_NFTs Output", "Generated NFT Batches")
-
     if not os.path.exists(Blend_My_NFTs_Output):
         os.makedirs(Blend_My_NFTs_Output)
     if not os.path.exists(batch_json_save_path):
         os.makedirs(batch_json_save_path)
-    # if not os.path.exists(nftBatch_save_path):
-    #     os.makedirs(nftBatch_save_path)    
 
-    return Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path
+    return Blend_My_NFTs_Output, batch_json_save_path
 
 # Update NFT count:
 combinations: int = 0
@@ -279,23 +275,19 @@ class initializeRecord(bpy.types.Operator):
         else:
             save_path = bpy.context.scene.my_tool.root_dir
         print(save_path)
-        Blend_My_NFTs_Output, output_save_path, nftBatch_save_path = make_directories(save_path)
+        Blend_My_NFTs_Output, output_save_path = make_directories(save_path)
 
         first_nftrecord_save_path = os.path.join(output_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(output_save_path, "_NFTRecord.json")
 
         bpy.context.scene.my_tool.batch_json_save_path = output_save_path
-
         bpy.context.scene.my_tool.loadNFTIndex = 1
         bpy.context.scene.my_tool.BatchSliderIndex = 1
 
         LoadNFT.init_batch(output_save_path)
         DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path, output_save_path, True)
-
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
-
         LoadNFT.update_current_batch(1, output_save_path)
-
         LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
         return {'FINISHED'}
 
@@ -367,6 +359,7 @@ class randomizeColor(bpy.types.Operator):
 class saveNewNFT(bpy.types.Operator):
     bl_idname = 'save.nft'
     bl_label = 'Save as New NFT'
+    bl_description = "Save current preview as a new NFT"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -391,6 +384,7 @@ class saveNewNFT(bpy.types.Operator):
 class createBatch(bpy.types.Operator):
     bl_idname = 'create.batch'
     bl_label = "Create NFTs"
+    bl_description = "Create multiple random NFTs"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -422,6 +416,7 @@ class createBatch(bpy.types.Operator):
 class loadNFT(bpy.types.Operator):
     bl_idname = 'load.nft'
     bl_label = "Load NFT"
+    bl_description = "Load NFT from index based on slider"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
@@ -444,6 +439,7 @@ class loadNFT(bpy.types.Operator):
 class loadNextNFT(bpy.types.Operator):
     bl_idname = 'next.nft'
     bl_label = "Load Next"
+    bl_description = 'Load Next NFT based on slider'
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
@@ -468,6 +464,7 @@ class loadNextNFT(bpy.types.Operator):
 class loadPrevNFT(bpy.types.Operator):
     bl_idname = 'prev.nft'
     bl_label = "Load Previous"
+    bl_description = 'Load Previous NFT based on slider'
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self,context):
@@ -492,6 +489,7 @@ class saveCurrentNFT(bpy.types.Operator):
     bl_idname = 'save.currentnft'
     bl_label = 'Save NFT'
     bl_description = "This action cannot be undone. Are you sure?"
+    bl_options = {"REGISTER", "UNDO"}
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
@@ -552,6 +550,7 @@ class deleteNFT(bpy.types.Operator):
 class loadBatch(bpy.types.Operator):
     bl_idname = 'load.batch'
     bl_label = "Load Batch"
+    bl_description = "Load Batch data based on slider index"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -584,6 +583,7 @@ class loadBatch(bpy.types.Operator):
 class saveBatch(bpy.types.Operator):
     bl_idname = 'save.batch'
     bl_label = "Save Batch"
+    bl_description = "Save and overwrite current Batch data to the current Batch"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -603,6 +603,7 @@ class saveBatch(bpy.types.Operator):
 class saveNewBatch(bpy.types.Operator):
     bl_idname = 'save.newbatch'
     bl_label = "Save as New Batch"
+    bl_description = "Save current Batch data to a new Batch"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -629,6 +630,7 @@ class swapCharacter(bpy.types.Operator):
     bl_label = "Choose"
     bl_options = {"REGISTER", "UNDO"}
     character_name: bpy.props.StringProperty(default="Kae")
+    bl_description = "Change current preview to"
 
     def execute(self, context):
         DNA = bpy.context.scene.my_tool.inputDNA
@@ -643,6 +645,7 @@ class swapCharacter(bpy.types.Operator):
 class chooseRootFolder(bpy.types.Operator):
     bl_idname = 'choose.root'
     bl_label = 'Choose Root Folder'
+    bl_description = "Choose root folder for all inputs and outputs"
     bl_options = {"REGISTER", "UNDO"}
     filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
     filter_glob: bpy.props.StringProperty(default ='',options = {'HIDDEN'})
@@ -665,6 +668,7 @@ class chooseRootFolder(bpy.types.Operator):
 class loadDirectory(bpy.types.Operator):
     bl_idname = 'load.dir'
     bl_label = 'Create/Load Directory'
+    bl_description = "Load all data from Root Directory or create new folder for data if none exists"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -679,7 +683,7 @@ class loadDirectory(bpy.types.Operator):
             print("is empty")
             save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
 
-        Blend_My_NFTs_Output, batch_json_save_path, nftBatch_save_path = make_directories(save_path)
+        Blend_My_NFTs_Output, batch_json_save_path = make_directories(save_path)
         batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
         NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
@@ -757,7 +761,7 @@ class createCharacterCollections(bpy.types.Operator):
 class renderBatch(bpy.types.Operator):
     bl_idname = "render.batch"
     bl_label = "Render Batch"
-    bl_description = "Render out image batch"
+    bl_description = "Render out batch"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -766,7 +770,6 @@ class renderBatch(bpy.types.Operator):
         export_path = os.path.join(export_path, "Blend_My_NFTs Output")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
-
 
         if os.path.exists(record_path):
             bpy.context.scene.render.engine = 'BLENDER_EEVEE'
@@ -822,6 +825,7 @@ class renderBatch(bpy.types.Operator):
 class chooseExportFolder(bpy.types.Operator):
     bl_idname = 'choose.export'
     bl_label = 'Choose Export Folder'
+    bl_description = "Choose folder for all NFT and render data"
     bl_options = {"REGISTER", "UNDO"}
     filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
     filter_glob: bpy.props.StringProperty(default ='',options = {'HIDDEN'})
@@ -1138,9 +1142,9 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
 
 #-----------------------------------------------------------------------
 
-class WCUSTOM_PT_LoadFromFile(bpy.types.Panel):
+class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
     bl_label = "Load from File"
-    bl_idname = "WCUSTOM_PT_LoadFromFile"
+    bl_idname = "WCUSTOM_PT_ELoadFromFile"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'GENERATION'
@@ -1301,10 +1305,8 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.label(text="Total Batches: {}".format(batch_count))            
             row = layout.row()
             row.prop(mytool, "BatchRenderIndex")
-            
 
             row = layout.row()
-
             if os.path.exists(batch_path):
                 batch_count = len(next(os.walk(batch_path))[1])
                 row.label(text="Number in batch: {}".format(batch_count))
@@ -1344,8 +1346,6 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                 else:
                     row.prop(mytool, "renderSectionIndex", text="Range Start")
                     row.prop(mytool, "renderSectionSize", text="Range End")
-
-            row = layout.row()
 
             row = layout.row()
             row.prop(mytool, "imageBool")
@@ -1400,66 +1400,6 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row = layout.row()
         row.operator(purgeData.bl_idname, text=purgeData.bl_label)
 
-
-
-
-# class WCUSTOM_PT_RarityTypeSub(bpy.types.Panel):
-#     bl_label = "Type"
-#     bl_idname = "WCUSTOM_PT_RarityTypeSub"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         row = layout.row()
-#         row.label(text="this contains all types")
-
-# class WCUSTOM_PT_RarityModelSub(bpy.types.Panel):
-#     bl_label = "Model"
-#     bl_idname = "WCUSTOM_PT_RarityModelSub"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         row = layout.row()
-#         # row.label(text="okay")
-
-# class WCUSTOM_PT_RarityVariantSub(bpy.types.Panel):
-#     bl_label = "Variant"
-#     bl_idname = "WCUSTOM_PT_RarityVariantSub"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'Blend_My_NFTs'
-#     rarity = 20
-#     r_id = "a"
-#     bpy.types.Object.help = bpy.props.IntProperty()
-#     # bpy.data.objects.new(r_id, bpy.props.IntProperty())
-#     bpy.types.Scene[r_id]= bpy.props.IntProperty()  
-#     # bpy.context.scene[r_id] = bpy.props.IntProperty()
-#     # bpy.types.Object[r_id] = bpy.props.StringProperty()
-#     okay : bpy.props.StringProperty()
-
-#     def invoke(self, context):
-#         self.okay.add()
-#         return {'RUNNING_MODAL'}
-
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-
-#         row = layout.row()
-#         row.label(text=str(self.rarity))
-#         # layout.prop(self.okay, self.okay)
-#         # row.prop(context.object, "newrarity")
-#         row.prop(context.object, "help")
-
         
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
@@ -1478,20 +1418,16 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
 #         row.operator("wm.url_open", text="Documentation",
 #                      icon='URL').url = "https://github.com/torrinworx/Blend_My_NFTs"
 
-
-
-
 classes = (
-
     #Panels
 
     BMNFTS_PGT_MyProperties,
     WCUSTOM_PT_Initialize,
     WCUSTOM_PT_ARootDirectory,
     WCUSTOM_PT_EditBatch,
-    WCUSTOM_PT_FCreateData,
-    WCUSTOM_PT_LoadFromFile,
+    WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_PreviewNFTs,
+    WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
@@ -1501,8 +1437,6 @@ classes = (
     GU_PT_collection_custom_properties,
     WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
-    # WCUSTOM_PT_RarityTypeSub,
-    # WCUSTOM_PT_RarityModelSub,
     # BMNFTS_PT_Documentation,
 
 
@@ -1511,7 +1445,6 @@ classes = (
     loadBatch,
     saveBatch,
     saveNewBatch,
-
     randomizeModel,
     randomizeColor,
     initializeRecord,
@@ -1532,23 +1465,8 @@ classes = (
     renderBatch,
     chooseExportFolder,
     moveDataToLocal,
-    assetlibTest,
-
     purgeData,
 
-    
-    # UIList 1:
-
-    # UIList.CUSTOM_OT_actions,
-    # UIList.CUSTOM_OT_addViewportSelection,
-    # UIList.CUSTOM_OT_printItems,
-    # UIList.CUSTOM_OT_clearList,
-    # UIList.CUSTOM_OT_removeDuplicates,
-    # UIList.CUSTOM_OT_selectItems,
-    # UIList.CUSTOM_OT_deleteObject,
-    # UIList.CUSTOM_UL_items,
-    # UIList.CUSTOM_PT_objectList,
-    # UIList.CUSTOM_PG_objectCollection,
 )
 
 def register():
@@ -1557,51 +1475,6 @@ def register():
 
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=BMNFTS_PGT_MyProperties)
 
-
-
-
-    # hierarchy = LoadNFT.load_in_Rarity_file()
-
-    # for i in ["01-UpperTorso"]:
-    #     # type2 = hierarchy[i]
-
-    #     id = f"WCUSTOM_PT_RarityTypeSub_1"
-    #     panel =  type(id,
-    #     (WCUSTOM_PT_RarityTypeSub, bpy.types.Panel, ),
-    #     {"bl_idname" : id,
-    #     "bl_parent_id" : "WCUSTOM_PT_RarityEditor",
-    #     "bl_label" : i}
-    #         )    
-    #     bpy.utils.register_class(panel)
-
-    #     types = list(hierarchy[i].keys())
-
-    #     for j in types:
-    #         id = "WCUSTOM_PT_RarityModelSub_" + str(types.index(j))
-    #         panel =  type(id,
-    #         (WCUSTOM_PT_RarityModelSub, bpy.types.Panel, ),
-    #         {"bl_idname" : id,
-    #         "bl_parent_id" : "WCUSTOM_PT_RarityTypeSub_1",
-    #         "bl_label" : j}
-    #             )    
-    #         bpy.utils.register_class(panel)
-
-    #         # variants = list(types[j].keys())
-    #         variants = list(hierarchy[i][j].keys())
-
-    #         for k in variants:
-    #             id = "WCUSTOM_PT_RarityVariantSub_" + str(types.index(j)) + '_' + str(variants.index(k))
-    #             panel =  type(id,
-    #             (WCUSTOM_PT_RarityVariantSub, bpy.types.Panel, ),
-    #             {"bl_idname" : id,
-    #             "bl_parent_id" : ("WCUSTOM_PT_RarityModelSub_" + str(types.index(j))),
-    #             "bl_label" : k,
-    #             "r_id" : "r" + str(k),
-    #             "rarity": hierarchy[i][j][k]["rarity"]}
-    #             )    
-    #             bpy.utils.register_class(panel)
-
-   
     # UIList1:
 
     # bpy.types.Scene.custom = bpy.props.CollectionProperty(type=UIList.CUSTOM_PG_objectCollection)
