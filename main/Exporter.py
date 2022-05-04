@@ -2,11 +2,14 @@
 # This file takes a given Batch created by DNA_Generator.py and tells blender to render the image or export a 3D model to
 # the NFT_Output folder.
 
+from re import L
 import bpy
 import os
 import time
 import json
 import importlib
+import shutil
+from datetime import datetime
 
 from . import Previewer
 importlib.reload(Previewer)
@@ -236,6 +239,10 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 
 
+
+# -------------------------------- Custom render --------------------------------------
+
+
 def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
     folder = os.path.join(save_path, "OUTPUT")
     master_record_path = os.path.join(folder, "_NFTRecord.json")
@@ -246,87 +253,93 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
         os.makedirs(folder)
 
     batch_path = os.path.join(save_path, "OUTPUT", "Batch_{:03d}".format(batch_num))
-    for file_format in file_formats:
-        if file_format in ['PNG', 'JPEG']:
-            camera_name = "CameraStill"
-            if bpy.data.objects.get(camera_name) is not None:
-                bpy.context.scene.camera = bpy.data.objects[camera_name]
-            else:
-                print("Cannot find camera of name 'CameraStill', will continue with current camera")
-                if bpy.context.scene.camera is None:
-                    print("Camera does not exist in scene, please make one :^(")
-            for i in range(nft_range[0], nft_range[1] + 1):
+
+    for i in range(nft_range[0], nft_range[1] + 1):
+        file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
+        json_path = os.path.join(batch_path, "NFT_{:04d}".format(i), file_name)
+
+        for file_format in file_formats:
+            if file_format in ['PNG', 'JPEG']:
+                camera_name = "CameraStill"
+                if bpy.data.objects.get(camera_name) is not None:
+                    bpy.context.scene.camera = bpy.data.objects[camera_name]
+                else:
+                    print("Cannot find camera of name 'CameraStill', will continue with current camera")
                 if transparency:
                     color_mode = 'RGBA'
                 else:
                     color_mode = 'RGB'
                 start_time = time.time()
-                render_nft_single_custom(folder, batch_path, batch_num, i, file_format, color_mode, totalDNAList)
-                print(f"{bcolors.OK}Time taken: {bcolors.RESET}" + "{:.2f}".format(time.time() - start_time))
+                nft_name, render_passed = render_nft_single_custom(batch_path, batch_num, i, file_format, color_mode, totalDNAList)
+                time_taken = time.time() - start_time
+                print(f"{bcolors.OK}Time taken: {bcolors.RESET}" + "{:.2f}".format(time_taken))
+                file_type = 'IMAGES'
+                send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
 
-
-        elif file_format in ['MP4']:
-            camera_name = "CameraVideo"
-            if bpy.data.objects.get(camera_name) is not None:
-                bpy.context.scene.camera = bpy.data.objects[camera_name]
-            else:
-                print("Cannot find camera of name 'CameraVideo', will continue with current camera")
-                if bpy.context.scene.camera is None:
-                    print("Camera does not exist in scene, please make one :^(")
-            for i in range(nft_range[0], nft_range[1] + 1):
+            elif file_format in ['MP4']:
+                camera_name = "CameraVideo"
+                if bpy.data.objects.get(camera_name) is not None:
+                    bpy.context.scene.camera = bpy.data.objects[camera_name]
+                else:
+                    print("Cannot find camera of name 'CameraVideo', will continue with current camera")
                 start_time = time.time()
-                render_nft_single_video(folder, batch_path, batch_num, i, file_format, totalDNAList)
-                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time.time() - start_time))
+                nft_name, render_passed = render_nft_single_video(batch_path, batch_num, i, file_format, totalDNAList)
+                time_taken = time.time() - start_time
+                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
+                file_type = 'ANIMATIONS'
+                send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
 
-        elif file_format in ['FBX', 'GLB']:
-            for i in range(nft_range[0], nft_range[1] + 1):
+            elif file_format in ['FBX', 'GLB']:
                 start_time = time.time()
-                render_nft_single_model(folder, batch_path, batch_num, i, file_format, totalDNAList)
-                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time.time() - start_time))
+                nft_name, render_passed = render_nft_single_model(batch_path, batch_num, i, file_format, totalDNAList)
+                time_taken = time.time() - start_time
+                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
+                file_type = '3DMODELS'
+                send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
 
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
     return
 
 
 
-def render_nft_single_custom(folder_path, batch_path, batch_num, nft_num, image_file_format, color_mode, totalDNAList):
+
+def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, color_mode, totalDNAList):
     file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
     json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
-
     SingleDict = json.load(open(json_path))
 
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
-    
     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
     name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
     nft_name = name_prefix + "{:04d}".format(total_index)
 
     image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
-
     Previewer.show_nft_from_dna(DNA)
 
     bpy.context.scene.render.filepath = image_path
     bpy.context.scene.render.image_settings.file_format = image_file_format
     bpy.context.scene.render.image_settings.color_mode = color_mode
-    bpy.ops.render.render(write_still=True)
-    return
+    try:
+        bpy.ops.render.render(write_still=True)
+        return nft_name, True
+    except:
+        print((f"{bcolors.ERROR}Render Failed{bcolors.RESET}"))
+        return nft_name, False
 
 
 
-
-def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_format, totalDNAList):
+def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDNAList):
     file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
     json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
 
     SingleDict = json.load(open(json_path))
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
-
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+
     name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
     nft_name = name_prefix + "{:04d}.mp4".format(total_index)
-
     Previewer.show_nft_from_dna(DNA)
 
     video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
@@ -336,22 +349,25 @@ def render_nft_single_video(folder_path, batch_path, batch_num, nft_num, file_fo
         bpy.context.scene.render.image_settings.file_format = "FFMPEG"
         bpy.context.scene.render.ffmpeg.format = 'MPEG4'
         bpy.context.scene.render.ffmpeg.codec = 'H264'
-        bpy.ops.render.render(animation=True)
-        print("FINISHED VIDEO RENDER")
-    return
+        try:
+            bpy.ops.render.render(animation=True)
+            print("FINISHED VIDEO RENDER")
+            return nft_name, True
+        except:
+            print((f"{bcolors.ERROR}Render Failed{bcolors.RESET}"))
+            return nft_name, False
 
-def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_format, totalDNAList):
+
+def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDNAList):
     file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
     json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
-    
-    print(f"{bcolors.OK}Generating 3D Model{bcolors.RESET}")
-
-
     SingleDict = json.load(open(json_path))
     dnaDictionary = SingleDict["CharacterItems"]
 
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
+    print(f"{bcolors.OK}Generating 3D Model: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+
     name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
     nft_name = name_prefix + "{:04d}".format(total_index)
     modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
@@ -362,7 +378,7 @@ def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_fo
 
     for i in dnaDictionary:
         coll = list(dnaDictionary[i].keys())[0]
-        print(coll)
+        # print(coll)
         for obj in bpy.data.collections[coll].all_objects:
              obj.select_set(True)
 
@@ -370,40 +386,150 @@ def render_nft_single_model(folder_path, batch_path, batch_num, nft_num, file_fo
     for obj in bpy.data.collections[char_variant].all_objects:
         obj.select_set(True)
 
-    if file_format == 'GLB':
-        bpy.ops.export_scene.gltf(filepath=f"{modelPath}.glb",
+    try:
+        if file_format == 'GLB':
+            bpy.ops.export_scene.gltf(filepath=f"{modelPath}.glb",
+                                        check_existing=True,
+                                        export_format='GLB',
+                                        use_selection=True)
+        if file_format == 'GLTF_SEPARATE':
+            bpy.ops.export_scene.gltf(filepath=f"{modelPath}",
+                                        check_existing=True,
+                                        export_format='GLTF_SEPARATE',
+                                        use_selection=True)
+        if file_format == 'GLTF_EMBEDDED':
+            bpy.ops.export_scene.gltf(filepath=f"{modelPath}.gltf",
+                                        check_existing=True,
+                                        export_format='GLTF_EMBEDDED',
+                                        use_selection=True)
+        elif file_format == 'FBX':
+            bpy.ops.export_scene.fbx(filepath=f"{modelPath}.fbx",
+                                        check_existing=True,
+                                        use_selection=True)
+        elif file_format == 'OBJ':
+            bpy.ops.export_scene.obj(filepath=f"{modelPath}.obj",
+                                        check_existing=True,
+                                        use_selection=True)
+        elif file_format == 'X3D':
+            bpy.ops.export_scene.x3d(filepath=f"{modelPath}.x3d",
+                                        check_existing=True,
+                                        use_selection=True)
+        elif file_format == 'STL':
+            bpy.ops.export_mesh.stl(filepath=f"{modelPath}.stl",
                                     check_existing=True,
-                                    export_format='GLB',
                                     use_selection=True)
-    if file_format == 'GLTF_SEPARATE':
-        bpy.ops.export_scene.gltf(filepath=f"{modelPath}",
-                                    check_existing=True,
-                                    export_format='GLTF_SEPARATE',
-                                    use_selection=True)
-    if file_format == 'GLTF_EMBEDDED':
-        bpy.ops.export_scene.gltf(filepath=f"{modelPath}.gltf",
-                                    check_existing=True,
-                                    export_format='GLTF_EMBEDDED',
-                                    use_selection=True)
-    elif file_format == 'FBX':
-        bpy.ops.export_scene.fbx(filepath=f"{modelPath}.fbx",
-                                    check_existing=True,
-                                    use_selection=True)
-    elif file_format == 'OBJ':
-        bpy.ops.export_scene.obj(filepath=f"{modelPath}.obj",
-                                    check_existing=True,
-                                    use_selection=True)
-    elif file_format == 'X3D':
-        bpy.ops.export_scene.x3d(filepath=f"{modelPath}.x3d",
-                                    check_existing=True,
-                                    use_selection=True)
-    elif file_format == 'STL':
-        bpy.ops.export_mesh.stl(filepath=f"{modelPath}.stl",
-                                check_existing=True,
-                                use_selection=True)
-    elif file_format == 'VOX':
-        bpy.ops.export_vox.some_data(filepath=f"{modelPath}.vox")
+        elif file_format == 'VOX':
+            bpy.ops.export_vox.some_data(filepath=f"{modelPath}.vox")
+        return nft_name, True
+
+    except:
+        print((f"{bcolors.ERROR}Render Failed{bcolors.RESET}"))
+        return nft_name, False
+
+
+
+# ----------------------------------- Export Logs --------------------------------------------
+
+def send_to_export_log(batch_path, batch_num, record_name, nft_name, file_type, file_format, render_time, key, render_sucess):
+    Log, log_name = return_export_log_data(batch_path, batch_num, file_type)
+    log_path = os.path.join(batch_path, log_name)
+    logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    Log[key] = {'nft_number': nft_name, 'finished': logged_time, 
+                'time_taken': "{:.2f} seconds".format(render_time), 'file_format': file_format,
+                'has_succeeded': render_sucess}
+    try:
+        log = json.dumps(Log, indent=1, ensure_ascii=True)
+        with open(log_path, 'w') as outfile:
+            outfile.write(log + '\n')
+    except:
+        print(f"{bcolors.ERROR} ERROR:\nCould not export data to {log_path}\n {bcolors.RESET}")
     return
+
+
+ 
+def return_export_log_data(batch_path, batch_num, file_format):
+    log_name = "LOG_Batch_{:03d}_{}.json".format(batch_num, file_format)
+    path = os.path.join(batch_path, log_name)
+    if os.path.exists(path):
+        log = json.load(open(path))
+        return log, log_name
+    else:
+        return {}, log_name
+
+
+# ---------------------------- Exporting out record data to local directory -------------------------------------------
+
+def clear_all_export_data(record_path, local_output_path): # clear all nft, record, render data from export dir
+    if not os.path.exists(local_output_path):
+        return
+    if os.path.abspath(record_path) == os.path.abspath(local_output_path):
+        return
+    
+    for dir in os.listdir(local_output_path):
+        new_path = os.path.join(local_output_path, dir)
+        if os.path.isdir(new_path):
+            shutil.rmtree(new_path)
+        else:
+            os.remove(new_path)
+    return
+
+
+def export_record_data(record_batch_root, local_batch_root): # copy all record data to export dir
+                                                            # keep any currently existing render data in export dir unless NFT count < render index
+    if os.path.abspath(record_batch_root) == os.path.abspath(local_batch_root):
+        return False
+    # if os.path.exists(local_batch_root):
+    #     shutil.rmtree(local_batch_root)
+    clear_all_export_data(record_batch_root, local_batch_root) # CHECK THIS
+    recurse_copy_data('', record_batch_root, local_batch_root)
+    # recurse_delete_data('', record_batch_root, local_batch_root)
+    return True
+
+
+def recurse_copy_data(batch_path, record_batch_root, local_batch_root): # copies only json files
+    local_path = os.path.join(local_batch_root, batch_path)
+    record_path = os.path.join(record_batch_root, batch_path)
+
+    for dir in os.listdir(record_path):
+        new_record_path = os.path.join(record_path, dir)
+        if os.path.isdir(new_record_path):
+            new_dir = os.path.join(local_path, dir)
+            if not os.path.exists(new_dir):
+                os.makedirs(new_dir)
+            new_batch_path = os.path.join(batch_path, dir)
+            recurse_copy_data(new_batch_path, record_batch_root, local_batch_root)
+        else:
+            new_local_path = os.path.join(local_path, dir)
+            if str(new_local_path).lower().endswith('.json'):
+                shutil.copy(new_record_path, new_local_path)
+            else:
+                print("Would not copy {}".format(new_local_path))
+    return
+
+
+def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # delete nfts that exist in local but don't exist in record folder
+    local_path = os.path.join(local_batch_root, batch_path)               # leaves rendered outputs
+    record_path = os.path.join(record_batch_root, batch_path)
+
+    for dir in os.listdir(local_path):
+        new_record_path = os.path.join(record_path, dir)
+        if os.path.exists(new_record_path):
+            if os.path.isdir(new_record_path):
+                new_batch_path = os.path.join(batch_path, dir)
+                recurse_delete_data(new_batch_path, record_batch_root, local_batch_root)
+        else:
+            new_local_path = os.path.join(local_path, dir)
+            if os.path.isdir(new_local_path):
+                shutil.rmtree(new_local_path)
+            else:
+                if str(new_local_path).lower().endswith('.json'):
+                    os.remove(new_local_path)
+                    print(new_local_path)
+
+
+
+
+
 
 if __name__ == '__main__':
     render_and_save_NFTs()

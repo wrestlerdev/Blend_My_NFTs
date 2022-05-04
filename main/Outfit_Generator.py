@@ -177,7 +177,7 @@ def get_style(): # placeholder
     style = 'a'
     return style
 
-def get_rando_color(): # placeholder
+def get_rando_color(): # TODO placeholder
     return get_style(), '#FFFFFF', '#FFFFFF', '#FFFFFF'
 
 
@@ -333,7 +333,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         
                     for varient_mesh in bpy.data.collections[varient].objects: # placeholder
                         varient_mesh.hide_render = True
-                        varient_mesh.hide_viewport = False # CHECK THIS
+                        varient_mesh.hide_viewport = True # CHECK THIS
                         # should this hide viewport
 
 
@@ -406,6 +406,18 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for obj in chidlrenObjs:
                         print(obj.name) 
 
+                armature_name = "armature_" + str(character).lower()
+                if bpy.data.objects.get(armature_name) is not None:
+                    for obj in chidlrenObjs:
+                        if obj.modifiers:
+                            for mod in obj.modifiers:
+                                if mod.type == 'ARMATURE':
+                                    mod.object = bpy.data.objects[armature_name]
+                        else:
+                            mod = obj.modifiers.new(name='armature', type='ARMATURE')
+                            mod.object = bpy.data.objects[armature_name]
+                # else:
+                    # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
                 
                 bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
                 bpy.data.collections.get(varientChoosen).hide_render = False # CHECK THIS
@@ -538,9 +550,13 @@ def PickWeightedAttributeType(AttributeTypes):
             number_List_Of_i.append(attributetype)
             rarity_List_Of_i.append(float(rarity))
 
-    typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
-
-    return typeChoosen[0], list(AttributeTypes.keys()).index(typeChoosen[0])
+    if len(number_List_Of_i) > 0:
+        typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          
+        return typeChoosen[0], list(AttributeTypes.keys()).index(typeChoosen[0])
+    else:
+        first_attribute = list(AttributeTypes.keys())[0]
+        print("no type attributes had rarity > 0, so chose first type attribute: {}".format(first_attribute))
+        return first_attribute, 0
 
 
 
@@ -557,14 +573,19 @@ def PickWeightedTypeVarient(Varients):
             number_List_Of_i.append(varient)
             rarity_List_Of_i.append(float(rarity))
 
-    variantChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)    
+    if len(number_List_Of_i) > 0:
+        variantChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)  
+        return variantChoosen[0], list(Varients.keys()).index(variantChoosen[0])
+    else:
+        first_variant = list(Varients.keys())[0]
+        print("no variant attributes had rarity > 0, so chose first variant attribute: {}".format(first_variant))
+        return first_variant, 0
     # charVariants = bpy.data.collections[variantChoosen[0]].children
     # if charVariants:
     #     for child in charVariants:
     #         if child.name.split('_')[-1] == character:
     #             return child.name, list(Varients.keys()).index(variantChoosen[0])
     # else:
-    return variantChoosen[0], list(Varients.keys()).index(variantChoosen[0])
 
 
 
@@ -580,8 +601,13 @@ def PickWeightedTextureVarient(Textures):
             number_List_Of_i.append(texture)
             rarity_List_Of_i.append(float(rarity))
 
-    textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)  
-    return textureChoosen[0], list(Textures.keys()).index(textureChoosen[0])
+    if len(number_List_Of_i) > 0:
+        textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)  
+        return textureChoosen[0], list(Textures.keys()).index(textureChoosen[0])
+    else:
+        first_texture = list(Textures.keys())[0]
+        print("no texture attributes had rarity > 0, so chose first texture attribute: {}".format(first_texture))
+        return first_texture, 0
 
 
 

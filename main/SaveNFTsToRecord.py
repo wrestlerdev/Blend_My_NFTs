@@ -15,7 +15,6 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
 
     DataDictionary = json.load(open(single_record_path))
     single_i = int(DataDictionary["numNFTsGenerated"])
-    hierarchy = DataDictionary["hierarchy"]
     
     MasterDictionary = json.load(open(master_record_save_path))
     totalDNAList = MasterDictionary["DNAList"]
@@ -43,6 +42,7 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
         print("ERROR: This NFT(s) already exists")
         return False
 
+
 def UpdateNFTRecord(DNASetToAdd, DataDictionary, single_record_path, master_record_save_path):
     print("This should updated record.json with new nft DNA and number")
 
@@ -63,23 +63,19 @@ def UpdateNFTRecord(DNASetToAdd, DataDictionary, single_record_path, master_reco
     updatedDataDictionary["DNAList"] = currentDNASet
     updatedMasterDictionary["DNAList"] = totalDNASet
 
-
     try:
       ledger = json.dumps(updatedDataDictionary, indent=1, ensure_ascii=True)
       with open(single_record_path, 'w') as outfile:
         outfile.write(ledger + '\n')
         print("Success update {}". format(single_record_path))
-
     except:
         print("Failed to update {}". format(single_record_path))
-
 
     try:
       ledger = json.dumps(updatedMasterDictionary, indent=1, ensure_ascii=True)
       with open(master_record_save_path, 'w') as outfile:
         outfile.write(ledger + '\n')
         print("Success update {}". format(master_record_save_path))
-
     except:
         print("Failed to update {}". format(master_record_save_path))
 
@@ -101,7 +97,6 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
     updatedDictionary["numNFTsGenerated"] = DataDictionary["numNFTsGenerated"]
 
-
     DNAList = DataDictionary["DNAList"]
     oldDNA = DNAList[nft_index - 1]
     DNAList[nft_index - 1] = DNAToAdd
@@ -110,7 +105,6 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     oldDNAIndex = totalDNAList.index(oldDNA)
     totalDNAList[oldDNAIndex] = DNAToAdd
     updatedMasterDictionary["DNAList"] = totalDNAList
-
 
     try:
       ledger = json.dumps(updatedDictionary, indent=1, ensure_ascii=True)
@@ -123,7 +117,6 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     singleNFT = {}
     singleNFT["DNAList"] = DNAToAdd
     singleNFT["CharacterItems"] = NFTDict[DNAToAdd]
-
     singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
     with open(os.path.join(batch_save_path, "NFT_{:04d}".format(nft_index), ("Batch_{:03d}_NFT_{:04d}.json".format(batch_index, nft_index))), "w") as outfile:
         outfile.write(singleNFTObject)
@@ -143,17 +136,14 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
 
     updatedDictionary = {}
     updatedDictionary["numNFTsGenerated"] = DataDictionary["numNFTsGenerated"] - 1
-
+    updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
     updatedMasterDictionary = {}
     updatedMasterDictionary["numNFTsGenerated"] = MasterDictionary["numNFTsGenerated"] - 1
-
-    updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
 
     DNAList = DataDictionary["DNAList"]
     if DNAToDelete in DNAList:
         DNA_index = DNAList.index(DNAToDelete) + 1
         DNAList.remove(DNAToDelete)
-
         updatedDictionary["DNAList"] = DNAList
 
         try:
@@ -170,17 +160,17 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
             ledger = json.dumps(updatedMasterDictionary, indent=1, ensure_ascii=True)
             with open(master_record_save_path, 'w') as outfile:
                 outfile.write(ledger + '\n')
-                print("Success update {}".format(updatedMasterDictionary))
+                print("Success update {}".format(master_record_save_path))
         except:
-            print("Failed to update .json file")
+            print("Failed to update {}".format(master_record_save_path))
 
     else:
         print("smth went wrong :^(")
     return DNA_index
 
 
-def UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index):
-    total_nfts = len(os.listdir(save_path)) - 1 # TODO
+def UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index): 
+    total_nfts = len(next(os.walk(save_path))[1])
     nft_save_path = os.path.join(save_path, "NFT_{:04d}".format(DNA_index))
     shutil.rmtree(nft_save_path)
     for i in range(DNA_index + 1, total_nfts + 1): # nfts from records should not be deleted after rendering starts

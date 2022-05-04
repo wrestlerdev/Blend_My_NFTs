@@ -38,21 +38,19 @@ def get_total_DNA(): # get number of saved DNAs
     return len(DNAList)
 
 
-def init_batch(batch_data_path):
+def init_batch(batch_data_path): # delete all batch data then create first batch folder
     # delete_batch_files(batch_data_path)
     shutil.rmtree(batch_data_path)
 
     os.makedirs(batch_data_path)
-
     first_batch_path = os.path.join(batch_data_path, "Batch_{:03d}".format(1))
     if not os.path.exists(first_batch_path):
         os.makedirs(first_batch_path)
-    
     return
 
 
 
-def update_collection_rarity_property(NFTRecord_save_path):
+def update_collection_rarity_property(NFTRecord_save_path): # update rarity value for in scene collections
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
@@ -83,7 +81,7 @@ def update_collection_rarity_property(NFTRecord_save_path):
     return
 
 
-def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
+def save_collection_rarity_property(index, NFTRecord_save_path, batch_path): # save current rarity from collections to record
     dir_name = 'Batch_{:03d}'.format(index)
     dir_path = os.path.join(batch_path, dir_name)
     if not os.path.exists(dir_path):
@@ -133,23 +131,19 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):
                         tex_rarity = int(float(hierarchy[slot][type][v][tex]["texture_rarity"]))
                         tex_coll['rarity'] = int(tex_rarity)
                     update_rarity_color(tex, tex_rarity)
-
     return
 
 
-def batch_property_updated():
+def batch_property_updated(): # check if batch is out of range then set in range if it is
     if(bpy.context.scene.my_tool.BatchSliderIndex != bpy.context.scene.my_tool.lastBatchSliderIndex): # to stop recursion
 
         Batch_save_path = bpy.context.scene.my_tool.batch_json_save_path
-        
         newIndex = bpy.context.scene.my_tool.BatchSliderIndex
         batches = len(os.listdir(Batch_save_path))
         if newIndex > batches:
             bpy.context.scene.my_tool.BatchSliderIndex = batches
             bpy.context.scene.my_tool.lastBatchSliderIndex = batches
-
     return
-
 
 
 def update_rarity_color(coll_name, rarity):
@@ -180,7 +174,7 @@ def update_current_batch(index, batch_path): # updates current batch record path
 
 
 
-def check_if_paths_exist(batch_num=1):
+def check_if_paths_exist(batch_num=1): # may be redundant now
     if bpy.context.scene.my_tool.batch_json_save_path == '':
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
