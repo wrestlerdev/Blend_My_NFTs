@@ -59,25 +59,31 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
         types = list(hierarchy[slot].keys())
         for type in types:
             variants = list(hierarchy[slot][type].keys())
-            first_texture = list(hierarchy[slot][type][variants[0]].keys())[0]
-            type_coll = bpy.data.collections[type]
-            type_rarity = hierarchy[slot][type][variants[0]][first_texture]["type_rarity"]
-            type_coll["rarity"] =  int(float(type_rarity))
-            update_rarity_color(type, type_rarity)
+            #This checks if a type has any varinets in it BETA_1.0
+            print(type)
+            print(variants)
+            if len(variants) > 0:
+                #This checks if a varients has any texture sets in it BETA_1.0 
+                if len(list(hierarchy[slot][type][variants[0]].keys())) >0:
+                    first_texture = list(hierarchy[slot][type][variants[0]].keys())[0]
+                    type_coll = bpy.data.collections[type]
+                    type_rarity = hierarchy[slot][type][variants[0]][first_texture]["type_rarity"]
+                    type_coll["rarity"] =  int(float(type_rarity))
+                    update_rarity_color(type, type_rarity)
 
-            for v in variants:
-                first_texture = list(hierarchy[slot][type][v].keys())[0]
-                variant_rarity = hierarchy[slot][type][v][first_texture]["variant_rarity"]
-                var_coll = bpy.data.collections[v]
-                var_coll["rarity"] = int(float(variant_rarity))
-                update_rarity_color(v, int(float(variant_rarity)))
+                    for v in variants:
+                        first_texture = list(hierarchy[slot][type][v].keys())[0]
+                        variant_rarity = hierarchy[slot][type][v][first_texture]["variant_rarity"]
+                        var_coll = bpy.data.collections[v]
+                        var_coll["rarity"] = int(float(variant_rarity))
+                        update_rarity_color(v, int(float(variant_rarity)))
 
-                textures = list(hierarchy[slot][type][v].keys())
-                for texture in textures:
-                    texture_rarity = hierarchy[slot][type][v][texture]["texture_rarity"]
-                    tex_coll = bpy.data.collections[texture]
-                    tex_coll["rarity"] = int(float(texture_rarity))
-                    update_rarity_color(texture, int(float(texture_rarity)))
+                        textures = list(hierarchy[slot][type][v].keys())
+                        for texture in textures:
+                            texture_rarity = hierarchy[slot][type][v][texture]["texture_rarity"]
+                            tex_coll = bpy.data.collections[texture]
+                            tex_coll["rarity"] = int(float(texture_rarity))
+                            update_rarity_color(texture, int(float(texture_rarity)))
     return
 
 

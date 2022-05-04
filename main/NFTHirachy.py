@@ -83,7 +83,7 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       """
       Returns the name of "i" attribute name, attribute genre, attribute variant
       """
-      name = i.split("_")[:4]
+      name = i.split("_")
       return name
 
    def getOrder_rarity(i):
@@ -94,22 +94,20 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       a = [''] * 4
       a[0] = i.rsplit('_', 1)[1]
       
-      if(attributeTypeColl.get('rarity') is not NONE):
+      if(attributeTypeColl.get('rarity') is not None):
          a[1] = attributeTypeColl.get('rarity')
       else:
          attributeTypeColl['rarity'] = 50
 
-      if(attributeVariantColl.get('rarity') is not NONE):
+      if(attributeVariantColl.get('rarity') is not None):
          a[2] = attributeVariantColl.get('rarity')
       else:
          attributeVariantColl['rarity'] = 50
 
-      if(attributeTextureColl.get('rarity') is not NONE):
+      if(attributeTextureColl.get('rarity') is not None):
          a[3] = attributeTextureColl.get('rarity')
       else:
          attributeTextureColl['rarity'] = 50
-      
-      
 
       # x = re.sub(r'[a-zA-Z]', "", i)
       # a = x.split("_")
@@ -119,7 +117,10 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       return list(a)
 
    def get_textureSet():
-      textureSet = ''. join(i for i in (name[3]) if not i.isdigit())
+      print("Name is: ")
+      print(name)
+
+      textureSet = name[4]
       return textureSet
       
 
