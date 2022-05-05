@@ -109,7 +109,8 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path): # s
             if type_coll.get('rarity') is not None:
                 type_rarity = type_coll["rarity"]
             else:
-                rarity = type.split('_')[4]
+                # rarity = type.split('_')[4]
+                rarity = 50 # BETA_1.0
                 type_rarity = rarity
                 type_coll["rarity"] = rarity
             update_rarity_color(type, type_rarity)
@@ -122,7 +123,8 @@ def save_collection_rarity_property(index, NFTRecord_save_path, batch_path): # s
                     update_rarity_color(v, int(float(var_coll["rarity"])))
                     total_rarity += int(float(var_coll["rarity"]))
                 else:   
-                    v_rarity = v.split('_')[4]
+                    # v_rarity = v.split('_')[4]
+                    v_rarity = 50 # BETA_1.0
                     var_coll['rarity'] = int(v_rarity)
                     variant_dict[v] = v_rarity # TODO
                     update_rarity_color(v, int(v_rarity))

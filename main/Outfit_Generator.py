@@ -454,35 +454,19 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 def PickWeightedAttributeType(AttributeTypes):
     number_List_Of_i = []
     rarity_List_Of_i = []
-    ifZeroBool = None
-
-
-    # for attributetype in AttributeTypes:
-    #     number_List_Of_i.append(attributetype)
-
-    #     # rarity = attributetype.split("_")[1]
-    #     rarity = TypesRarity[attributetype]["type_rarity"]
-    #     rarity_List_Of_i.append(float(rarity))
-
-    # for x in rarity_List_Of_i:
-    #     if x == 0:
-    #         ifZeroBool = True
-    #     elif x != 0:
-    #         ifZeroBool = False
-
-    # if ifZeroBool == True:
-    #     typeChoosen = random.choices(number_List_Of_i, k=1)
-    # elif ifZeroBool == False:
-    #     typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)     
+    ifZeroBool = None  
 
     for attributetype in AttributeTypes:
         # rarity = attributetype.split("_")[1]
-        first_variant = list(AttributeTypes[attributetype].keys())[0]
-        first_texture = list(AttributeTypes[attributetype][first_variant].keys())[0]
-        rarity = float(AttributeTypes[attributetype][first_variant][first_texture]["type_rarity"])
-        if rarity > 0.0:
-            number_List_Of_i.append(attributetype)
-            rarity_List_Of_i.append(float(rarity))
+        
+        if AttributeTypes[attributetype].keys(): # BETA_1.0
+            first_variant = list(AttributeTypes[attributetype].keys())[0]
+            if list(AttributeTypes[attributetype][first_variant].keys()): # BETA_1.0
+                first_texture = list(AttributeTypes[attributetype][first_variant].keys())[0]
+                rarity = float(AttributeTypes[attributetype][first_variant][first_texture]["type_rarity"])
+                if rarity > 0.0:
+                    number_List_Of_i.append(attributetype)
+                    rarity_List_Of_i.append(float(rarity))
 
     if len(number_List_Of_i) > 0:
         typeChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)          

@@ -316,7 +316,7 @@ class randomizePreview(bpy.types.Operator):
         bpy.context.scene.my_tool.lastDNA = DNA[0][0]
         bpy.context.scene.my_tool.inputDNA = DNA[0][0]
 
-        Exporter.metaData.returnERC721MetaDataCustom("testetstsest", DNA[0][0])
+        # Exporter.metaData.returnERC721MetaDataCustom("testetstsest", DNA[0][0])
         return {'FINISHED'}
 
 

@@ -98,6 +98,8 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedDictionary["numNFTsGenerated"] = DataDictionary["numNFTsGenerated"]
 
     DNAList = DataDictionary["DNAList"]
+    print(nft_index)
+    print(len(DNAList))
     oldDNA = DNAList[nft_index - 1]
     DNAList[nft_index - 1] = DNAToAdd
     updatedDictionary["DNAList"] = DNAList

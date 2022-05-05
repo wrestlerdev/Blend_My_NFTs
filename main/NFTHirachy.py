@@ -124,7 +124,7 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       return
 
    elif len(orderRarity) > 0:
-      number = orderRarity[0]
+      number = name[3]
       slotName = name[0]
       clothingGenre = name[1]
       clothingItem = name[2]
