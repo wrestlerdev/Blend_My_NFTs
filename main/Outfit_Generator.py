@@ -454,7 +454,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 def PickWeightedAttributeType(AttributeTypes):
     number_List_Of_i = []
     rarity_List_Of_i = []
-    ifZeroBool = None  
 
     for attributetype in AttributeTypes:
         # rarity = attributetype.split("_")[1]
@@ -481,7 +480,6 @@ def PickWeightedAttributeType(AttributeTypes):
 def PickWeightedTypeVarient(Varients):
     number_List_Of_i = []
     rarity_List_Of_i = []
-    ifZeroBool = None
 
     for varient in Varients:
         first_texture = list(Varients[varient].keys())[0]
