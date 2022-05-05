@@ -244,11 +244,11 @@ def update_combinations(dummy1, dummy2):
     global combinations
     global offset
 
-    combinations = (get_combinations.get_combinations_from_scene()) - offset
+    #combinations = (get_combinations.get_combinations_from_scene()) - offset
 
     # redraw_panel()
 
-bpy.app.handlers.depsgraph_update_post.append(update_combinations)
+#bpy.app.handlers.depsgraph_update_post.append(update_combinations)
 
 
 
@@ -736,7 +736,7 @@ class createSlotFolders(bpy.types.Operator):
 
     def execute(self, context):
         folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
-        SaveNFTsToRecord.CreateSlotsFolderHierarchy(folder_dir)
+        SaveNFTsToRecord.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
 
         return {'FINISHED'}
 
