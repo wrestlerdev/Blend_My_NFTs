@@ -163,10 +163,7 @@ def returnERC721MetaDataCustom(name, DNA):
 
     attributes = sorted(attributes, key = lambda i:MetadataAttributeOrder[i["trait_type"]])
     metaDataDictErc721["attributes"] = attributes
-    metaDataObj = json.dumps(metaDataDictErc721, indent=1, ensure_ascii=True)
-    with open("TestMetaData.json", "w") as outfile:
-            outfile.write(metaDataObj)
-    return metaDataDictErc721
+    
 
 
 
