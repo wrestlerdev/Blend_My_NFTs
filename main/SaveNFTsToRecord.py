@@ -198,9 +198,6 @@ def delete_hierarchy(parent_col):
                 for obj in child.objects:
                     bpy.data.objects.remove(obj, do_unlink=True)       
                 bpy.data.collections.remove(child)
-    
-
-
     get_child_names(parent_col)
 
 
@@ -240,6 +237,10 @@ def CreateSlotsFolderHierarchy(save_path):
                     char_tex_col = characterCollectionDict[char].copy()
                     char_tex_col.name = varient_coll_texture.name + "_" + char 
                     varient_coll_texture.children.link(char_tex_col)
+
+                for char in config.Characters:
+                    bpy.data.collections.remove(characterCollectionDict[char])
+
 
 
                 #Move on to types and varients if they exsist
@@ -295,6 +296,10 @@ def CreateSlotsFolderHierarchy(save_path):
                                                             SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
                                         else:
                                             print("No Textures")
+
+                                        #Remove base children objects used as a way to easily copy to texture varients
+                                        for char in config.Characters:
+                                            bpy.data.collections.remove(characterCollectionDict[char])
 
     for child_col in holder.children:
         for child_obj in child_col.objects:
