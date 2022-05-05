@@ -14,6 +14,9 @@ from datetime import datetime
 from . import Previewer
 importlib.reload(Previewer)
 
+from . import metaData
+importlib.reload(metaData)
+
 enableGeneration = False
 colorList = []
 generationType = None
@@ -296,7 +299,7 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
                 file_type = '3DMODELS'
                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
-
+        save_metadata_file(nft_name)
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
     return
 
@@ -527,8 +530,42 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # dele
                     print(new_local_path)
 
 
+# -----------------------------------------------------------------
+
+def save_metadata_file(path, nft_name, DNA):
+    path = os.path.join(path, nft_name)
+    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA)
+
+    metaDataObj = json.dumps(metadata, indent=1, ensure_ascii=True)
+    with open("{}_ERC721.json".format(path), "w") as outfile:
+            outfile.write(metaDataObj)
 
 
+
+def save_all_metadata_files(output_path):
+    count = 0
+    record_path = os.path.join(output_path,"_NFTRecord.json")
+    total_record = json.load(open(record_path))
+    total_DNA = total_record["DNAList"]
+
+    for dir in os.listdir(output_path):
+        batch_path = os.path.join(output_path, dir)
+        if os.path.isdir(batch_path):
+            for nft_dir in os.listdir(batch_path):
+                nft_path = os.path.join(batch_path, nft_dir)
+                if os.path.isdir(nft_path):
+                    for nft_data in os.listdir(nft_path):
+                        if nft_data.endswith(".json") and nft_data.startswith('Batch'):
+                            nft_record = os.path.join(nft_path, nft_data)
+                            single_record = json.load(open(nft_record))
+                            DNA = single_record["DNAList"]
+                            name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+                            index = total_DNA.index(DNA) + 1
+                            nft_name = name_prefix + "{:04d}".format(index)
+                            save_metadata_file(nft_path, nft_name, DNA)
+                            count += 1
+    print("{} metadata files have been created".format(count))
+    return
 
 
 if __name__ == '__main__':

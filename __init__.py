@@ -315,6 +315,8 @@ class randomizePreview(bpy.types.Operator):
         Exporter.Previewer.fill_pointers_from_dna(DNA[0][0], Slots)
         bpy.context.scene.my_tool.lastDNA = DNA[0][0]
         bpy.context.scene.my_tool.inputDNA = DNA[0][0]
+
+        Exporter.metaData.returnERC721MetaDataCustom("testetstsest", DNA[0][0])
         return {'FINISHED'}
 
 
@@ -357,7 +359,7 @@ class randomizeColor(bpy.types.Operator):
 class clearSlots(bpy.types.Operator):
     bl_idname = 'clear.slots'
     bl_label = 'Clear All Slots'
-    bl_description = ''
+    bl_description = 'Set all slots to Null'
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
@@ -884,6 +886,21 @@ class moveDataToLocal(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class exportMetadata(bpy.types.Operator):
+    bl_idname = 'export.metadata'
+    bl_label = 'Export ERC721 Metadata'
+    bl_description = 'Export out metadata for all NFTs'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        bacth_path_end = os.path.join("Blend_My_NFTs Output", "OUTPUT")
+        path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bacth_path_end)
+        Exporter.save_all_metadata_files(path)
+        return {'FINISHED'}
+
+
+
+
 #----------------------------------------------------------------
 
 class purgeData(bpy.types.Operator):
@@ -905,50 +922,6 @@ class purgeData(bpy.types.Operator):
         colls = [c for c in bpy.data.collections if c.users == 0]
         bpy.data.batch_remove(colls)
         return {'FINISHED'}
-
-
-
-#----------------------------------------------------------------
-
-class assetlibTest(bpy.types.Operator):
-    bl_idname = 'assetlib.test'
-    bl_label = "Asset Library"
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
-        start = time.process_time()
-        prefs = bpy.context.preferences
-        filepaths = prefs.filepaths
-        asset_libraries = filepaths.asset_libraries
-        asset_library = asset_libraries[1]
-        library_path = (asset_library.path)
-
-        # files = [file for file in os.listdir(library_path) if file.endswith(".blend")]
-        # print(files)
-        # objects = []
-        inner_path = 'Collection'
-        import_file = 'kae_rig_bounds_v09_02.blend'
-        # for blend in files:
-        #     blend_path = os.path.join(path, blend)
-        #     print(blend_path)
-        #     with bpy.data.libraries.load(blend_path) as (data_from, data_to):
-        #         for d in data_from.objects:
-        #             objects.append(d)
-        coll_name = 'Imported'
-        coll = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[coll_name]                    
-        bpy.context.view_layer.active_layer_collection = coll
-
-        DNA = bpy.context.scene.my_tool.inputDNA
-        new_path = os.path.join(library_path, import_file, inner_path)
-
-        Exporter.Previewer.assettest(DNA, library_path, inner_path, coll_name, Slots)
-        
-        # Previewer.assettest2(DNA, new_path, coll_name)
-        # print(bpy.context.object)
-        # bpy.ops.asset.open_containing_blend_file()
-        print(time.process_time() - start)
-        return {'FINISHED'}
-
 
 
 
@@ -1393,6 +1366,24 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
 
             layout.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
+
+#-------------------------------------------
+
+class WCUSTOM_PT_CreateMetadata(bpy.types.Panel):
+    bl_label = "Export Metadata"
+    bl_idname = "WCUSTOM_PT_CreateMetadata"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'EXPORTING'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.operator(exportMetadata.bl_idname, text=exportMetadata.bl_label)
+
 #------------------------------------
 
 
@@ -1458,6 +1449,7 @@ classes = (
     GU_PT_collection_custom_properties,
     WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
+    WCUSTOM_PT_CreateMetadata,
     # BMNFTS_PT_Documentation,
 
 
@@ -1488,6 +1480,7 @@ classes = (
     chooseExportFolder,
     moveDataToLocal,
     purgeData,
+    exportMetadata,
 
 )
 
