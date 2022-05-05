@@ -210,88 +210,89 @@ def CreateSlotsFolderHierarchy(save_path):
     holder = bpy.data.collections.new("Holder")
     bpy.context.scene.collection.children.link(holder)
 
-    slots_path = CheckAndFormatPath(save_path)
-    for slot in os.listdir(slots_path):
-        type_path = CheckAndFormatPath(slots_path, slot)
-        if type_path != "":
-            #Create slot type collection and link to scene
-            slot_coll = bpy.data.collections.new(slot)
-            bpy.context.scene.collection.children.link(slot_coll)
+    slots_path = CheckAndFormatPath(save_path, "SLOTS")
+    if(slots_path != ""):
+        for slot in os.listdir(slots_path):
+            type_path = CheckAndFormatPath(slots_path, slot)
+            if type_path != "":
+                #Create slot type collection and link to scene
+                slot_coll = bpy.data.collections.new(slot)
+                bpy.context.scene.collection.children.link(slot_coll)
 
-            #Set Up NUll texture slot
-            slot_col_type = bpy.data.collections.new("00-" + slot.partition('-')[2] + "Null" )
-            slot_coll.children.link(slot_col_type)
-            slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000")
-            slot_col_type.children.link(slot_col_var)
-            characterCollectionDict = {}
-            for char in config.Characters:
-                varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + char)
-                characterCollectionDict[char] = varient_coll_char
-                new_object = bpy.context.scene.objects["BLANK"].copy()                                                
-                varient_coll_char.objects.link(new_object)
-                slot_col_var.children.link(varient_coll_char)
-                
-            varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + "A")
-            slot_col_var.children.link(varient_coll_texture)
-            for char in config.Characters:
-                char_tex_col = characterCollectionDict[char].copy()
-                char_tex_col.name = varient_coll_texture.name + "_" + char 
-                varient_coll_texture.children.link(char_tex_col)
+                #Set Up NUll texture slot
+                slot_col_type = bpy.data.collections.new("00-" + slot.partition('-')[2] + "Null" )
+                slot_coll.children.link(slot_col_type)
+                slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000")
+                slot_col_type.children.link(slot_col_var)
+                characterCollectionDict = {}
+                for char in config.Characters:
+                    varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + char)
+                    characterCollectionDict[char] = varient_coll_char
+                    new_object = bpy.context.scene.objects["BLANK"].copy()                                                
+                    varient_coll_char.objects.link(new_object)
+                    slot_col_var.children.link(varient_coll_char)
+                    
+                varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + "A")
+                slot_col_var.children.link(varient_coll_texture)
+                for char in config.Characters:
+                    char_tex_col = characterCollectionDict[char].copy()
+                    char_tex_col.name = varient_coll_texture.name + "_" + char 
+                    varient_coll_texture.children.link(char_tex_col)
 
 
-            #Move on to types and varients if they exsist
-            for type in os.listdir(type_path):                
-                varient_path = CheckAndFormatPath(type_path, type)
-                if varient_path != "":
-                    #create varient collection and link to slot
-                    type_coll = bpy.data.collections.new(type)
-                    slot_coll.children.link(type_coll)
-                    for varient in os.listdir(varient_path):             
-                        item_path = CheckAndFormatPath(varient_path, varient)
-                        if item_path != "":
-                            varient_coll = bpy.data.collections.new(varient)
-                            type_coll.children.link(varient_coll)
+                #Move on to types and varients if they exsist
+                for type in os.listdir(type_path):                
+                    varient_path = CheckAndFormatPath(type_path, type)
+                    if varient_path != "":
+                        #create varient collection and link to slot
+                        type_coll = bpy.data.collections.new(type)
+                        slot_coll.children.link(type_coll)
+                        for varient in os.listdir(varient_path):             
+                            item_path = CheckAndFormatPath(varient_path, varient)
+                            if item_path != "":
+                                varient_coll = bpy.data.collections.new(varient)
+                                type_coll.children.link(varient_coll)
 
-                            for file in os.listdir(item_path):
-                                if file.rpartition('.')[2] == "blend":
-                                    directory = os.path.join(item_path, file, "Collection")
-                                    directory = directory.replace('\\', '/')
-                                    characterCollectionDict = {}
-                                    for char in config.Characters:
-                                        varient_coll_char = bpy.data.collections.new(varient + "_" + char)
-                                        varient_coll.children.link(varient_coll_char)
-                                        characterCollectionDict[char] = varient_coll_char
-                                        file_path = ""
-                                        file_path = os.path.join(directory, char)
-                                        file_path = file_path.replace('\\', '/')
-                                        print(directory)
-                                        print(file_path) 
-                                        #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
-                                        layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
-                                        bpy.context.view_layer.active_layer_collection = layer_collection
+                                for file in os.listdir(item_path):
+                                    if file.rpartition('.')[2] == "blend":
+                                        directory = os.path.join(item_path, file, "Collection")
+                                        directory = directory.replace('\\', '/')
+                                        characterCollectionDict = {}
+                                        for char in config.Characters:
+                                            varient_coll_char = bpy.data.collections.new(varient + "_" + char)
+                                            varient_coll.children.link(varient_coll_char)
+                                            characterCollectionDict[char] = varient_coll_char
+                                            file_path = ""
+                                            file_path = os.path.join(directory, char)
+                                            file_path = file_path.replace('\\', '/')
+                                            print(directory)
+                                            print(file_path) 
+                                            #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
+                                            layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
+                                            bpy.context.view_layer.active_layer_collection = layer_collection
 
-                                        bpy.ops.wm.append(filepath=file_path, directory=directory, filename=char, active_collection=True, autoselect=True )
+                                            bpy.ops.wm.append(filepath=file_path, directory=directory, filename=char, active_collection=True, autoselect=True )
 
-                                        #goes through the temp holder collection created and finds children imported and unlink objs from them
-                                        for obj in bpy.context.selected_objects:
-                                            varient_coll_char.objects.link(obj)
+                                            #goes through the temp holder collection created and finds children imported and unlink objs from them
+                                            for obj in bpy.context.selected_objects:
+                                                varient_coll_char.objects.link(obj)
 
-                                    texture_path = CheckAndFormatPath(item_path, "Textures")
-                                    if(texture_path != ""):
-                                        for texture_set in os.listdir(texture_path):
-                                            varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set)
-                                            varient_coll.children.link(varient_texture_set)
-                                            for char in list(characterCollectionDict.keys()):
-                                                col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
-                                                varient_texture_set.children.link(col)
-                                                for child in characterCollectionDict[char].objects:
-                                                    new_object = child.copy()                                                
-                                                    col.objects.link(new_object)
-                                                    set_path = CheckAndFormatPath(texture_path, texture_set)
-                                                    if(set_path != ""):
-                                                        SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
-                                    else:
-                                        print("No Textures")
+                                        texture_path = CheckAndFormatPath(item_path, "Textures")
+                                        if(texture_path != ""):
+                                            for texture_set in os.listdir(texture_path):
+                                                varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set)
+                                                varient_coll.children.link(varient_texture_set)
+                                                for char in list(characterCollectionDict.keys()):
+                                                    col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
+                                                    varient_texture_set.children.link(col)
+                                                    for child in characterCollectionDict[char].objects:
+                                                        new_object = child.copy()                                                
+                                                        col.objects.link(new_object)
+                                                        set_path = CheckAndFormatPath(texture_path, texture_set)
+                                                        if(set_path != ""):
+                                                            SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
+                                        else:
+                                            print("No Textures")
 
     for child_col in holder.children:
         for child_obj in child_col.objects:
