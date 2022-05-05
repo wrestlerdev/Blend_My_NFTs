@@ -48,11 +48,12 @@ def createHirachy(rarity_from_name):
             _textures = _varients[j].children
 
             for k in range(len(_textures)):
-               if not _textures[k].name.split('_')[-1] in config.Characters: # check if char variation mesh
+               print(_textures[k])
+               if not _textures[k].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
                   Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i], rarity_from_name)
 
-            Varients[_varients[j].name] = Textures
-
+            if not _varients[j].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
+               Varients[_varients[j].name] = Textures
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -63,11 +64,6 @@ def createHirachy(rarity_from_name):
          sortedAttibutetype[key] = unsortedAttributeType[key]
       
       sortedAttibutes[attribute] = sortedAttibutetype
-
-   firstAttribute = list(sortedAttibutes.values())[0]
-   firstType = list(firstAttribute.values())[0]
-   firstVarient = list(firstType.values())[0]
-
    return sortedAttibutes
 
 
@@ -90,24 +86,23 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       """
       Returns the "order", "type_rarity", varient_rarity and texture rarity
       """
-      print(i.rsplit('_', 1))
       a = [''] * 4
       a[0] = i.rsplit('_', 1)[1]
       
       if(attributeTypeColl.get('rarity') is not None):
          a[1] = attributeTypeColl.get('rarity')
       else:
-         attributeTypeColl['rarity'] = 50
+         a[1] = attributeTypeColl['rarity'] = 50
 
       if(attributeVariantColl.get('rarity') is not None):
          a[2] = attributeVariantColl.get('rarity')
       else:
-         attributeVariantColl['rarity'] = 50
+         a[2] = attributeVariantColl['rarity'] = 50
 
       if(attributeTextureColl.get('rarity') is not None):
          a[3] = attributeTextureColl.get('rarity')
       else:
-         attributeTextureColl['rarity'] = 50
+         a[3] = attributeTextureColl['rarity'] = 50
 
       # x = re.sub(r'[a-zA-Z]', "", i)
       # a = x.split("_")
@@ -117,8 +112,6 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       return list(a)
 
    def get_textureSet():
-      print("Name is: ")
-      print(name)
 
       textureSet = name[4]
       return textureSet
@@ -150,4 +143,5 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl,
       
       eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingVersion": number,
                      "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": variant_rarity, "type_rarity": type_rarity}
+      
    return eachObject

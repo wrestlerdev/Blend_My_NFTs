@@ -219,18 +219,20 @@ def CreateSlotsFolderHierarchy(save_path):
             bpy.context.scene.collection.children.link(slot_coll)
 
             #Set Up NUll texture slot
-            slot_col_null = bpy.data.collections.new("00_" + slot.partition('-')[2] + "_Null" )
-            slot_coll.children.link(slot_col_null)
+            slot_col_type = bpy.data.collections.new("00-" + slot.partition('-')[2] + "Null" )
+            slot_coll.children.link(slot_col_type)
+            slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000")
+            slot_col_type.children.link(slot_col_var)
             characterCollectionDict = {}
             for char in config.Characters:
-                varient_coll_char = bpy.data.collections.new(slot_col_null.name.partition('_')[2] + "_Null_" + "000_" + char)
+                varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + char)
                 characterCollectionDict[char] = varient_coll_char
                 new_object = bpy.context.scene.objects["BLANK"].copy()                                                
                 varient_coll_char.objects.link(new_object)
-                slot_col_null.children.link(varient_coll_char)
+                slot_col_var.children.link(varient_coll_char)
                 
-            varient_coll_texture = bpy.data.collections.new(slot_col_null.name.partition('_')[2] + "_Null_" + "000_" + "A")
-            slot_col_null.children.link(varient_coll_texture)
+            varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + "A")
+            slot_col_var.children.link(varient_coll_texture)
             for char in config.Characters:
                 char_tex_col = characterCollectionDict[char].copy()
                 char_tex_col.name = varient_coll_texture.name + "_" + char 
@@ -340,113 +342,113 @@ def CheckAndFormatPath(path, pathTojoin = ""):
     return new_path
 
 
-def SearchForMeshesAndCreateCharacterDuplicates(record_save_path):
-    DataDictionary = json.load(open(record_save_path))
-    hierarchy = DataDictionary["hierarchy"]
+# def SearchForMeshesAndCreateCharacterDuplicates(record_save_path):
+#     DataDictionary = json.load(open(record_save_path))
+#     hierarchy = DataDictionary["hierarchy"]
 
-    slots = list(hierarchy.keys())
-    for slot in slots:
-        types = list(hierarchy[slot].keys())
-        for type in types:
-            variants = list(hierarchy[slot][type].keys())
-            for variant in variants:
-                kae_variant = variant + "_" + config.Characters[0]
-                if bpy.data.collections.get(kae_variant) is None:
-                    original_meshes = bpy.data.collections[variant].objects
-                    for character in config.Characters:
-                        char_coll_name = variant + '_' + character
-                        char_coll = bpy.data.collections.new(char_coll_name)
-                        bpy.data.collections[variant].children.link(char_coll)
-                        print(original_meshes)
-                        for mesh in original_meshes:
-                            new_mesh = bpy.data.objects[mesh.name].copy()
-                            char_coll.objects.link(new_mesh)
-                            mat_slots = new_mesh.material_slots
-                            for m in mat_slots:
-                                material = bpy.data.materials['MasterV01']
-                                material.use_nodes = True
-                    for og_mesh in original_meshes:
-                        og_mesh.hide_render = True
-                        og_mesh.hide_viewport = True
-    return
+#     slots = list(hierarchy.keys())
+#     for slot in slots:
+#         types = list(hierarchy[slot].keys())
+#         for type in types:
+#             variants = list(hierarchy[slot][type].keys())
+#             for variant in variants:
+#                 kae_variant = variant + "_" + config.Characters[0]
+#                 if bpy.data.collections.get(kae_variant) is None:
+#                     original_meshes = bpy.data.collections[variant].objects
+#                     for character in config.Characters:
+#                         char_coll_name = variant + '_' + character
+#                         char_coll = bpy.data.collections.new(char_coll_name)
+#                         bpy.data.collections[variant].children.link(char_coll)
+#                         print(original_meshes)
+#                         for mesh in original_meshes:
+#                             new_mesh = bpy.data.objects[mesh.name].copy()
+#                             char_coll.objects.link(new_mesh)
+#                             mat_slots = new_mesh.material_slots
+#                             for m in mat_slots:
+#                                 material = bpy.data.materials['MasterV01']
+#                                 material.use_nodes = True
+#                     for og_mesh in original_meshes:
+#                         og_mesh.hide_render = True
+#                         og_mesh.hide_viewport = True
+#     return
 
 
-def SearchForTexturesAndCreateDuplicates(save_path):
-    slots_path = os.path.join(save_path, "INPUT")
-    slots_path = os.path.join(slots_path, "Slots")
+# def SearchForTexturesAndCreateDuplicates(save_path):
+#     slots_path = os.path.join(save_path, "INPUT")
+#     slots_path = os.path.join(slots_path, "Slots")
     
-    for slot in os.listdir(slots_path):
-        type_path = os.path.join(slots_path, slot)
-        for type in os.listdir(type_path):
-            varient_path = os.path.join(type_path, type)
-            for varient in os.listdir(varient_path):
-                texture_path = os.path.join(varient_path, varient)
-                texture_path = os.path.join(texture_path, "Textures")
+#     for slot in os.listdir(slots_path):
+#         type_path = os.path.join(slots_path, slot)
+#         for type in os.listdir(type_path):
+#             varient_path = os.path.join(type_path, type)
+#             for varient in os.listdir(varient_path):
+#                 texture_path = os.path.join(varient_path, varient)
+#                 texture_path = os.path.join(texture_path, "Textures")
                 
-                Kae = None
-                Nef = None
-                Rem =  None
+#                 Kae = None
+#                 Nef = None
+#                 Rem =  None
 
-                for col in bpy.data.collections[varient].children:
-                    name = col.name.rpartition('_')[2]
-                    if name in config.Characters:
-                        if name == "Kae": 
-                            Kae =  col
-                        elif name == "Nef":
-                            Nef = col
-                        elif name == "Rem":
-                            Rem = col
-                    else:                    
-                        for obj in col.objects:
-                            bpy.data.objects.remove(obj, do_unlink=True)
-                        bpy.data.collections.remove(col)
+#                 for col in bpy.data.collections[varient].children:
+#                     name = col.name.rpartition('_')[2]
+#                     if name in config.Characters:
+#                         if name == "Kae": 
+#                             Kae =  col
+#                         elif name == "Nef":
+#                             Nef = col
+#                         elif name == "Rem":
+#                             Rem = col
+#                     else:                    
+#                         for obj in col.objects:
+#                             bpy.data.objects.remove(obj, do_unlink=True)
+#                         bpy.data.collections.remove(col)
 
-                for texture in os.listdir(texture_path):
-                    print(texture)
-                    print(varient)
-                    splitName = varient.rpartition('_')
-                    texture_collection_name = splitName[0] + texture + splitName[1] + splitName[2]
-                    collection = bpy.data.collections.new(texture_collection_name)
-                    bpy.data.collections[varient].children.link(collection)
-                    texture_set = os.path.join(texture_path, texture)
-                    for character in config.Characters:
-                        if bpy.data.collections.get(varient + "_" + character ) != None:
-                            DuplicateChildrenMaterials(bpy.data.collections[varient + "_" + character ], collection, texture_set)
+#                 for texture in os.listdir(texture_path):
+#                     print(texture)
+#                     print(varient)
+#                     splitName = varient.rpartition('_')
+#                     texture_collection_name = splitName[0] + texture + splitName[1] + splitName[2]
+#                     collection = bpy.data.collections.new(texture_collection_name)
+#                     bpy.data.collections[varient].children.link(collection)
+#                     texture_set = os.path.join(texture_path, texture)
+#                     for character in config.Characters:
+#                         if bpy.data.collections.get(varient + "_" + character ) != None:
+#                             DuplicateChildrenMaterials(bpy.data.collections[varient + "_" + character ], collection, texture_set)
 
 
-def DuplicateChildrenMaterials(originalCollection, newParentCollection, texture_set):
-    collection = bpy.data.collections.new(newParentCollection.name + originalCollection.name.rpartition('_')[1] + originalCollection.name.rpartition('_')[2] )
-    bpy.data.collections[newParentCollection.name].children.link(collection)
-    for child in originalCollection.objects:
-        print(child.name)
-        ob = bpy.data.objects[child.name].copy()
-        collection.objects.link(ob)
+# def DuplicateChildrenMaterials(originalCollection, newParentCollection, texture_set):
+#     collection = bpy.data.collections.new(newParentCollection.name + originalCollection.name.rpartition('_')[1] + originalCollection.name.rpartition('_')[2] )
+#     bpy.data.collections[newParentCollection.name].children.link(collection)
+#     for child in originalCollection.objects:
+#         print(child.name)
+#         ob = bpy.data.objects[child.name].copy()
+#         collection.objects.link(ob)
 
-        material_slots = ob.material_slots
-        for m in material_slots:
-            #material = m.material
-            material = bpy.data.materials['MasterV01']
-            material.use_nodes = True
-            matcopy = material.copy()
-            m.material = matcopy
-            #m.material = bpy.data.materials['Test_02']
-            # get the nodes
+#         material_slots = ob.material_slots
+#         for m in material_slots:
+#             #material = m.material
+#             material = bpy.data.materials['MasterV01']
+#             material.use_nodes = True
+#             matcopy = material.copy()
+#             m.material = matcopy
+#             #m.material = bpy.data.materials['Test_02']
+#             # get the nodes
             
-            for node in material.node_tree.nodes:
-                if (node.label == "Diffuse"):
-                    for tex in os.listdir(texture_set):
-                        if "_D_" in tex:
-                            file = file = os.path.join(texture_set, tex)
-                            print(file)
-                            file = file.replace('\\', '/')
-                            print(file)
-                            newImage = bpy.data.images.load(file, check_existing=True)
-                            node.image = newImage
-                        elif "_N_" in tex:
-                            file = file = os.path.join(texture_set, tex)
-                            file = file.replace('\\', '/')
-                            newImage = bpy.data.images.load(file, check_existing=True)
-                            node.image = newImage
+#             for node in material.node_tree.nodes:
+#                 if (node.label == "Diffuse"):
+#                     for tex in os.listdir(texture_set):
+#                         if "_D_" in tex:
+#                             file = file = os.path.join(texture_set, tex)
+#                             print(file)
+#                             file = file.replace('\\', '/')
+#                             print(file)
+#                             newImage = bpy.data.images.load(file, check_existing=True)
+#                             node.image = newImage
+#                         elif "_N_" in tex:
+#                             file = file = os.path.join(texture_set, tex)
+#                             file = file.replace('\\', '/')
+#                             newImage = bpy.data.images.load(file, check_existing=True)
+#                             node.image = newImage
 
 
 
