@@ -283,17 +283,30 @@ def CreateSlotsFolderHierarchy(save_path):
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
                                         if(texture_path != ""):
                                             for texture_set in os.listdir(texture_path):
-                                                varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set)
-                                                varient_coll.children.link(varient_texture_set)
-                                                for char in list(characterCollectionDict.keys()):
-                                                    col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
-                                                    varient_texture_set.children.link(col)
-                                                    for child in characterCollectionDict[char].objects:
-                                                        new_object = child.copy()                                                
-                                                        col.objects.link(new_object)
-                                                        set_path = CheckAndFormatPath(texture_path, texture_set)
-                                                        if(set_path != ""):
-                                                            SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
+                                                set_path = CheckAndFormatPath(texture_path, texture_set)
+                                                if(set_path != ""):
+                                                    print(set_path)
+                                                    color_path = CheckAndFormatPath(set_path, "ColorInfo.json")
+                                                    if(color_path != ""):
+                                                        print(color_path)
+                                                        ColorInfo = json.load(open(color_path))
+                                                        print(list( ColorInfo.keys() ))
+                                                        for color_tex_varient in list( ColorInfo.keys() ):
+                                                            varient_texture_set = bpy.data.collections.new(varient + "_" + color_tex_varient)
+                                                            varient_texture_set["colorName"] = ColorInfo[color_tex_varient]["ComonName"]
+                                                            varient_texture_set["color_primary"] = "#000000"
+                                                            varient_texture_set["color_secondary"] = "#000000"
+                                                            varient_texture_set["color_tertiary"] = "#000000"
+                                                            varient_coll.children.link(varient_texture_set)
+                                                            for char in list(characterCollectionDict.keys()):
+                                                                col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
+                                                                varient_texture_set.children.link(col)
+                                                                for child in characterCollectionDict[char].objects:
+                                                                    new_object = child.copy()                                                
+                                                                    col.objects.link(new_object)
+                                                                    set_path = CheckAndFormatPath(texture_path, texture_set)
+                                                                    if(set_path != ""):
+                                                                        SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
                                         else:
                                             print("No Textures")
 
