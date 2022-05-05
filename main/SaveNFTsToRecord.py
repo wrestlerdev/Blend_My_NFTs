@@ -217,13 +217,27 @@ def CreateSlotsFolderHierarchy(save_path):
             #Create slot type collection and link to scene
             slot_coll = bpy.data.collections.new(slot)
             bpy.context.scene.collection.children.link(slot_coll)
+
+            #Set Up NUll texture slot
             slot_col_null = bpy.data.collections.new("00_" + slot.partition('-')[2] + "_Null" )
             slot_coll.children.link(slot_col_null)
-            for char in ["Kae", "Nef", "Rem"]:
-                varient_coll_char = bpy.data.collections.new(slot_col_null.name.partition('_')[2] + "_Null_" + char)
+            characterCollectionDict = {}
+            for char in config.Characters:
+                varient_coll_char = bpy.data.collections.new(slot_col_null.name.partition('_')[2] + "_Null_" + "000_" + char)
+                characterCollectionDict[char] = varient_coll_char
+                new_object = bpy.context.scene.objects["BLANK"].copy()                                                
+                varient_coll_char.objects.link(new_object)
                 slot_col_null.children.link(varient_coll_char)
+                
+            varient_coll_texture = bpy.data.collections.new(slot_col_null.name.partition('_')[2] + "_Null_" + "000_" + "A")
+            slot_col_null.children.link(varient_coll_texture)
+            for char in config.Characters:
+                char_tex_col = characterCollectionDict[char].copy()
+                char_tex_col.name = varient_coll_texture.name + "_" + char 
+                varient_coll_texture.children.link(char_tex_col)
 
 
+            #Move on to types and varients if they exsist
             for type in os.listdir(type_path):                
                 varient_path = CheckAndFormatPath(type_path, type)
                 if varient_path != "":
@@ -241,7 +255,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                     directory = os.path.join(item_path, file, "Collection")
                                     directory = directory.replace('\\', '/')
                                     characterCollectionDict = {}
-                                    for char in ["Kae", "Nef", "Rem"]:
+                                    for char in config.Characters:
                                         varient_coll_char = bpy.data.collections.new(varient + "_" + char)
                                         varient_coll.children.link(varient_coll_char)
                                         characterCollectionDict[char] = varient_coll_char
