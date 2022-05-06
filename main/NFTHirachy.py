@@ -12,7 +12,7 @@ from functools import partial
 from . import config
 
 
-def createHirachy(rarity_from_name):
+def createHirachy():
    # rarity_from_name = bool whether rarity in new heirarchy should use either 'collection custom property rarity' or 'collection name rarity'
    unsortedttributeList = {} 
    coll = bpy.context.scene.collection.children
@@ -50,7 +50,7 @@ def createHirachy(rarity_from_name):
             for k in range(len(_textures)):
                print(_textures[k])
                if not _textures[k].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
-                  Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i], rarity_from_name)
+                  Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i])
 
             if not _varients[j].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
                Varients[_varients[j].name] = Textures
@@ -67,7 +67,7 @@ def createHirachy(rarity_from_name):
    return sortedAttibutes
 
 
-def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl, rarity_from_name):
+def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl):
    attributeVariant = attributeVariantColl.name
    attributeTexture = attributeTextureColl.name
    eachObject={}
