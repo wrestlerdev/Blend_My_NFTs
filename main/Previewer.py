@@ -374,7 +374,7 @@ def set_armature_for_meshes(character, meshes):
 #---------------------------------------------------------------------------
 
 
-def get_hierarchy_ordered(index= 0):
+def get_hierarchy_ordered(index=0):
    if not index:
       index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
@@ -385,8 +385,9 @@ def get_hierarchy_ordered(index= 0):
    return hierarchy
 
 
-def get_hierarchy_unordered():
-   index = bpy.context.scene.my_tool.CurrentBatchIndex
+def get_hierarchy_unordered(index=0):
+   if not index:
+      index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))      
    DataDictionary = json.load(open(NFTRecord_save_path))
