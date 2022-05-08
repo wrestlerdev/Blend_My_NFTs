@@ -209,7 +209,7 @@ def CreateSlotsFolderHierarchy(save_path):
     holder = bpy.data.collections.new("Holder")
     bpy.context.scene.collection.children.link(holder)
 
-    slots_path = CheckAndFormatPath(save_path, "SLOTS")
+    slots_path = CheckAndFormatPath(save_path, "INPUT/SLOTS")
     if(slots_path != ""):
         for slot in os.listdir(slots_path):
             type_path = CheckAndFormatPath(slots_path, slot)
@@ -294,9 +294,9 @@ def CreateSlotsFolderHierarchy(save_path):
                                                         for color_tex_varient in list( ColorInfo.keys() ):
                                                             varient_texture_set = bpy.data.collections.new(varient + "_" + color_tex_varient)
                                                             varient_texture_set["colorName"] = ColorInfo[color_tex_varient]["ComonName"]
-                                                            varient_texture_set["color_primary"] = "#000000"
-                                                            varient_texture_set["color_secondary"] = "#000000"
-                                                            varient_texture_set["color_tertiary"] = "#000000"
+                                                            varient_texture_set["color_primary"] = ColorInfo[color_tex_varient]["R"]
+                                                            varient_texture_set["color_secondary"] =  (1.0, 1.0, 1.0, 1.0)
+                                                            varient_texture_set["color_tertiary"] = (1.0, 1.0, 1.0, 1.0)
                                                             varient_coll.children.link(varient_texture_set)
                                                             for char in list(characterCollectionDict.keys()):
                                                                 col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
@@ -306,7 +306,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                                     col.objects.link(new_object)
                                                                     set_path = CheckAndFormatPath(texture_path, texture_set)
                                                                     if(set_path != ""):
-                                                                        SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
+                                                                        SetUpObjectMaterialsAndTextures(varient_texture_set, new_object, set_path)                                              
                                         else:
                                             print("No Textures")
 
@@ -322,7 +322,7 @@ def CreateSlotsFolderHierarchy(save_path):
 
     return
 
-def SetUpObjectMaterialsAndTextures(obj, texture_path):
+def SetUpObjectMaterialsAndTextures(parent, obj, texture_path):
     material_slots = obj.material_slots
     for m in material_slots:
         #material = m.material
@@ -336,20 +336,24 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
         
         for node in matcopy.node_tree.nodes:
             if (node.label == "Diffuse"):
-                print( os.listdir(texture_path) )
                 for tex in os.listdir(texture_path):
                     if "_D_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         print(file)
-                        file = file.replace('\\', '/')
+                        file = file.replace('/', '\\')
                         print(file)
                         newImage = bpy.data.images.load(file, check_existing=True)
                         node.image = newImage
-                    elif "_N_" in tex:
+            if node.label == "Normal":
+                for tex in os.listdir(texture_path):
+                    if "_N_" in tex:
                         file = file = os.path.join(texture_path, tex)
-                        file = file.replace('\\', '/')
+                        file = file.replace('/', '\\')
                         newImage = bpy.data.images.load(file, check_existing=True)
                         node.image = newImage
+            if node.label == "RTint":
+                node.outputs["Color"].default_value = parent["color_primary"]
+
 
 def CheckAndFormatPath(path, pathTojoin = ""):
     if pathTojoin != "" :
