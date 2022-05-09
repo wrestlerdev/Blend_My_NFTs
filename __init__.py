@@ -1036,7 +1036,7 @@ class WCUSTOM_PT_FCreateData(bpy.types.Panel):
 
 
 class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
-    bl_label = "Preview NFT"
+    bl_label = "Create NFTs"
     bl_idname = "WCUSTOM_PT_PreviewNFTs"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -1051,7 +1051,7 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
-        row = layout.separator(factor=0.25)
+        # row = layout.separator(factor=0.0)
         row = layout.row()
         row.prop(mytool, "maxNFTs")
         row.operator(createBatch.bl_idname, text=createBatch.bl_label)
@@ -1313,8 +1313,9 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        row = layout.row()
-        row.prop(mytool, "root_dir")
+        box = layout.box()
+        row = box.row()
+        row.prop(mytool, "root_dir",text='')
         row.operator(chooseRootFolder.bl_idname, text=chooseRootFolder.bl_label)
 
         row = layout.row()
@@ -1327,7 +1328,11 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
         row = layout.row()
-        row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+        
+        if output_path != os.path.abspath(mytool.root_dir):
+            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label, emboss=False)
+        else:
+            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
 
         row = layout.row()
         row = layout.row()
