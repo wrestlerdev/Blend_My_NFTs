@@ -285,18 +285,22 @@ def CreateSlotsFolderHierarchy(save_path):
                                             for texture_set in os.listdir(texture_path):
                                                 set_path = CheckAndFormatPath(texture_path, texture_set)
                                                 if(set_path != ""):
-                                                    print(set_path)
                                                     color_path = CheckAndFormatPath(set_path, "ColorInfo.json")
                                                     if(color_path != ""):
-                                                        print(color_path)
                                                         ColorInfo = json.load(open(color_path))
-                                                        print(list( ColorInfo.keys() ))
-                                                        for color_tex_varient in list( ColorInfo.keys() ):
+                                                        availableSets = list(ColorInfo.values())[0]
+                                                        
+                                                        for color_tex_varient in availableSets:
+                                                            print(color_tex_varient)
                                                             varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set + color_tex_varient)
-                                                            varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
-                                                            varient_texture_set["color_primary"] = ColorInfo[color_tex_varient]["R"]
-                                                            varient_texture_set["color_secondary"] =  (1.0, 1.0, 1.0, 1.0)
-                                                            varient_texture_set["color_tertiary"] = (1.0, 1.0, 1.0, 1.0)
+                                                            global_color_path = CheckAndFormatPath(save_path, "INPUT/GlobalColorList.json")
+                                                            globalColorInfo = json.load(open(global_color_path))
+                                                            print(globalColorInfo[color_tex_varient])
+                                                            #varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
+                                                            varient_texture_set["color_style"] = globalColorInfo[color_tex_varient]["ComonName"]
+                                                            varient_texture_set["color_primary"] = globalColorInfo[color_tex_varient]["R"]
+                                                            varient_texture_set["color_secondary"] =  globalColorInfo[color_tex_varient]["G"]
+                                                            varient_texture_set["color_tertiary"] = globalColorInfo[color_tex_varient]["B"]
                                                             varient_coll.children.link(varient_texture_set)
                                                             for char in list(characterCollectionDict.keys()):
                                                                 col = bpy.data.collections.new(varient + "_" + texture_set + color_tex_varient + "_" + char)
