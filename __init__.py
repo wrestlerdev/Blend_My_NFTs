@@ -735,7 +735,7 @@ class loadDirectory(bpy.types.Operator):
         bpy.context.scene.my_tool.CurrentBatchIndex = 1
         bpy.context.scene.my_tool.loadNFTIndex = 1
         bpy.context.scene.my_tool.BatchSliderIndex = 1
-        if os.path.exists(batch_path):
+        if os.path.exists(batch_path) and os.path.exists(NFTRecord_save_path):
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         else:
             LoadNFT.init_batch(batch_json_save_path)
