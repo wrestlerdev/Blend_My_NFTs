@@ -412,16 +412,16 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
             #ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
             ColorID = ['#111111'] * 3
-            SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), ColorGen.styleChoice, ColorID[0], ColorID[1], ColorID[2]])
+            SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
 
             # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
             #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
             TextureVarientDict = {}
             current_entry = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]
-            current_entry["color_style"] = ColorGen.styleChoice
-            current_entry["color_primary"] = ColorID[0]
-            current_entry["color_secondary"] = ColorID[1]
-            current_entry["color_tertiary"] = ColorID[2]
+            #current_entry["color_style"] = ColorGen.styleChoice
+            #current_entry["color_primary"] = ColorID[0]
+            #current_entry["color_secondary"] = ColorID[1]
+            #current_entry["color_tertiary"] = ColorID[2]
             TextureVarientDict[textureChoosen] = current_entry
             ItemsUsed[attribute] = TextureVarientDict
 

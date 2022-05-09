@@ -344,10 +344,11 @@ def create_item_dict(DNA): # make dict from DNA to save to file
          texturevariant_dict = {}
          coll_index = coll_keys[strand]
          uh_info = uhierarchy[coll_index][atttype[0]][variant[0]][texture]
-         uh_info["color_style"] = DNASplit[3]
-         uh_info["color_primary"] = DNASplit[4]
-         uh_info["color_secondary"] = DNASplit[5]
-         uh_info["color_tertiary"] = DNASplit[6]
+         print(uh_info)
+         # uh_info["color_style"] = DNASplit[3]
+         # uh_info["color_primary"] = DNASplit[4]
+         # uh_info["color_secondary"] = DNASplit[5]
+         # uh_info["color_tertiary"] = DNASplit[6]
          texturevariant_dict[texture] = uh_info
          item_dict[coll_keys[strand]] = texturevariant_dict
    nft_dict = {}
