@@ -299,7 +299,6 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
                 file_type = '3DMODELS'
                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
-        save_metadata_file(nft_name)
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
     return
 
