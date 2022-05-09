@@ -86,7 +86,7 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
       """
       Returns the "order", "type_rarity", varient_rarity and texture rarity
       """
-      a = [''] * 4
+      a = [''] * 8
       a[0] = i.rsplit('_', 1)[1]
       
       if(attributeTypeColl.get('rarity') is not None):
@@ -103,6 +103,11 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
          a[3] = attributeTextureColl.get('rarity')
       else:
          a[3] = attributeTextureColl['rarity'] = 50
+
+      a[4] = attributeTextureColl["color_style"]
+      a[5] = attributeTextureColl["color_primary"]
+      a[6] = attributeTextureColl["color_secondary"]
+      a[7] = attributeTextureColl["color_tertiary"]
 
       # x = re.sub(r'[a-zA-Z]', "", i)
       # a = x.split("_")
@@ -129,6 +134,10 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
       clothingGenre = name[1]
       clothingItem = name[2]
       textureSet = get_textureSet()
+      colorstyle = name[4]
+      colorprimary = name[5]
+      colorseoncdary = name[6]
+      colortertiary = name[7]
 
       if(clothingGenre != "Null"):
          type_rarity = orderRarity[1]
@@ -139,9 +148,12 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
          variant_rarity = 0.0
          texture_rarity = 0.0
 
+
+
       
       
       eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingVersion": number,
-                     "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": variant_rarity, "type_rarity": type_rarity}
+                     "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": variant_rarity, "type_rarity": type_rarity, 
+                     "color_style": colorstyle, "color_primary": colorprimary, "color_secondary": colorseoncdary, "color_tertiary": colortertiary }
       
    return eachObject

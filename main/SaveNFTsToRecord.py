@@ -293,13 +293,13 @@ def CreateSlotsFolderHierarchy(save_path):
                                                         print(list( ColorInfo.keys() ))
                                                         for color_tex_varient in list( ColorInfo.keys() ):
                                                             varient_texture_set = bpy.data.collections.new(varient + "_" + color_tex_varient)
-                                                            varient_texture_set["colorName"] = ColorInfo[color_tex_varient]["ComonName"]
+                                                            varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
                                                             varient_texture_set["color_primary"] = ColorInfo[color_tex_varient]["R"]
                                                             varient_texture_set["color_secondary"] =  (1.0, 1.0, 1.0, 1.0)
                                                             varient_texture_set["color_tertiary"] = (1.0, 1.0, 1.0, 1.0)
                                                             varient_coll.children.link(varient_texture_set)
                                                             for char in list(characterCollectionDict.keys()):
-                                                                col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
+                                                                col = bpy.data.collections.new(varient + "_" + color_tex_varient + "_" + char)
                                                                 varient_texture_set.children.link(col)
                                                                 for child in characterCollectionDict[char].objects:
                                                                     new_object = child.copy()                                                
