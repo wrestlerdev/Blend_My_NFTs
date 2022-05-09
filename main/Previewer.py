@@ -38,6 +38,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
    show_character(character)
+   print(hierarchy)
    for attribute in hierarchy: # hide all
       for type in hierarchy[attribute]:
             for variant in hierarchy[attribute][type]:
@@ -378,24 +379,23 @@ def set_armature_for_meshes(character, meshes):
 
 
 def get_hierarchy_ordered(index=0):
+   if not index:
+         index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
    if os.path.exists(NFTRecord_save_path):
-      if not index:
-         index = bpy.context.scene.my_tool.CurrentBatchIndex
       DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
       hierarchy = DataDictionary["hierarchy"]
-      hierarchy
       return hierarchy
    return None
 
 
 def get_hierarchy_unordered(index=0):
+   if not index:
+         index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))      
    if os.path.exists(NFTRecord_save_path):
-      if not index:
-         index = bpy.context.scene.my_tool.CurrentBatchIndex
       DataDictionary = json.load(open(NFTRecord_save_path))
       hierarchy = DataDictionary["hierarchy"]
       return hierarchy
