@@ -22,7 +22,7 @@ import importlib
 from .main import config
 # Import files from main directory:
 
-importList = ['ArtistUI', 'Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
+importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
 
 if bpy in locals():
         importlib.reload(LoadNFT)
@@ -33,7 +33,6 @@ if bpy in locals():
         importlib.reload(get_combinations)
         importlib.reload(SaveNFTsToRecord)
         importlib.reload(UIList)
-        importlib.reload(ArtistUI)
 else:
     from .main import \
         LoadNFT, \
@@ -42,8 +41,7 @@ else:
         Exporter, \
         Batch_Refactorer, \
         SaveNFTsToRecord, \
-        get_combinations, \
-        ArtistUI
+        get_combinations
 
     from .ui_Lists import UIList
 
@@ -297,7 +295,10 @@ class initializeRecord(bpy.types.Operator):
         original_hierarchy = Exporter.Previewer.get_hierarchy_unordered(1)
         LoadNFT.init_batch(output_save_path)
         # DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path)
-        DNA_Generator.save_rarity_To_Record(original_hierarchy, first_nftrecord_save_path)
+        if original_hierarchy != None:
+            DNA_Generator.save_rarity_To_Record(original_hierarchy, first_nftrecord_save_path)
+        else:
+            DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path)
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
         LoadNFT.update_current_batch(1, output_save_path)
         LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
@@ -375,6 +376,7 @@ class clearSlots(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         lastDNA = bpy.context.scene.my_tool.inputDNA
         DNASplit = lastDNA.split(',')
         character = DNASplit.pop(0)
@@ -584,6 +586,9 @@ class loadBatch(bpy.types.Operator):
     bl_description = "Load Batch data based on slider index"
     bl_options = {"REGISTER", "UNDO"}
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
     def execute(self, context):
         index = bpy.context.scene.my_tool.BatchSliderIndex
         LoadNFT.check_if_paths_exist(index)
@@ -617,6 +622,9 @@ class saveBatch(bpy.types.Operator):
     bl_description = "Save and overwrite current Batch data to the current Batch"
     bl_options = {"REGISTER", "UNDO"}
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
@@ -636,6 +644,9 @@ class saveNewBatch(bpy.types.Operator):
     bl_label = "Save as New Batch"
     bl_description = "Save current Batch data to a new Batch"
     bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
@@ -664,6 +675,7 @@ class swapCharacter(bpy.types.Operator):
     bl_description = "Change current preview to"
 
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         DNA = bpy.context.scene.my_tool.inputDNA
         DNAString = DNA.split(',')
         DNAString[0] = self.character_name
@@ -798,6 +810,7 @@ class renderBatch(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
         export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
         export_path = os.path.join(export_path, "Blend_My_NFTs Output")
@@ -1019,9 +1032,6 @@ class WCUSTOM_PT_FCreateData(bpy.types.Panel):
         mytool = scene.my_tool
 
 
-        row = layout.row()
-        row.prop(mytool, "maxNFTs")
-        row.operator(createBatch.bl_idname, text=createBatch.bl_label)
 
 
 
@@ -1041,10 +1051,18 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
+        row = layout.separator(factor=0.25)
         row = layout.row()
-        row = layout.row()
+        row.prop(mytool, "maxNFTs")
+        row.operator(createBatch.bl_idname, text=createBatch.bl_label)
+
+
+        row = layout.separator()
+        box = layout.box()
+        row = box.row()
         row.operator(saveCurrentNFT.bl_idname, text=saveCurrentNFT.bl_label)
         row.operator(saveNewNFT.bl_idname, text=saveNewNFT.bl_label)
+
 
        
 
@@ -1271,9 +1289,9 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
             batch_path = bpy.context.scene.my_tool.batch_json_save_path
             row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(os.listdir(batch_path)) - 1))
         else:
-            row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
-        row = layout.row()
-        row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+            # row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
+            row.label(text="Please create or load directory")
+
         row = layout.row()
         row.prop(mytool, "BatchSliderIndex")
 
@@ -1300,14 +1318,23 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row.operator(chooseRootFolder.bl_idname, text=chooseRootFolder.bl_label)
 
         row = layout.row()
+        row.label(text="Current loaded directory:")
+        row = layout.row()
+        output_path = os.path.abspath(os.path.join(mytool.batch_json_save_path, '..\..'))
+        row.label(text=output_path)
+
+        row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
+
+        row = layout.row()
+        row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
 
         row = layout.row()
         row = layout.row()
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
 
-        row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
-        row.operator(createCharacterCollections.bl_idname, text=createCharacterCollections.bl_label)
+        # row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
+        # row.operator(createCharacterCollections.bl_idname, text=createCharacterCollections.bl_label)
 
 
 
@@ -1439,8 +1466,8 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                 row = layout.row()
 
             layout.separator()
-
-            layout.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
+            box = layout.box()
+            box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 
 #-------------------------------------------
@@ -1461,7 +1488,7 @@ class WCUSTOM_PT_CreateMetadata(bpy.types.Panel):
 
         export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
         if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
-            row.operator(exportMetadata.bl_idname, text=exportMetadata.bl_label)
+            row.operator(exportMetadata.bl_idname, text=exportMetadata.bl_label, emboss=False)
 
 #------------------------------------
 
@@ -1480,12 +1507,13 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row = layout.row()
         row.label(text="Collections:")
         row = layout.row()
+        
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
         row = layout.row()
-        row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
-        row = layout.row()
-        row.operator(createCharacterCollections.bl_idname, text=createCharacterCollections.bl_label)
-        row = layout.row()
+        # row.operator(organizeScene.bl_idname, text=organizeScene.bl_label)
+        # row = layout.row()
+        # row.operator(createCharacterCollections.bl_idname, text=createCharacterCollections.bl_label)
+        # row = layout.row()
 
         row.label(text="Clean up:")
         row = layout.row()
@@ -1553,7 +1581,7 @@ classes = (
     WCUSTOM_PT_EditBatch,
     WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_PreviewNFTs,
-    WCUSTOM_PT_FCreateData,
+    # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
