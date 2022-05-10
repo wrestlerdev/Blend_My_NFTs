@@ -29,6 +29,16 @@ def read_DNAList_from_file(batch_index, index): # return DNA as string
     else:
         return len(DNAList), ''
 
+
+def get_all_DNA_from_batch(index):
+    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+    DataDictionary = json.load(open(NFTRecord_save_path))
+    DNAList = DataDictionary["DNAList"]
+
+    return DNAList
+
+
 def get_total_DNA(): # get number of saved DNAs
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
@@ -126,8 +136,8 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
     return
 
 
-def save_collection_rarity_property(index, NFTRecord_save_path, batch_path): # save current rarity from collections to record
-    dir_name = 'Batch_{:03d}'.format(index)
+def save_collection_rarity_property(index, NFTRecord_save_path, batch_path):    # save current rarity from collections to record
+    dir_name = 'Batch_{:03d}'.format(index)                                     # redundant now?
     dir_path = os.path.join(batch_path, dir_name)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)

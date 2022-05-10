@@ -577,6 +577,28 @@ class deleteNFT(bpy.types.Operator):
 
 
 
+class deleteAllNFTs(bpy.types.Operator):
+    bl_idname = 'delete.allnfts'
+    bl_label = 'Delete All NFTs'
+    bl_description = "This will delete all NFTS from the current Batch. u sure bud?"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self,context):
+        batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
+        TotalDNA = LoadNFT.get_all_DNA_from_batch(batch_index)
+        master_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "_NFTRecord.json")
+
+
+        if len(TotalDNA) > 0:
+            SaveNFTsToRecord.DeleteAllNFTs(TotalDNA, nft_save_path, batch_index, master_save_path)
+        else:
+            print(">:^(")
+        return {'FINISHED'}
+
 #-------------------------------
 
 
@@ -1286,7 +1308,8 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
         row.operator(loadNextNFT.bl_idname, text=loadNextNFT.bl_label)
 
         row = layout.row()
-        row.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label)
+        row.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
+        row.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
         return
 
 
@@ -1327,7 +1350,7 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
         row = layout.row()
-        row.operator(resetBatch.bl_idname, text=resetBatch.bl_label)
+        row.operator(resetBatch.bl_idname, text=resetBatch.bl_label, emboss=False)
 
 
 
@@ -1652,6 +1675,7 @@ classes = (
     chooseRootFolder,
     loadDirectory,
     deleteNFT,
+    deleteAllNFTs,
     createSlotFolders,
     organizeScene,
     createCharacterCollections,

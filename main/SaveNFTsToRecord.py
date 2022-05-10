@@ -130,6 +130,12 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     return True
 
 
+def DeleteAllNFTs(TotalDNA, save_path, batch_index, master_record_save_path):
+    for index in range(len(TotalDNA), 0, -1):
+        DNA = TotalDNA[index - 1]
+        DeleteNFT(DNA, save_path, batch_index, master_record_save_path)
+    return
+
 
 def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
     NFTRecord_save_path = os.path.join(save_path, "_NFTRecord_{:03d}.json".format(batch_index))
