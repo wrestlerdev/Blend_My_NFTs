@@ -77,6 +77,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
             for child in texture_children:
                if child.name.split('_')[-1] == character:
                   meshes = child.objects
+                  print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB {}".format(child))
                   child.hide_viewport = False
                   child.hide_render = False
                else:

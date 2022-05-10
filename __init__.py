@@ -231,6 +231,11 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.textureindex_has_been_updated("textureSetIndex", "lastSetIndex"))
     lastSetIndex: bpy.props.StringProperty(default="A")
 
+    RTint: bpy.props.FloatVectorProperty(name="R Tint", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
+    GTint: bpy.props.FloatVectorProperty(name="G Tint", subtype="COLOR", default=(0.0,1.0,0.0,1.0), size=4, min=0.0, max=1)
+    BTint: bpy.props.FloatVectorProperty(name="B Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
+
+    colorStyleName: bpy.props.StringProperty(name="Colour Style Name", default="wah")
 
 def make_directories(save_path):
     Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
@@ -1010,9 +1015,38 @@ class addNewColourStyle(bpy.types.Operator):
     bl_description = 'Append new colour style to colour list'
     bl_options = {'REGISTER', 'UNDO'}
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
     def execute(self, context):
         print(">:3c")
         self.report({'INFO'}, '>:3c')
+        return {'FINISHED'}
+
+class updateColourStyle(bpy.types.Operator):
+    bl_idname = 'update.colorstyle'
+    bl_label = 'Update Colour Style'
+    bl_description = 'This will overwrite the current colour style, are you sure?'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+
+class deleteColourStyle(bpy.types.Operator):
+    bl_idname = 'delete.colorstyle'
+    bl_label = 'Delete Colour Style'
+    bl_description = 'This cannot be undone, are you sure?'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+
         return {'FINISHED'}
 
 
@@ -1546,7 +1580,7 @@ class WCUSTOM_PT_CreateMetadata(bpy.types.Panel):
 
         export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
         if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
-            row.operator(exportMetadata.bl_idname, text=exportMetadata.bl_label, emboss=False)
+            row.operator(exportMetadata.bl_idname, text=exportMetadata.bl_label, emboss=True)
 
 #------------------------------------
 
@@ -1595,7 +1629,9 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
 
         row = layout.row()
         box = row.box()
-        box.label(text="wrow")
+        box.label(text="Some text here as instructions?")
+
+        layout.separator()
 
         row = layout.row()
         row.operator(prevColorStyle.bl_idname, text=prevColorStyle.bl_label)
@@ -1608,10 +1644,30 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.prop(mytool, "textureSetIndex", text='')
         row.operator(nextTextureSet.bl_idname, text=nextTextureSet.bl_label)
 
-        row = layout.row()
-        row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
-        
+        layout.separator()
 
+        box = layout.box()
+        row = box.row()
+        row.label(text="Color Style Name")
+        row.prop(mytool, "colorStyleName", text="")
+
+        layout.separator()
+
+        row = layout.row()
+        row.prop(mytool, "RTint", text="Red Tint")
+        row = layout.row()
+        row.prop(mytool, "GTint", text="Green Tint")
+        row = layout.row()
+        row.prop(mytool, "BTint", text="Blue Tint")
+
+        layout.separator()
+        box = layout.box()
+
+        row = box.row()
+        row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
+        row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
+        row = box.row()
+        row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
         
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
@@ -1685,10 +1741,12 @@ classes = (
     purgeData,
     exportMetadata,
     addNewColourStyle,
+    updateColourStyle,
     nextColorStyle,
     prevColorStyle,
     nextTextureSet,
-    prevTextureSet
+    prevTextureSet,
+    deleteColourStyle
 
 )
 
