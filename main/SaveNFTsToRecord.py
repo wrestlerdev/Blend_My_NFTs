@@ -227,17 +227,17 @@ def CreateSlotsFolderHierarchy(save_path):
                 #Set Up NUll texture slot
                 slot_col_type = bpy.data.collections.new("00-" + slot.partition('-')[2] + "Null" )
                 slot_coll.children.link(slot_col_type)
-                slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000")
+                slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_000_" + "Null" )
                 slot_col_type.children.link(slot_col_var)
                 characterCollectionDict = {}
                 for char in config.Characters:
-                    varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + char)
+                    varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2]+ "_000_" + "Null_"  + char)
                     characterCollectionDict[char] = varient_coll_char
                     new_object = bpy.context.scene.objects["BLANK"].copy()                                                
                     varient_coll_char.objects.link(new_object)
                     slot_col_var.children.link(varient_coll_char)
                     
-                varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + "A000")
+                varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_000_" + "Null_" +  "A000")
                 slot_col_var.children.link(varient_coll_texture)
                 for char in config.Characters:
                     char_tex_col = characterCollectionDict[char].copy()
