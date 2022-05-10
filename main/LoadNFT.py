@@ -51,7 +51,7 @@ def init_batch(batch_data_path): # delete all batch data then create first batch
 
 
 def update_collection_rarity_property(NFTRecord_save_path): # update rarity value for in scene collections
-    DataDictionary = json.load(open(NFTRecord_save_path))
+    DataDictionary = json.load(open(NFTRecord_save_path)) # sets any collection not in hierarchy as rarity = 0
     hierarchy = DataDictionary["hierarchy"]
 
     slots = list(hierarchy.keys())
@@ -64,10 +64,16 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
             variants = list(hierarchy[slot][type].keys())
             #This checks if a type has any varinets in it BETA_1.0
             if len(variants) > 0:
-                #This checks if a varients has any texture sets in it BETA_1.0 
-                if len(list(hierarchy[slot][type][variants[0]].keys())) > 0:
-                    first_texture = list(hierarchy[slot][type][variants[0]].keys())[0]
-                    type_rarity = hierarchy[slot][type][variants[0]][first_texture]["type_rarity"]
+                #This checks if a varients has any texture sets in it BETA_1.0
+                for h_variant in variants:
+                    h_variant_exists = False
+                    if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
+                        h_variant_exists = True
+                        break
+                if h_variant_exists:
+                # if len(list(hierarchy[slot][type][variants[0]].keys())) > 0 or len(list(hierarchy[slot][type][variant].keys())) > 0:
+                    first_texture = list(hierarchy[slot][type][h_variant].keys())[0]
+                    type_rarity = hierarchy[slot][type][h_variant][first_texture]["type_rarity"]
                     if type in types:
                         scene_type_coll["rarity"] =  int(float(type_rarity))
                         update_rarity_color(type, type_rarity)
@@ -89,6 +95,7 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                         else:
                             update_rarity_color(variant, 0)
                             scene_var_coll["rarity"] = 0
+
                             textures = []
                         scene_tex_colls = scene_var_coll.children
                         for scene_text_coll in scene_tex_colls:
@@ -101,10 +108,20 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                                 scene_text_coll["rarity"] = 0
                                 update_rarity_color(texture, 0)
                 else: # BETA_1.0
-                    scene_var_coll["rarity"] = 0
-                    update_rarity_color(variant, 0)
+                    current_var_coll = bpy.data.collections[h_variant]
+                    # current_var_coll["rarity"] = 0
+                    # scene_type_coll["rarity"] = 0
+                    if current_var_coll.get("rarity") is not None:
+                        del(current_var_coll["rarity"])
+                    if scene_type_coll.get("rarity") is not None:
+                        del(scene_type_coll["rarity"])
+                    
+                    update_rarity_color(type, 0)
+                    update_rarity_color(h_variant, 0)
             else: # BETA_1.0
-                scene_type_coll["rarity"] = 0
+                if scene_type_coll.get("rarity") is not None:
+                    del(scene_type_coll["rarity"])
+                # scene_type_coll["rarity"] = 0
                 update_rarity_color(type, 0)
     return
 

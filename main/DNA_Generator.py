@@ -378,6 +378,31 @@ def send_To_Record_JSON(NFTRecord_save_path):
    return DataDictionary
 
 
+def create_default_rarity_Record(NFTRecord_save_path):
+   DataDictionary = {}
+   DataDictionary["numNFTsGenerated"] = 0
+   hierarchy = NFTHirachy.createHirachy()
+   DataDictionary["DNAList"] = []
+
+   for slot in list(hierarchy.keys()):
+      for type in list(hierarchy[slot].keys()):
+         for variant in list(hierarchy[slot][type].keys()):
+            for texture in list(hierarchy[slot][type][variant].keys()):
+               hierarchy[slot][type][variant][texture]["texture_rarity"] = 50
+               hierarchy[slot][type][variant][texture]["variant_rarity"] = 50
+               hierarchy[slot][type][variant][texture]["type_rarity"] = 50
+   DataDictionary["hierarchy"] = hierarchy
+
+   try:
+      ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
+      print("woo")
+      with open(NFTRecord_save_path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+   except:
+      print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
+
+   return DataDictionary
+
 def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
    # OriginalDictionary = json.load(open(NFTRecord_save_path))
    # original_hierarchy = OriginalDictionary["hierarchy"]

@@ -634,7 +634,8 @@ class saveBatch(bpy.types.Operator):
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
 
-        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
+        # LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
+        LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
 
@@ -658,11 +659,37 @@ class saveNewBatch(bpy.types.Operator):
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
-        LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
+        # LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
+        LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
         bpy.context.scene.my_tool.BatchSliderIndex = index
         return {'FINISHED'}
 
+
+
+class resetBatch(bpy.types.Operator):
+    bl_idname = 'reset.batch'
+    bl_label = "Reset Batch"
+    bl_description = "This will reset the Batch at index. This cannot be undone"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        batch_index = bpy.context.scene.my_tool.BatchSliderIndex
+        LoadNFT.check_if_paths_exist(batch_index)
+        batch_path = bpy.context.scene.my_tool.batch_json_save_path
+        total_batches = len(os.listdir(batch_path)) - 1
+
+        if batch_index > total_batches:
+            self.report({"ERROR"}, "Failed: Invalid batch to reset")
+            return {'FINISHED'}
+
+        nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+        DNA_Generator.create_default_rarity_Record(nftrecord_path)
+        LoadNFT.update_collection_rarity_property(nftrecord_path)
+        return {'FINISHED'}
 
 #----------------------------------------------------------------
 
@@ -1295,10 +1322,13 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "BatchSliderIndex")
 
-        row = layout.row()
         row.operator(loadBatch.bl_idname, text=loadBatch.bl_label)
+        row = layout.row()
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
+        row = layout.row()
+        row.operator(resetBatch.bl_idname, text=resetBatch.bl_label)
+
 
 
 class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
@@ -1606,6 +1636,7 @@ classes = (
     loadBatch,
     saveBatch,
     saveNewBatch,
+    resetBatch,
     randomizeModel,
     randomizeColor,
     clearSlots,
