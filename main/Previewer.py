@@ -57,11 +57,6 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       texture = list(variant[1].items())[int(texture_index)][0]
       texture_children = bpy.data.collections[texture].children
 
-      # if len(DNASplit) > 3:
-      #    style = DNASplit[3]
-      #    hex_01 = DNASplit[4]
-      #    hex_02 = DNASplit[5]
-      #    hex_03 = DNASplit[6]
 
       if texture_children:
          for child in texture_children:
@@ -79,19 +74,6 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       if meshes:
          set_armature_for_meshes(character, meshes)
 
-         # for mesh in meshes:
-            # obj = bpy.data.objects[mesh.name]
-            # col_01 = Color(HexToRGB(hex_01))
-            # col_02 = Color(HexToRGB(hex_02))
-            # col_03 = Color(HexToRGB(hex_03))
-            # obj["TestColor"] = col_01
-            # obj["R"] = col_01
-            # obj["G"] = col_02
-            # obj["B"] = col_03
-            # obj.hide_viewport = False
-            # obj.hide_render = False
-
-
       bpy.data.collections[variant[0]].hide_viewport = False
       bpy.data.collections[variant[0]].hide_render = False
 
@@ -104,9 +86,8 @@ def get_null_dna(character="Kae"):
    hierarchy = get_hierarchy_unordered()
    DNASplit = [character]
    for slot in list(hierarchy.keys()):
-      color = '-a-#FFFFFF-#FFFFFF-#FFFFFF'
       null_strand = '0-0-0'
-      DNASplit.append(null_strand + color)
+      DNASplit.append(null_strand)
       # DNASplit.append(null_strand)
    DNA = ','.join(DNASplit)
    return DNA
@@ -124,7 +105,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
       variant_child = bpy.data.collections[variant_name].children[0]
       texture_name = variant_child.name
 
-   else: # get variant name by stripping out texture
+   else: # get variant name by stripping out texture/color
       print("is this a texture var?")
       texture_name = variant_name
       variant_split = variant_name.split('_')
@@ -139,13 +120,6 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    lastDNA = bpy.context.scene.my_tool.lastDNA
    DNAString = lastDNA.split(",")
    character = DNAString.pop(0)
-
-   hierarchy = get_hierarchy_unordered()
-   attributeskeys = list(hierarchy.keys())
-   attributes_index = attributeskeys.index(slot_coll.name)
-
-   DNAStrand = DNAString[attributes_index]
-   DNASplit = DNAStrand.split('-')
 
    for type_coll in slot_coll.children: # get type,variant,texture index by going through collection hierarchy
       if variant_name in type_coll.children:
@@ -172,9 +146,6 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
             for texture_coll in variant_coll.children:
                texture_coll.hide_render = True
                texture_coll.hide_viewport = True
-            # for variant_mesh in var_coll.objects: # placeholder
-            #    variant_mesh.hide_render = True
-            #    variant_mesh.hide_viewport = False
 
       var_coll.hide_render = False
       var_coll.hide_viewport = False
@@ -193,14 +164,6 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
       else:
          meshes = bpy.data.collections.get(texture_name).objects # if character texture variant doesnt exist
          # mesh set armature?
-      # for mesh in meshes:
-      #    obj = bpy.data.objects[mesh.name]
-      #    obj["TestColor"] = HexToRGB(last_color[1])
-      #    obj["R"] = HexToRGB(last_color[1])
-      #    obj["G"] = HexToRGB(last_color[2])
-      #    obj["B"] = HexToRGB(last_color[3])
-      #    obj.hide_viewport = False
-      #    obj.hide_render = False
 
    return new_dna_strand # return dna strand or empty string if not valid
 
@@ -328,11 +291,8 @@ def create_item_dict(DNA): # make dict from DNA to save to file
          
          texturevariant_dict = {}
          coll_index = coll_keys[strand]
-         uh_info = uhierarchy[coll_index][atttype[0]][variant[0]][texture]
-         # uh_info["color_style"] = DNASplit[3]
-         # uh_info["color_primary"] = DNASplit[4]
-         # uh_info["color_secondary"] = DNASplit[5]
-         # uh_info["color_tertiary"] = DNASplit[6]
+         uh_info = uhierarchy[coll_index][atttype[0]][variant[0]][texture] # add color info too here
+
          texturevariant_dict[texture] = uh_info
          item_dict[coll_keys[strand]] = texturevariant_dict
    nft_dict = {}

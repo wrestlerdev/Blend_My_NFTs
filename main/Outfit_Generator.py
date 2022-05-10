@@ -102,11 +102,6 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
     newDNASplit = [DNASplit[0], DNASplit[1], DNASplit[2]]
 
     if not (newDNASplit[0] == 0 and newDNASplit[1] == 0): # if not null
-        if len(DNASplit) > 3: # append color style
-            newDNASplit.append(DNASplit[3])
-        else:
-            newDNASplit.append(get_style())
-
 
         slot = bpy.context.scene.my_tool[inputSlot]
         col = (random.random(), random.random(), random.random())
@@ -130,12 +125,6 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
             obj.hide_viewport = False
             obj.hide_render = False
             hex = ColorGen.RGBtoHex((col))
-
-
-        if len(DNASplit) > 2:
-            newDNASplit.extend([hex, DNASplit[5], DNASplit[6]])
-        else:
-            newDNASplit.extend([hex, hex, hex])
 
         newDNAStrand = '-'.join(newDNASplit)
         newDNAString = copy.deepcopy(DNAString)
@@ -307,13 +296,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         bpy.data.collections.get(texture).hide_render = True
 
                         
-                    for varient_mesh in bpy.data.collections[varient].objects: # placeholder
+                    for varient_mesh in bpy.data.collections[varient].objects: # CHECK THIS placeholder
                         varient_mesh.hide_render = True
-                        varient_mesh.hide_viewport = True # CHECK THIS
-                        # should this hide viewport
+                        varient_mesh.hide_viewport = True
 
-
-        
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
         ItemsUsed = {}
 

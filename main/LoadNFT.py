@@ -65,7 +65,6 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
     hierarchy = DataDictionary["hierarchy"]
 
     slots = list(hierarchy.keys())
-    # scene_slot_colls = bpy.data.collections[slot].children
     for slot in slots:
         types = list(hierarchy[slot].keys())
         scene_type_colls = bpy.data.collections[slot].children
@@ -75,13 +74,12 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
             #This checks if a type has any varinets in it BETA_1.0
             if len(variants) > 0:
                 #This checks if a varients has any texture sets in it BETA_1.0
-                for h_variant in variants:
-                    h_variant_exists = False
+                for h_variant in variants: # check if any valid variants do exist
+                    h_variant_exists = False # hierarchy variant
                     if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
                         h_variant_exists = True
                         break
-                if h_variant_exists:
-                # if len(list(hierarchy[slot][type][variants[0]].keys())) > 0 or len(list(hierarchy[slot][type][variant].keys())) > 0:
+                if h_variant_exists: #
                     first_texture = list(hierarchy[slot][type][h_variant].keys())[0]
                     type_rarity = hierarchy[slot][type][h_variant][first_texture]["type_rarity"]
                     if type in types:
@@ -100,13 +98,12 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                             variant_rarity = hierarchy[slot][type][variant][first_texture]["variant_rarity"]
                             update_rarity_color(variant, int(float(variant_rarity)))
                             scene_var_coll["rarity"] = int(float(variant_rarity))
-                        
                             textures = list(hierarchy[slot][type][variant].keys())
                         else:
                             update_rarity_color(variant, 0)
                             scene_var_coll["rarity"] = 0
-
                             textures = []
+
                         scene_tex_colls = scene_var_coll.children
                         for scene_text_coll in scene_tex_colls:
                             texture = scene_text_coll.name
@@ -117,10 +114,8 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                             else:
                                 scene_text_coll["rarity"] = 0
                                 update_rarity_color(texture, 0)
-                else: # BETA_1.0
+                else: # BETA_1.0 || has no textures so is not a valid collection
                     current_var_coll = bpy.data.collections[h_variant]
-                    # current_var_coll["rarity"] = 0
-                    # scene_type_coll["rarity"] = 0
                     if current_var_coll.get("rarity") is not None:
                         del(current_var_coll["rarity"])
                     if scene_type_coll.get("rarity") is not None:
@@ -131,7 +126,6 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
             else: # BETA_1.0
                 if scene_type_coll.get("rarity") is not None:
                     del(scene_type_coll["rarity"])
-                # scene_type_coll["rarity"] = 0
                 update_rarity_color(type, 0)
     return
 
@@ -232,11 +226,8 @@ def update_current_batch(index, batch_path): # updates current batch record path
 
 
 def check_if_paths_exist(batch_num=1): # may be redundant now
-    root_output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output", "OUTPUT")
     if bpy.context.scene.my_tool.batch_json_save_path == '':
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
         Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
         bpy.context.scene.my_tool.batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "OUTPUT")
         bpy.context.scene.my_tool.CurrentBatchIndex = batch_num
-    # elif root_output_path != bpy.context.scene.my_tool.batch_json_save_path:
-    #     bpy.context.scene.my_tool.batch_json_save_path = root_output_path
