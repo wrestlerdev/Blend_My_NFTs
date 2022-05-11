@@ -347,7 +347,7 @@ def SetUpObjectMaterialsAndTextures(parent, obj, texture_path):
         for node in matcopy.node_tree.nodes:
             if (node.label == "Diffuse"):
                 for tex in os.listdir(texture_path):
-                    if "_D_" in tex:
+                    if "D_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         print(file)
                         file = file.replace('/', '\\')
@@ -356,7 +356,28 @@ def SetUpObjectMaterialsAndTextures(parent, obj, texture_path):
                         node.image = newImage
             if node.label == "Normal":
                 for tex in os.listdir(texture_path):
-                    if "_N_" in tex:
+                    if "N_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+            if node.label == "ColorID":
+                for tex in os.listdir(texture_path):
+                    if "ID_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+            if node.label == "Metallic":
+                for tex in os.listdir(texture_path):
+                    if "M_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+            if node.label == "Roughness":
+                for tex in os.listdir(texture_path):
+                    if "R_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         file = file.replace('/', '\\')
                         newImage = bpy.data.images.load(file, check_existing=True)
