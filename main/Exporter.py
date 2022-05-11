@@ -313,8 +313,9 @@ def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, 
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
-    name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
-    nft_name = name_prefix + "{:04d}".format(total_index)
+    # name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+    # nft_name = name_prefix + "{:04d}".format(total_index)
+    nft_name = file_name[:-len(".json")]
 
     image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
     Previewer.show_nft_from_dna(DNA)
@@ -340,8 +341,9 @@ def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDN
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
-    name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
-    nft_name = name_prefix + "{:04d}.mp4".format(total_index)
+    # name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+    # nft_name = name_prefix + "{:04d}.mp4".format(total_index)
+    nft_name = file_name[:-len(".json")] + ".mp4"
     Previewer.show_nft_from_dna(DNA)
 
     video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
@@ -370,8 +372,9 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Generating 3D Model: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
-    name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
-    nft_name = name_prefix + "{:04d}".format(total_index)
+    # name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
+    # nft_name = name_prefix + "{:04d}".format(total_index)
+    nft_name = file_name[:-len(".json")]
     modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
 
     Previewer.show_nft_from_dna(DNA)
@@ -566,6 +569,63 @@ def save_all_metadata_files(output_path):
     print("{} metadata files have been created".format(count))
     return
 
+
+
+# ------------------------------- Refactor Exports ---------------------------
+
+def refactor_all_batches(batches_path, master_record_path):
+    nft_num = 1
+    batches = len(next(os.walk(batches_path))[1])
+
+    for i in range(batches):
+        batch_path = os.path.join(batches_path, "Batch_{:03d}".format(i + 1))
+        nft_num = refactor_single_batch(batch_path, i+1, master_record_path, nft_num)
+    return
+
+def refactor_single_batch(batch_path, batch_index, master_record_path, nft_num):
+    nfts = len(next(os.walk(batch_path))[1])
+
+    for i in range(nfts):
+        nft_path = os.path.join(batch_path, "NFT_{:04d}".format(i + 1))
+        prefix = "Batch_{:03d}_NFT_{:04d}".format(batch_index, i + 1)
+        refactor_single_nft(nft_path, prefix, nft_num)
+        nft_num += 1
+    return nft_num
+
+def refactor_single_nft(folder_path, prefix, number):
+
+    files = os.listdir(folder_path)
+    for old_file in files:
+        if prefix in old_file:
+            new_prefix = bpy.context.scene.my_tool.renderPrefix
+            file_name = new_prefix + "{:04d}".format(number)
+            suffix = old_file[len(prefix):]
+            new_file_name = file_name + suffix
+            if suffix == ".json":
+                save_filename_to_record(os.path.join(folder_path, old_file), old_file)
+
+            old_path = os.path.join(folder_path, old_file)
+            new_path = os.path.join(folder_path, new_file_name)
+            # print("")
+            # print("old path: {}".format(old_path))
+            # print("new path: {}".format(new_path))
+            os.rename(old_path, new_path)
+            
+        else:
+            print("already renamed images?")
+            
+    return
+
+def save_filename_to_record(nftrecord_path, old_name):
+    if os.path.exists(nftrecord_path):
+        record = json.load(open(nftrecord_path))
+        record["OldFileName"] = old_name
+
+        recordObj = json.dumps(record, indent=1, ensure_ascii=True)
+        with open(nftrecord_path, "w") as outfile:
+                outfile.write(recordObj)
+
+    return
 
 if __name__ == '__main__':
     render_and_save_NFTs()
