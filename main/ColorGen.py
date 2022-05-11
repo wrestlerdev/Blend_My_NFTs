@@ -296,3 +296,96 @@ def RGBtoHex(vals, rgbtype=1):
 
     #Ensure values are rounded integers, convert to hex, and concatenate
     return '#' + ''.join(['{:02X}'.format(int(round(x))) for x in vals])
+
+
+#----------------------------------------------------------------------------------------------
+
+def textureindex_has_been_updated(tool, last_tool):
+    color_dict = {"001": "red", "002": "purple", "004": "green", "003": "grey", "007": "white"}
+    # get index to point to color hierarchy keys
+    # then get the name corresponding to it to fill
+    texture_string = bpy.context.scene.my_tool[tool]
+    texture_string = texture_string.upper()
+    texture_string = ''.join([i for i in texture_string if not i.isdigit()])
+    if not texture_string:
+        bpy.context.scene.my_tool[tool] = bpy.context.scene.my_tool[last_tool]
+        return
+    texture_string = texture_string[:1]
+
+    index = ord(texture_string) - 65 # 65 is A in ascii
+    color_keys = list(color_dict.keys())
+    if index >= len(color_keys):
+        index = len(color_keys) - 1
+        texture_string = bpy.context.scene.my_tool[last_tool]
+
+    color_keys = sorted(color_keys)
+    color_key = color_keys[index]
+
+    bpy.context.scene.my_tool[tool] = texture_string
+    bpy.context.scene.my_tool[last_tool] = texture_string
+    return
+
+
+def add_to_textureindex(amount):
+    color_dict = {"001": "red", "002": "purple", "004": "green", "003": "grey", "007": "white"}
+    max_sets = len(color_dict.keys())
+
+    index = ord(bpy.context.scene.my_tool.textureSetIndex) - 65
+    index += amount
+    if index >= max_sets:
+        index = 0
+    elif index < 0:
+        index = max_sets - 1
+
+    texture = chr(index + 65)
+    bpy.context.scene.my_tool.textureSetIndex = texture
+    bpy.context.scene.my_tool.lastSetIndex = texture
+    return index
+
+
+
+def colourindex_has_been_updated(tool, last_tool):
+    color_dict = {"001": "red", "002": "purple", "005": "green", "003": "grey"}
+    color_keys = list(color_dict.keys())
+    color_keys = sorted(color_keys)
+
+    max_color = len(color_keys)
+    string = bpy.context.scene.my_tool.get(tool)
+    if string in color_keys:
+    # index = ''.join([i for i in string if i.isdigit()])
+        index = str(color_keys.index(string))
+        if index:
+            if int(index) >= max_color:
+                index = str(max_color - 1)
+            color_key = color_keys[int(index)]
+            new_string_index = color_key
+            # new_string_index = "{:03d}".format(int(index))
+            if len(new_string_index) > 3:
+                new_string_index = new_string_index[:3]
+        else:
+            new_string_index = color_key
+            # new_string_index = "{:03d}".format(int(bpy.context.scene.my_tool[last_tool]))
+        bpy.context.scene.my_tool[last_tool] = int(index)
+        bpy.context.scene.my_tool[tool] = new_string_index
+    bpy.context.scene.my_tool[tool] = color_keys[bpy.context.scene.my_tool[last_tool]]
+
+
+def add_to_colourindex(amount):
+    color_dict = {"001": "red", "002": "purple", "005": "green", "003": "grey"}
+    color_keys = list(color_dict.keys())
+    color_keys = sorted(color_keys)
+    max_color = len(color_keys)
+
+    index = bpy.context.scene.my_tool.colourStyleIndex
+    index = color_keys.index(index)
+
+    index += amount
+    if index >= max_color:
+        index = 0
+    elif index < 0:
+        index = max_color - 1
+        
+    color_key = color_keys[index]
+    bpy.context.scene.my_tool.colourStyleIndex = color_key
+    bpy.context.scene.my_tool.lastStyleIndex = index
+    return index

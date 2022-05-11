@@ -98,6 +98,8 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedDictionary["numNFTsGenerated"] = DataDictionary["numNFTsGenerated"]
 
     DNAList = DataDictionary["DNAList"]
+    print(nft_index)
+    print(len(DNAList))
     oldDNA = DNAList[nft_index - 1]
     DNAList[nft_index - 1] = DNAToAdd
     updatedDictionary["DNAList"] = DNAList
@@ -127,6 +129,12 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
 
     return True
 
+
+def DeleteAllNFTs(TotalDNA, save_path, batch_index, master_record_save_path):
+    for index in range(len(TotalDNA), 0, -1):
+        DNA = TotalDNA[index - 1]
+        DeleteNFT(DNA, save_path, batch_index, master_record_save_path)
+    return
 
 
 def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
@@ -207,7 +215,7 @@ def CreateSlotsFolderHierarchy(save_path):
     holder = bpy.data.collections.new("Holder")
     bpy.context.scene.collection.children.link(holder)
 
-    slots_path = CheckAndFormatPath(save_path, "SLOTS")
+    slots_path = CheckAndFormatPath(save_path, "INPUT/SLOTS")
     if(slots_path != ""):
         for slot in os.listdir(slots_path):
             type_path = CheckAndFormatPath(slots_path, slot)
@@ -219,17 +227,17 @@ def CreateSlotsFolderHierarchy(save_path):
                 #Set Up NUll texture slot
                 slot_col_type = bpy.data.collections.new("00-" + slot.partition('-')[2] + "Null" )
                 slot_coll.children.link(slot_col_type)
-                slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000")
+                slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_000_" + "Null" )
                 slot_col_type.children.link(slot_col_var)
                 characterCollectionDict = {}
                 for char in config.Characters:
-                    varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + char)
+                    varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2]+ "_000_" + "Null_"  + char)
                     characterCollectionDict[char] = varient_coll_char
                     new_object = bpy.context.scene.objects["BLANK"].copy()                                                
                     varient_coll_char.objects.link(new_object)
                     slot_col_var.children.link(varient_coll_char)
                     
-                varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_Null_" + "000_" + "A")
+                varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_000_" + "Null_" +  "A000")
                 slot_col_var.children.link(varient_coll_texture)
                 for char in config.Characters:
                     char_tex_col = characterCollectionDict[char].copy()
@@ -281,17 +289,34 @@ def CreateSlotsFolderHierarchy(save_path):
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
                                         if(texture_path != ""):
                                             for texture_set in os.listdir(texture_path):
-                                                varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set)
-                                                varient_coll.children.link(varient_texture_set)
-                                                for char in list(characterCollectionDict.keys()):
-                                                    col = bpy.data.collections.new(varient + "_" + texture_set + "_" + char)
-                                                    varient_texture_set.children.link(col)
-                                                    for child in characterCollectionDict[char].objects:
-                                                        new_object = child.copy()                                                
-                                                        col.objects.link(new_object)
-                                                        set_path = CheckAndFormatPath(texture_path, texture_set)
-                                                        if(set_path != ""):
-                                                            SetUpObjectMaterialsAndTextures(new_object, set_path)                                              
+                                                set_path = CheckAndFormatPath(texture_path, texture_set)
+                                                if(set_path != ""):
+                                                    color_path = CheckAndFormatPath(set_path, "ColorInfo.json")
+                                                    if(color_path != ""):
+                                                        ColorInfo = json.load(open(color_path))
+                                                        availableSets = list(ColorInfo.values())[0]
+                                                        
+                                                        for color_tex_varient in availableSets:
+                                                            print(color_tex_varient)
+                                                            varient_texture_set = bpy.data.collections.new(varient + "_" + texture_set + color_tex_varient)
+                                                            global_color_path = CheckAndFormatPath(save_path, "INPUT/GlobalColorList.json")
+                                                            globalColorInfo = json.load(open(global_color_path))
+                                                            print(globalColorInfo[color_tex_varient])
+                                                            #varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
+                                                            varient_texture_set["color_style"] = globalColorInfo[color_tex_varient]["ComonName"]
+                                                            varient_texture_set["color_primary"] = globalColorInfo[color_tex_varient]["R"]
+                                                            varient_texture_set["color_secondary"] =  globalColorInfo[color_tex_varient]["G"]
+                                                            varient_texture_set["color_tertiary"] = globalColorInfo[color_tex_varient]["B"]
+                                                            varient_coll.children.link(varient_texture_set)
+                                                            for char in list(characterCollectionDict.keys()):
+                                                                col = bpy.data.collections.new(varient + "_" + texture_set + color_tex_varient + "_" + char)
+                                                                varient_texture_set.children.link(col)
+                                                                for child in characterCollectionDict[char].objects:
+                                                                    new_object = child.copy()                                                
+                                                                    col.objects.link(new_object)
+                                                                    set_path = CheckAndFormatPath(texture_path, texture_set)
+                                                                    if(set_path != ""):
+                                                                        SetUpObjectMaterialsAndTextures(varient_texture_set, new_object, set_path)                                              
                                         else:
                                             print("No Textures")
 
@@ -307,7 +332,7 @@ def CreateSlotsFolderHierarchy(save_path):
 
     return
 
-def SetUpObjectMaterialsAndTextures(obj, texture_path):
+def SetUpObjectMaterialsAndTextures(parent, obj, texture_path):
     material_slots = obj.material_slots
     for m in material_slots:
         #material = m.material
@@ -321,20 +346,45 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
         
         for node in matcopy.node_tree.nodes:
             if (node.label == "Diffuse"):
-                print( os.listdir(texture_path) )
                 for tex in os.listdir(texture_path):
-                    if "_D_" in tex:
+                    if "D_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         print(file)
-                        file = file.replace('\\', '/')
+                        file = file.replace('/', '\\')
                         print(file)
                         newImage = bpy.data.images.load(file, check_existing=True)
                         node.image = newImage
-                    elif "_N_" in tex:
+            if node.label == "Normal":
+                for tex in os.listdir(texture_path):
+                    if "N_" in tex:
                         file = file = os.path.join(texture_path, tex)
-                        file = file.replace('\\', '/')
+                        file = file.replace('/', '\\')
                         newImage = bpy.data.images.load(file, check_existing=True)
                         node.image = newImage
+            if node.label == "ColorID":
+                for tex in os.listdir(texture_path):
+                    if "ID_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+            if node.label == "Metallic":
+                for tex in os.listdir(texture_path):
+                    if "M_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+            if node.label == "Roughness":
+                for tex in os.listdir(texture_path):
+                    if "R_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=True)
+                        node.image = newImage
+            if node.label == "RTint":
+                node.outputs["Color"].default_value = parent["color_primary"]
+
 
 def CheckAndFormatPath(path, pathTojoin = ""):
     if pathTojoin != "" :
