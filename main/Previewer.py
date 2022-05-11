@@ -28,6 +28,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
 
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
+   style = DNAString.pop(0)
    show_character(character)
    for attribute in hierarchy: # hide all
       for type in hierarchy[attribute]:
@@ -120,6 +121,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    lastDNA = bpy.context.scene.my_tool.lastDNA
    DNAString = lastDNA.split(",")
    character = DNAString.pop(0)
+   style = DNAString.pop(0)
 
    for type_coll in slot_coll.children: # get type,variant,texture index by going through collection hierarchy
       if variant_name in type_coll.children:
@@ -237,6 +239,7 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with variants
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
+   style = DNAString.pop(0)
    show_character(character)
    
    ohierarchy = get_hierarchy_ordered()
@@ -271,6 +274,7 @@ def create_item_dict(DNA): # make dict from DNA to save to file
    uhierarchy = get_hierarchy_unordered()
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
+   style = DNAString.pop(0)
 
    item_dict = {}
 
@@ -292,6 +296,7 @@ def create_item_dict(DNA): # make dict from DNA to save to file
          texturevariant_dict = {}
          coll_index = coll_keys[strand]
          uh_info = uhierarchy[coll_index][atttype[0]][variant[0]][texture] # add color info too here
+         uh_info["Style"] = style
 
          texturevariant_dict[texture] = uh_info
          item_dict[coll_keys[strand]] = texturevariant_dict

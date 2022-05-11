@@ -20,6 +20,7 @@ import time
 import os
 import importlib
 from .main import config
+from PIL import Image
 # Import files from main directory:
 
 importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
@@ -1080,7 +1081,8 @@ class deleteColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-
+        image_path = os.path.abspath("T_cellMain_N.png")
+        im = Image.open(image_path)
         return {'FINISHED'}
 
 

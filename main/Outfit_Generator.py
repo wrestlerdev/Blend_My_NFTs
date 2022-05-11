@@ -97,6 +97,7 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
 
     DNAString = CurrentDNA.split(",")
     character = DNAString.pop(0)
+    style = DNAString.pop(0)
     DNASplit = DNAString[index].split('-')
 
     newDNASplit = [DNASplit[0], DNASplit[1], DNASplit[2]]
@@ -138,14 +139,6 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
     return CurrentDNA
 
 
-def get_style(): # placeholder
-    style = 'a'
-    return style
-
-def get_rando_color(): # TODO placeholder
-    return get_style(), '#FFFFFF', '#FFFFFF', '#FFFFFF'
-
-
 
 def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
@@ -168,6 +161,7 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
     currentVarient = ''
     DNAString = CurrentDNA.split(",")
     character = DNAString.pop(0)
+    style = DNAString.pop(0)
 
     for strand in range(len(DNAString)):
         DNASplit = DNAString[strand].split('-')
@@ -195,10 +189,7 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
             attributes = slot
             indexToEdit =  strand
             currentVarient = variant
-            if len(DNASplit) > 3:
-                last_color = DNASplit[3:] # get last used colour from dna, should this include texture?
-            else:
-                last_color = get_rando_color()
+
 
     attempts = 100
     while attempts > 0:
@@ -215,8 +206,7 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                         willItemFit = False
             if(willItemFit):       
                 DNAStrand = [str(typeIndex), str(varientIndex), str(textureIndex)]
-                if typeIndex != 0 or varientIndex != 0: # if is not a null block
-                    DNAStrand += last_color
+
                 newDNAString = '-'.join(DNAStrand)
                 # DNAString[indexToEdit] = str(typeIndex) + '-' + str(varientIndex)
                 DNAString[indexToEdit] = newDNAString
@@ -308,6 +298,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         character = PickCharacter()
+        style = "Temp"
         ColorGen.SetUpCharacterStyle(character)
 
         # letterstyles = 'abcdefghijkl'
@@ -404,6 +395,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
             TextureVarientDict = {}
             current_entry = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]
+            current_entry["Style"] = style
             #current_entry["color_style"] = ColorGen.styleChoice
             #current_entry["color_primary"] = ColorID[0]
             #current_entry["color_secondary"] = ColorID[1]
@@ -413,6 +405,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
                 
         SingleDNA.insert(0,character)
+        SingleDNA.insert(1, style) # TODO add color style to dict too
         
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
