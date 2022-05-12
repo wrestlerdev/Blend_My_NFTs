@@ -5,7 +5,6 @@
 import bpy
 import os
 import json
-import random
 import shutil
 from . import config
 
@@ -98,8 +97,7 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedDictionary["numNFTsGenerated"] = DataDictionary["numNFTsGenerated"]
 
     DNAList = DataDictionary["DNAList"]
-    print(nft_index)
-    print(len(DNAList))
+
     oldDNA = DNAList[nft_index - 1]
     DNAList[nft_index - 1] = DNAToAdd
     updatedDictionary["DNAList"] = DNAList
@@ -159,7 +157,7 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
             with open(NFTRecord_save_path, 'w') as outfile:
                 outfile.write(ledger + '\n')
                 print("Success update {}".format(NFTRecord_save_path))
-            UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index)
+            UpdateSingleNFTFileIndex(DNA_index, save_path, batch_index)
 
             totalDNAList = MasterDictionary["DNAList"]
             totalDNAList.remove(DNAToDelete)
@@ -177,7 +175,7 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
     return DNA_index
 
 
-def UpdateSingleNFTFileIndex(DNAToDelete, DNA_index, save_path, batch_index): 
+def UpdateSingleNFTFileIndex(DNA_index, save_path, batch_index): 
     total_nfts = len(next(os.walk(save_path))[1])
     nft_save_path = os.path.join(save_path, "NFT_{:04d}".format(DNA_index))
     shutil.rmtree(nft_save_path)

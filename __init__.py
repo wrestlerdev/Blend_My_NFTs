@@ -20,6 +20,7 @@ import time
 import os
 import importlib
 from .main import config
+from PIL import Image
 # Import files from main directory:
 
 importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
@@ -236,6 +237,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     BTint: bpy.props.FloatVectorProperty(name="B Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
 
     colorStyleName: bpy.props.StringProperty(name="Colour Style Name", default="wah")
+
+canRefactor = False
 
 def make_directories(save_path):
     Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
@@ -967,6 +970,8 @@ class moveDataToLocal(bpy.types.Operator):
         return {'FINISHED'}
 
 
+# --------------------------------------------------------------
+
 class exportMetadata(bpy.types.Operator):
     bl_idname = 'export.metadata'
     bl_label = 'Export ERC721 Metadata'
@@ -981,6 +986,36 @@ class exportMetadata(bpy.types.Operator):
 
 
 
+class refactorExports(bpy.types.Operator):
+    bl_idname = 'refactor.exports'
+    bl_label = 'Refactor All Exports'
+    bl_description = "Rename all exports"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        export_dir = bpy.context.scene.my_tool.separateExportPath
+        batches_path = os.path.join(export_dir, "Blend_My_NFTs Output", "OUTPUT")
+        master_record_path = ''
+        Exporter.refactor_all_batches(batches_path, master_record_path)
+
+        return {'FINISHED'}
+
+
+class confirmRefactor(bpy.types.Operator):
+    bl_idname = 'confirm.refactor'
+    bl_label = 'Have all renders been finalized?'
+    bl_description = "Are you super super duper sure?"
+    bl_options = {'REGISTER', 'UNDO'}
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        global canRefactor
+        canRefactor = True
+        return {'FINISHED'}
 
 #----------------------------------------------------------------
 
@@ -1049,7 +1084,8 @@ class deleteColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-
+        image_path = os.path.abspath("T_cellMain_N.png")
+        im = Image.open(image_path)
         return {'FINISHED'}
 
 
@@ -1454,17 +1490,6 @@ class WCUSTOM_PT_OutputSettings(bpy.types.Panel):
         row = layout.row()
         row.operator(moveDataToLocal.bl_idname, text=moveDataToLocal.bl_label)
         export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
-        if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
-
-            row = layout.row()
-            row.prop(mytool, "renderPrefix")
-            row = layout.row()
-            row.label(text="Output example:")
-            row.label(text="{}0123.png".format(mytool.renderPrefix))
-            row.label(text="")
-            row = layout.row()
-            row = layout.row()
-
 
 
 
@@ -1588,6 +1613,42 @@ class WCUSTOM_PT_CreateMetadata(bpy.types.Panel):
 #------------------------------------
 
 
+class WCUSTOM_PT_RefactorExports(bpy.types.Panel):
+    bl_label = "Refactor All Exports"
+    bl_idname = "WCUSTOM_PT_RefactorExports"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'EXPORTING'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+
+        if canRefactor:
+            export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+            if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
+
+                row = layout.row()
+                row.prop(mytool, "renderPrefix")
+
+                row = layout.row()
+                row.label(text="Output example:")
+                row.label(text="{}0123.png".format(mytool.renderPrefix))
+                row = layout.row()
+                row.operator(refactorExports.bl_idname, text=refactorExports.bl_label)
+        else:
+            box = layout.box()
+            row = box.row()
+            row.label(text=confirmRefactor.bl_label)
+            row = box.row()
+            row.operator(confirmRefactor.bl_idname, text="Confirm")
+
+
+
+#------------------------------------
+
 class WCUSTOM_PT_Initialize(bpy.types.Panel):
     bl_label = "Render NFTs"
     bl_idname = "WCUSTOM_PT_Initialize"
@@ -1709,6 +1770,7 @@ classes = (
     WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
     WCUSTOM_PT_CreateMetadata,
+    WCUSTOM_PT_RefactorExports,
     WCUSTOM_PT_ArtistUI,
     # BMNFTS_PT_Documentation,
 
@@ -1749,7 +1811,9 @@ classes = (
     prevColorStyle,
     nextTextureSet,
     prevTextureSet,
-    deleteColourStyle
+    deleteColourStyle,
+    confirmRefactor,
+    refactorExports
 
 )
 
