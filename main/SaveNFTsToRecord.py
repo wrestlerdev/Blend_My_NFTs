@@ -260,6 +260,8 @@ def CreateSlotsFolderHierarchy(save_path):
                             item_path = CheckAndFormatPath(varient_path, varient)
                             if item_path != "":
                                 varient_coll = bpy.data.collections.new(varient)
+                                varient_coll.hide_viewport = True
+                                varient_coll.hide_render = True
                                 type_coll.children.link(varient_coll)
 
                                 for file in os.listdir(item_path):
@@ -271,6 +273,8 @@ def CreateSlotsFolderHierarchy(save_path):
                                             varient_coll_char = bpy.data.collections.new(varient + "_" + char)
                                             varient_coll.children.link(varient_coll_char)
                                             characterCollectionDict[char] = varient_coll_char
+                                            varient_coll_char.hide_viewport = True
+                                            varient_coll_char.hide_render = True
                                             file_path = ""
                                             file_path = os.path.join(directory, char)
                                             file_path = file_path.replace('\\', '/')
@@ -362,35 +366,42 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
                         print(file)
                         file = file.replace('/', '\\')
                         print(file)
-                        newImage = bpy.data.images.load(file, check_existing=True)
+                        newImage = bpy.data.images.load(file, check_existing=False)
                         node.image = newImage
             if node.label == "Normal":
                 for tex in os.listdir(texture_path):
                     if "N_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
+                        newImage = bpy.data.images.load(file, check_existing=False)
                         node.image = newImage
             if node.label == "ColorID":
                 for tex in os.listdir(texture_path):
                     if "ID_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
+                        newImage = bpy.data.images.load(file, check_existing=False)
                         node.image = newImage
             if node.label == "Metallic":
                 for tex in os.listdir(texture_path):
                     if "M_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
+                        newImage = bpy.data.images.load(file, check_existing=False)
                         node.image = newImage
             if node.label == "Roughness":
                 for tex in os.listdir(texture_path):
                     if "R_" in tex:
                         file = file = os.path.join(texture_path, tex)
                         file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
+                        newImage = bpy.data.images.load(file, check_existing=False)
+                        node.image = newImage
+            if node.label == "Emissive":
+                for tex in os.listdir(texture_path):
+                    if "E_" in tex:
+                        file = file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=False)
                         node.image = newImage
             # if node.label == "RTint":
             #     node.outputs["Color"].default_value = parent["color_primary"]
