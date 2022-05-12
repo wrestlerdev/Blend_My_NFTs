@@ -1033,6 +1033,9 @@ class updateColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
+        save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+        DNA_Generator.Outfit_Generator.ColorGen.SetUpCharacterStyle("//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/", "Kae")
+        DNA_Generator.Outfit_Generator.ColorGen.PickOutfitColors("//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/", "not", [])
         return {'FINISHED'}
 
 

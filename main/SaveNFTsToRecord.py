@@ -259,6 +259,7 @@ def CreateSlotsFolderHierarchy(save_path):
                         for varient in os.listdir(varient_path):             
                             item_path = CheckAndFormatPath(varient_path, varient)
                             if item_path != "":
+                                print(varient)
                                 varient_coll = bpy.data.collections.new(varient)
                                 varient_coll.hide_viewport = True
                                 varient_coll.hide_render = True
@@ -277,9 +278,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                             varient_coll_char.hide_render = True
                                             file_path = ""
                                             file_path = os.path.join(directory, char)
-                                            file_path = file_path.replace('\\', '/')
-                                            print(directory)
-                                            print(file_path) 
+                                            file_path = file_path.replace('\\', '/') 
                                             #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
                                             layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
                                             bpy.context.view_layer.active_layer_collection = layer_collection
@@ -343,6 +342,7 @@ def CreateSlotsFolderHierarchy(save_path):
             child_col.objects.unlink(child_obj)
         bpy.data.collections.remove(child_col)                                    
     bpy.data.collections.remove(holder)
+    bpy.ops.outliner.orphans_purge()
 
     return
 
@@ -363,9 +363,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
                 for tex in os.listdir(texture_path):
                     if "T_" in tex:
                         file = file = os.path.join(texture_path, tex)
-                        print(file)
                         file = file.replace('/', '\\')
-                        print(file)
                         newImage = bpy.data.images.load(file, check_existing=False)
                         node.image = newImage
             if node.label == "Normal":

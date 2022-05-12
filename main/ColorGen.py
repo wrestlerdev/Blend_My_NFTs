@@ -151,8 +151,8 @@ def SplitComplmentaryColor(col, split):
     colors[2] = (c2.r, c2.g, c2.b, 1.0)
     return colors
 
-style = []
-styleChoice = ""
+availableColorStyleKeys = []
+styleKey = ""
 
 maincolor = (0.0, 0.0, 0.0)
 secondarycolor = (0.0, 0.0, 0.0)
@@ -161,71 +161,90 @@ mainColorIndex = -1
 SecondaryColorIndex = -1
 
 
-def SetUpCharacterStyle(Character):
-    global style, styleChoice
+def SetUpCharacterStyle(save_path, Character):
+    global availableColorStyleKeys, styleKey
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
 
-    styleIndex = random.randrange(0, len(cols.keys()) )
-    styleChoice = list(cols.keys())[styleIndex]
-    style = copy.deepcopy( cols[styleChoice] )
 
+    print(save_path)
+    color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
+    globalStyleInfo = json.load(open(color_style_path))
 
+    styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
+    styleKey = list(globalStyleInfo.keys())[styleIndex]
+    availableColorStyleKeys =  globalStyleInfo[styleKey]
+    print(styleKey)
+    print(availableColorStyleKeys)
 
-    if( random.random() > .05 ):
-        mainColorIndex = 0
-        #maincolor = style.pop(mainColorIndex)
-        maincolor = style[mainColorIndex]
-        SecondaryColorIndex = random.randrange(0, len(style))
-        #secondarycolor = style.pop(SecondaryColorIndex)
-        secondarycolor = style[SecondaryColorIndex]
-    else:
-        SecondaryColorIndex = 0
-        #secondarycolor = style.pop(SecondaryColorIndex)
-        secondarycolor = style[SecondaryColorIndex]
-        mainColorIndex = random.randrange(0, len(style))
-        #maincolor = style.pop(mainColorIndex)
-        maincolor = style[mainColorIndex]
+    
 
-    for child in bpy.data.collections.get(Character).objects:
-        obj = bpy.data.objects[child.name]
-        obj["TestColor"] = skincols[random.randrange(len(skincols))]
-        obj["metallic"] = random.random()
-        obj.hide_viewport = False
-        obj.hide_render = False
+    #varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
+    # varient_texture_set["color_style"] = globalColorInfo[color_tex_varient]["ComonName"]
+    # varient_texture_set["color_primary"] = globalColorInfo[color_tex_varient]["R"]
+    # varient_texture_set["color_secondary"] =  globalColorInfo[color_tex_varient]["G"]
+    # varient_texture_set["color_tertiary"] = globalColorInfo[color_tex_varient]["B"]
 
-def PickOutfitColors(attribute, chidlrenObjs):
+    #style = copy.deepcopy( cols[styleChoice] )
+    # if( random.random() > .05 ):
+    #     mainColorIndex = 0
+    #     #maincolor = style.pop(mainColorIndex)
+    #     maincolor = style[mainColorIndex]
+    #     SecondaryColorIndex = random.randrange(0, len(style))
+    #     #secondarycolor = style.pop(SecondaryColorIndex)
+    #     secondarycolor = style[SecondaryColorIndex]
+    # else:
+    #     SecondaryColorIndex = 0
+    #     #secondarycolor = style.pop(SecondaryColorIndex)
+    #     secondarycolor = style[SecondaryColorIndex]
+    #     mainColorIndex = random.randrange(0, len(style))
+    #     #maincolor = style.pop(mainColorIndex)
+    #     maincolor = style[mainColorIndex]
+
+    # for child in bpy.data.collections.get(Character).objects:
+    #     obj = bpy.data.objects[child.name]
+    #     obj["TestColor"] = skincols[random.randrange(len(skincols))]
+    #     obj["metallic"] = random.random()
+    #     obj.hide_viewport = False
+    #     obj.hide_render = False
+    return styleKey
+
+def CheckAndFormatPath(path, pathTojoin = ""):
+    if pathTojoin != "" :
+        path = os.path.join(path, pathTojoin)
+
+    new_path = path.replace('\\', '/')
+
+    if not os.path.exists(new_path):
+        return ""
+    return new_path
+
+def PickOutfitColors(save_path, attribute, chidlrenObjs):
     global style, styleChoice
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
     
-    col = (0.0, 0.0, 0.0)
-    colw = (1.0,1.0,1.0)
-    hexCodes = [RGBtoHex(colw)] * 3
-    colIndex = -1
-    if(attribute == "01-UpperTorso"):
-        col =  maincolor
-        colIndex = mainColorIndex
-    elif(attribute == "08-PelvisThick" or attribute == "08-PelvisThick"):
-        col = secondarycolor
-        colIndex = SecondaryColorIndex
-    elif(attribute == "17-UpperHead"):
+    if(attribute == "17-UpperHead"):
         colIndex = random.randrange(0, len(haircols) ) 
         col = haircols[colIndex]
-    else:
-        colIndex = random.randrange(0, len(style) ) 
-        col = style[colIndex]
 
     colors = [(random.uniform(0,1.0), random.uniform(0,1.0), random.uniform(0,1.0), 1.0)] * 3
+    color_list_path = CheckAndFormatPath(save_path, "INPUT/GlobalColorList.json")
+    globalColorInfo = json.load(open(color_list_path))
+
+    colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
+    colorkey = availableColorStyleKeys[colorkeyindex]
+    colorChoice = globalColorInfo[colorkey]
+    print(colorChoice)
+
     #colors = MonocromaticColor(col, random.uniform(0,1))
     #colors = AnalagousColor(col, random.uniform(0.075,0.35))
     #colors = SplitComplmentaryColor(col, random.uniform(0.1,0.3) )
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
 
-        c = Color()
-        c.hsv = col[0], col[1], col[2]
-
+        # c = Color()
+        # c.hsv = col[0], col[1], col[2]
 
         # obj["R"] = colors[0]
         # obj["G"] = colors[1]
@@ -240,11 +259,11 @@ def PickOutfitColors(attribute, chidlrenObjs):
 
             for node in material.node_tree.nodes:
                 if (node.label == "RTint"):
-                    node.outputs["Color"].default_value = colors[0]
+                    node.outputs["Color"].default_value = colorChoice["R"]
                 if (node.label == "GTint"):
-                    node.outputs["Color"].default_value = colors[1]
+                    node.outputs["Color"].default_value = colorChoice["G"]
                 if (node.label == "BTint"):
-                    node.outputs["Color"].default_value = colors[2]
+                    node.outputs["Color"].default_value = colorChoice["B"]
 
             matcopy = material.copy()
             m.material = matcopy
@@ -256,11 +275,6 @@ def PickOutfitColors(attribute, chidlrenObjs):
         obj.hide_viewport = False
         obj.hide_render = False
 
-    hexCodes = [None] * 3
-    hexCodes[0] = RGBtoHex((colors[0]))
-    hexCodes[1] = RGBtoHex((colors[1]))
-    hexCodes[2] = RGBtoHex((colors[2]))
-    
     # for block in bpy.data.materials:
     #     if block.users == 0:
     #         bpy.data.materials.remove(block)
@@ -272,7 +286,7 @@ def PickOutfitColors(attribute, chidlrenObjs):
     # for block in bpy.data.images:
     #     if block.users == 0:
     #         bpy.data.images.remove(block)
-    return hexCodes
+    return colorkey
 
 def RGBtoHex(vals, rgbtype=1):
     """Converts RGB values in a variety of formats to Hex values.
