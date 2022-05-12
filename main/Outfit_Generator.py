@@ -281,9 +281,9 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                             bpy.data.collections.get(char_var).hide_viewport = True
                             bpy.data.collections.get(char_var).hide_render = True
 
-                    for texture in hierarchy[attribute][type][varient]:
-                        bpy.data.collections.get(texture).hide_viewport = True
-                        bpy.data.collections.get(texture).hide_render = True
+                    # for texture in hierarchy[attribute][type][varient]:
+                    #     bpy.data.collections.get(texture).hide_viewport = True
+                    #     bpy.data.collections.get(texture).hide_render = True
 
                         
                     for varient_mesh in bpy.data.collections[varient].objects: # CHECK THIS placeholder
@@ -335,7 +335,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 typeIndex = 0
                 varientChoosen = list(hierarchy[attribute][typeChoosen].keys())[0]
                 varientIndex = 0
-                textureChoosen = list(hierarchy[attribute][typeChoosen][varientChoosen].keys())[0]
+                if len(list(hierarchy[attribute][typeChoosen][varientChoosen]['textureSets'].keys())) > 0:
+                    textureChoosen = list(hierarchy[attribute][typeChoosen][varientChoosen].keys())[0]
+                else:
+                    textureChoosen = None
                 textureIndex = 0
             else:
                 position = attributevalues.index(hierarchy[attribute])
@@ -343,7 +346,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
 
-                char_variants = bpy.data.collections.get(textureChoosen).children
+                char_variants = bpy.data.collections.get(varientChoosen).children
                 if char_variants:
                     for char_coll in char_variants:
                         char_name = char_coll.name.split('_')[-1]
@@ -375,10 +378,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
                 bpy.data.collections.get(varientChoosen).hide_render = False # CHECK THIS
 
-                bpy.data.collections.get(textureChoosen).hide_viewport = False # CHECK THIS
-                bpy.data.collections.get(textureChoosen).hide_render = False # CHECK THIS
+                # bpy.data.collections.get(textureChoosen).hide_viewport = False # CHECK THIS
+                # bpy.data.collections.get(textureChoosen).hide_render = False # CHECK THIS
 
-                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]["clothingGenre"]
+                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
                 
                 #loop through all slots that selected item will take up
                 UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
@@ -393,15 +396,16 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
             # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
             #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
-            TextureVarientDict = {}
-            current_entry = hierarchy[attribute][typeChoosen][varientChoosen][textureChoosen]
+            VarientDict = {}
+            current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
             current_entry["Style"] = style
+            current_entry["TextureSet"] = textureChoosen
             #current_entry["color_style"] = ColorGen.styleChoice
             #current_entry["color_primary"] = ColorID[0]
             #current_entry["color_secondary"] = ColorID[1]
             #current_entry["color_tertiary"] = ColorID[2]
-            TextureVarientDict[textureChoosen] = current_entry
-            ItemsUsed[attribute] = TextureVarientDict
+            VarientDict[varientChoosen] = current_entry
+            ItemsUsed[attribute] = VarientDict
 
                 
         SingleDNA.insert(0,character)
@@ -440,8 +444,7 @@ def PickWeightedAttributeType(AttributeTypes):
         if AttributeTypes[attributetype].keys(): # BETA_1.0
             first_variant = list(AttributeTypes[attributetype].keys())[0]
             if list(AttributeTypes[attributetype][first_variant].keys()): # BETA_1.0
-                first_texture = list(AttributeTypes[attributetype][first_variant].keys())[0]
-                rarity = float(AttributeTypes[attributetype][first_variant][first_texture]["type_rarity"])
+                rarity = float(AttributeTypes[attributetype][first_variant]["type_rarity"])
                 if rarity > 0.0:
                     number_List_Of_i.append(attributetype)
                     rarity_List_Of_i.append(float(rarity))
@@ -461,9 +464,7 @@ def PickWeightedTypeVarient(Varients):
     rarity_List_Of_i = []
 
     for varient in Varients:
-        first_texture = list(Varients[varient].keys())[0]
-
-        rarity = float(Varients[varient][first_texture]["variant_rarity"])
+        rarity = float(Varients[varient]["variant_rarity"])
         if rarity > 0.0:
             number_List_Of_i.append(varient)
             rarity_List_Of_i.append(float(rarity))
@@ -485,22 +486,23 @@ def PickWeightedTypeVarient(Varients):
 
 
 def PickWeightedTextureVarient(Textures):
+    print(Textures['textureSets'])
     number_List_Of_i = []
     rarity_List_Of_i = []
 
-    for texture in Textures:
-        print(Textures[texture])
-        rarity = float(Textures[texture]["texture_rarity"])
-        t_last_string = str(Textures[texture]).split('_')[-1]
-        if rarity > 0.0 and t_last_string not in config.Characters:
+    for texture in Textures['textureSets'].keys():
+        print(Textures['textureSets'][texture])
+        rarity = float(Textures['textureSets'][texture])
+        if rarity > 0.0:
             number_List_Of_i.append(texture)
             rarity_List_Of_i.append(float(rarity))
 
     if len(number_List_Of_i) > 0:
         textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)  
-        return textureChoosen[0], list(Textures.keys()).index(textureChoosen[0])
+        return textureChoosen[0], list(Textures['textureSets'].keys()).index(textureChoosen[0])
     else:
-        first_texture = list(Textures.keys())[0]
+        # first_texture = list(Textures['textureSets'].keys())[0] # TODO CHECK IF ANY TEXTURES EXIST?
+        first_texture = None
         print("no texture attributes had rarity > 0, so chose first texture attribute: {}".format(first_texture))
         return first_texture, 0
 

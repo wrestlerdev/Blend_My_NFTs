@@ -44,16 +44,9 @@ def createHirachy():
          _varients = bpy.data.collections[_attributeTypes[i].name].children
          
          for j in range(len(_varients)):
-            Textures = {}
-            _textures = _varients[j].children
-
-            for k in range(len(_textures)):
-               print(_textures[k])
-               if not _textures[k].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
-                  Textures[_textures[k].name] = attributeData(_textures[k], _varients[j], _attributeTypes[i])
 
             if not _varients[j].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
-               Varients[_varients[j].name] = Textures
+               Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i])
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -67,10 +60,8 @@ def createHirachy():
    return sortedAttibutes
 
 
-def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl):
+def attributeData(attributeVariantColl, attributeTypeColl):
    attributeVariant = attributeVariantColl.name
-   attributeTexture = attributeTextureColl.name
-   print(attributeTexture)
    eachObject={}
    """
    Creates a dictionary of each attribute
@@ -100,30 +91,30 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
       else:
          a[2] = attributeVariantColl['rarity'] = 50
 
-      if(attributeTextureColl.get('rarity') is not None):
-         a[3] = attributeTextureColl.get('rarity')
-      else:
-         a[3] = attributeTextureColl['rarity'] = 50
+      # if(attributeTextureColl.get('rarity') is not None):
+      #    a[3] = attributeTextureColl.get('rarity')
+      # else:
+      #    a[3] = attributeTextureColl['rarity'] = 50
 
-      if(attributeTextureColl.get('color_style') is not None):
-         a[4] = attributeTextureColl.get('color_style')
+      if(attributeVariantColl.get('Style') is not None):
+         a[3] = attributeVariantColl.get('Style')
       else:
-         a[4] = attributeTextureColl['color_style'] = "0"
+         a[3] = attributeVariantColl['Style'] = "Temp_Style"
 
-      if(attributeTextureColl.get('color_primary') is not None):
-         a[5] = attributeTextureColl.get('color_primary')
+      if(attributeVariantColl.get('color_primary') is not None):
+         a[4] = attributeVariantColl.get('color_primary')
       else:
-         a[5] = attributeTextureColl['color_primary'] = "0"
+         a[4] = attributeVariantColl['color_primary'] = "0"
 
-      if(attributeTextureColl.get('color_secondary') is not None):
-         a[6] = attributeTextureColl.get('color_secondary')
+      if(attributeVariantColl.get('color_secondary') is not None):
+         a[5] = attributeVariantColl.get('color_secondary')
       else:
-         a[6] = attributeTextureColl['color_secondary'] = "0"
+         a[5] = attributeVariantColl['color_secondary'] = "0"
 
-      if(attributeTextureColl.get('color_tertiary') is not None):
-         a[7] = attributeTextureColl.get('color_tertiary')
+      if(attributeVariantColl.get('color_tertiary') is not None):
+         a[6] = attributeVariantColl.get('color_tertiary')
       else:
-         a[7] = attributeTextureColl['color_tertiary'] = "0"
+         a[6] = attributeVariantColl['color_tertiary'] = "0"
 
       # x = re.sub(r'[a-zA-Z]', "", i)
       # a = x.split("_")
@@ -132,13 +123,16 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
       # del a[0] #Remove ItemName Name
       return list(a)
 
-   def get_textureSet():
-
-      textureSet = name[4]
-      return textureSet
+   def get_textureSets(variant_coll):
+      textures = {}
+      for mesh in variant_coll.objects:
+         # print(mesh.material_slots[0])
+         textures[mesh.name] = 50
+         # textures.append(mesh.name)
+      return textures
       
-   name = getName(attributeTexture)
-   orderRarity = getOrder_rarity(attributeTexture)
+   name = getName(attributeVariant)
+   orderRarity = getOrder_rarity(attributeVariant)
 
    if len(orderRarity) == 0:
       return
@@ -147,26 +141,24 @@ def attributeData(attributeTextureColl, attributeVariantColl, attributeTypeColl)
       
       slotName = name[0]
       clothingGenre = name[1]
-      clothingItem = name[2]
-      number = name[3]
-      textureSet = get_textureSet()
+      number = name[2]
+      clothingItem = name[3]
+      textureSets = get_textureSets(attributeVariantColl)
 
       if(clothingGenre != "Null"):
          type_rarity = orderRarity[1]
          variant_rarity = orderRarity[2]
-         texture_rarity = orderRarity[3]
       else:
          type_rarity = 0.0
          variant_rarity = 0.0
-         texture_rarity = 0.0
 
-      colorstyle = orderRarity[4]
-      colorprimary = ''.join(str(list(orderRarity[5])))
-      colorseoncdary = ''.join(str(list(orderRarity[6])))
-      colortertiary = ''.join(str(list(orderRarity[7])))    
+      colorstyle = ''.join(str(list(orderRarity[3])))
+      colorprimary = ''.join(str(list(orderRarity[4])))
+      colorseoncdary = ''.join(str(list(orderRarity[5])))
+      colortertiary = ''.join(str(list(orderRarity[6])))    
       
-      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingVersion": number,
-                     "textureSet": textureSet, "texture_rarity": texture_rarity, "variant_rarity": variant_rarity, "type_rarity": type_rarity,
-                     "color_style": colorstyle, "color_primary": colorprimary, "color_secondary": colorseoncdary, "color_tertiary": colortertiary}
+      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingIndex": number,
+                     "textureSets": textureSets, "variant_rarity": variant_rarity, "type_rarity": type_rarity,
+                     "Style": colorstyle, "color_primary": colorprimary, "color_secondary": colorseoncdary, "color_tertiary": colortertiary}
       
    return eachObject
