@@ -47,15 +47,16 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       DNASplit = DNAString[strand].split('-')
       atttype_index = DNASplit[0]
       variant_index = DNASplit[1]
-      texture_index = DNASplit[2]
+      texture_index = int(DNASplit[2])
 
       slot = list(hierarchy.items())[strand]
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
       variant_children = bpy.data.collections[variant].children
    
-      textures = variant.objects
-      texture = textures[texture_index] # TODO DO SMTH WITH TEXTURE
+      textures = bpy.data.collections[variant].objects
+      if textures:
+         texture = textures[texture_index] # TODO DO SMTH WITH TEXTURE
 
       if variant_children:
          for child in variant_children:
@@ -71,15 +72,18 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
 
       if meshes:
          set_armature_for_meshes(character, meshes)
-         set_texture_on_mesh(meshes, texture)
+         if textures:
+            set_texture_on_mesh(meshes, texture)
+         # else:
+         #    print("texture where")
 
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
 
 
-   def set_texture_on_mesh(meshes, texture_mesh):
-      print("sike")
-      return
+def set_texture_on_mesh(meshes, texture_mesh):
+   print("sike")
+   return
 
 #------------------------------------------------------------------------------------
 

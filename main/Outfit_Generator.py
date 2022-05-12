@@ -491,7 +491,6 @@ def PickWeightedTextureVarient(Textures):
     rarity_List_Of_i = []
 
     for texture in Textures['textureSets'].keys():
-        print(Textures['textureSets'][texture])
         rarity = float(Textures['textureSets'][texture])
         if rarity > 0.0:
             number_List_Of_i.append(texture)
