@@ -299,7 +299,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
         character = PickCharacter()
         style = "Temp"
-        ColorGen.SetUpCharacterStyle(character)
+        print(save_path)
+        ColorGen.SetUpCharacterStyle(save_path)
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -389,8 +390,11 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
-
-            #ColorID = ColorGen.PickOutfitColors(attribute, chidlrenObjs)
+            if(len(bpy.data.collections.get(varientChoosen).objects) > 0):
+                textureVarient = bpy.data.collections.get(varientChoosen).objects[random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))]
+                for child in chidlrenObjs:
+                    child.material_slots[0].material = textureVarient.material_slots[0].material #Check this - update to loop through all material slots
+            ColorGen.PickOutfitColors(save_path, attribute, chidlrenObjs)
             ColorID = ['#111111'] * 3
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
 

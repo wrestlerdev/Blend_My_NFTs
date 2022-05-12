@@ -161,7 +161,7 @@ mainColorIndex = -1
 SecondaryColorIndex = -1
 
 
-def SetUpCharacterStyle(save_path, Character):
+def SetUpCharacterStyle(save_path):
     global availableColorStyleKeys, styleKey
     global maincolor, secondarycolor
     global mainColorIndex, SecondaryColorIndex
@@ -237,26 +237,12 @@ def PickOutfitColors(save_path, attribute, chidlrenObjs):
     colorChoice = globalColorInfo[colorkey]
     print(colorChoice)
 
-    #colors = MonocromaticColor(col, random.uniform(0,1))
-    #colors = AnalagousColor(col, random.uniform(0.075,0.35))
-    #colors = SplitComplmentaryColor(col, random.uniform(0.1,0.3) )
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
-
-        # c = Color()
-        # c.hsv = col[0], col[1], col[2]
-
-        # obj["R"] = colors[0]
-        # obj["G"] = colors[1]
-        # obj["B"] = colors[2]
-
 
         material_slots = obj.material_slots
         for m in material_slots:
             material = m.material
-            material = bpy.data.materials['MasterV01']
-            material.use_nodes = True
-
             for node in material.node_tree.nodes:
                 if (node.label == "RTint"):
                     node.outputs["Color"].default_value = colorChoice["R"]
@@ -264,13 +250,6 @@ def PickOutfitColors(save_path, attribute, chidlrenObjs):
                     node.outputs["Color"].default_value = colorChoice["G"]
                 if (node.label == "BTint"):
                     node.outputs["Color"].default_value = colorChoice["B"]
-
-            matcopy = material.copy()
-            m.material = matcopy
-            #m.material = bpy.data.materials['Test_02']
-            # get the nodes
-            
-
 
         obj.hide_viewport = False
         obj.hide_render = False

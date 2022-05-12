@@ -329,7 +329,7 @@ class randomizePreview(bpy.types.Operator):
 
     def execute(self, context):
         maxNFTs = bpy.context.scene.my_tool.collectionSize
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.root_dir)
         # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
