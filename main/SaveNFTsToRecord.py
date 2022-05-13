@@ -353,52 +353,49 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
         material.use_nodes = True
         matcopy = material.copy()
         m.material = matcopy
-        #m.material = bpy.data.materials['Test_02']
+
         # get the nodes
-        
-        for node in matcopy.node_tree.nodes:
-            if (node.label == "Diffuse"):
-                for tex in os.listdir(texture_path):
-                    if "T_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=False)
-                        node.image = newImage
-            if node.label == "Normal":
-                for tex in os.listdir(texture_path):
-                    if "N_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=False)
-                        node.image = newImage
-            if node.label == "ColorID":
-                for tex in os.listdir(texture_path):
-                    if "ID_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=False)
-                        node.image = newImage
-            if node.label == "Metallic":
-                for tex in os.listdir(texture_path):
-                    if "M_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=False)
-                        node.image = newImage
-            if node.label == "Roughness":
-                for tex in os.listdir(texture_path):
-                    if "R_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=False)
-                        node.image = newImage
-            if node.label == "Emissive":
-                for tex in os.listdir(texture_path):
-                    if "E_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=False)
-                        node.image = newImage
+        for tex in os.listdir(texture_path):
+            if "T_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["DiffuseNode"].image = newImage
+                matcopy.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
+
+            if "N_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["NormalNode"].image = newImage
+                matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
+            if "ID_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["ColorIDNode"].image = newImage
+                matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
+
+            if "M_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["MetallicNode"].image = newImage
+                matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
+
+            if "R_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["RoughnessNode"].image = newImage
+                matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
+
+            if "E_" in tex:
+                file = file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["EmissiveNode"].image = newImage 
+                matcopy.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
             # if node.label == "RTint":
             #     node.outputs["Color"].default_value = parent["color_primary"]
 
