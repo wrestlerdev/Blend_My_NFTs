@@ -7,7 +7,6 @@ import re
 import copy
 import time
 import json
-import random
 import importlib
 from functools import partial
 
@@ -355,30 +354,17 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    return DataDictionary, possibleCombinations, DNAList
 
-def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, rarity_from_name):
+def send_To_Record_JSON(NFTRecord_save_path):
    """
    Creates NFTRecord.json file and sends "batchDataDictionary" to it. NFTRecord.json is a permanent record of all DNA
    you've generated with all attribute variants. If you add new variants or attributes to your .blend file, other scripts
    need to reference this .json file to generate new DNA and make note of the new attributes and variants to prevent
    repeate DNA.
    """
-
-   batchList = os.listdir(batch_json_save_path)
-
-   # if batchList:
-   #    for i in batchList:
-   #       batch = os.path.join(batch_json_save_path, i)
-   #       if os.path.exists(batch):
-   #          os.remove(
-   #             os.path.join(batch_json_save_path, i)
-   #          )
-
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
-   DataDictionary["hierarchy"] = NFTHirachy.createHirachy(rarity_from_name)
+   DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
-
-   #DataDictionary, possibleCombinations, DNAList = generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity)
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
@@ -390,6 +376,75 @@ def send_To_Record_JSON(NFTRecord_save_path, batch_json_save_path, rarity_from_n
 
    return DataDictionary
 
+
+def create_default_rarity_Record(NFTRecord_save_path):
+   DataDictionary = {}
+   DataDictionary["numNFTsGenerated"] = 0
+   hierarchy = NFTHirachy.createHirachy()
+   DataDictionary["DNAList"] = []
+
+   for slot in list(hierarchy.keys()):
+      for type in list(hierarchy[slot].keys()):
+         for variant in list(hierarchy[slot][type].keys()):
+            for texture in list(hierarchy[slot][type][variant].keys()):
+               hierarchy[slot][type][variant][texture]["texture_rarity"] = 50
+               hierarchy[slot][type][variant][texture]["variant_rarity"] = 50
+               hierarchy[slot][type][variant][texture]["type_rarity"] = 50
+   DataDictionary["hierarchy"] = hierarchy
+
+   try:
+      ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
+      print("woo")
+      with open(NFTRecord_save_path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+   except:
+      print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
+
+   return DataDictionary
+
+def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
+   # OriginalDictionary = json.load(open(NFTRecord_save_path))
+   # original_hierarchy = OriginalDictionary["hierarchy"]
+
+   DataDictionary = {}
+   DataDictionary["numNFTsGenerated"] = 0
+   # DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
+   hierarchy = NFTHirachy.createHirachy()
+   DataDictionary["DNAList"] = []
+
+   exists_in_original = True
+   for slot in list(hierarchy.keys()):
+      if slot in original_hierarchy:
+         exists_in_original = True
+      else:
+         exists_in_original = False
+      for type in list(hierarchy[slot].keys()):
+         if exists_in_original and type in original_hierarchy[slot]:
+            exists_in_original = True
+         else: 
+            exists_in_original = False
+         for variant in list(hierarchy[slot][type].keys()):
+            if exists_in_original and variant in original_hierarchy[slot][type]:
+               exists_in_original = True
+            else: 
+               exists_in_original = False
+            for texture in list(hierarchy[slot][type][variant].keys()):
+               if exists_in_original and texture in original_hierarchy[slot][type][variant]:
+                  hierarchy[slot][type][variant][texture]["texture_rarity"]   = original_hierarchy[slot][type][variant][texture]["texture_rarity"]
+                  hierarchy[slot][type][variant][texture]["variant_rarity"]   = original_hierarchy[slot][type][variant][texture]["variant_rarity"]
+                  hierarchy[slot][type][variant][texture]["type_rarity"]      = original_hierarchy[slot][type][variant][texture]["type_rarity"]
+               # print(original_hierarchy[slot][type][variant][texture] is not None)
+   DataDictionary["hierarchy"] = hierarchy
+
+   try:
+      ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
+      with open(NFTRecord_save_path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+
+   except:
+      print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
+
+   return DataDictionary
 
 
 def set_up_master_Record(save_path):
