@@ -170,37 +170,6 @@ def SetUpCharacterStyle():
     availableColorStyleKeys =  globalStyleInfo[styleKey]
     print(styleKey)
     print(availableColorStyleKeys)
-
-    
-
-    #varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
-    # varient_texture_set["color_style"] = globalColorInfo[color_tex_varient]["ComonName"]
-    # varient_texture_set["color_primary"] = globalColorInfo[color_tex_varient]["R"]
-    # varient_texture_set["color_secondary"] =  globalColorInfo[color_tex_varient]["G"]
-    # varient_texture_set["color_tertiary"] = globalColorInfo[color_tex_varient]["B"]
-
-    #style = copy.deepcopy( cols[styleChoice] )
-    # if( random.random() > .05 ):
-    #     mainColorIndex = 0
-    #     #maincolor = style.pop(mainColorIndex)
-    #     maincolor = style[mainColorIndex]
-    #     SecondaryColorIndex = random.randrange(0, len(style))
-    #     #secondarycolor = style.pop(SecondaryColorIndex)
-    #     secondarycolor = style[SecondaryColorIndex]
-    # else:
-    #     SecondaryColorIndex = 0
-    #     #secondarycolor = style.pop(SecondaryColorIndex)
-    #     secondarycolor = style[SecondaryColorIndex]
-    #     mainColorIndex = random.randrange(0, len(style))
-    #     #maincolor = style.pop(mainColorIndex)
-    #     maincolor = style[mainColorIndex]
-
-    # for child in bpy.data.collections.get(Character).objects:
-    #     obj = bpy.data.objects[child.name]
-    #     obj["TestColor"] = skincols[random.randrange(len(skincols))]
-    #     obj["metallic"] = random.random()
-    #     obj.hide_viewport = False
-    #     obj.hide_render = False
     return styleKey
 
 def CheckAndFormatPath(path, pathTojoin = ""):
@@ -244,21 +213,6 @@ def PickOutfitColors(attribute, chidlrenObjs):
                     node.outputs["Color"].default_value = colorChoice["G"]
                 if (node.label == "BTint"):
                     node.outputs["Color"].default_value = colorChoice["B"]
-
-        obj.hide_viewport = False
-        obj.hide_render = False
-
-    # for block in bpy.data.materials:
-    #     if block.users == 0:
-    #         bpy.data.materials.remove(block)
-
-    # for block in bpy.data.textures:
-    #     if block.users == 0:
-    #         bpy.data.textures.remove(block)
-
-    # for block in bpy.data.images:
-    #     if block.users == 0:
-    #         bpy.data.images.remove(block)
     return colorkey
 
 def RGBtoHex(vals, rgbtype=1):
