@@ -135,10 +135,11 @@ def returnERC721MetaDataCustom(name, DNA):
 
     DNAString = DNA.split(",")
     character = DNAString.pop(0)
+    style = DNAString.pop(0)
     # metaDataDictErc721["name"] = str(character + ": #0123")
 
     attributes.append({"trait_type": "Character", "value": character})
-
+    
     for strand in range(len(DNAString)):
         DNASplit = DNAString[strand].split('-')
         atttype_index = DNASplit[0]
@@ -156,6 +157,8 @@ def returnERC721MetaDataCustom(name, DNA):
         split_variant_type = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant_type)).split())
 
         attribute_type = "{} {}".format(split_variant_type, split_description)
+        print(MetadataAttributeDict.get(variant.split('_')[1]))
+        
         attribute = MetadataAttributeDict[variant.split('_')[1]]
         if variant_type not in ["Null", "Nulll", "Block"]:
             dict = {"trait_type": attribute, "value": attribute_type}

@@ -998,8 +998,8 @@ class refactorExports(bpy.types.Operator):
     def execute(self, context):
         export_dir = bpy.context.scene.my_tool.separateExportPath
         batches_path = os.path.join(export_dir, "Blend_My_NFTs Output", "OUTPUT")
-        master_record_path = ''
-        Exporter.refactor_all_batches(batches_path, master_record_path)
+        render_record_path = os.path.join(batches_path, "_RenderRecord.json")
+        Exporter.refactor_all_batches(batches_path, render_record_path)
 
         return {'FINISHED'}
 
