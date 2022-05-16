@@ -333,7 +333,7 @@ class randomizePreview(bpy.types.Operator):
         # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
-        Exporter.Previewer.fill_pointers_from_dna(DNA[0][0], Slots)
+        Exporter.Previewer.show_nft_from_dna(DNA[0][0])
         bpy.context.scene.my_tool.lastDNA = DNA[0][0]
         bpy.context.scene.my_tool.inputDNA = DNA[0][0]
 

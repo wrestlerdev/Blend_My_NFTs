@@ -122,9 +122,6 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
             obj = bpy.data.objects[child.name]
             obj["TestColor"] = col
             obj["R"] = col
-            
-            obj.hide_viewport = False
-            obj.hide_render = False
             hex = ColorGen.RGBtoHex((col))
 
         newDNAStrand = '-'.join(newDNASplit)
@@ -133,7 +130,7 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
 
         newDNAString.insert(0, character)
         newDNA = ','.join(newDNAString)
-        print(newDNAStrand)
+        print(newDNAStrand)      
         return newDNA
 
     return CurrentDNA
@@ -212,19 +209,6 @@ def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
                 DNAString[indexToEdit] = newDNAString
                 DNAString.insert(0, character)
                 FormattedDNA = ','.join(DNAString)
-                bpy.data.collections[currentVarient].hide_viewport = True
-                bpy.data.collections[currentVarient].hide_render = True
-                bpy.data.collections[varientChoosen].hide_viewport = False
-                bpy.data.collections[varientChoosen].hide_render = False
-                charVariants = bpy.data.collections[varientChoosen].children
-                if charVariants: # check if character variants for a mesh exists
-                    for charVar in charVariants:
-                        if charVar.name.split('_')[-1] == character:
-                            charVar.hide_viewport = False
-                            charVar.hide_render = False
-                        else:
-                            charVar.hide_viewport = True
-                            charVar.hide_render = True
                 return FormattedDNA
         attempts -= 1
     return CurrentDNA
@@ -269,26 +253,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         #         bpy.data.objects.remove(obj, do_unlink=True)
         #     bpy.data.collections.remove(child)
 
-        for attribute in hierarchy:
-            for type in hierarchy[attribute]:
-                for varient in hierarchy[attribute][type]:
-                    bpy.data.collections.get(varient).hide_viewport = True
-                    bpy.data.collections.get(varient).hide_render = True
-
-                    for char in config.Characters:
-                        char_var = varient + '_' + char
-                        if bpy.data.collections.get(char_var) is not None:
-                            bpy.data.collections.get(char_var).hide_viewport = True
-                            bpy.data.collections.get(char_var).hide_render = True
-
-                    # for texture in hierarchy[attribute][type][varient]:
-                    #     bpy.data.collections.get(texture).hide_viewport = True
-                    #     bpy.data.collections.get(texture).hide_render = True
-
-                        
-                    for varient_mesh in bpy.data.collections[varient].objects: # CHECK THIS placeholder
-                        varient_mesh.hide_render = True
-                        varient_mesh.hide_viewport = True
+            
 
         SingleDNA = ["0"] * len(list(hierarchy.keys()))
         ItemsUsed = {}
@@ -300,7 +265,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         character = PickCharacter()
         style = "Temp"
         print(save_path)
-        ColorGen.SetUpCharacterStyle(save_path)
+        ColorGen.SetUpCharacterStyle()
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -352,12 +317,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for char_coll in char_variants:
                         char_name = char_coll.name.split('_')[-1]
                         if char_name == character:
-                            char_coll.hide_viewport = False
-                            char_coll.hide_render = False
                             chidlrenObjs = char_coll.objects
-                        else:
-                            char_coll.hide_viewport = True
-                            char_coll.hide_render = True
                 else:
                     chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
                     for obj in chidlrenObjs:
@@ -375,12 +335,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                             mod.object = bpy.data.objects[armature_name]
                 # else:
                     # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
-                
-                bpy.data.collections.get(varientChoosen).hide_viewport = False # CHECK THIS
-                bpy.data.collections.get(varientChoosen).hide_render = False # CHECK THIS
-
-                # bpy.data.collections.get(textureChoosen).hide_viewport = False # CHECK THIS
-                # bpy.data.collections.get(textureChoosen).hide_render = False # CHECK THIS
+            
 
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
                 
@@ -390,11 +345,13 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
+            textureIndex = 0
             if(len(bpy.data.collections.get(varientChoosen).objects) > 0):
-                textureVarient = bpy.data.collections.get(varientChoosen).objects[random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))]
+                textureIndex = random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))
+                textureVarient = bpy.data.collections.get(varientChoosen).objects[textureIndex]
                 for child in chidlrenObjs:
                     child.material_slots[0].material = textureVarient.material_slots[0].material #Check this - update to loop through all material slots
-            ColorGen.PickOutfitColors(save_path, attribute, chidlrenObjs)
+            ColorGen.PickOutfitColors(attribute, chidlrenObjs)
             ColorID = ['#111111'] * 3
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
 
@@ -403,17 +360,15 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             VarientDict = {}
             current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
             current_entry["Style"] = style
-            current_entry["TextureSet"] = textureChoosen
-            #current_entry["color_style"] = ColorGen.styleChoice
-            #current_entry["color_primary"] = ColorID[0]
-            #current_entry["color_secondary"] = ColorID[1]
-            #current_entry["color_tertiary"] = ColorID[2]
+            current_entry["TextureSet"] = textureIndex
+            current_entry["color_style"] = ColorGen.styleKey
+            current_entry["color_key"] = ColorGen.colorkey
             VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict
 
                 
-        SingleDNA.insert(0,character)
-        SingleDNA.insert(1, style) # TODO add color style to dict too
+        SingleDNA.insert(0, character)
+        SingleDNA.insert(1, ColorGen.styleKey) # TODO add color style to dict too
         
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
@@ -518,14 +473,6 @@ def PickCharacter(default_char=''):
         char = random.choice(config.Characters)
     else:
         char = default_char
-
-    for c in config.Characters:
-        if char == c:
-            bpy.data.collections[c].hide_viewport = False
-            bpy.data.collections[c].hide_render = False
-        else:
-            bpy.data.collections[c].hide_viewport = True
-            bpy.data.collections[c].hide_render = True
     return char
 
 

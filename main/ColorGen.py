@@ -153,21 +153,15 @@ def SplitComplmentaryColor(col, split):
 
 availableColorStyleKeys = []
 styleKey = ""
-
-maincolor = (0.0, 0.0, 0.0)
-secondarycolor = (0.0, 0.0, 0.0)
-
-mainColorIndex = -1
-SecondaryColorIndex = -1
+colorkey = ""
 
 
-def SetUpCharacterStyle(save_path):
+
+def SetUpCharacterStyle():
     global availableColorStyleKeys, styleKey
-    global maincolor, secondarycolor
-    global mainColorIndex, SecondaryColorIndex
 
 
-    print(save_path)
+    save_path = bpy.context.scene.my_tool.root_dir
     color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
     globalStyleInfo = json.load(open(color_style_path))
 
@@ -176,37 +170,6 @@ def SetUpCharacterStyle(save_path):
     availableColorStyleKeys =  globalStyleInfo[styleKey]
     print(styleKey)
     print(availableColorStyleKeys)
-
-    
-
-    #varient_texture_set["color_style"] = ColorInfo[color_tex_varient]["ComonName"]
-    # varient_texture_set["color_style"] = globalColorInfo[color_tex_varient]["ComonName"]
-    # varient_texture_set["color_primary"] = globalColorInfo[color_tex_varient]["R"]
-    # varient_texture_set["color_secondary"] =  globalColorInfo[color_tex_varient]["G"]
-    # varient_texture_set["color_tertiary"] = globalColorInfo[color_tex_varient]["B"]
-
-    #style = copy.deepcopy( cols[styleChoice] )
-    # if( random.random() > .05 ):
-    #     mainColorIndex = 0
-    #     #maincolor = style.pop(mainColorIndex)
-    #     maincolor = style[mainColorIndex]
-    #     SecondaryColorIndex = random.randrange(0, len(style))
-    #     #secondarycolor = style.pop(SecondaryColorIndex)
-    #     secondarycolor = style[SecondaryColorIndex]
-    # else:
-    #     SecondaryColorIndex = 0
-    #     #secondarycolor = style.pop(SecondaryColorIndex)
-    #     secondarycolor = style[SecondaryColorIndex]
-    #     mainColorIndex = random.randrange(0, len(style))
-    #     #maincolor = style.pop(mainColorIndex)
-    #     maincolor = style[mainColorIndex]
-
-    # for child in bpy.data.collections.get(Character).objects:
-    #     obj = bpy.data.objects[child.name]
-    #     obj["TestColor"] = skincols[random.randrange(len(skincols))]
-    #     obj["metallic"] = random.random()
-    #     obj.hide_viewport = False
-    #     obj.hide_render = False
     return styleKey
 
 def CheckAndFormatPath(path, pathTojoin = ""):
@@ -219,11 +182,11 @@ def CheckAndFormatPath(path, pathTojoin = ""):
         return ""
     return new_path
 
-def PickOutfitColors(save_path, attribute, chidlrenObjs):
-    global style, styleChoice
-    global maincolor, secondarycolor
-    global mainColorIndex, SecondaryColorIndex
-    
+def PickOutfitColors(attribute, chidlrenObjs):
+    global styleKey, availableColorStyleKeys
+    global colorkey
+
+    save_path = save_path = bpy.context.scene.my_tool.root_dir
     if(attribute == "17-UpperHead"):
         colIndex = random.randrange(0, len(haircols) ) 
         col = haircols[colIndex]
@@ -250,21 +213,6 @@ def PickOutfitColors(save_path, attribute, chidlrenObjs):
                     node.outputs["Color"].default_value = colorChoice["G"]
                 if (node.label == "BTint"):
                     node.outputs["Color"].default_value = colorChoice["B"]
-
-        obj.hide_viewport = False
-        obj.hide_render = False
-
-    # for block in bpy.data.materials:
-    #     if block.users == 0:
-    #         bpy.data.materials.remove(block)
-
-    # for block in bpy.data.textures:
-    #     if block.users == 0:
-    #         bpy.data.textures.remove(block)
-
-    # for block in bpy.data.images:
-    #     if block.users == 0:
-    #         bpy.data.images.remove(block)
     return colorkey
 
 def RGBtoHex(vals, rgbtype=1):

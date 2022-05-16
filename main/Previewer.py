@@ -35,11 +35,14 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
             for variant in hierarchy[attribute][type]:
                bpy.data.collections[variant].hide_viewport = True
                bpy.data.collections[variant].hide_render = True
-               char_var = variant + '_' + character
-
-               if bpy.data.collections.get(char_var) is not None:
-                  bpy.data.collections.get(char_var).hide_viewport = True
-                  bpy.data.collections.get(char_var).hide_render = True
+               for char in config.Characters:
+                  char_var = variant + '_' + char
+                  if bpy.data.collections.get(char_var) is not None:
+                     bpy.data.collections.get(char_var).hide_viewport = True
+                     bpy.data.collections.get(char_var).hide_render = True
+                     for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                        obj.hide_viewport = True
+                        obj.hide_render = True
 
 
    for strand in range(len(DNAString)):
@@ -64,6 +67,9 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                meshes = child.objects
                child.hide_viewport = False
                child.hide_render = False
+               for obj in meshes: # Should we re hide the object meshes?
+                  obj.hide_viewport = False
+                  obj.hide_render = False
             else:
                child.hide_viewport = True
                child.hide_render = True
