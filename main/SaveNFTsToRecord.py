@@ -300,15 +300,21 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 if(set_path != ""):
                                                     new_object = bpy.context.scene.objects["BLANK"].copy()
                                                     new_object.name = varient + "_" + texture_set
-                                                    new_object.hide_viewport = True
-                                                    new_object.hide_render = True
                                                     varient_coll.objects.link(new_object)
                                                     SetUpObjectMaterialsAndTextures(new_object, set_path) 
                                                     if index == 0:
                                                         #Remove base children objects used as a way to easily copy to texture varients
                                                         for char in config.Characters:                                     
                                                             for object in characterCollectionDict[char].objects:
+
+                                                                # for i in reversed(range(len(object.material_slots))):  # CHECK THIS ADD TO PREVIEWER
+                                                                #     bpy.context.view_layer.objects.active = object
+                                                                #     object.active_material_index = i
+                                                                #     bpy.ops.object.material_slot_remove()
+                                                                    
                                                                 object.material_slots[0].material = new_object.material_slots[0].material
+                                                    new_object.hide_viewport = True
+                                                    new_object.hide_render = True
                                                     index += 1 
 
                                         else:
