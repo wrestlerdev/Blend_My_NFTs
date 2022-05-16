@@ -370,12 +370,14 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["NormalNode"].image = newImage
+                matcopy.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
                 matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
             if "ID_" in tex:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["ColorIDNode"].image = newImage
+                matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
 
             if "M_" in tex:
