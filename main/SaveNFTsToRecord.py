@@ -282,12 +282,14 @@ def CreateSlotsFolderHierarchy(save_path):
                                             bpy.context.view_layer.active_layer_collection = layer_collection
 
                                             bpy.ops.wm.append(filepath=file_path, directory=directory, filename=char, active_collection=True, autoselect=True )
-
-                                            #goes through the temp holder collection created and finds children imported and unlink objs from them
-                                            for obj in bpy.context.selected_objects:
-                                                varient_coll_char.objects.link(obj)
-                                                if obj.type == "ARMATURE":
-                                                    bpy.data.objects.remove(obj, do_unlink=True)
+                                            if len(bpy.context.selected_objects) > 0:
+                                                #goes through the temp holder collection created and finds children imported and unlink objs from them
+                                                for obj in bpy.context.selected_objects:
+                                                    obj.hide_viewport = True
+                                                    obj.hide_render =  True
+                                                    varient_coll_char.objects.link(obj)
+                                                    if obj.type == "ARMATURE":
+                                                        bpy.data.objects.remove(obj, do_unlink=True)
 
 
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
