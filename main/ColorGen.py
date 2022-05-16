@@ -153,21 +153,15 @@ def SplitComplmentaryColor(col, split):
 
 availableColorStyleKeys = []
 styleKey = ""
-
-maincolor = (0.0, 0.0, 0.0)
-secondarycolor = (0.0, 0.0, 0.0)
-
-mainColorIndex = -1
-SecondaryColorIndex = -1
+colorkey = ""
 
 
-def SetUpCharacterStyle(save_path):
+
+def SetUpCharacterStyle():
     global availableColorStyleKeys, styleKey
-    global maincolor, secondarycolor
-    global mainColorIndex, SecondaryColorIndex
 
 
-    print(save_path)
+    save_path = bpy.context.scene.my_tool.root_dir
     color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
     globalStyleInfo = json.load(open(color_style_path))
 
@@ -219,11 +213,11 @@ def CheckAndFormatPath(path, pathTojoin = ""):
         return ""
     return new_path
 
-def PickOutfitColors(save_path, attribute, chidlrenObjs):
-    global style, styleChoice
-    global maincolor, secondarycolor
-    global mainColorIndex, SecondaryColorIndex
-    
+def PickOutfitColors(attribute, chidlrenObjs):
+    global styleKey, availableColorStyleKeys
+    global colorkey
+
+    save_path = save_path = bpy.context.scene.my_tool.root_dir
     if(attribute == "17-UpperHead"):
         colIndex = random.randrange(0, len(haircols) ) 
         col = haircols[colIndex]

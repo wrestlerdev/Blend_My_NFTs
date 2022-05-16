@@ -265,7 +265,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         character = PickCharacter()
         style = "Temp"
         print(save_path)
-        ColorGen.SetUpCharacterStyle(save_path)
+        ColorGen.SetUpCharacterStyle()
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -345,11 +345,13 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
+            textureIndex = 0
             if(len(bpy.data.collections.get(varientChoosen).objects) > 0):
-                textureVarient = bpy.data.collections.get(varientChoosen).objects[random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))]
+                textureIndex = random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))
+                textureVarient = bpy.data.collections.get(varientChoosen).objects[textureIndex]
                 for child in chidlrenObjs:
                     child.material_slots[0].material = textureVarient.material_slots[0].material #Check this - update to loop through all material slots
-            ColorGen.PickOutfitColors(save_path, attribute, chidlrenObjs)
+            ColorGen.PickOutfitColors(attribute, chidlrenObjs)
             ColorID = ['#111111'] * 3
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
 
@@ -358,17 +360,15 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             VarientDict = {}
             current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
             current_entry["Style"] = style
-            current_entry["TextureSet"] = textureChoosen
-            #current_entry["color_style"] = ColorGen.styleChoice
-            #current_entry["color_primary"] = ColorID[0]
-            #current_entry["color_secondary"] = ColorID[1]
-            #current_entry["color_tertiary"] = ColorID[2]
+            current_entry["TextureSet"] = textureIndex
+            current_entry["color_style"] = ColorGen.styleKey
+            current_entry["color_key"] = ColorGen.colorkey
             VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict
 
                 
-        SingleDNA.insert(0,character)
-        SingleDNA.insert(1, style) # TODO add color style to dict too
+        SingleDNA.insert(0, character)
+        SingleDNA.insert(1, ColorGen.styleKey) # TODO add color style to dict too
         
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
