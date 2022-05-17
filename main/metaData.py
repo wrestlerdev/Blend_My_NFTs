@@ -139,6 +139,7 @@ def returnERC721MetaDataCustom(name, DNA):
     # metaDataDictErc721["name"] = str(character + ": #0123")
 
     attributes.append({"trait_type": "Character", "value": character})
+    attributes.append({"trait_type": "Style", "value": style})
     
     for strand in range(len(DNAString)):
         DNASplit = DNAString[strand].split('-')
@@ -156,19 +157,26 @@ def returnERC721MetaDataCustom(name, DNA):
         split_description = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', description)).split())
         split_variant_type = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant_type)).split())
 
-        attribute_type = "{} {}".format(split_variant_type, split_description)
+        attribute_type = "{} {} {}".format(str(texture_index), split_variant_type, split_description)
         print(MetadataAttributeDict.get(variant.split('_')[1]))
-        
-        attribute = MetadataAttributeDict[variant.split('_')[1]]
-        if variant_type not in ["Null", "Nulll", "Block"]:
-            dict = {"trait_type": attribute, "value": attribute_type}
-            attributes.append(dict)
+        if MetadataAttributeDict.get(variant.split('_')[1]) is not None:
+            attribute = MetadataAttributeDict[variant.split('_')[1]]
+            if variant_type not in ["Null", "Nulll", "Block"]:
+                dict = {"trait_type": attribute, "value": attribute_type}
+                attributes.append(dict)
+        else:
+            attribute = "Temp: " + variant.split('_')[1]
+            if variant_type not in ["Null", "Nulll", "Block"]:
+                dict = {"trait_type": attribute, "value": attribute_type}
+                attributes.append(dict)
 
-    attributes = sorted(attributes, key = lambda i:MetadataAttributeOrder[i["trait_type"]])
+
+
+    # attributes = sorted(attributes, key = lambda i:MetadataAttributeOrder[i["trait_type"]])
     metaDataDictErc721["attributes"] = attributes
     
 
-
+    return metaDataDictErc721
 
 
 

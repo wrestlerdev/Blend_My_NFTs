@@ -535,12 +535,12 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # dele
 
 # -----------------------------------------------------------------
 
-def save_metadata_file(path, nft_name, nft_num, DNA):
-    path = os.path.join(path, nft_name)
+def save_metadata_file(path, nft_name, batch_num, nft_num, DNA):
+    nft_path = os.path.join(path, nft_name)
     metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA)
 
     metaDataObj = json.dumps(metadata, indent=1, ensure_ascii=True)
-    with open(os.path.join(path, "ERC721_{}.json".format(nft_num)), "w") as outfile:
+    with open(os.path.join(path, "ERC721_{}_{}.json".format(batch_num, nft_num)), "w") as outfile:
             outfile.write(metaDataObj)
 
 
@@ -559,13 +559,16 @@ def save_all_metadata_files(output_path):
                 if os.path.isdir(nft_path):
                     for nft_data in os.listdir(nft_path):
                         if nft_data.endswith(".json") and nft_data.startswith('Batch'):
+                            batch_index = nft_data.split('_')[1]
+                            nft_index = nft_data.split('_')[3]
+                            nft_index = nft_index.split('.')[0]
                             nft_record = os.path.join(nft_path, nft_data)
                             single_record = json.load(open(nft_record))
                             DNA = single_record["DNAList"]
                             name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
                             index = total_DNA.index(DNA) + 1
                             nft_name = name_prefix + "{:04d}".format(index)
-                            save_metadata_file(nft_path, nft_name, "{:04d}".format(index), DNA)
+                            save_metadata_file(nft_path, nft_name, batch_index, nft_index, DNA)
                             count += 1
     print("{} metadata files have been created".format(count))
     return
@@ -647,9 +650,13 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList): # REMEMBE
                     record_path = os.path.join(folder_path, default_prefix + '.json')
                     save_filename_to_record(record_path, file_name)
                     # shutil.copy(old_path, new_path)
+                else: # is this metadata?????????????
+                    metadata_path = os.path.join(folder_path, old_file)
+                    change_nftname_in_metadata(metadata_path, file_name)
             else:
             # print("old path: {}".format(old_path))
             # print("new path: {}".format(new_path))
+                print("hmph")
                 os.rename(old_path, new_path)
             
         else:
@@ -661,12 +668,14 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList): # REMEMBE
             # print("already renamed images?")
             
             if suffix == "json":
-                print(prefix)
-                print(default_prefix)
                 if current_prefix == default_prefix:
-                    print(old_path)
                     record_path = os.path.join(old_path)
                     save_filename_to_record(record_path, new_file_name)
+                else:
+                    metadata_path = os.path.join(old_path)
+                    # change_nftname_in_metadata(metadata_path, new_file_name)
+            else:
+                os.rename(old_path, new_path)
     
     return DNA if is_new else None
 
@@ -676,11 +685,23 @@ def save_filename_to_record(nftrecord_path, new_name):
     new_name = new_name.split('.')[0]
     if os.path.exists(nftrecord_path):
         record = json.load(open(nftrecord_path))
-        record["NewPrefix"] = new_name
+        record["NewName"] = new_name
 
         recordObj = json.dumps(record, indent=1, ensure_ascii=True)
         with open(nftrecord_path, "w") as outfile:
                 outfile.write(recordObj)
+    return
+
+
+def change_nftname_in_metadata(metadata_path, new_name):
+    # new_name = new_name.split('.')[0]
+    if os.path.exists(metadata_path):
+        data = json.load(open(metadata_path))
+        data["name"] = new_name
+
+        dataObj = json.dumps(data, indent=1, ensure_ascii=True)
+        with open(metadata_path, "w") as outfile:
+                outfile.write(dataObj)
 
     return
 
