@@ -20,7 +20,10 @@ import time
 import os
 import importlib
 from .main import config
-from PIL import Image
+try:
+    from PIL import Image
+except:
+    pass
 # Import files from main directory:
 
 importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
