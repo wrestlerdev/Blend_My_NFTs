@@ -59,7 +59,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
    
       textures = bpy.data.collections[variant].objects
       if textures:
-         texture = textures[texture_index] # TODO DO SMTH WITH TEXTURE
+         texture = textures[texture_index]
 
       if variant_children:
          for child in variant_children:
@@ -88,7 +88,9 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
 
 
 def set_texture_on_mesh(meshes, texture_mesh):
-   print("sike")
+   for child in meshes:         
+      for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+         child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
    return
 
 #------------------------------------------------------------------------------------

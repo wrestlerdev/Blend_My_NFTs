@@ -202,7 +202,9 @@ def PickOutfitColors(attribute, chidlrenObjs):
 
     for child in chidlrenObjs:
         obj = bpy.data.objects[child.name]
-
+        print("-------------------")
+        print(child.name)
+        print(obj.name)
         material_slots = obj.material_slots
         for m in material_slots:
             material = m.material
