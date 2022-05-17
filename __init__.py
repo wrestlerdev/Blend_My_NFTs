@@ -329,11 +329,11 @@ class randomizePreview(bpy.types.Operator):
 
     def execute(self, context):
         maxNFTs = bpy.context.scene.my_tool.collectionSize
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        save_path = bpy.path.abspath(bpy.context.scene.my_tool.root_dir)
         # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
-        Exporter.Previewer.fill_pointers_from_dna(DNA[0][0], Slots)
+        Exporter.Previewer.show_nft_from_dna(DNA[0][0])
         bpy.context.scene.my_tool.lastDNA = DNA[0][0]
         bpy.context.scene.my_tool.inputDNA = DNA[0][0]
 
@@ -1068,6 +1068,9 @@ class updateColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
+        save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+        DNA_Generator.Outfit_Generator.ColorGen.SetUpCharacterStyle("//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/", "Kae")
+        DNA_Generator.Outfit_Generator.ColorGen.PickOutfitColors("//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/", "not", [])
         return {'FINISHED'}
 
 

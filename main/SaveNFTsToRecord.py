@@ -257,7 +257,10 @@ def CreateSlotsFolderHierarchy(save_path):
                         for varient in os.listdir(varient_path):             
                             item_path = CheckAndFormatPath(varient_path, varient)
                             if item_path != "":
+                                print(varient)
                                 varient_coll = bpy.data.collections.new(varient)
+                                varient_coll.hide_viewport = True
+                                varient_coll.hide_render = True
                                 type_coll.children.link(varient_coll)
 
                                 for file in os.listdir(item_path):
@@ -269,11 +272,11 @@ def CreateSlotsFolderHierarchy(save_path):
                                             varient_coll_char = bpy.data.collections.new(varient + "_" + char)
                                             varient_coll.children.link(varient_coll_char)
                                             characterCollectionDict[char] = varient_coll_char
+                                            varient_coll_char.hide_viewport = True
+                                            varient_coll_char.hide_render = True
                                             file_path = ""
                                             file_path = os.path.join(directory, char)
-                                            file_path = file_path.replace('\\', '/')
-                                            print(directory)
-                                            print(file_path) 
+                                            file_path = file_path.replace('\\', '/') 
                                             #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
                                             layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
                                             bpy.context.view_layer.active_layer_collection = layer_collection
@@ -297,15 +300,21 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 if(set_path != ""):
                                                     new_object = bpy.context.scene.objects["BLANK"].copy()
                                                     new_object.name = varient + "_" + texture_set
-                                                    new_object.hide_viewport = True
-                                                    new_object.hide_render = True
                                                     varient_coll.objects.link(new_object)
                                                     SetUpObjectMaterialsAndTextures(new_object, set_path) 
                                                     if index == 0:
                                                         #Remove base children objects used as a way to easily copy to texture varients
                                                         for char in config.Characters:                                     
                                                             for object in characterCollectionDict[char].objects:
+
+                                                                # for i in reversed(range(len(object.material_slots))):  # CHECK THIS ADD TO PREVIEWER
+                                                                #     bpy.context.view_layer.objects.active = object
+                                                                #     object.active_material_index = i
+                                                                #     bpy.ops.object.material_slot_remove()
+                                                                    
                                                                 object.material_slots[0].material = new_object.material_slots[0].material
+                                                    new_object.hide_viewport = True
+                                                    new_object.hide_render = True
                                                     index += 1 
 
                                         else:
@@ -339,6 +348,7 @@ def CreateSlotsFolderHierarchy(save_path):
             child_col.objects.unlink(child_obj)
         bpy.data.collections.remove(child_col)                                    
     bpy.data.collections.remove(holder)
+    bpy.ops.outliner.orphans_purge()
 
     return
 
@@ -351,47 +361,51 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path):
         material.use_nodes = True
         matcopy = material.copy()
         m.material = matcopy
-        #m.material = bpy.data.materials['Test_02']
+
         # get the nodes
-        
-        for node in matcopy.node_tree.nodes:
-            if (node.label == "Diffuse"):
-                for tex in os.listdir(texture_path):
-                    if "T_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        print(file)
-                        file = file.replace('/', '\\')
-                        print(file)
-                        newImage = bpy.data.images.load(file, check_existing=True)
-                        node.image = newImage
-            if node.label == "Normal":
-                for tex in os.listdir(texture_path):
-                    if "N_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
-                        node.image = newImage
-            if node.label == "ColorID":
-                for tex in os.listdir(texture_path):
-                    if "ID_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
-                        node.image = newImage
-            if node.label == "Metallic":
-                for tex in os.listdir(texture_path):
-                    if "M_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
-                        node.image = newImage
-            if node.label == "Roughness":
-                for tex in os.listdir(texture_path):
-                    if "R_" in tex:
-                        file = file = os.path.join(texture_path, tex)
-                        file = file.replace('/', '\\')
-                        newImage = bpy.data.images.load(file, check_existing=True)
-                        node.image = newImage
+        for tex in os.listdir(texture_path):
+            if "T_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["DiffuseNode"].image = newImage
+                matcopy.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
+
+            if "N_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["NormalNode"].image = newImage
+                matcopy.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
+                matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
+            if "ID_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["ColorIDNode"].image = newImage
+                matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
+
+            if "M_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["MetallicNode"].image = newImage
+                matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
+
+            if "R_" in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["RoughnessNode"].image = newImage
+                matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
+
+            if "E_" in tex:
+                file = file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["EmissiveNode"].image = newImage 
+                matcopy.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
             # if node.label == "RTint":
             #     node.outputs["Color"].default_value = parent["color_primary"]
 
