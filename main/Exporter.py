@@ -574,14 +574,13 @@ def save_all_metadata_files(output_path):
 
 # ------------------------------- Refactor Exports ---------------------------
 
-def refactor_all_batches(batches_path, master_record_path): # should render record be separate record?
-    if not os.path.exists(master_record_path):
-        DNAList = []
-        emptyDict = {}
-        emptyDict["DNAList"] = DNAList
-        emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
-        with open(master_record_path, 'w') as outfile:
-            outfile.write(emptydata + '\n')
+def refactor_all_batches(batches_path, master_record_path):
+    DNAList = []
+    emptyDict = {}
+    emptyDict["DNAList"] = DNAList
+    emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
+    with open(master_record_path, 'w') as outfile:
+        outfile.write(emptydata + '\n')
 
     batches = len(next(os.walk(batches_path))[1])
 
@@ -656,7 +655,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList): # REMEMBE
         else:
             new_prefix = bpy.context.scene.my_tool.renderPrefix
             current_prefix, suffix = old_file.split('.')
-            new_file_name = new_prefix + str(index) + '.' + suffix
+            new_file_name = new_prefix + "{:04d}".format(index) + '.' + suffix
             old_path = os.path.join(folder_path, old_file)
             new_path = os.path.join(folder_path, new_file_name)
             # print("already renamed images?")
@@ -674,6 +673,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList): # REMEMBE
 
 
 def save_filename_to_record(nftrecord_path, new_name):
+    new_name = new_name.split('.')[0]
     if os.path.exists(nftrecord_path):
         record = json.load(open(nftrecord_path))
         record["NewPrefix"] = new_name

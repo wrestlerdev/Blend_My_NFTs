@@ -1439,6 +1439,14 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
+        output_path = os.path.abspath(os.path.join(mytool.batch_json_save_path, '..\..'))
+        row = layout.row()
+        
+        if output_path != os.path.abspath(mytool.root_dir):
+            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label, emboss=False)
+        else:
+            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+
         box = layout.box()
         row = box.row()
         row.prop(mytool, "root_dir",text='')
@@ -1447,18 +1455,12 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.label(text="Current loaded directory:")
         row = layout.row()
-        output_path = os.path.abspath(os.path.join(mytool.batch_json_save_path, '..\..'))
         row.label(text=output_path)
 
         row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
-        row = layout.row()
-        
-        if output_path != os.path.abspath(mytool.root_dir):
-            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label, emboss=False)
-        else:
-            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+
 
         row = layout.row()
         row = layout.row()
