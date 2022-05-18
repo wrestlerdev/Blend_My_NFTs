@@ -314,8 +314,6 @@ def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, 
     DNA = SingleDict["DNAList"]
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
-    # name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
-    # nft_name = name_prefix + "{:04d}".format(total_index)
     nft_name = file_name[:-len(".json")]
 
     image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
@@ -342,8 +340,6 @@ def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDN
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
-    # name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
-    # nft_name = name_prefix + "{:04d}.mp4".format(total_index)
     nft_name = file_name[:-len(".json")] + ".mp4"
     Previewer.show_nft_from_dna(DNA)
 
@@ -373,18 +369,25 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Generating 3D Model: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
-    # name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
-    # nft_name = name_prefix + "{:04d}".format(total_index)
     nft_name = file_name[:-len(".json")]
     modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
 
     Previewer.show_nft_from_dna(DNA)
-    # if not os.path.exists(modelFolder):
-    #     os.makedirs(modelFolder)
 
     for i in dnaDictionary:
-        coll = list(dnaDictionary[i].keys())[0]
-        # print(coll)
+        if dnaDictionary[i] != 'Null':
+            coll = list(dnaDictionary[i].keys())[0]
+        else:
+            slot_coll = bpy.data.collections[i]
+            if slot_coll.children:
+                type_coll = slot_coll.children[0]
+                if type_coll.children:
+                    var_coll = type_coll.children[0]
+                    coll = var_coll.name
+                else:
+                    coll = type_coll.name
+            else:
+                coll = slot_coll.name
         for obj in bpy.data.collections[coll].all_objects:
              obj.select_set(True)
 
