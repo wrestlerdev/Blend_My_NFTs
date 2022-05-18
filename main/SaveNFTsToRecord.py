@@ -227,12 +227,16 @@ def CreateSlotsFolderHierarchy(save_path):
                 slot_coll.children.link(slot_col_type)
                 slot_col_var = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_000_" + "Null" )
                 slot_col_type.children.link(slot_col_var)
+                
+                tex_object = bpy.context.scene.objects["BLANK"].copy()
+                slot_col_type.objects.link(tex_object)
                 characterCollectionDict = {}
                 for char in config.Characters:
                     varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2]+ "_000_" + "Null_"  + char)
                     characterCollectionDict[char] = varient_coll_char
                     new_object = bpy.context.scene.objects["BLANK"].copy()                                                
                     varient_coll_char.objects.link(new_object)
+                    new_object.material_slots[0].material = tex_object.material_slots[0].material
                     slot_col_var.children.link(varient_coll_char)
                     
                 # varient_coll_texture = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2] + "_000_" + "Null_" +  "A000")
@@ -298,23 +302,22 @@ def CreateSlotsFolderHierarchy(save_path):
                                             for texture_set in os.listdir(texture_path):
                                                 set_path = CheckAndFormatPath(texture_path, texture_set)
                                                 if(set_path != ""):
-                                                    new_object = bpy.context.scene.objects["BLANK"].copy()
-                                                    new_object.name = varient + "_" + texture_set
-                                                    varient_coll.objects.link(new_object)
-                                                    SetUpObjectMaterialsAndTextures(new_object, set_path) 
-                                                    if index == 0:
-                                                        #Remove base children objects used as a way to easily copy to texture varients
-                                                        for char in config.Characters:                                     
-                                                            for object in characterCollectionDict[char].objects:
-
-                                                                # for i in reversed(range(len(object.material_slots))):  # CHECK THIS ADD TO PREVIEWER
-                                                                #     bpy.context.view_layer.objects.active = object
-                                                                #     object.active_material_index = i
-                                                                #     bpy.ops.object.material_slot_remove()
-                                                                    
-                                                                object.material_slots[0].material = new_object.material_slots[0].material
-                                                    new_object.hide_viewport = True
-                                                    new_object.hide_render = True
+                                                    tex_object = bpy.context.scene.objects["BLANK"].copy()
+                                                    tex_object.name = varient + "_" + texture_set
+                                                    varient_coll.objects.link(tex_object)
+                                                    SetUpObjectMaterialsAndTextures(tex_object, set_path) 
+                                                    #Remove base children objects used as a way to easily copy to texture varients
+                                                    for char in config.Characters:                                     
+                                                        for childObj in characterCollectionDict[char].objects: 
+                                                            for i in range(0, len(tex_object.material_slots)):
+                                                                if childObj.material_slots[i]: 
+                                                                    print("Material SHould exsists")                                                                 
+                                                                    childObj.material_slots[i].material = tex_object.material_slots[i].material
+                                                                else:
+                                                                    childObj.data.materials.append(tex_object.material_slots[i].material)
+                                                                    print("NO MATWRIAL SLOT TO EDIT SO ADDING ONE")
+                                                    tex_object.hide_viewport = True
+                                                    tex_object.hide_render = True
                                                     index += 1 
 
                                         else:
