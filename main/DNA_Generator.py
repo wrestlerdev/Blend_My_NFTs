@@ -425,14 +425,8 @@ def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
             exists_in_original = False
          for variant in list(hierarchy[slot][type].keys()):
             if exists_in_original and variant in original_hierarchy[slot][type]:
-               exists_in_original = True
-            else: 
-               exists_in_original = False
-            for texture in list(hierarchy[slot][type][variant].keys()):
-               if exists_in_original and texture in original_hierarchy[slot][type][variant]:
-                  hierarchy[slot][type][variant][texture]["texture_rarity"]   = original_hierarchy[slot][type][variant][texture]["texture_rarity"]
-                  hierarchy[slot][type][variant][texture]["variant_rarity"]   = original_hierarchy[slot][type][variant][texture]["variant_rarity"]
-                  hierarchy[slot][type][variant][texture]["type_rarity"]      = original_hierarchy[slot][type][variant][texture]["type_rarity"]
+               hierarchy[slot][type][variant]["variant_rarity"]   = original_hierarchy[slot][type][variant]["variant_rarity"]
+               hierarchy[slot][type][variant]["type_rarity"]      = original_hierarchy[slot][type][variant]["type_rarity"]
                # print(original_hierarchy[slot][type][variant][texture] is not None)
    DataDictionary["hierarchy"] = hierarchy
 
