@@ -592,21 +592,25 @@ def refactor_all_batches(batches_path, master_record_path):
         refactor_single_batch(batch_path, i+1, master_record_path)
     return
 
+
 def refactor_single_batch(batch_path, batch_index, master_record_path):
     master_record = json.load(open(master_record_path))
     DNAList = master_record["DNAList"]
-
     nfts = len(next(os.walk(batch_path))[1])
 
     for i in range(nfts):
         nft_path = os.path.join(batch_path, "NFT_{:04d}".format(i + 1))
         default_prefix = "Batch_{:03d}_NFT_{:04d}".format(batch_index, i + 1)
+        metadata_prefix = "ERC721_{:03d}_{:04d}".format(batch_index, i + 1)
 
         for dir in os.listdir(nft_path): # checking if files have been renamed
             prefix, suffix = dir.split('.')
             if suffix != 'json':
                 if prefix != default_prefix:
-                    break
+                    if prefix != metadata_prefix:
+                        break
+                    else:
+                        prefix = default_prefix
                 else:
                     prefix = default_prefix
         
@@ -620,7 +624,9 @@ def refactor_single_batch(batch_path, batch_index, master_record_path):
         outfile.write(master_record_data + '\n')
     return
 
-def refactor_single_nft(folder_path, default_prefix, prefix, DNAList): # REMEMBER TO MAKE THIS APPLY TO THE METADATA FILE :<
+
+def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
+    # will rename export files and add new export names to json file info
     single_record = json.load(open(os.path.join(folder_path, default_prefix + '.json')))
     DNA = single_record["DNAList"]
     if not DNA in DNAList:
@@ -631,61 +637,36 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList): # REMEMBE
         index = DNAList.index(DNA)
         is_new = False
 
-
     files = os.listdir(folder_path)
     for old_file in files:
         if prefix in old_file:
-            new_prefix = bpy.context.scene.my_tool.renderPrefix
-            file_name = new_prefix + "{:04d}".format(index)
+            current_prefix = prefix
             suffix = old_file.split('.')[-1]
-            new_file_name = file_name + '.' + suffix
-            old_path = os.path.join(folder_path, old_file)
-            new_path = os.path.join(folder_path, new_file_name)
-            
-            # if os.path.exists(os.path.join(folder_path, old_path)):
-
-
-            if suffix == "json":
-                if prefix == default_prefix:
-                    record_path = os.path.join(folder_path, default_prefix + '.json')
-                    save_filename_to_record(record_path, file_name)
-                    # shutil.copy(old_path, new_path)
-                else: # is this metadata?????????????
-                    metadata_path = os.path.join(folder_path, old_file)
-                    change_nftname_in_metadata(metadata_path, file_name)
-            else:
-            # print("old path: {}".format(old_path))
-            # print("new path: {}".format(new_path))
-                print("hmph")
-                os.rename(old_path, new_path)
-            
-        else:
-            new_prefix = bpy.context.scene.my_tool.renderPrefix
+        else: # if file has already been refactored previously
             current_prefix, suffix = old_file.split('.')
-            new_file_name = new_prefix + "{:04d}".format(index) + '.' + suffix
-            old_path = os.path.join(folder_path, old_file)
-            new_path = os.path.join(folder_path, new_file_name)
-            # print("already renamed images?")
-            
-            if suffix == "json":
-                if current_prefix == default_prefix:
-                    record_path = os.path.join(old_path)
-                    save_filename_to_record(record_path, new_file_name)
-                else:
-                    metadata_path = os.path.join(old_path)
-                    # change_nftname_in_metadata(metadata_path, new_file_name)
+
+        new_prefix = bpy.context.scene.my_tool.renderPrefix
+        new_file_name = new_prefix + "{:04d}".format(index) + '.' + suffix
+        old_path = os.path.join(folder_path, old_file)
+        new_path = os.path.join(folder_path, new_file_name)            
+        if suffix == "json":
+            if current_prefix == default_prefix:
+                record_path = os.path.join(old_path)
+                save_filename_to_record(record_path, new_file_name)
             else:
-                os.rename(old_path, new_path)
+                metadata_path = os.path.join(old_path)
+                change_nftname_in_metadata(metadata_path, new_file_name)
+        else:
+            os.rename(old_path, new_path)
     
     return DNA if is_new else None
-
 
 
 def save_filename_to_record(nftrecord_path, new_name):
     new_name = new_name.split('.')[0]
     if os.path.exists(nftrecord_path):
         record = json.load(open(nftrecord_path))
-        record["NewName"] = new_name
+        record["filename"] = new_name
 
         recordObj = json.dumps(record, indent=1, ensure_ascii=True)
         with open(nftrecord_path, "w") as outfile:
@@ -694,7 +675,7 @@ def save_filename_to_record(nftrecord_path, new_name):
 
 
 def change_nftname_in_metadata(metadata_path, new_name):
-    # new_name = new_name.split('.')[0]
+    new_name = new_name.split('.')[0]
     if os.path.exists(metadata_path):
         data = json.load(open(metadata_path))
         data["name"] = new_name
