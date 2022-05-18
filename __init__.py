@@ -20,7 +20,10 @@ import time
 import os
 import importlib
 from .main import config
-from PIL import Image
+try:
+    from PIL import Image
+except:
+    pass
 # Import files from main directory:
 
 importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
@@ -998,8 +1001,8 @@ class refactorExports(bpy.types.Operator):
     def execute(self, context):
         export_dir = bpy.context.scene.my_tool.separateExportPath
         batches_path = os.path.join(export_dir, "Blend_My_NFTs Output", "OUTPUT")
-        master_record_path = ''
-        Exporter.refactor_all_batches(batches_path, master_record_path)
+        render_record_path = os.path.join(batches_path, "_RenderRecord.json")
+        Exporter.refactor_all_batches(batches_path, render_record_path)
 
         return {'FINISHED'}
 
@@ -1439,6 +1442,14 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
+        output_path = os.path.abspath(os.path.join(mytool.batch_json_save_path, '..\..'))
+        row = layout.row()
+        
+        if output_path != os.path.abspath(mytool.root_dir):
+            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label, emboss=False)
+        else:
+            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+
         box = layout.box()
         row = box.row()
         row.prop(mytool, "root_dir",text='')
@@ -1447,18 +1458,12 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.label(text="Current loaded directory:")
         row = layout.row()
-        output_path = os.path.abspath(os.path.join(mytool.batch_json_save_path, '..\..'))
         row.label(text=output_path)
 
         row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
-        row = layout.row()
-        
-        if output_path != os.path.abspath(mytool.root_dir):
-            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label, emboss=False)
-        else:
-            row.operator(initializeRecord.bl_idname, text=initializeRecord.bl_label)
+
 
         row = layout.row()
         row = layout.row()
