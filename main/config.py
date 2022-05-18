@@ -1,3 +1,3 @@
-Characters = ["Kae", "Nef", "Rem"]
+Characters = ["Nef", "Kae", "Rem"]
 
 MasterMaterialName = 'MasterV01'
