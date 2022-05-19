@@ -278,23 +278,35 @@ def CreateSlotsFolderHierarchy(save_path):
                                             characterCollectionDict[char] = varient_coll_char
                                             varient_coll_char.hide_viewport = True
                                             varient_coll_char.hide_render = True
-                                            file_path = ""
-                                            file_path = os.path.join(directory, char)
-                                            file_path = file_path.replace('\\', '/') 
-                                            #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
-                                            layer_collection = bpy.context.view_layer.layer_collection.children["Holder"]
-                                            bpy.context.view_layer.active_layer_collection = layer_collection
+                                        file_path = ""
+                                        file_path = os.path.join(directory, "ITEM")
+                                        file_path = file_path.replace('\\', '/') 
+                                        #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
+                                        tempHolder = bpy.data.collections.new("tempHolder")
+                                        bpy.context.scene.collection.children.link(tempHolder)
+                                        layer_collection = bpy.context.view_layer.layer_collection.children[tempHolder.name]
+                                        bpy.context.view_layer.active_layer_collection = layer_collection
 
-                                            bpy.ops.wm.append(filepath=file_path, directory=directory, filename=char, active_collection=True, autoselect=True )
-                                            if len(bpy.context.selected_objects) > 0:
-                                                #goes through the temp holder collection created and finds children imported and unlink objs from them
-                                                for obj in bpy.context.selected_objects:
-                                                    obj.hide_viewport = True
-                                                    obj.hide_render =  True
-                                                    varient_coll_char.objects.link(obj)
-                                                    if obj.type == "ARMATURE":
-                                                        bpy.data.objects.remove(obj, do_unlink=True)
+                                        bpy.ops.wm.append(filepath=file_path, directory=directory, filename="ITEM", active_collection=True, autoselect=True )
 
+                                        if len(bpy.context.selected_objects) > 0:
+                                            #goes through the temp holder collection created and finds children imported and unlink objs from them
+                                            for obj in bpy.context.selected_objects:
+                                                if obj.type == "ARMATURE":
+                                                    bpy.data.objects.remove(obj, do_unlink=True)
+
+                                        for item in tempHolder.children:
+                                            if item.name == "ITEM":
+                                                for char in item.children:
+                                                    print(char.name)
+                                                    for obj in char.objects:
+                                                        print(obj.name)
+                                                        for c in config.Characters:
+                                                            if char.name.partition(".")[0] == c:
+                                                                print(c)
+                                                                characterCollectionDict[c].objects.link(obj)
+                                                                obj.hide_viewport = True
+                                                                obj.hide_render =  True
 
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
                                         if(texture_path != ""):
@@ -318,7 +330,13 @@ def CreateSlotsFolderHierarchy(save_path):
                                                     #                 print("NO MATWRIAL SLOT TO EDIT SO ADDING ONE")
                                                     tex_object.hide_viewport = True
                                                     tex_object.hide_render = True
-                                                    index += 1 
+                                                    index += 1
+                                            for child_col in tempHolder.children:
+                                                for child_obj in child_col.objects:
+                                                    child_col.objects.unlink(child_obj)
+                                                bpy.data.collections.remove(child_col)                                    
+                                            bpy.data.collections.remove(tempHolder)
+                                            bpy.ops.outliner.orphans_purge() 
 
                                         else:
                                             print("No Textures")
@@ -346,12 +364,6 @@ def CreateSlotsFolderHierarchy(save_path):
     #         for char in list(characterCollectionDict.keys()):
     #             col = bpy.data.collections.new(varient + "_" + texture_set + color_tex_varient + "_" + char)
     #             varient_texture_set.children.link(col)
-    for child_col in holder.children:
-        for child_obj in child_col.objects:
-            child_col.objects.unlink(child_obj)
-        bpy.data.collections.remove(child_col)                                    
-    bpy.data.collections.remove(holder)
-    bpy.ops.outliner.orphans_purge()
 
     return
 
@@ -377,39 +389,37 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
         for m in matfolderlink.keys():         
             if len(obj.material_slots) <= i:
                 print("Slot Exists")
-                #obj.material_slots[i].link = 'OBJECT'
-            else:
-                print("]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
-                print(obj.name)
-                obj.material_slots
                 tempmaterial = bpy.data.materials['MasterV01']
                 tempcopy = tempmaterial.copy()
+                tempcopy.name = m
+                obj.material_slots[i].link = 'OBJECT'
+                obj.material_slots[i].material = tempcopy
+                tempcopy.name = m     
+  
+            else:
+                print("********************************")
+                print(obj.name)
+                tempmaterial = bpy.data.materials['MasterV01']
+                tempcopy = tempmaterial.copy()
+                tempcopy.name = m
                 # bpy.data.objects[obj.name].select_set(True)
                 # bpy.ops.object.material_slot_add()
                 # bpy.ops.material.new()
                 # obj.material_slots[i].link = 'OBJECT'
                 # #bpy.ops.object.material_slot_remove()
                 # bpy.data.objects[obj.name].select_set(False)
-                obj.data.materials.append(tempcopy)
+                obj.data.materials.append(None)
                 obj.material_slots[i].link = 'OBJECT'
-                #obj.data.materials.pop(index = i)
-                
-            
-            print(matfolderlink[m])
-            material = bpy.data.materials['MasterV01']
-            material.use_nodes = True
-            matcopy = material.copy()
-            matcopy.name = m
-            obj.material_slots[i].link = 'OBJECT'
-            obj.material_slots[i].material = matcopy
-            LinkImagesToNodes(matcopy, os.path.join(texture_path, matfolderlink[m]))
+                obj.material_slots[i].material = tempcopy
+                tempcopy.name = m
+                #obj.data.materials.pop(index = i)     
+            print(m)
+            # material = bpy.data.materials['MasterV01']
+            # material.use_nodes = True
+            # matcopy = material.copy()
+            # matcopy.name = m
+            LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
             i += 1
-    for i in reversed(range(0, len(obj.material_slots))):
-        if obj.material_slots[i].link != 'OBJECT':
-            print(i)
-            #obj.data.materials.pop(index = i)
-
-
     else:
         material_slots = obj.material_slots
         for m in material_slots:
@@ -420,6 +430,13 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
             matcopy = material.copy()
             m.material = matcopy
             LinkImagesToNodes(matcopy, texture_path)
+    
+    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    for i in reversed(range(0, len(obj.material_slots))):
+        if obj.material_slots[i].link != 'OBJECT':
+            print("Deleting: " + str(i))
+            obj.material_slots[i].link = 'OBJECT'
+            #obj.data.materials.pop(index = i)
     
 
 def LinkImagesToNodes(matcopy, texture_path):

@@ -19,6 +19,68 @@ from . import config
 
 
 # A list for each caterogry of clothing that states what slots it will fil
+
+#Shirts
+ShirtCropSleeveless = ["01-UpperTorso"]
+ShirtCropSleevelessNeck = ["01-UpperTorso", "13-Neck"]
+ShirtCrop = ["01-UpperTorso", "03-LForeArm", "05-RForeArm"]
+ShirtCropNeck = ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "18-BackPack"]
+
+ShirtMidSleeveless = ["01-UpperTorso", "02-MiddleTorso"]
+ShirtMidSleevelessNeck = ["01-UpperTorso", "02-MiddleTorso", "13-Neck"]
+ShirtMid = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"]
+ShirtMidNeck = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack"]
+
+ShirtLongSleeveless = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick"]
+ShirtLongSleevelessNeck = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick","13-Neck"]
+ShirtLong = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm"]
+ShirtLongNeck = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "18-BackPack"]
+
+#Pants
+PantsShort = ["09-PelvisThin"]
+PantsShortThick = ["08-PelvisThick", "09-PelvisThin"]
+PantsShortHigh = ["08-PelvisThick", "09-PelvisThin", "02-MiddleTorso"]
+
+PantsMid = ["09-PelvisThin", "10-Calf"]
+PantsMidThick = ["08-PelvisThick", "09-PelvisThin", "10-Calf"]
+PantsMidHigh = ["08-PelvisThick", "09-PelvisThin", "10-Calf", "02-MiddleTorso"]
+
+PantsLong = ["09-PelvisThin", "10-Calf", "11-Ankle"]
+PantsLongThick = ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"]
+PantsLongHigh = ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle", "02-MiddleTorso"]
+
+#Outfir
+OutfitLong = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack", "10-Calf", "11-Ankle"]
+OutfitLongSleeveless = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack", "10-Calf", "11-Ankle"]
+
+OutfitMid = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack", "10-Calf"]
+OutfitMidSleeveless = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack", "10-Calf"]
+
+OutfitShort = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack"]
+OutfitShortSleeveless = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack"]
+
+#Arms
+Forearm = ["03-LForeArm", "05-RForeArm"]
+HandsShort = ["07-Hands"]
+HandsLong = ["05-RForeArm", "03-LForeArm", "07-Hands"]
+
+#Feet
+FeetLong = ["10-Calf", "11-Ankle", "12-Feet"]
+FeetMid = ["11-Ankle", "12-Feet"]
+FeetShort = ["12-Feet"]
+
+#Head
+Neck = ["13-Neck"]
+HeadUpper = ["17-UpperHead"]
+HeadMiddle = ["15-MiddleHead"]
+HeadLower = ["14-LowerHead"]
+HeadFull = ["15-MiddleHead", "14-LowerHead"]
+
+#Backpack
+Backpack = ["13-Neck", "18-BackPack"]
+
+
+ThinPantsSlots = ["09-PelvisThin", "10-Calf", "11-Ankle"]
 CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"]
 LongCoatsSlot = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"]
 VestHoodiesSlot = ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-BackPack"]
