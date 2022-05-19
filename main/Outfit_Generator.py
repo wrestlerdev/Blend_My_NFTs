@@ -496,12 +496,6 @@ def PickWeightedTypeVarient(Varients):
         first_variant = list(Varients.keys())[0]
         print("no variant attributes had rarity > 0, so chose first variant attribute: {}".format(first_variant))
         return first_variant, 0
-    # charVariants = bpy.data.collections[variantChoosen[0]].children
-    # if charVariants:
-    #     for child in charVariants:
-    #         if child.name.split('_')[-1] == character:
-    #             return child.name, list(Varients.keys()).index(variantChoosen[0])
-    # else:
 
 
 
@@ -531,7 +525,12 @@ def PickWeightedTextureVarient(Textures):
  
 def PickCharacter(default_char=''):
     if default_char == '':
-        char = random.choice(config.Characters)
+        if bpy.context.scene.my_tool.isCharacterLocked:
+            inputDNA = bpy.context.scene.my_tool.inputDNA
+            DNASplit = inputDNA.split(',')
+            char = DNASplit[0]
+        else:
+            char = random.choice(config.Characters)
     else:
         char = default_char
     return char
