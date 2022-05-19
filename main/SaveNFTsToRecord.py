@@ -229,12 +229,14 @@ def CreateSlotsFolderHierarchy(save_path):
                 slot_col_type.children.link(slot_col_var)
                 
                 tex_object = bpy.context.scene.objects["BLANK"].copy()
+                tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()
                 slot_col_type.objects.link(tex_object)
                 characterCollectionDict = {}
                 for char in config.Characters:
                     varient_coll_char = bpy.data.collections.new(slot.partition('-')[2] + "_" + slot_col_type.name.partition('-')[2]+ "_000_" + "Null_"  + char)
                     characterCollectionDict[char] = varient_coll_char
-                    new_object = bpy.context.scene.objects["BLANK"].copy()                                                
+                    new_object = bpy.context.scene.objects["BLANK"].copy()
+                    new_object.data = bpy.context.scene.objects["BLANK"].data.copy()                                                
                     varient_coll_char.objects.link(new_object)
                     #new_object.material_slots[0].material = tex_object.material_slots[0].material
                     slot_col_var.children.link(varient_coll_char)
@@ -315,6 +317,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 set_path = CheckAndFormatPath(texture_path, texture_set)
                                                 if(set_path != ""):
                                                     tex_object = bpy.context.scene.objects["BLANK"].copy()
+                                                    tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()
                                                     tex_object.name = varient + "_" + texture_set
                                                     varient_coll.objects.link(tex_object)
                                                     SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict) 
@@ -387,16 +390,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
         i = 0
         print(matfolderlink)
         for m in matfolderlink.keys():         
-            if len(obj.material_slots) <= i:
-                print("Slot Exists")
-                tempmaterial = bpy.data.materials['MasterV01']
-                tempcopy = tempmaterial.copy()
-                tempcopy.name = m
-                obj.material_slots[i].link = 'OBJECT'
-                obj.material_slots[i].material = tempcopy
-                tempcopy.name = m     
-  
-            else:
+            if i >= len(obj.material_slots):
                 print("********************************")
                 print(obj.name)
                 tempmaterial = bpy.data.materials['MasterV01']
@@ -409,10 +403,19 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
                 # #bpy.ops.object.material_slot_remove()
                 # bpy.data.objects[obj.name].select_set(False)
                 obj.data.materials.append(None)
-                obj.material_slots[i].link = 'OBJECT'
+                #obj.material_slots[i].link = 'OBJECT'
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m
-                #obj.data.materials.pop(index = i)     
+                #obj.data.materials.pop(index = i) 
+            else:
+                print("Slot Exists")
+                tempmaterial = bpy.data.materials['MasterV01']
+                tempcopy = tempmaterial.copy()
+                tempcopy.name = m
+                #obj.material_slots[i].link = 'OBJECT'
+                obj.material_slots[i].material = tempcopy
+                tempcopy.name = m     
+    
             print(m)
             # material = bpy.data.materials['MasterV01']
             # material.use_nodes = True
@@ -424,19 +427,20 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
         material_slots = obj.material_slots
         for m in material_slots:
             #material = m.material
-            m.link = 'OBJECT' 
+            #m.link = 'OBJECT' 
             material = bpy.data.materials['MasterV01']
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
+            print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             LinkImagesToNodes(matcopy, texture_path)
     
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-    for i in reversed(range(0, len(obj.material_slots))):
-        if obj.material_slots[i].link != 'OBJECT':
-            print("Deleting: " + str(i))
-            obj.material_slots[i].link = 'OBJECT'
-            #obj.data.materials.pop(index = i)
+    
+    # for i in reversed(range(0, len(obj.material_slots))):
+    #     if obj.material_slots[i].link != 'OBJECT':
+    #         print("Deleting: " + str(i))
+    #         obj.material_slots[i].link = 'OBJECT'
+    #         #obj.data.materials.pop(index = i)
     
 
 def LinkImagesToNodes(matcopy, texture_path):
