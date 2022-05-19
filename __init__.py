@@ -20,13 +20,10 @@ import time
 import os
 import importlib
 from .main import config
-try:
-    from PIL import Image
-except:
-    pass
+
 # Import files from main directory:
 
-importList = ['Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
+importList = ['TextureEditor', 'Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
 
 if bpy in locals():
         importlib.reload(LoadNFT)
@@ -37,6 +34,7 @@ if bpy in locals():
         importlib.reload(get_combinations)
         importlib.reload(SaveNFTsToRecord)
         importlib.reload(UIList)
+        importlib.reload(TextureEditor)
 else:
     from .main import \
         LoadNFT, \
@@ -45,7 +43,8 @@ else:
         Exporter, \
         Batch_Refactorer, \
         SaveNFTsToRecord, \
-        get_combinations
+        get_combinations, \
+        TextureEditor
 
     from .ui_Lists import UIList
 
@@ -1135,6 +1134,19 @@ class prevTextureSet(bpy.types.Operator):
 
 
 
+# --------------------------------- Textures ---------------------------------------------
+
+
+class texturestuff(bpy.types.Operator):
+    bl_idname = 'temp.text'
+    bl_label = 'test'
+    bl_description = 'test'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        TextureEditor.create_downres_textures(input_path, 1024)
+        return {'FINISHED'}
 
 
 # ------------------------------- Panels ----------------------------------------------
@@ -1178,7 +1190,6 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "maxNFTs")
         row.operator(createBatch.bl_idname, text=createBatch.bl_label)
-
 
         row = layout.separator()
         box = layout.box()
@@ -1231,6 +1242,9 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
 
         row = layout.row()
         row.prop(mytool, "isCharacterLocked", toggle=1, expand=True)
+
+        row = layout.row()
+        row.operator(texturestuff.bl_idname, text=texturestuff.bl_label)
         # row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
         
 
@@ -1812,7 +1826,9 @@ classes = (
     prevTextureSet,
     deleteColourStyle,
     confirmRefactor,
-    refactorExports
+    refactorExports,
+
+    texturestuff
 
 )
 
