@@ -210,9 +210,6 @@ def CreateSlotsFolderHierarchy(save_path):
     delete_hierarchy(bpy.context.scene.collection)
     bpy.ops.outliner.orphans_purge()
 
-    holder = bpy.data.collections.new("Holder")
-    bpy.context.scene.collection.children.link(holder)
-
     slots_path = CheckAndFormatPath(save_path, "INPUT/SLOTS")
     if(slots_path != ""):
         for slot in os.listdir(slots_path):
@@ -230,6 +227,8 @@ def CreateSlotsFolderHierarchy(save_path):
                 
                 tex_object = bpy.context.scene.objects["BLANK"].copy()
                 tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()
+                tex_object.hide_viewport = True
+                tex_object.hide_render = True
                 slot_col_type.objects.link(tex_object)
                 characterCollectionDict = {}
                 for char in config.Characters:
@@ -238,6 +237,8 @@ def CreateSlotsFolderHierarchy(save_path):
                     new_object = bpy.context.scene.objects["BLANK"].copy()
                     new_object.data = bpy.context.scene.objects["BLANK"].data.copy()                                                
                     varient_coll_char.objects.link(new_object)
+                    varient_coll_char.hide_viewport = True
+                    varient_coll_char.hide_render = True
                     #new_object.material_slots[0].material = tex_object.material_slots[0].material
                     slot_col_var.children.link(varient_coll_char)
                     
@@ -281,7 +282,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                             varient_coll_char.hide_viewport = True
                                             varient_coll_char.hide_render = True
                                         file_path = ""
-                                        file_path = os.path.join(directory, "ITEM")
+                                        file_path = os.path.join(directory, "Item")
                                         file_path = file_path.replace('\\', '/') 
                                         #bpy.ops.wm.append(filepath='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/Import', directory='//EMPIRE/Empire/INTERACTIVE_PROJECTS/SOUL_AETHER/3D_PRODUCTION/SLOTS/01-Uppertorso/CropTops/Uppertorso_Croptops_beltedCrop_001/uppertorso_crop01_001.blend/Collection/', filename="Import")
                                         tempHolder = bpy.data.collections.new("tempHolder")
@@ -289,7 +290,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                         layer_collection = bpy.context.view_layer.layer_collection.children[tempHolder.name]
                                         bpy.context.view_layer.active_layer_collection = layer_collection
 
-                                        bpy.ops.wm.append(filepath=file_path, directory=directory, filename="ITEM", active_collection=True, autoselect=True )
+                                        bpy.ops.wm.append(filepath=file_path, directory=directory, filename="Item", active_collection=True, autoselect=True )
 
                                         if len(bpy.context.selected_objects) > 0:
                                             #goes through the temp holder collection created and finds children imported and unlink objs from them
@@ -298,7 +299,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                     bpy.data.objects.remove(obj, do_unlink=True)
 
                                         for item in tempHolder.children:
-                                            if item.name == "ITEM":
+                                            if item.name == "Item":
                                                 for char in item.children:
                                                     print(char.name)
                                                     for obj in char.objects:
