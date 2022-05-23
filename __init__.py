@@ -143,6 +143,17 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    textureSize: bpy.props.EnumProperty(
+            name='textuuuuuuuuures',
+            description="texture",
+            items=[
+                ('4k', '4k', '4096x4096'),
+                ('2k', '2k', '2048x2048'),
+                ('1k', '1k', '1024x1024'),
+                ('512', '512', '512x512')
+            ]
+        )
+
     isCharacterLocked: bpy.props.BoolProperty(name="Lock Character", default=False)
 
     separateExportPath: bpy.props.StringProperty(name="Directory")
@@ -1137,15 +1148,16 @@ class prevTextureSet(bpy.types.Operator):
 # --------------------------------- Textures ---------------------------------------------
 
 
-class texturestuff(bpy.types.Operator):
-    bl_idname = 'temp.text'
-    bl_label = 'test'
-    bl_description = 'test'
+class downresTextures(bpy.types.Operator):
+    bl_idname = 'downres.textures'
+    bl_label = 'Create Down-res Textures'
+    bl_description = 'Create Down-res Textures'
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        TextureEditor.create_downres_textures(input_path, 1024)
+        resolutions = [512, 1024, 2048]
+        TextureEditor.create_downres_textures(input_path, resolutions)
         return {'FINISHED'}
 
 
@@ -1243,10 +1255,12 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "isCharacterLocked", toggle=1, expand=True)
 
-        row = layout.row()
-        row.operator(texturestuff.bl_idname, text=texturestuff.bl_label)
-        # row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
-        
+        box = layout.box()
+        row = box.row()
+        row.prop(mytool, "textureSize", expand=True)
+
+
+
 
 # class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
 #     bl_label = "Torso Slots"
@@ -1480,11 +1494,11 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
-
-
-        row = layout.row()
         row = layout.row()
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
+
+        # row = layout.row()
+        row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
 
 
 #-----------------------------------------------------------------------
@@ -1684,10 +1698,14 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
         row = layout.row()
+        row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
+
+        row = layout.row()
 
         row.label(text="Clean up:")
         row = layout.row()
         row.operator(purgeData.bl_idname, text=purgeData.bl_label)
+
 
 
 
@@ -1828,7 +1846,7 @@ classes = (
     confirmRefactor,
     refactorExports,
 
-    texturestuff
+    downresTextures
 
 )
 

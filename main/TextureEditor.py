@@ -3,6 +3,7 @@ try:
 except:
     pass
 
+from sys import prefix
 from . import config
 import os
 
@@ -45,29 +46,30 @@ def create_downres_textures(input_path, dims):
 
 def downres_all_textures_in_folder(path, dims):
     image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
-    og_texture_prefixes = ['E_', 'ID_', 'M_', 'N_', 'R_', 'T_']
+    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D']
 
 
     texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in image_extensions)]
-    original_textures = [fn for fn in texture_images if any(fn.startswith(pre) for pre in og_texture_prefixes)] # original 4k textures
+    original_textures = [fn for fn in texture_images if any((fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
 
     for image in original_textures:
-        # image_path = os.path.join(path, image)
         downres_single_texture(path, image, dims)
-        return # GET RID OF THIS L8R
     return
 
 
 def downres_single_texture(path, image_name, dims):
-    prefixes = {256: '2_', 512: '5_', 1024: '1k_', 2048: '2k_'}
     
     if type(dims) != list:
         dims = [dims]
     for size in dims:
         image_path = os.path.join(path, image_name)
         with Image.open(image_path) as image:
-            resized = image.resize([size]*2)
-            new_name = prefixes[size] + image_name
+            resized = image.resize([size, size])
+            if size not in config.texture_suffixes:
+                print("This isn't a valid dimension for {} atm".format(image_name))
+                return
+            old_name = image_name.rpartition('.')
+            new_name = old_name[0] + config.texture_suffixes[size] + old_name[1] + old_name[2]
             new_path = os.path.join(path, new_name)
             resized.save(new_path, quality=95, optimize=True)
             print(new_path)
