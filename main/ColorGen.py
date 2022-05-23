@@ -332,3 +332,58 @@ def add_to_colourindex(amount):
     bpy.context.scene.my_tool.colourStyleIndex = color_key
     bpy.context.scene.my_tool.lastStyleIndex = index
     return index
+
+def SaveNewColorStyle(ColorListName, R, G, B, root_dir):
+    print(ColorListName)
+    print(R)
+    NewColorStyle = {}
+    NewColorStyle["ComonName"] = ColorListName
+    NewColorStyle["R"] = [R[0],R[1],R[2],R[3]]
+    NewColorStyle["G"] = [G[0],G[1],G[2],G[3]]
+    NewColorStyle["B"] = [B[0],B[1],B[2],B[3]]
+    print(NewColorStyle)
+    GlobalColorList = OpenColorList(root_dir)
+    GlobalColorList[ColorListName] = NewColorStyle
+    WriteToColorList(GlobalColorList, root_dir)
+
+
+def DeleteColorList(ColorListName, root_dir):
+    GlobalColorList = OpenColorList(root_dir)
+    GlobalColorList.pop(ColorListName, None)
+    WriteToColorList(GlobalColorList, root_dir)
+
+
+def DoesColorListExist(ColorListName, root_dir):
+    path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
+    GlobalColorList = json.load(open(path))
+    if GlobalColorList.get(ColorListName) is not None:
+        print("Exists")
+        doesListExist = True
+    else:
+        print("Does not exist")
+        doesListExist = False
+    return doesListExist
+
+def OpenColorList(root_dir):
+    path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
+    GlobalColorList = json.load(open(path))
+    return GlobalColorList
+
+def WriteToColorList(GlobalColorList, root_dir):
+    path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
+    try:
+      ledger = json.dumps(GlobalColorList, indent=1, ensure_ascii=True)
+      print(ledger)
+      with open(path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+    except:
+      print("ColorStyle was not sent")
+
+def ColorHasbeenUpdated(ColorTint):
+    print(inputColorListSceneObject)
+    inputColorListSceneObject = bpy.context.scene.my_tool.inputColorListSceneObject
+    Rtint = bpy.context.scene.my_tool.RTint
+    if inputColorListSceneObject is not None:
+        for mat in inputColorListSceneObject.material_slots:
+            print("Material")
+    return None

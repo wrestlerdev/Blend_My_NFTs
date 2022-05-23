@@ -208,6 +208,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     inputBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
 
+    inputColorListSceneObject: bpy.props.PointerProperty(name="ColorListObject", type=bpy.types.Object)
+
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -236,9 +238,12 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.textureindex_has_been_updated("textureSetIndex", "lastSetIndex"))
     lastSetIndex: bpy.props.StringProperty(default="A")
 
-    RTint: bpy.props.FloatVectorProperty(name="R Tint", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
-    GTint: bpy.props.FloatVectorProperty(name="G Tint", subtype="COLOR", default=(0.0,1.0,0.0,1.0), size=4, min=0.0, max=1)
-    BTint: bpy.props.FloatVectorProperty(name="B Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
+    RTint: bpy.props.FloatVectorProperty(name="R Tint", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1,
+                                        update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("RTint"))
+    GTint: bpy.props.FloatVectorProperty(name="G Tint", subtype="COLOR", default=(0.0,1.0,0.0,1.0), size=4, min=0.0, max=1,
+                                        update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("GTint"))
+    BTint: bpy.props.FloatVectorProperty(name="B Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
+                                        update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("BTint"))
 
     colorStyleName: bpy.props.StringProperty(name="Colour Style Name", default="wah")
 
@@ -1052,11 +1057,20 @@ class addNewColourStyle(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
+        if DNA_Generator.Outfit_Generator.ColorGen.DoesColorListExist(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.root_dir):
+            return context.window_manager.invoke_confirm(self, event)
+        else:
+            return self.execute(context)
 
     def execute(self, context):
         print(">:3c")
         self.report({'INFO'}, '>:3c')
+        DNA_Generator.Outfit_Generator.ColorGen.SaveNewColorStyle(
+        bpy.context.scene.my_tool.colorStyleName,
+        bpy.context.scene.my_tool.RTint,
+        bpy.context.scene.my_tool.GTint, 
+        bpy.context.scene.my_tool.BTint,
+        bpy.context.scene.my_tool.root_dir)
         return {'FINISHED'}
 
 class updateColourStyle(bpy.types.Operator):
@@ -1085,8 +1099,7 @@ class deleteColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        image_path = os.path.abspath("T_cellMain_N.png")
-        im = Image.open(image_path)
+        DNA_Generator.Outfit_Generator.ColorGen.DeleteColorList(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.root_dir)
         return {'FINISHED'}
 
 
@@ -1730,7 +1743,11 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
         row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
         row = box.row()
-        row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
+        if DNA_Generator.Outfit_Generator.ColorGen.DoesColorListExist(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.root_dir):
+            row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
+
+        row = layout.row()
+        row.prop(mytool, "inputColorListSceneObject", text='')
         
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
