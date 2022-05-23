@@ -446,22 +446,27 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
 
 def LinkImagesToNodes(matcopy, texture_path):
         # get the nodes
-        for tex in os.listdir(texture_path):
-            if "T_" in tex:
+        
+        for tex in os.listdir(texture_path):      
+            mapType = tex.rpartition("_")[2]
+            print(mapType)
+            mapType = mapType.partition(".")[0]
+            print('TEXTURE IS: ' + mapType)
+            if "D" == mapType:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["DiffuseNode"].image = newImage
                 matcopy.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
 
-            if "N_" in tex:
+            if "N" == mapType:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["NormalNode"].image = newImage
                 matcopy.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
                 matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
-            if "ID_" in tex:
+            if "ID" == mapType:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
@@ -469,21 +474,21 @@ def LinkImagesToNodes(matcopy, texture_path):
                 matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
 
-            if "M_" in tex:
+            if "M" == mapType:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["MetallicNode"].image = newImage
                 matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
 
-            if "R_" in tex:
+            if "R" == mapType:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["RoughnessNode"].image = newImage
                 matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
 
-            if "E_" in tex:
+            if "E" == mapType:
                 file = file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
