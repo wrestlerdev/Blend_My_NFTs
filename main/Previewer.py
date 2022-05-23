@@ -79,7 +79,10 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
          set_armature_for_meshes(character, meshes)
          if textures:
             resolution = '_' + bpy.context.scene.my_tool.textureSize
-            resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+            if resolution == '_4k':
+               resolution = 4096
+            else:
+               resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
             set_texture_on_mesh(meshes, texture, resolution)
          # else:
          #    print("texture where")
