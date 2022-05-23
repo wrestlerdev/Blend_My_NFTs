@@ -19,23 +19,67 @@ from . import config
 
 
 # A list for each caterogry of clothing that states what slots it will fil
-CoatSlots = ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"]
-LongCoatsSlot = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"]
-VestHoodiesSlot = ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-BackPack"]
-CropShirtsSlot = ["01-UpperTorso"]
-TShirtsSlot = ["01-UpperTorso", "02-MiddleTorso"]
-LongShirtSlots = ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"]
-LSleaveSlots = ["03-LForeArm", "04-LWrist", "07-Hands"]
-RSleaveSlots = ["05-RForeArm", "06-RWrist", "07-Hands"]
-ThickPantsSlots = ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"]
-ThinPantsSlots = ["09-PelvisThin", "10-Calf", "11-Ankle"]
-ShoesHighSlots = ["10-Calf", "11-Ankle", "12-Feet"]
-ShoesMiddleSlots = ["11-Ankle", "12-Feet"]
-ThickQuarterPantsSlot = ["08-PelvisThick", "09-PelvisThin", "10-Calf"]
-ThinQuarterPantsSlot = ["09-PelvisThin", "10-Calf"]
-ThickShortsSlot = ["08-PelvisThick", "09-PelvisThin"]
-ThinShortsSlot = ["09-PelvisThin"]
-NeckWearSlots = ["13-Neck"]
+ItemUsedBodySlot = {
+"ShirtCropSleeveless" : ["01-UpperTorso"],
+"ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck"],
+"ShirtCrop" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm"],
+"ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "18-BackPack"],
+"ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
+"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck"],
+"ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
+"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack"],
+"ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick"],
+"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick","13-Neck"],
+"ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm"],
+"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "18-BackPack"],
+"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "17-UpperHead"],
+"PantsShort" : ["09-PelvisThin"],
+"PantsShortThick" : ["08-PelvisThick", "09-PelvisThin"],
+"PantsShortHigh" : ["08-PelvisThick", "09-PelvisThin", "02-MiddleTorso"],
+"PantsMid" : ["09-PelvisThin", "10-Calf"],
+"PantsMidThick" : ["08-PelvisThick", "09-PelvisThin", "10-Calf"],
+"PantsMidHigh" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "02-MiddleTorso"],
+"PantsLong" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
+"PantsLongThick" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"],
+"PantsLongHigh" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle", "02-MiddleTorso"],
+"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack", "10-Calf", "11-Ankle"],
+"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack", "10-Calf", "11-Ankle"],
+"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack", "10-Calf"],
+"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack", "10-Calf"],
+"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack"],
+"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack"],
+"Forearm" : ["03-LForeArm", "05-RForeArm"],
+"HandsShort" : ["07-Hands"],
+"HandsLong" : ["05-RForeArm", "03-LForeArm", "07-Hands"],
+"FeetLong" : ["10-Calf", "11-Ankle", "12-Feet"],
+"FeetMid" : ["11-Ankle", "12-Feet"],
+"FeetShort" : ["12-Feet"],
+"Neck" : ["13-Neck"],
+"HeadUpper" : ["17-UpperHead"],
+"HeadMiddle" : ["15-MiddleHead"],
+"HeadLower" : ["14-LowerHead"],
+"HeadFull" : ["15-MiddleHead", "14-LowerHead"],
+"Backpack" : ["18-BackPack"],
+"BackpackHigh" : ["13-Neck", "18-BackPack"],
+"ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
+"CoatSlots" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"],
+"LongCoatsSlot" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"],
+"VestHoodiesSlot" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-BackPack"],
+"CropShirtsSlot" : ["01-UpperTorso"],
+"TShirtsSlot" : ["01-UpperTorso", "02-MiddleTorso"],
+"LongShirtSlots" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
+"LSleaveSlots" : ["03-LForeArm", "04-LWrist", "07-Hands"],
+"RSleaveSlots" : ["05-RForeArm", "06-RWrist", "07-Hands"],
+"ThickPantsSlots" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"],
+"ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
+"ShoesHighSlots" : ["10-Calf", "11-Ankle", "12-Feet"],
+"ShoesMiddleSlots" : ["11-Ankle", "12-Feet"],
+"ThickQuarterPantsSlot" : ["08-PelvisThick", "09-PelvisThin", "10-Calf"],
+"ThinQuarterPantsSlot" : ["09-PelvisThin", "10-Calf"],
+"ThickShortsSlot" : ["08-PelvisThick", "09-PelvisThin"],
+"ThinShortsSlot" : ["09-PelvisThin"],
+"NeckWearSlots" : ["13-Neck"],
+}
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
@@ -63,26 +107,6 @@ haircols = [(0.66667,0.53333,0.40000), (0.87059,0.74510,0.60000), (0.14118,0.109
 skincols = [(0.310, 0.102, 0.000), (0.21403, 0.129142,0.019756), (0.227,0.062,0.0000), (0.841,0.431,0.195) ]
 
 # A dictionary which can be called to find what slots to fill when using certian items
-ItemUsedBodySlot = {
-    "Coats": CoatSlots, 
-    "LongShirts": LongShirtSlots,
-    "LongCoats" : LongCoatsSlot,
-    "VestHoodie" : VestHoodiesSlot,
-    "CropShirts" : CropShirtsSlot,
-    "TShirts" : TShirtsSlot,
-    "Shorts" : ThinShortsSlot,
-    "LSleave": LSleaveSlots,
-    "RSleave": RSleaveSlots,  
-    "ThickPants": ThickPantsSlots, 
-    "ThickQuaterPants": ThickQuarterPantsSlot,
-    "ThickShorts" : ThickShortsSlot,
-    "ThinPants" : ThinPantsSlots,
-    "ThinShorts" : ThinShortsSlot, 
-    "ShoesHigh" : ShoesHighSlots, 
-    "ShoesMiddle" : ShoesMiddleSlots,
-    "NeckWear" : NeckWearSlots
-}
-
 
 def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
