@@ -162,6 +162,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
     loadNFTIndex: bpy.props.IntProperty(name="Number to Load:", min=1, max=9999, default=1)
     CurrentBatchIndex : bpy.props.IntProperty(name="Current Batch", min=1, max=10, default=1)
+    currentColorStyleKey : bpy.props.StringProperty(name="Color Style Key", default="N/A")
 
     BatchSliderIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.batch_property_updated())
     lastBatchSliderIndex: bpy.props.IntProperty(default=1)
@@ -245,6 +246,11 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("GTint"))
     BTint: bpy.props.FloatVectorProperty(name="B Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("BTint"))
+    AlphaTint: bpy.props.FloatVectorProperty(name="A Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
+                                        update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("AlphaTint"))
+    WhiteTint: bpy.props.FloatVectorProperty(name="W Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
+                                        update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
+
 
     colorStyleName: bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
 
@@ -1066,12 +1072,7 @@ class addNewColourStyle(bpy.types.Operator):
     def execute(self, context):
         print(">:3c")
         self.report({'INFO'}, '>:3c')
-        DNA_Generator.Outfit_Generator.ColorGen.SaveNewColorStyle(
-        bpy.context.scene.my_tool.colorStyleName,
-        bpy.context.scene.my_tool.RTint,
-        bpy.context.scene.my_tool.GTint, 
-        bpy.context.scene.my_tool.BTint,
-        bpy.context.scene.my_tool.root_dir)
+        DNA_Generator.Outfit_Generator.ColorGen.SaveNewColorStyle()
         return {'FINISHED'}
 
 class updateColourStyle(bpy.types.Operator):
@@ -1154,7 +1155,7 @@ class nextStyleColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.add_to_textureindex(1)
+        DNA_Generator.Outfit_Generator.ColorGen.NextStyleColor(1)
         return {'FINISHED'}
 
 class prevStyleColorSet(bpy.types.Operator):
@@ -1164,7 +1165,7 @@ class prevStyleColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.add_to_textureindex(1)
+        DNA_Generator.Outfit_Generator.ColorGen.NextStyleColor(-1)
         return {'FINISHED'}
 
 
@@ -1742,7 +1743,8 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         
         row = layout.row()
         row.operator(prevStyleColorSet.bl_idname, text=prevStyleColorSet.bl_label)
-        row.prop(mytool, "colorStyleColorListKey", text='')
+        #row.prop(mytool, "colorStyleColorListKey", text='')
+        row.label(text=bpy.context.scene.my_tool.currentColorStyleKey)
         row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
 
 
@@ -1755,6 +1757,10 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.prop(mytool, "GTint", text="Green Tint")
         row = layout.row()
         row.prop(mytool, "BTint", text="Blue Tint")
+        row = layout.row()
+        row.prop(mytool, "AlphaTint", text="Alpha Tint")
+        row = layout.row()
+        row.prop(mytool, "WhiteTint", text="White Tint")
 
         layout.separator()
 

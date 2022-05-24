@@ -23,15 +23,15 @@ ItemUsedBodySlot = {
 "ShirtCropSleeveless" : ["01-UpperTorso"],
 "ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck"],
 "ShirtCrop" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm"],
-"ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "19-BackPack"],
+"ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "19-Backpack"],
 "ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
 "ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck"],
 "ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
-"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack"],
+"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "19-Backpack"],
 "ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick"],
 "ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick","13-Neck"],
 "ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm"],
-"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "19-BackPack"],
+"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "19-Backpack"],
 "ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "17-UpperHead"],
 "PantsShort" : ["09-PelvisThin"],
 "PantsShortThick" : ["08-PelvisThick", "09-PelvisThin"],
@@ -42,12 +42,12 @@ ItemUsedBodySlot = {
 "PantsLong" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
 "PantsLongThick" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"],
 "PantsLongHigh" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle", "02-MiddleTorso"],
-"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack", "10-Calf", "11-Ankle"],
-"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-BackPack", "10-Calf", "11-Ankle"],
-"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack", "10-Calf"],
-"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-BackPack", "10-Calf"],
-"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack"],
-"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-BackPack"],
+"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-Backpack", "10-Calf", "11-Ankle"],
+"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-Backpack", "10-Calf", "11-Ankle"],
+"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-Backpack", "10-Calf"],
+"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-Backpack", "10-Calf"],
+"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-Backpack"],
+"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-Backpack"],
 "Forearm" : ["03-LForeArm", "05-RForeArm"],
 "HandsShort" : ["07-Hands"],
 "HandsLong" : ["05-RForeArm", "03-LForeArm", "07-Hands"],
@@ -59,12 +59,12 @@ ItemUsedBodySlot = {
 "HeadMiddle" : ["15-MiddleHead"],
 "HeadLower" : ["14-LowerHead"],
 "HeadFull" : ["15-MiddleHead", "14-LowerHead"],
-"Backpack" : ["19-BackPack"],
-"BackpackHigh" : ["19-BackPack"],
+"Backpack" : ["19-Backpack"],
+"BackpackHigh" : ["19-Backpack"],
 "ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
 "CoatSlots" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"],
 "LongCoatsSlot" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"],
-"VestHoodiesSlot" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "19-BackPack"],
+"VestHoodiesSlot" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "19-Backpack"],
 "CropShirtsSlot" : ["01-UpperTorso"],
 "TShirtsSlot" : ["01-UpperTorso", "02-MiddleTorso"],
 "LongShirtSlots" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
@@ -263,7 +263,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
     allowFailedAttempts = 50
     currentFailedAttempts = 0
-
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print(ItemUsedBodySlot["BackpackHigh"])
     while numberToGen > 0: 
         # bpy.ops.outliner.orphans_purge()
         # coll = bpy.data.collections.get("NFTHolder")

@@ -311,27 +311,50 @@ def NextStyle(direction):
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
     GlobalStyles = json.load(open(path))
-
+    keys_list = list(GlobalStyles)  
     if bpy.context.scene.my_tool.colorStyleName in GlobalStyles:
-        currentIndex = list(GlobalStyles.keys()).index(bpy.context.scene.my_tool.colorStyleName)
-        keys_list = list(GlobalStyles)
+        currentIndex = list(GlobalStyles.keys()).index(bpy.context.scene.my_tool.colorStyleName)      
         nextIndex = currentIndex + direction
         if(nextIndex >= 0 and nextIndex < len(keys_list)):
-            bpy.context.scene.my_tool.colorStyleName = keys_list[nextIndex]
+            key = keys_list[nextIndex]
         elif nextIndex < 0:
-            bpy.context.scene.my_tool.colorStyleName = keys_list[ len(keys_list) - 1]
-        elif nextIndex >= len(keys_list):
-            bpy.context.scene.my_tool.colorStyleName = keys_list[ 0 ]
+            key = keys_list[ len(keys_list) - 1]
+        else:
+            key = keys_list[ 0 ]
     else:
-        print("NO KEY!")
-    
+        key = keys_list[ 0 ]
+    bpy.context.scene.my_tool.colorStyleName = key
+    StyleColorList = GlobalStyles[key]
+    bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[0]
 
-def SaveNewColorStyle(ColorListName, R, G, B, root_dir):
+
+def NextStyleColor(direction):
+    root_dir = bpy.context.scene.my_tool.root_dir
+    path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
+    GlobalStyles = json.load(open(path))
+    keys_list = list(GlobalStyles)  
+    if bpy.context.scene.my_tool.colorStyleName in GlobalStyles:
+        StyleColorList = GlobalStyles[bpy.context.scene.my_tool.colorStyleName]
+        #bpy.context.scene.my_tool
+        #colorStyleColorListKey.index("bar")
+
+
+def SaveNewColorStyle():
+    R = bpy.context.scene.my_tool.RTint
+    G = bpy.context.scene.my_tool.GTint
+    B= bpy.context.scene.my_tool.BTint
+    A= bpy.context.scene.my_tool.AlphaTint
+    W = bpy.context.scene.my_tool.WhiteTint
+    root_dir = bpy.context.scene.my_tool.root_dir
+    ColorListName = bpy.context.scene.my_tool.colorStyleName
+
     NewColorStyle = {}
     NewColorStyle["ComonName"] = ColorListName
     NewColorStyle["R"] = [R[0],R[1],R[2],R[3]]
     NewColorStyle["G"] = [G[0],G[1],G[2],G[3]]
     NewColorStyle["B"] = [B[0],B[1],B[2],B[3]]
+    NewColorStyle["A"] = [A[0],A[1],A[2],A[3]]
+    NewColorStyle["W"] = [W[0],W[1],W[2],W[3]]
     print(NewColorStyle)
     GlobalColorList = OpenColorList(root_dir)
     GlobalColorList[ColorListName] = NewColorStyle
@@ -376,6 +399,8 @@ def ColorHasbeenUpdated(ColorTint):
     Rtint = bpy.context.scene.my_tool.RTint
     Gtint = bpy.context.scene.my_tool.GTint
     Btint = bpy.context.scene.my_tool.BTint
+    Atint = bpy.context.scene.my_tool.AlphaTint
+    Wtint = bpy.context.scene.my_tool.WhiteTint
     if inputColorListSceneObject is not None:
         for m in inputColorListSceneObject.material_slots:
             material = m.material
@@ -386,4 +411,8 @@ def ColorHasbeenUpdated(ColorTint):
                     node.outputs["Color"].default_value = Gtint
                 if (node.label == "BTint"):
                     node.outputs["Color"].default_value = Btint
+                if (node.label == "AlphaTint"):
+                    node.outputs["Color"].default_value = Atint
+                if (node.label == "WhiteTint"):
+                    node.outputs["Color"].default_value = Wtint
     return None
