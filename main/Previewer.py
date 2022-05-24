@@ -44,7 +44,6 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                         obj.hide_viewport = True
                         obj.hide_render = True
 
-
    for strand in range(len(DNAString)):
       meshes = None
       DNASplit = DNAString[strand].split('-')
@@ -79,17 +78,111 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
       if meshes:
          set_armature_for_meshes(character, meshes)
          if textures:
-            set_texture_on_mesh(meshes, texture)
-
+            resolution = '_' + bpy.context.scene.my_tool.textureSize
+            if resolution == '_4k':
+               resolution = 4096
+            else:
+               resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+            set_texture_on_mesh(meshes, texture, resolution)
+         # else:
+         #    print("texture where")
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
 
 
-def set_texture_on_mesh(meshes, texture_mesh):
-   for child in meshes:         
-      for i in range(0, len(texture_mesh.material_slots)):  # CHECK THIS ADD TO PREVIEWER    
+def set_texture_on_mesh(meshes, texture_mesh, resolution):
+   suffix = config.texture_suffixes[resolution]
+   # if suffix == '':
+   #    print("this should be 4k okay")
+   for child in meshes:
+      for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+         mat = texture_mesh.material_slots[i].material
+         if mat.use_nodes:
+            for n in mat.node_tree.nodes:
+               if n.type == 'TEX_IMAGE':
+                  if n.image is not None:
+
+                     texture_info = get_new_texture_name(n, suffix)
+                     if texture_info:
+                        new_texture, new_texture_path, _type = texture_info
+                        print(texture_info)
+                        # if _type == '_N':
+                        #    print("this is the normal")
+                        # elif _type == '_D':
+                        #    print("this is the diffuse")
+                        # elif _type == '_ID':
+                        #    print("this is the color id")
+                        # elif _type == '_M':
+                        #    print("this is the metallic")
+                        # elif _type == '_R':
+                        #    print("this is the roughness")
+                        # elif _type == '_E':
+                        #    print("this is the emissive")
+
+                        if os.path.exists(new_texture_path):
+                           file = new_texture_path.replace('/', '\\')
+
+                           if _type == '_N':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["NormalNode"].image = newImage
+                              mat.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
+                              mat.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
+                           elif _type == '_D':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["DiffuseNode"].image = newImage
+                              mat.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
+                           elif _type == '_ID':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["ColorIDNode"].image = newImage
+                              mat.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                              mat.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
+                           elif _type == '_M':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["MetallicNode"].image = newImage
+                              mat.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
+                           elif _type == '_R':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["RoughnessNode"].image = newImage
+                              mat.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
+                           elif _type == '_E':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["EmissiveNode"].image = newImage 
+                              mat.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
+                     # else:
+                        # print("Texture image within this node is not named properly (e.g. missing _N)")
+                  # else:
+                     # print("This node ({}) doesn't have an image".format(n.name))
+                     # then should it look for an image?
+
+
+
+
          child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
    return
+
+
+def get_new_texture_name(node, suffix):
+   types = ['_E', '_ID', '_M', '_N', '_R', '_D']
+   for _type in types:
+      filepath, partition, filename = node.image.filepath.rpartition('\\')
+      if _type in filename:
+         filesplit = filename.split(_type)
+         file_suffix, f, file_type = filesplit[1].rpartition('.')
+         if file_suffix == suffix:
+            # print(filepath)
+            # print("then this should be the same texture?")
+            return filename, node.image.filepath, _type
+         else:
+            # print("this is a different texture?")
+            new_path = filepath + partition
+            new_texture = filesplit[0] + _type + suffix + '.' + file_type 
+            new_texture_path = new_path + new_texture
+
+            return new_texture, new_texture_path, _type
+   # print(filepath)
+   return None
+
+
 
 #------------------------------------------------------------------------------------
 
