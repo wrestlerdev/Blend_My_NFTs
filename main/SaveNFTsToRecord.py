@@ -343,7 +343,13 @@ def CreateSlotsFolderHierarchy(save_path):
                                             bpy.ops.outliner.orphans_purge() 
 
                                         else:
-                                            print("No Textures")
+                                            print("No Textures" + varient)
+                                            for child_col in tempHolder.children:
+                                                for child_obj in child_col.objects:
+                                                    child_col.objects.unlink(child_obj)
+                                                bpy.data.collections.remove(child_col)                                    
+                                            bpy.data.collections.remove(tempHolder)
+                                            bpy.ops.outliner.orphans_purge()
 
                                         
 

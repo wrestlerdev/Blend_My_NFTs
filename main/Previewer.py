@@ -80,19 +80,14 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
          set_armature_for_meshes(character, meshes)
          if textures:
             set_texture_on_mesh(meshes, texture)
-         # else:
-         #    print("texture where")
 
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
 
 
 def set_texture_on_mesh(meshes, texture_mesh):
-   print("|||||||||||||||||||||||||||||||||||")
-   print(texture_mesh)
    for child in meshes:         
       for i in range(0, len(texture_mesh.material_slots)):  # CHECK THIS ADD TO PREVIEWER    
-         print(child)
          child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
    return
 
@@ -117,12 +112,10 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    is_texture = any(not char.isdigit() for char in v_name_split)
 
    if not is_texture:
-      print("this is a variant")
       variant_child = bpy.data.collections[variant_name].children[0]
       texture_name = variant_child.name
 
    else: # get variant name by stripping out texture/color
-      print("is this a texture var?")
       texture_name = variant_name
       variant_split = variant_name.split('_')
       variant_split = variant_split[:-1]
@@ -309,8 +302,8 @@ def create_item_dict(DNA): # make dict from DNA to save to file
          atttype = list(slot[1].items())[int(atttype_index)]
          if len(list(atttype[1].items())) <= int(variant_index):
             print(atttype[0]) # TODO  KEEP WORKING ON THIS AFTER OUTFITGEN
-            print(len(list(atttype[1].items())))
-            print(variant_index)
+            #print(len(list(atttype[1].items())))
+            #print(variant_index)
          if len(list(atttype[1].items())) > 0: # else?
             print(list(atttype[1].items())[int(variant_index)])
 

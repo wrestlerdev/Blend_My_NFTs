@@ -23,15 +23,15 @@ ItemUsedBodySlot = {
 "ShirtCropSleeveless" : ["01-UpperTorso"],
 "ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck"],
 "ShirtCrop" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm"],
-"ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "18-BackPack"],
+"ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "19-BackPack"],
 "ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
 "ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck"],
 "ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
-"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack"],
+"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack"],
 "ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick"],
 "ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick","13-Neck"],
 "ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm"],
-"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "18-BackPack"],
+"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "19-BackPack"],
 "ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "17-UpperHead"],
 "PantsShort" : ["09-PelvisThin"],
 "PantsShortThick" : ["08-PelvisThick", "09-PelvisThin"],
@@ -42,12 +42,12 @@ ItemUsedBodySlot = {
 "PantsLong" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
 "PantsLongThick" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"],
 "PantsLongHigh" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle", "02-MiddleTorso"],
-"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack", "10-Calf", "11-Ankle"],
-"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack", "10-Calf", "11-Ankle"],
-"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack", "10-Calf"],
-"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack", "10-Calf"],
-"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-BackPack"],
-"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-BackPack"],
+"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack", "10-Calf", "11-Ankle"],
+"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-BackPack", "10-Calf", "11-Ankle"],
+"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack", "10-Calf"],
+"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-BackPack", "10-Calf"],
+"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "19-BackPack"],
+"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "19-BackPack"],
 "Forearm" : ["03-LForeArm", "05-RForeArm"],
 "HandsShort" : ["07-Hands"],
 "HandsLong" : ["05-RForeArm", "03-LForeArm", "07-Hands"],
@@ -55,16 +55,16 @@ ItemUsedBodySlot = {
 "FeetMid" : ["11-Ankle", "12-Feet"],
 "FeetShort" : ["12-Feet"],
 "Neck" : ["13-Neck"],
-"HeadUpper" : ["17-UpperHead"],
+"HeadUpper" : ["17-UpperHead", "16-Earings"],
 "HeadMiddle" : ["15-MiddleHead"],
 "HeadLower" : ["14-LowerHead"],
 "HeadFull" : ["15-MiddleHead", "14-LowerHead"],
-"Backpack" : ["18-BackPack"],
-"BackpackHigh" : ["13-Neck", "18-BackPack"],
+"Backpack" : ["19-BackPack"],
+"BackpackHigh" : ["19-BackPack"],
 "ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
 "CoatSlots" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"],
 "LongCoatsSlot" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"],
-"VestHoodiesSlot" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-BackPack"],
+"VestHoodiesSlot" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "19-BackPack"],
 "CropShirtsSlot" : ["01-UpperTorso"],
 "TShirtsSlot" : ["01-UpperTorso", "02-MiddleTorso"],
 "LongShirtSlots" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
@@ -362,9 +362,16 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             
 
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
-                
+                print("-------------------")
+                print(ItemClothingGenre)
                 #loop through all slots that selected item will take up
-                UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+                if ItemClothingGenre in ItemUsedBodySlot:
+                    UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+                else: 
+                    UsedUpSlotArray = []
+                print("USED UP SLOT: ")
+                print(UsedUpSlotArray)
+
                 if UsedUpSlotArray:
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
@@ -388,11 +395,11 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             current_entry["color_key"] = ColorGen.colorkey
             VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict
-
+            
                 
         SingleDNA.insert(0, character)
         SingleDNA.insert(1, ColorGen.styleKey) # TODO add color style to dict too
-        
+        print(attributeUsedDict)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")

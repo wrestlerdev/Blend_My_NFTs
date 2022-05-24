@@ -236,6 +236,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     textureSetIndex: bpy.props.StringProperty(default="A",
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.textureindex_has_been_updated("textureSetIndex", "lastSetIndex"))
+    colorStyleColorListKey: bpy.props.StringProperty(default="001")
     lastSetIndex: bpy.props.StringProperty(default="A")
 
     RTint: bpy.props.FloatVectorProperty(name="R Tint", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1,
@@ -245,7 +246,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     BTint: bpy.props.FloatVectorProperty(name="B Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("BTint"))
 
-    colorStyleName: bpy.props.StringProperty(name="Colour Style Name", default="wah")
+    colorStyleName: bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
 
 canRefactor = False
 
@@ -1110,7 +1111,7 @@ class nextColorStyle(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.add_to_colourindex(1)
+        DNA_Generator.Outfit_Generator.ColorGen.NextStyle(1)
         return {'FINISHED'}
 
 
@@ -1121,14 +1122,14 @@ class prevColorStyle(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.add_to_colourindex(-1)
+        DNA_Generator.Outfit_Generator.ColorGen.NextStyle(-1)
         return {'FINISHED'}
 
 
-class nextTextureSet(bpy.types.Operator):
-    bl_idname = 'next.textureset'
-    bl_label = 'Next Set'
-    bl_description = 'Next texture set'
+class nextGlobalColorSet(bpy.types.Operator):
+    bl_idname = 'next.globalcolorset'
+    bl_label = 'Next Global Color'
+    bl_description = 'Next Global Color'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1136,18 +1137,35 @@ class nextTextureSet(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class prevTextureSet(bpy.types.Operator):
-    bl_idname = 'prev.textureset'
-    bl_label = 'Prev Set'
-    bl_description = 'Prev ctexture set'
+class prevGlobalColorSet(bpy.types.Operator):
+    bl_idname = 'prev.globalcolorset'
+    bl_label = 'Prev Global Color'
+    bl_description = 'Prev Global Color'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.add_to_textureindex(-1)
         return {'FINISHED'}
 
+class nextStyleColorSet(bpy.types.Operator):
+    bl_idname = 'next.stylecolorset'
+    bl_label = 'Next Style Color'
+    bl_description = 'Next Style Color'
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    def execute(self, context):
+        DNA_Generator.Outfit_Generator.ColorGen.add_to_textureindex(1)
+        return {'FINISHED'}
 
-
+class prevStyleColorSet(bpy.types.Operator):
+    bl_idname = 'prev.stylecolorset'
+    bl_label = 'Prev Style Color'
+    bl_description = 'Prev Style Color'
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    def execute(self, context):
+        DNA_Generator.Outfit_Generator.ColorGen.add_to_textureindex(1)
+        return {'FINISHED'}
 
 
 # ------------------------------- Panels ----------------------------------------------
@@ -1712,22 +1730,24 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
 
         row = layout.row()
         row.operator(prevColorStyle.bl_idname, text=prevColorStyle.bl_label)
-        row.prop(mytool, "colourStyleIndex", text='')
+        row.prop(mytool, "colorStyleName", text="")
         row.operator(nextColorStyle.bl_idname, text=nextColorStyle.bl_label)
 
         row = layout.row()
-        row.operator(prevTextureSet.bl_idname, text=prevTextureSet.bl_label)
-        row.prop(mytool, "textureSetIndex", text='')
-        row.operator(nextTextureSet.bl_idname, text=nextTextureSet.bl_label)
+        row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
+
+        if DNA_Generator.Outfit_Generator.ColorGen.DoesColorListExist(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.root_dir):
+            row = layout.row()
+            row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
+        
+        row = layout.row()
+        row.operator(prevStyleColorSet.bl_idname, text=prevStyleColorSet.bl_label)
+        row.prop(mytool, "colorStyleColorListKey", text='')
+        row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
+
 
         layout.separator()
-
-        box = layout.box()
-        row = box.row()
-        row.label(text="Color Style Name")
-        row.prop(mytool, "colorStyleName", text="")
-
-        layout.separator()
+        row = layout.row()
 
         row = layout.row()
         row.prop(mytool, "RTint", text="Red Tint")
@@ -1737,17 +1757,20 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.prop(mytool, "BTint", text="Blue Tint")
 
         layout.separator()
+
         box = layout.box()
+        box.prop(mytool, "inputColorListSceneObject", text='')
 
-        row = box.row()
-        row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
-        row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
-        row = box.row()
-        if DNA_Generator.Outfit_Generator.ColorGen.DoesColorListExist(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.root_dir):
-            row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
 
+        layout.separator()
         row = layout.row()
-        row.prop(mytool, "inputColorListSceneObject", text='')
+
+        row.operator(prevGlobalColorSet.bl_idname, text=prevGlobalColorSet.bl_label)
+        row.prop(mytool, "GlobalColorSetKey", text='')
+        row.operator(nextGlobalColorSet.bl_idname, text=nextGlobalColorSet.bl_label)
+        
+        row = layout.row()
+        row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
         
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
@@ -1825,8 +1848,10 @@ classes = (
     updateColourStyle,
     nextColorStyle,
     prevColorStyle,
-    nextTextureSet,
-    prevTextureSet,
+    nextGlobalColorSet,
+    prevGlobalColorSet,
+    nextStyleColorSet,
+    prevStyleColorSet,
     deleteColourStyle,
     confirmRefactor,
     refactorExports
