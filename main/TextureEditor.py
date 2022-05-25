@@ -111,10 +111,10 @@ def create_downres_textures(input_path, dims):
                             for multi_texture_dir in os.listdir(texture_path):
                                 multi_texture_set = os.path.join(texture_path, multi_texture_dir)
                                 downres_all_textures_in_folder(multi_texture_set, dims)
-                                return # GET RID OF THIS L8R
+                                # return # GET RID OF THIS L8R
                         else:
                             downres_all_textures_in_folder(texture_path, dims)
-                            return # GET RID OF THIS L8R
+                            # return # GET RID OF THIS L8R
 
     return
 
