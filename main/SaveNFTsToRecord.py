@@ -485,6 +485,7 @@ def LinkImagesToNodes(matcopy, texture_path):
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["MetallicNode"].image = newImage
+                matcopy.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
 
             if "R" == mapType:
@@ -492,6 +493,7 @@ def LinkImagesToNodes(matcopy, texture_path):
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["RoughnessNode"].image = newImage
+                matcopy.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
 
             if "E" == mapType:

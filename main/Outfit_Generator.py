@@ -130,7 +130,6 @@ def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
 
         slot = bpy.context.scene.my_tool[inputSlot]
         col = (random.random(), random.random(), random.random())
-        print(slot.name)
         col = (random.random(), random.random(), random.random())
 
         childrenColls = slot.children
@@ -263,8 +262,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
     allowFailedAttempts = 50
     currentFailedAttempts = 0
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    print(ItemUsedBodySlot["BackpackHigh"])
     while numberToGen > 0: 
         # bpy.ops.outliner.orphans_purge()
         # coll = bpy.data.collections.get("NFTHolder")
@@ -289,7 +286,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
         character = PickCharacter()
         style = "Temp"
-        print(save_path)
         ColorGen.SetUpCharacterStyle()
 
         # letterstyles = 'abcdefghijkl'
@@ -345,8 +341,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                             chidlrenObjs = char_coll.objects
                 else:
                     chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
-                    for obj in chidlrenObjs:
-                        print(obj.name) 
+                    #for obj in chidlrenObjs:
 
                 armature_name = "armature_" + str(character).lower()
                 if bpy.data.objects.get(armature_name) is not None:
@@ -363,15 +358,11 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             
 
                 ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
-                print("-------------------")
-                print(ItemClothingGenre)
                 #loop through all slots that selected item will take up
                 if ItemClothingGenre in ItemUsedBodySlot:
                     UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
                 else: 
                     UsedUpSlotArray = []
-                print("USED UP SLOT: ")
-                print(UsedUpSlotArray)
 
                 if UsedUpSlotArray:
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
@@ -400,7 +391,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 
         SingleDNA.insert(0, character)
         SingleDNA.insert(1, ColorGen.styleKey) # TODO add color style to dict too
-        print(attributeUsedDict)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
@@ -470,7 +460,6 @@ def PickWeightedTypeVarient(Varients):
 
 
 def PickWeightedTextureVarient(Textures):
-    print(Textures['textureSets'])
     number_List_Of_i = []
     rarity_List_Of_i = []
 

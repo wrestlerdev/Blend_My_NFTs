@@ -159,8 +159,6 @@ colorkey = ""
 
 def SetUpCharacterStyle():
     global availableColorStyleKeys, styleKey
-
-
     save_path = bpy.context.scene.my_tool.root_dir
     color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
     globalStyleInfo = json.load(open(color_style_path))
@@ -168,6 +166,7 @@ def SetUpCharacterStyle():
     styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
     styleKey = list(globalStyleInfo.keys())[styleIndex]
     availableColorStyleKeys =  globalStyleInfo[styleKey]
+    print("STYLE: " + styleKey )
     return styleKey
 
 def CheckAndFormatPath(path, pathTojoin = ""):
@@ -209,6 +208,11 @@ def PickOutfitColors(attribute, chidlrenObjs):
                     node.outputs["Color"].default_value = colorChoice["G"]
                 if (node.label == "BTint"):
                     node.outputs["Color"].default_value = colorChoice["B"]
+                if (node.label == "AlphaTint"):
+                    node.outputs["Color"].default_value = colorChoice["A"]
+                if (node.label == "WhiteTint"):
+                    node.outputs["Color"].default_value = colorChoice["W"]
+                
     return colorkey
 
 def RGBtoHex(vals, rgbtype=1):
@@ -237,83 +241,12 @@ def RGBtoHex(vals, rgbtype=1):
 
 #----------------------------------------------------------------------------------------------
 
-def textureindex_has_been_updated(tool, last_tool):
-    color_dict = {"001": "red", "002": "purple", "004": "green", "003": "grey", "007": "white"}
-    # get index to point to color hierarchy keys
-    # then get the name corresponding to it to fill
-    texture_string = bpy.context.scene.my_tool[tool]
-    texture_string = texture_string.upper()
-    texture_string = ''.join([i for i in texture_string if not i.isdigit()])
-    if not texture_string:
-        bpy.context.scene.my_tool[tool] = bpy.context.scene.my_tool[last_tool]
-        return
-    texture_string = texture_string[:1]
-
-    index = ord(texture_string) - 65 # 65 is A in ascii
-    color_keys = list(color_dict.keys())
-    if index >= len(color_keys):
-        index = len(color_keys) - 1
-        texture_string = bpy.context.scene.my_tool[last_tool]
-
-    color_keys = sorted(color_keys)
-    color_key = color_keys[index]
-
-    bpy.context.scene.my_tool[tool] = texture_string
-    bpy.context.scene.my_tool[last_tool] = texture_string
-    return
-
-
-def add_to_textureindex(amount):
-    color_dict = {"001": "red", "002": "purple", "004": "green", "003": "grey", "007": "white"}
-    max_sets = len(color_dict.keys())
-
-    index = ord(bpy.context.scene.my_tool.textureSetIndex) - 65
-    index += amount
-    if index >= max_sets:
-        index = 0
-    elif index < 0:
-        index = max_sets - 1
-
-    texture = chr(index + 65)
-    bpy.context.scene.my_tool.textureSetIndex = texture
-    bpy.context.scene.my_tool.lastSetIndex = texture
-    return index
-
-
-
-def colourindex_has_been_updated(tool, last_tool):
-    color_dict = {"001": "red", "002": "purple", "005": "green", "003": "grey"}
-    color_keys = list(color_dict.keys())
-    color_keys = sorted(color_keys)
-
-    max_color = len(color_keys)
-    string = bpy.context.scene.my_tool.get(tool)
-    if string in color_keys:
-    # index = ''.join([i for i in string if i.isdigit()])
-        index = str(color_keys.index(string))
-        if index:
-            if int(index) >= max_color:
-                index = str(max_color - 1)
-            color_key = color_keys[int(index)]
-            new_string_index = color_key
-            # new_string_index = "{:03d}".format(int(index))
-            if len(new_string_index) > 3:
-                new_string_index = new_string_index[:3]
-        else:
-            new_string_index = color_key
-            # new_string_index = "{:03d}".format(int(bpy.context.scene.my_tool[last_tool]))
-        bpy.context.scene.my_tool[last_tool] = int(index)
-        bpy.context.scene.my_tool[tool] = new_string_index
-    bpy.context.scene.my_tool[tool] = color_keys[bpy.context.scene.my_tool[last_tool]]
-
 
 def NextStyle(direction):
-    root_dir = bpy.context.scene.my_tool.root_dir
-    path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
-    GlobalStyles = json.load(open(path))
-    keys_list = list(GlobalStyles)  
-    if bpy.context.scene.my_tool.colorStyleName in GlobalStyles:
-        currentIndex = list(GlobalStyles.keys()).index(bpy.context.scene.my_tool.colorStyleName)      
+    GlobalStyleList = OpenGlobalStyleList()
+    keys_list = list(GlobalStyleList)  
+    if bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
+        currentIndex = list(GlobalStyleList.keys()).index(bpy.context.scene.my_tool.colorStyleName)      
         nextIndex = currentIndex + direction
         if(nextIndex >= 0 and nextIndex < len(keys_list)):
             key = keys_list[nextIndex]
@@ -324,29 +257,74 @@ def NextStyle(direction):
     else:
         key = keys_list[ 0 ]
     bpy.context.scene.my_tool.colorStyleName = key
-    StyleColorList = GlobalStyles[key]
+    StyleColorList = GlobalStyleList[key]
     bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[0]
 
 
 def NextStyleColor(direction):
-    root_dir = bpy.context.scene.my_tool.root_dir
-    path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
-    GlobalStyles = json.load(open(path))
-    keys_list = list(GlobalStyles)  
-    if bpy.context.scene.my_tool.colorStyleName in GlobalStyles:
-        StyleColorList = GlobalStyles[bpy.context.scene.my_tool.colorStyleName]
-        #bpy.context.scene.my_tool
-        #colorStyleColorListKey.index("bar")
+    GlobalStyleList = OpenGlobalStyleList()
+    if bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
+        StyleColorList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
+        currentIndex = StyleColorList.index(bpy.context.scene.my_tool.currentColorStyleKey)      
+        nextIndex = currentIndex + direction
+        if nextIndex < 0:
+            nextIndex = len(StyleColorList) - 1
+        elif nextIndex >= len(StyleColorList):
+            nextIndex = 0
+        bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[nextIndex]
 
+def AddColorSetToStyle():
+    GlobalStyleList = OpenGlobalStyleList()
+    if bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
+        StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
+        print(StyleColorSetList)
+        StyleColorSetList.append(bpy.context.scene.my_tool.colorSetName)
+        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = StyleColorSetList
+        WriteToGlobalStyleList(GlobalStyleList)
 
 def SaveNewColorStyle():
+    GlobalStyleList = OpenGlobalStyleList()
+    if bpy.context.scene.my_tool.colorStyleName not in GlobalStyleList:
+        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = []
+    WriteToGlobalStyleList(GlobalStyleList)
+
+def NextGlobalColorSet(direction):
+    GlobalColorList = OpenGlobalColorList()
+    keys_list = list(GlobalColorList.keys())
+    if bpy.context.scene.my_tool.colorSetName in GlobalColorList:
+        currentIndex = keys_list.index(bpy.context.scene.my_tool.colorSetName)      
+        nextIndex = currentIndex + direction
+        if(nextIndex >= 0 and nextIndex < len(keys_list)):
+            key = keys_list[nextIndex]
+        elif nextIndex < 0:
+            key = keys_list[ len(keys_list) - 1]
+        else:
+            key = keys_list[ 0 ]
+    else:
+        key = keys_list[ 0 ]
+    bpy.context.scene.my_tool.colorSetName = key
+    UpdateColorWheels()
+
+
+def UpdateColorWheels():
+    GlobalColorList = OpenGlobalColorList()
+    ColorSet = GlobalColorList[bpy.context.scene.my_tool.colorSetName]
+    bpy.context.scene.my_tool.RTint = ColorSet["R"]
+    bpy.context.scene.my_tool.GTint = ColorSet["G"]
+    bpy.context.scene.my_tool.BTint = ColorSet["B"]
+    bpy.context.scene.my_tool.AlphaTint = ColorSet["A"]
+    bpy.context.scene.my_tool.WhiteTint = ColorSet["W"]
+    print("Hello")
+
+
+def AddNewGlobalColorSet():
     R = bpy.context.scene.my_tool.RTint
     G = bpy.context.scene.my_tool.GTint
     B= bpy.context.scene.my_tool.BTint
     A= bpy.context.scene.my_tool.AlphaTint
     W = bpy.context.scene.my_tool.WhiteTint
     root_dir = bpy.context.scene.my_tool.root_dir
-    ColorListName = bpy.context.scene.my_tool.colorStyleName
+    ColorListName = bpy.context.scene.my_tool.colorSetName
 
     NewColorStyle = {}
     NewColorStyle["ComonName"] = ColorListName
@@ -356,38 +334,57 @@ def SaveNewColorStyle():
     NewColorStyle["A"] = [A[0],A[1],A[2],A[3]]
     NewColorStyle["W"] = [W[0],W[1],W[2],W[3]]
     print(NewColorStyle)
-    GlobalColorList = OpenColorList(root_dir)
+    GlobalColorList = OpenGlobalColorList()
     GlobalColorList[ColorListName] = NewColorStyle
-    WriteToColorList(GlobalColorList, root_dir)
+    WriteToGlobalColorList(GlobalColorList)
 
-
-def DeleteColorList(ColorListName, root_dir):
-    GlobalColorList = OpenColorList(root_dir)
+def DeleteGlobalColor():
+    ColorListName = bpy.context.scene.my_tool.colorSetName
+    GlobalColorList = OpenGlobalColorList()
     GlobalColorList.pop(ColorListName, None)
-    WriteToColorList(GlobalColorList, root_dir)
+    WriteToGlobalColorList(GlobalColorList)
 
 
-def DoesColorListExist(ColorListName, root_dir):
+def DoesGlobalColorExist():
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     GlobalColorList = json.load(open(path))
-    if GlobalColorList.get(ColorListName) is not None:
+    if GlobalColorList.get(bpy.context.scene.my_tool.colorStyleName) is not None:
         doesListExist = True
     else:
         doesListExist = False
     return doesListExist
 
-def OpenColorList(root_dir):
+def OpenGlobalColorList():
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     GlobalColorList = json.load(open(path))
+    print(root_dir)
+    print(GlobalColorList)
     return GlobalColorList
 
-def WriteToColorList(GlobalColorList, root_dir):
+def WriteToGlobalColorList(GlobalColorList):
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     try:
       ledger = json.dumps(GlobalColorList, indent=1, ensure_ascii=True)
+      print(ledger)
+      with open(path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+    except:
+      print("ColorStyle was not sent")
+
+def OpenGlobalStyleList():
+    root_dir = bpy.context.scene.my_tool.root_dir
+    path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
+    GlobalStyleList = json.load(open(path))
+    return GlobalStyleList
+
+def WriteToGlobalStyleList(GlobalStyleList):
+    root_dir = bpy.context.scene.my_tool.root_dir
+    path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
+    try:
+      ledger = json.dumps(GlobalStyleList, indent=1, ensure_ascii=True)
       print(ledger)
       with open(path, 'w') as outfile:
          outfile.write(ledger + '\n')

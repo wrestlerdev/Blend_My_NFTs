@@ -95,7 +95,8 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
    # if suffix == '':
    #    print("this should be 4k okay")
    for child in meshes:
-      for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+      #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+      for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
          mat = texture_mesh.material_slots[i].material
          if mat.use_nodes:
             for n in mat.node_tree.nodes:
@@ -139,10 +140,12 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
                            elif _type == '_M':
                               newImage = bpy.data.images.load(file, check_existing=False)
                               mat.node_tree.nodes["MetallicNode"].image = newImage
+                              mat.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
                               mat.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
                            elif _type == '_R':
                               newImage = bpy.data.images.load(file, check_existing=False)
                               mat.node_tree.nodes["RoughnessNode"].image = newImage
+                              mat.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
                               mat.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
                            elif _type == '_E':
                               newImage = bpy.data.images.load(file, check_existing=False)
