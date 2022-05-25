@@ -148,9 +148,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             description="texture",
             items=[
                 ('4k', '4k', '4096x4096'),
-                ('2k', '2k', '2048x2048'),
-                ('1k', '1k', '1024x1024'),
-                ('512', '512', '512x512')
+                # ('2k', '2k', '2048x2048'),
+                ('1k', '1k', '1024x1024')
+                # ('512', '512', '512x512')
             ]
         )
 
@@ -1207,12 +1207,29 @@ class downresTextures(bpy.types.Operator):
     bl_description = 'Create Down-res Textures'
     bl_options = {'REGISTER', 'UNDO'}
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [512, 1024, 2048]
+        resolutions = [1024]
         TextureEditor.create_downres_textures(input_path, resolutions)
         return {'FINISHED'}
 
+
+class renameAllOriginalTextures(bpy.types.Operator):
+    bl_idname = 'rename.textures'
+    bl_label = 'Rename All Textures'
+    bl_description = "This can't be undone okay!!!!!!"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        TextureEditor.rename_all_original_textures(input_path)
+        return {'FINISHED'}
 
 # ------------------------------- Panels ----------------------------------------------
 
@@ -1750,8 +1767,15 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row = layout.row()
         
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
+
+        row = layout.row()
+        row.label(text="Textures:")
+
+        row = layout.row()
+        row.operator(renameAllOriginalTextures.bl_idname, text=renameAllOriginalTextures.bl_label)
         row = layout.row()
         row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
+
 
         row = layout.row()
 
@@ -1925,7 +1949,8 @@ classes = (
     confirmRefactor,
     refactorExports,
 
-    downresTextures
+    downresTextures,
+    renameAllOriginalTextures
 
 )
 
