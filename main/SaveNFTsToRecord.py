@@ -343,7 +343,13 @@ def CreateSlotsFolderHierarchy(save_path):
                                             bpy.ops.outliner.orphans_purge() 
 
                                         else:
-                                            print("No Textures")
+                                            print("No Textures" + varient)
+                                            for child_col in tempHolder.children:
+                                                for child_obj in child_col.objects:
+                                                    child_col.objects.unlink(child_obj)
+                                                bpy.data.collections.remove(child_col)                                    
+                                            bpy.data.collections.remove(tempHolder)
+                                            bpy.ops.outliner.orphans_purge()
 
                                         
 
@@ -479,6 +485,7 @@ def LinkImagesToNodes(matcopy, texture_path):
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["MetallicNode"].image = newImage
+                matcopy.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
 
             if "R" == mapType:
@@ -486,6 +493,7 @@ def LinkImagesToNodes(matcopy, texture_path):
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["RoughnessNode"].image = newImage
+                matcopy.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
 
             if "E" == mapType:

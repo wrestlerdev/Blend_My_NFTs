@@ -95,7 +95,8 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
    # if suffix == '':
    #    print("this should be 4k okay")
    for child in meshes:
-      for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+      #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+      for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
          mat = texture_mesh.material_slots[i].material
          if mat.use_nodes:
             for n in mat.node_tree.nodes:
@@ -139,10 +140,12 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
                            elif _type == '_M':
                               newImage = bpy.data.images.load(file, check_existing=False)
                               mat.node_tree.nodes["MetallicNode"].image = newImage
+                              mat.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
                               mat.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
                            elif _type == '_R':
                               newImage = bpy.data.images.load(file, check_existing=False)
                               mat.node_tree.nodes["RoughnessNode"].image = newImage
+                              mat.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
                               mat.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
                            elif _type == '_E':
                               newImage = bpy.data.images.load(file, check_existing=False)
@@ -205,12 +208,10 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    is_texture = any(not char.isdigit() for char in v_name_split)
 
    if not is_texture:
-      print("this is a variant")
       variant_child = bpy.data.collections[variant_name].children[0]
       texture_name = variant_child.name
 
    else: # get variant name by stripping out texture/color
-      print("is this a texture var?")
       texture_name = variant_name
       variant_split = variant_name.split('_')
       variant_split = variant_split[:-1]
@@ -397,8 +398,8 @@ def create_item_dict(DNA): # make dict from DNA to save to file
          atttype = list(slot[1].items())[int(atttype_index)]
          if len(list(atttype[1].items())) <= int(variant_index):
             print(atttype[0]) # TODO  KEEP WORKING ON THIS AFTER OUTFITGEN
-            print(len(list(atttype[1].items())))
-            print(variant_index)
+            #print(len(list(atttype[1].items())))
+            #print(variant_index)
          if len(list(atttype[1].items())) > 0: # else?
             print(list(atttype[1].items())[int(variant_index)])
 
