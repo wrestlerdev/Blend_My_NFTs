@@ -310,6 +310,11 @@ def CreateSlotsFolderHierarchy(save_path):
                                                                 characterCollectionDict[c].objects.link(obj)
                                                                 obj.hide_viewport = True
                                                                 obj.hide_render =  True
+                                                                if obj.modifiers:
+                                                                    for mod in obj.modifiers:
+                                                                        if mod.type == 'SUBSURF':
+                                                                            print(obj.name)
+                                                                            mod.show_viewport = False
 
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
                                         if(texture_path != ""):
