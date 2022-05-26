@@ -180,6 +180,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
     inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Exporter.Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
 
+    lastC: bpy.props.StringProperty(name='lastC')
+    inputC: bpy.props.StringProperty(name="CDNA")
+
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso",Slots))
     inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,

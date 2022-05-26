@@ -341,7 +341,7 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 
 
 def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with variants
-   # return
+   return
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
    style = DNAString.pop(0)
