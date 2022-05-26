@@ -144,6 +144,9 @@ def downres_single_texture(path, image_name, dims):
             old_name = image_name.rpartition('.')
             new_name = old_name[0] + config.texture_suffixes[size] + old_name[1] + old_name[2]
             new_path = os.path.join(path, new_name)
-            resized.save(new_path, quality=95, optimize=True)
+            if new_path.endswith('tif'):
+                resized.save(new_path, optimize=True)
+            else:
+                resized.save(new_path, quality=95, optimize=True)
             print(new_path)
     return
