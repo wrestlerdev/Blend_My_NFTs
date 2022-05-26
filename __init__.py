@@ -368,6 +368,16 @@ class randomizePreview(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class randomizeColour(bpy.types.Operator):
+    bl_idname = 'randomize.col'
+    bl_label = 'Randomize Colour'
+    bl_description = "Randomize Colour"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        print(":>")
+        return {'FINISHED'}
+
 # class randomizeModel(bpy.types.Operator):
 #     bl_idname = 'randomize.model'
 #     bl_label = 'Randomize Model'
@@ -1271,12 +1281,16 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
+        row = layout.row()
+        row.prop(mytool, "inputC")
+        row.operator(randomizeColour.bl_idname, text=randomizeColour.bl_label)
+
+        row = layout.separator()
         # row = layout.separator(factor=0.0)
         row = layout.row()
         row.prop(mytool, "maxNFTs")
         row.operator(createBatch.bl_idname, text=createBatch.bl_label)
 
-        row = layout.separator()
         box = layout.box()
         row = box.row()
         row.operator(saveCurrentNFT.bl_idname, text=saveCurrentNFT.bl_label)
@@ -1930,6 +1944,7 @@ classes = (
     saveBatch,
     saveNewBatch,
     resetBatch,
+    randomizeColour,
     # randomizeModel,
     # randomizeColor,
     clearSlots,
