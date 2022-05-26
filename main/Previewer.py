@@ -26,6 +26,10 @@ class bcolors:
 def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
 
+   #Check to see if NFT dictionary passed through is valid or not 
+   #If valid get collor key used for each item 
+   #If not valid look at texture varient for RGBAW tint 
+
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
    style = DNAString.pop(0)
