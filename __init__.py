@@ -1302,9 +1302,9 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
 #             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
-class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
-    bl_label = "All Slots"
-    bl_idname = "WCUSTOM_PT_ParentSlots"
+class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
+    bl_label = "Model Settings"
+    bl_idname = "WCUSTOM_PT_ModelSettings"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'GENERATION'
@@ -1314,6 +1314,7 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
         row = layout.row()
+
         for char in config.Characters:
             inputDNA = bpy.context.scene.my_tool.inputDNA
             DNASplit = inputDNA.split(',')
@@ -1330,128 +1331,142 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         row.prop(mytool, "textureSize", expand=True)
 
 
+class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
+    bl_label = "All Slots"
+    bl_idname = "WCUSTOM_PT_ParentSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        row = layout.row()
 
 
-# class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
-#     bl_label = "Torso Slots"
-#     bl_idname = "WCUSTOM_PT_TorsoSlots"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'GENERATION'
-#     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-#     slots = {"inputUpperTorso": ("MOD_CLOTH"),
-#     "inputMiddleTorso": ("MOD_CLOTH"),
-#     "inputBackPack": ("CON_ARMATURE")}
+
+class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
+    bl_label = "Torso Slots"
+    bl_idname = "WCUSTOM_PT_TorsoSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+
+    slots = {"inputUpperTorso": ("MOD_CLOTH"),
+    "inputMiddleTorso": ("MOD_CLOTH"),
+    "inputBackPack": ("CON_ARMATURE")}
     
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         for name in self.slots:
-#             row = layout.row()
-#             row.label(text=Slots[name][1], icon=self.slots[name])
-#             row.prop(mytool, name, text="")
-#             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-#             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
-# class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
-#     bl_label = "Arms Slots"
-#     bl_idname = "WCUSTOM_PT_ArmSlots"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'GENERATION'
-#     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
+    bl_label = "Arms Slots"
+    bl_idname = "WCUSTOM_PT_ArmSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-#     slots = {
-#     "inputRForeArm": ("LOOP_FORWARDS"),
-#     "inputLForeArm": ("LOOP_BACK"),
-#     "inputRWrist": ("FORWARD"),
-#     "inputLWrist": ("BACK"),
-#     "inputHands": ("VIEW_PAN"),}
+    slots = {
+    "inputRForeArm": ("LOOP_FORWARDS"),
+    "inputLForeArm": ("LOOP_BACK"),
+    "inputRWrist": ("FORWARD"),
+    "inputLWrist": ("BACK"),
+    "inputHands": ("VIEW_PAN"),}
     
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         for name in self.slots:
-#             row = layout.row()
-#             row.label(text=Slots[name][1], icon=self.slots[name])
-#             row.prop(mytool, name, text="")
-#             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-#             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
-# class WCUSTOM_PT_LegSlots(bpy.types.Panel):
-#     bl_label = "Leg Slots"
-#     bl_idname = "WCUSTOM_PT_LegSlots"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'GENERATION'
-#     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+class WCUSTOM_PT_LegSlots(bpy.types.Panel):
+    bl_label = "Leg Slots"
+    bl_idname = "WCUSTOM_PT_LegSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-#     slots = {
-#     "inputPelvisThick": ("OUTLINER_OB_ARMATURE"),
-#     "inputPelvisThin": ("HANDLE_ALIGNED"),
-#     "inputCalf": ("LINCURVE"),
-#     "inputAnkle": ("LINCURVE"),
-#     "inputFeet": ("MOD_DYNAMICPAINT"),}
+    slots = {
+    "inputPelvisThick": ("OUTLINER_OB_ARMATURE"),
+    "inputPelvisThin": ("HANDLE_ALIGNED"),
+    "inputCalf": ("LINCURVE"),
+    "inputAnkle": ("LINCURVE"),
+    "inputFeet": ("MOD_DYNAMICPAINT"),}
     
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         for name in self.slots:
-#             row = layout.row()
-#             row.label(text=Slots[name][1], icon=self.slots[name])
-#             row.prop(mytool, name, text="")
-#             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-#             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
-# class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
-#     bl_label = "Head Slots"
-#     bl_idname = "WCUSTOM_PT_HeadSlots"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'GENERATION'
-#     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
+    bl_label = "Head Slots"
+    bl_idname = "WCUSTOM_PT_HeadSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-#     slots = {
-#     "inputUpperHead": ("MESH_CONE"),
-#     "inputMiddleHead": ("HIDE_OFF"),
-#     "inputLowerHead": ("USER"),
-#     "inputEarings": ("PMARKER_ACT"),
-#     "inputNeck": ("NODE_INSERT_OFF"),}
+    slots = {
+    "inputUpperHead": ("MESH_CONE"),
+    "inputMiddleHead": ("HIDE_OFF"),
+    "inputLowerHead": ("USER"),
+    "inputEarings": ("PMARKER_ACT"),
+    "inputNeck": ("NODE_INSERT_OFF"),}
     
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         for name in self.slots:
-#             row = layout.row()
-#             row.label(text=Slots[name][1], icon=self.slots[name])
-#             row.prop(mytool, name, text="")
-#             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-#             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
-# class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
-#     bl_label = "Other Slots"
-#     bl_idname = "WCUSTOM_PT_OtherSlots"
-#     bl_space_type = 'VIEW_3D'
-#     bl_region_type = 'UI'
-#     bl_category = 'GENERATION'
-#     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
-#     slots = {"inputBackground": ("NODE_TEXTURE")}
+class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
+    bl_label = "Other Slots"
+    bl_idname = "WCUSTOM_PT_OtherSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+    slots = {"inputBackground": ("NODE_TEXTURE")}
     
-#     def draw(self, context):
-#         layout = self.layout
-#         scene = context.scene
-#         mytool = scene.my_tool
-#         for name in self.slots:
-#             row = layout.row()
-#             row.label(text=Slots[name][1], icon=self.slots[name])
-#             row.prop(mytool, name, text="")
-#             row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
-#             row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        for name in self.slots:
+            row = layout.row()
+            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.prop(mytool, name, text="")
+            # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
+            # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 #-----------------------------------------------------------------------
@@ -1889,13 +1904,14 @@ classes = (
     WCUSTOM_PT_EditBatch,
     WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_PreviewNFTs,
+    WCUSTOM_PT_ModelSettings,
     # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
-    # WCUSTOM_PT_HeadSlots,
-    # WCUSTOM_PT_TorsoSlots,
-    # WCUSTOM_PT_ArmSlots,
-    # WCUSTOM_PT_LegSlots,
-    # WCUSTOM_PT_OtherSlots,
+    WCUSTOM_PT_HeadSlots,
+    WCUSTOM_PT_TorsoSlots,
+    WCUSTOM_PT_ArmSlots,
+    WCUSTOM_PT_LegSlots,
+    WCUSTOM_PT_OtherSlots,
     GU_PT_collection_custom_properties,
     WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
