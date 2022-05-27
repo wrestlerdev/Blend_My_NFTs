@@ -218,7 +218,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
 
          dna_string = [str(type_index), str(variant_index), str(texture_index)]
          new_dna_strand = '-'.join(dna_string)
-         break # CHECK THIS
+         break
       else:
          type_index += 1
          # stop putting a break here lmao
@@ -272,25 +272,19 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
    else:
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], None)
-      print("***********")
-      print(new_dnastrand)
       last_variant = bpy.context.scene.my_tool.get(last_key)
-      print(last_variant)
       last_type = last_variant.name.split('_')[1]
-      if last_type not in ['Null', 'Nulll']: # gets null variant then fills pointer with it
-         coll = bpy.data.collections[coll_name]
-         null_type_coll = coll.children[0]
-         null_var_coll = null_type_coll.children[0]
-         new_dnastrand = set_from_collection(coll, null_var_coll.name)
-         if new_dnastrand != '':
-            dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
+      coll = bpy.data.collections[coll_name]
+      null_type_coll = coll.children[0]
+      null_var_coll = null_type_coll.children[0]
+      new_dnastrand = set_from_collection(coll, null_var_coll.name)
+      if new_dnastrand != '':
+         dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
 
-            bpy.context.scene.my_tool[slots_key] = None
-            bpy.context.scene.my_tool[last_key] = null_var_coll
-            bpy.context.scene.my_tool.lastDNA = dna_string
-
-      else: # will refill pointer with null
          bpy.context.scene.my_tool[slots_key] = None
+         bpy.context.scene.my_tool[last_key] = null_var_coll
+         bpy.context.scene.my_tool.lastDNA = dna_string
+         bpy.context.scene.my_tool.inputDNA = dna_string
 
 
 

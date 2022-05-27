@@ -1361,6 +1361,8 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         mytool = scene.my_tool
         row = layout.row()
 
+        row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
+
 
 
 
