@@ -20,14 +20,19 @@ col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green"
 def read_DNAList_from_file(batch_index, index): # return DNA as string
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+    NFT_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(batch_index), "NFT_{:04d}".format(index), "Batch_{:03d}".format(batch_index) + "_NFT_{:04d}.json".format(index))
     DataDictionary = json.load(open(NFTRecord_save_path))
+    NFTDictionary = json.load(open(NFT_save_path))
+   
+    DNA = NFTDictionary["DNAList"]
+    NFTDict = NFTDictionary["CharacterItems"]
     DNAList = DataDictionary["DNAList"]
 
     if index <= len(DNAList):
         DNA = DNAList[index - 1]
-        return len(DNAList), DNA
+        return len(DNAList), DNA, NFTDict
     else:
-        return len(DNAList), ''
+        return len(DNAList), '', ''
 
 
 def get_all_DNA_from_batch(index):

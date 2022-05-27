@@ -23,13 +23,14 @@ class bcolors:
 
 
 
-def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to hide/show DNA
+def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
-
    #Check to see if NFT dictionary passed through is valid or not 
    #If valid get collor key used for each item 
    #If not valid look at texture varient for RGBAW tint 
+   print(NFTDict)
 
+   keys = list(NFTDict.keys())
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
    style = DNAString.pop(0)
@@ -47,8 +48,17 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                      for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
                         obj.hide_viewport = True
                         obj.hide_render = True
-
+   CDNA = []
    for strand in range(len(DNAString)):
+      itemDict = NFTDict[keys[strand]]
+      if(itemDict != "Null"):
+         itemKey = list(itemDict)[0]
+         itemValues = itemDict[itemKey]
+         colorKey = itemValues["color_key"]
+         print(colorKey)
+         CDNA.append(colorKey)
+      else:
+         CDNA.append("null")
       meshes = None
       DNASplit = DNAString[strand].split('-')
       atttype_index = DNASplit[0]
@@ -92,7 +102,7 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
          #    print("texture where")
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
-
+   print(CDNA)
 
 def set_texture_on_mesh(meshes, texture_mesh, resolution):
    suffix = config.texture_suffixes[resolution]

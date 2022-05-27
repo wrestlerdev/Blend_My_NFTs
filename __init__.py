@@ -361,10 +361,12 @@ class randomizePreview(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.root_dir)
         # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        DNA = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)[0][0]
-        Exporter.Previewer.show_nft_from_dna(DNA)
-        bpy.context.scene.my_tool.lastDNA = DNA
-        bpy.context.scene.my_tool.inputDNA = DNA
+        DNA, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
+        SingleDNA = DNA[0]
+        SingleNFTDict = NFTDict[DNA[0]]
+        Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
+        bpy.context.scene.my_tool.lastDNA = SingleDNA
+        bpy.context.scene.my_tool.inputDNA = SingleDNA
         return {'FINISHED'}
 
 
@@ -478,8 +480,8 @@ class createBatch(bpy.types.Operator):
         numGenerated = LoadNFT.get_total_DNA()
         bpy.context.scene.my_tool.loadNFTIndex = numGenerated
         DNA = DNASet[len(DNASet) - 1] # show last DNA created
-
-        Exporter.Previewer.show_nft_from_dna(DNA)
+        print(NFTDict[DNA])
+        Exporter.Previewer.show_nft_from_dna(DNA, NFTDict[DNA])
         bpy.context.scene.my_tool.lastDNA = DNA
         bpy.context.scene.my_tool.inputDNA = DNA
         Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
@@ -501,10 +503,10 @@ class loadNFT(bpy.types.Operator):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
         batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
-        TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
+        TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         if TotalDNA > 0 and DNA != '':
-            Exporter.Previewer.show_nft_from_dna(DNA)
+            Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
             bpy.context.scene.my_tool.lastDNA = DNA
             bpy.context.scene.my_tool.inputDNA = DNA
             Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
@@ -530,9 +532,9 @@ class loadNextNFT(bpy.types.Operator):
         if  nftnum > 0 and bpy.context.scene.my_tool.loadNFTIndex < nftnum:
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
+            TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
-            Exporter.Previewer.show_nft_from_dna(DNA)
+            Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
             bpy.context.scene.my_tool.lastDNA = DNA
             bpy.context.scene.my_tool.inputDNA = DNA
             Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
@@ -552,9 +554,9 @@ class loadPrevNFT(bpy.types.Operator):
         if len(os.listdir(nft_save_path)) > 1 :
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex - 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
+            TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
-            Exporter.Previewer.show_nft_from_dna(DNA)
+            Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
             bpy.context.scene.my_tool.lastDNA = DNA
             bpy.context.scene.my_tool.inputDNA = DNA
             Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
@@ -609,10 +611,10 @@ class deleteNFT(bpy.types.Operator):
         if TotalDNA > 0 and DNA != '':
             deleted_index = SaveNFTsToRecord.DeleteNFT(DNA, nft_save_path, batch_index, master_save_path)
             new_index = min(deleted_index, TotalDNA - 1)
-            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, new_index)
+            TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, new_index)
 
             bpy.context.scene.my_tool.loadNFTIndex = new_index
-            Exporter.Previewer.show_nft_from_dna(DNA)
+            Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
             bpy.context.scene.my_tool.lastDNA = DNA
             bpy.context.scene.my_tool.inputDNA = DNA
             Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
@@ -670,9 +672,9 @@ class loadBatch(bpy.types.Operator):
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
             bpy.context.scene.my_tool.loadNFTIndex = 1
-            TotalDNA, DNA = LoadNFT.read_DNAList_from_file(index, 1)
+            TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(index, 1)
             if DNA != '':
-                Exporter.Previewer.show_nft_from_dna(DNA)
+                Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
                 bpy.context.scene.my_tool.lastDNA = DNA
                 bpy.context.scene.my_tool.inputDNA = DNA
                 Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
