@@ -6,6 +6,7 @@ import bpy
 import os
 import json
 from . import config
+from random import randrange
 
 enableGeneration = False
 colorList = []
@@ -40,9 +41,9 @@ def show_nft_from_dna(DNA): # goes through collection hiearchy based on index to
                   if bpy.data.collections.get(char_var) is not None:
                      bpy.data.collections.get(char_var).hide_viewport = True
                      bpy.data.collections.get(char_var).hide_render = True
-                     for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
-                        obj.hide_viewport = True
-                        obj.hide_render = True
+                     # for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                     #    obj.hide_viewport = True
+                     #    obj.hide_render = True
 
    for strand in range(len(DNAString)):
       meshes = None
@@ -106,19 +107,6 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
                      texture_info = get_new_texture_name(n, suffix)
                      if texture_info:
                         new_texture, new_texture_path, _type = texture_info
-                        print(texture_info)
-                        # if _type == '_N':
-                        #    print("this is the normal")
-                        # elif _type == '_D':
-                        #    print("this is the diffuse")
-                        # elif _type == '_ID':
-                        #    print("this is the color id")
-                        # elif _type == '_M':
-                        #    print("this is the metallic")
-                        # elif _type == '_R':
-                        #    print("this is the roughness")
-                        # elif _type == '_E':
-                        #    print("this is the emissive")
 
                         if os.path.exists(new_texture_path):
                            file = new_texture_path.replace('/', '\\')
@@ -204,18 +192,9 @@ def get_null_dna(character="Kae"):
 
 
 def set_from_collection(slot_coll, variant_name): # hide all in coll and show given variant based on name
-   v_name_split = variant_name.split('_')[-1]
-   is_texture = any(not char.isdigit() for char in v_name_split)
-
-   if not is_texture:
-      variant_child = bpy.data.collections[variant_name].children[0]
-      texture_name = variant_child.name
-
-   else: # get variant name by stripping out texture/color
-      texture_name = variant_name
-      variant_split = variant_name.split('_')
-      variant_split = variant_split[:-1]
-      variant_name = '_'.join(variant_split)
+   if not variant_name:
+      type_null = slot_coll.children[0]
+      variant_name = type_null.children[0].name
 
    new_dna_strand = ''
    type_index = 0
@@ -227,15 +206,15 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    character = DNAString.pop(0)
    style = DNAString.pop(0)
 
-   for type_coll in slot_coll.children: # get type,variant,texture index by going through collection hierarchy
+   for type_coll in slot_coll.children: # get type, variant index by going through collection hierarchy
       if variant_name in type_coll.children:
          var_coll = bpy.data.collections[variant_name]
-         tex_coll = bpy.data.collections[texture_name]
+         texture_objs = var_coll.objects
 
          type_list = list(type_coll.children)
-         var_list = list(var_coll.children)
          variant_index = type_list.index(var_coll)
-         texture_index = var_list.index(tex_coll) # TODO HOW TO GET TEXTURE INDEX NOW
+         if len(texture_objs) > 0:
+            texture_index = randrange(len(texture_objs))
 
          dna_string = [str(type_index), str(variant_index), str(texture_index)]
          new_dna_strand = '-'.join(dna_string)
@@ -249,27 +228,26 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
          for variant_coll in type_coll.children: # hide all
             variant_coll.hide_render = True
             variant_coll.hide_viewport = True
-            for texture_coll in variant_coll.children:
-               texture_coll.hide_render = True
-               texture_coll.hide_viewport = True
 
       var_coll.hide_render = False
       var_coll.hide_viewport = False
-      tex_coll.hide_render = False
-      tex_coll.hide_viewport = False
 
-      if tex_coll.children:
-         for child in tex_coll.children:
+      if var_coll.children:
+         for child in var_coll.children:
             if child.name.split('_')[-1] == character:
                meshes = child.objects
+               for mesh in meshes:
+                  mesh.hide_viewport = False
+                  mesh.hide_render = False
                child.hide_viewport = False
                child.hide_render = False
             else:
                child.hide_viewport = True
                child.hide_render = True
-      else:
-         meshes = bpy.data.collections.get(texture_name).objects # if character texture variant doesnt exist
-         # mesh set armature?
+      # else:
+      #    meshes = bpy.data.collections.get(variant_name).objects # if character texture variant doesnt exist
+      #    # mesh set armature?
+
 
    return new_dna_strand # return dna strand or empty string if not valid
 
@@ -279,8 +257,9 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
    last_key = slots_key.replace("input", "last")
    coll_name, label = Slots[slots_key]
    if bpy.context.scene.my_tool.get(slots_key) is not None: # pointer has been filled
-
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
+
+      print(new_dnastrand)
       if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
          dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
          
@@ -292,7 +271,11 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
          bpy.context.scene.my_tool[slots_key] = None
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
    else:
+      new_dnastrand = set_from_collection(bpy.data.collections[coll_name], None)
+      print("***********")
+      print(new_dnastrand)
       last_variant = bpy.context.scene.my_tool.get(last_key)
+      print(last_variant)
       last_type = last_variant.name.split('_')[1]
       if last_type not in ['Null', 'Nulll']: # gets null variant then fills pointer with it
          coll = bpy.data.collections[coll_name]
@@ -302,12 +285,12 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
          if new_dnastrand != '':
             dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
 
-            bpy.context.scene.my_tool[slots_key] = null_var_coll
+            bpy.context.scene.my_tool[slots_key] = None
             bpy.context.scene.my_tool[last_key] = null_var_coll
             bpy.context.scene.my_tool.lastDNA = dna_string
 
       else: # will refill pointer with null
-         bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
+         bpy.context.scene.my_tool[slots_key] = None
 
 
 
@@ -316,7 +299,7 @@ def update_DNA_with_strand(new_dnastrand, coll_name):
    hierarchy = get_hierarchy_ordered()
    coll_index = list(hierarchy.keys()).index(coll_name)
    DNA = dna_string.split(',') 
-   DNA[coll_index + 1] = str(new_dnastrand)
+   DNA[coll_index + 2] = str(new_dnastrand)
    dna_string = ','.join(DNA)
    return dna_string
 
@@ -341,12 +324,11 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 
 
 def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with variants
-   return
+   # return
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
    style = DNAString.pop(0)
    show_character(character)
-   
    ohierarchy = get_hierarchy_ordered()
    for i in range(len(DNAString)):
 
@@ -357,14 +339,18 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
 
       slot = list(ohierarchy.items())[i]
       atttype = list(slot[1].items())[int(atttype_index)]
-      variant = list(atttype[1].items())[int(variant_index)]
-      texture = list(variant[1].items())[int(texture_index)][0]
+      variant = list(atttype[1].items())[int(variant_index)][0]
+      # texture = list(variant[1].items())[int(texture_index)][0]
 
       coll_name = slot[0][3:len(slot[0])] # CHECK THIS FOR NEW HIERARCHY
       last_coll_name = "last" + str(coll_name)
       input_coll_name = "input" + str(coll_name)
-      bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[texture]
-      bpy.context.scene.my_tool[input_coll_name] = bpy.data.collections[texture]
+      if any(n in variant for n in ['Null', 'Nulll']):
+         bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
+         bpy.context.scene.my_tool[input_coll_name] = None
+      else:
+         bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
+         bpy.context.scene.my_tool[input_coll_name] = bpy.data.collections[variant]
    return
 
 

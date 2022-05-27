@@ -108,133 +108,133 @@ skincols = [(0.310, 0.102, 0.000), (0.21403, 0.129142,0.019756), (0.227,0.062,0.
 
 # A dictionary which can be called to find what slots to fill when using certian items
 
-def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
-    index = bpy.context.scene.my_tool.CurrentBatchIndex
-    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+# def RandomizeSingleDNAStrandColor(inputSlot, slot_coll, CurrentDNA, save_path):
+#     index = bpy.context.scene.my_tool.CurrentBatchIndex
+#     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+#     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
 
-    DataDictionary = json.load(open(NFTRecord_save_path))
+#     DataDictionary = json.load(open(NFTRecord_save_path))
 
-    hierarchy = DataDictionary["hierarchy"]
-    attributeskeys = list(hierarchy.keys())
-    index = attributeskeys.index(slot_coll)
+#     hierarchy = DataDictionary["hierarchy"]
+#     attributeskeys = list(hierarchy.keys())
+#     index = attributeskeys.index(slot_coll)
 
-    DNAString = CurrentDNA.split(",")
-    character = DNAString.pop(0)
-    style = DNAString.pop(0)
-    DNASplit = DNAString[index].split('-')
+#     DNAString = CurrentDNA.split(",")
+#     character = DNAString.pop(0)
+#     style = DNAString.pop(0)
+#     DNASplit = DNAString[index].split('-')
 
-    newDNASplit = [DNASplit[0], DNASplit[1], DNASplit[2]]
+#     newDNASplit = [DNASplit[0], DNASplit[1], DNASplit[2]]
 
-    if not (newDNASplit[0] == 0 and newDNASplit[1] == 0): # if not null
+#     if not (newDNASplit[0] == 0 and newDNASplit[1] == 0): # if not null
 
-        slot = bpy.context.scene.my_tool[inputSlot]
-        col = (random.random(), random.random(), random.random())
-        col = (random.random(), random.random(), random.random())
+#         slot = bpy.context.scene.my_tool[inputSlot]
+#         col = (random.random(), random.random(), random.random())
+#         col = (random.random(), random.random(), random.random())
 
-        childrenColls = slot.children
-        if childrenColls:
-            for childColl in childrenColls:
-                if childColl.name.split('_')[-1] == character:
-                    chidlrenObjs = childColl.objects
-                    break
-        else:
-            chidlrenObjs = slot.objects
-        # hexCodes = ColorGen.PickOutfitColors(slot_coll, chidlrenObjs)
-        for child in chidlrenObjs:
-            obj = bpy.data.objects[child.name]
-            obj["TestColor"] = col
-            obj["R"] = col
-            hex = ColorGen.RGBtoHex((col))
+#         childrenColls = slot.children
+#         if childrenColls:
+#             for childColl in childrenColls:
+#                 if childColl.name.split('_')[-1] == character:
+#                     chidlrenObjs = childColl.objects
+#                     break
+#         else:
+#             chidlrenObjs = slot.objects
+#         # hexCodes = ColorGen.PickOutfitColors(slot_coll, chidlrenObjs)
+#         for child in chidlrenObjs:
+#             obj = bpy.data.objects[child.name]
+#             obj["TestColor"] = col
+#             obj["R"] = col
+#             hex = ColorGen.RGBtoHex((col))
 
-        newDNAStrand = '-'.join(newDNASplit)
-        newDNAString = copy.deepcopy(DNAString)
-        newDNAString[index] = newDNAStrand
+#         newDNAStrand = '-'.join(newDNASplit)
+#         newDNAString = copy.deepcopy(DNAString)
+#         newDNAString[index] = newDNAStrand
 
-        newDNAString.insert(0, character)
-        newDNA = ','.join(newDNAString)
-        print(newDNAStrand)      
-        return newDNA
+#         newDNAString.insert(0, character)
+#         newDNA = ','.join(newDNAString)
+#         print(newDNAStrand)      
+#         return newDNA
 
-    return CurrentDNA
+#     return CurrentDNA
 
 
 
-def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
-    index = bpy.context.scene.my_tool.CurrentBatchIndex
-    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+# def RandomizeSingleDNAStrandMesh(inputSlot, CurrentDNA, save_path):
+#     index = bpy.context.scene.my_tool.CurrentBatchIndex
+#     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+#     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
 
-    DataDictionary = json.load(open(NFTRecord_save_path))
+#     DataDictionary = json.load(open(NFTRecord_save_path))
 
-    hierarchy = DataDictionary["hierarchy"]
-    DNAList = DataDictionary["DNAList"]
+#     hierarchy = DataDictionary["hierarchy"]
+#     DNAList = DataDictionary["DNAList"]
 
     
-    #Build Dict
-    attributeskeys = list(hierarchy.keys())
-    attributevalues = list(hierarchy.values())
-    attributeUsedDict = dict.fromkeys(attributeskeys, False)
+#     #Build Dict
+#     attributeskeys = list(hierarchy.keys())
+#     attributevalues = list(hierarchy.values())
+#     attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
-    attributes = {}
-    indexToEdit = -1
-    currentVarient = ''
-    DNAString = CurrentDNA.split(",")
-    character = DNAString.pop(0)
-    style = DNAString.pop(0)
+#     attributes = {}
+#     indexToEdit = -1
+#     currentVarient = ''
+#     DNAString = CurrentDNA.split(",")
+#     character = DNAString.pop(0)
+#     style = DNAString.pop(0)
 
-    for strand in range(len(DNAString)):
-        DNASplit = DNAString[strand].split('-')
-        atttype_index = DNASplit[0]
-        variant_index = DNASplit[1]
-        texture_index = DNASplit[2]
+#     for strand in range(len(DNAString)):
+#         DNASplit = DNAString[strand].split('-')
+#         atttype_index = DNASplit[0]
+#         variant_index = DNASplit[1]
+#         texture_index = DNASplit[2]
 
-        slot = list(hierarchy.items())[strand]
+#         slot = list(hierarchy.items())[strand]
 
-        atttype = list(slot[1].items())[int(atttype_index)]
-        variant = list(atttype[1].items())[int(variant_index)][0]
-
-
-        slotName = list(atttype[1].items())[int(variant_index)][1]["slotName"]
-        formatedSlot = str(inputSlot).split("input", 2)[1]
-        if(slotName != formatedSlot):
-            #loop through all slots that selected item will take up
-            ItemClothingGenre = list(atttype[1].items())[int(variant_index)][1]["clothingGenre"]
-            UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-            if UsedUpSlotArray:
-                for i in ItemUsedBodySlot.get(ItemClothingGenre):
-                    SlotUpdateValue = {i : True}
-                    attributeUsedDict.update(SlotUpdateValue)
-        else:
-            attributes = slot
-            indexToEdit =  strand
-            currentVarient = variant
+#         atttype = list(slot[1].items())[int(atttype_index)]
+#         variant = list(atttype[1].items())[int(variant_index)][0]
 
 
-    attempts = 100
-    while attempts > 0:
-        typeChoosen, typeIndex = PickWeightedAttributeType(attributes[1])
-        varientChoosen, varientIndex = PickWeightedTypeVarient(attributes[1][typeChoosen])
-        textureChoosen, textureIndex = PickWeightedTextureVarient(attributes[1][typeChoosen][varientChoosen]["textures"])
-        if(varientChoosen != currentVarient):
-            willItemFit =  True
-            ItemClothingGenre = hierarchy[attributes[0]][typeChoosen][varientChoosen]["clothingGenre"]
-            UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-            if UsedUpSlotArray:
-                for i in UsedUpSlotArray:
-                    if attributeUsedDict.get(i):
-                        willItemFit = False
-            if(willItemFit):       
-                DNAStrand = [str(typeIndex), str(varientIndex), str(textureIndex)]
+#         slotName = list(atttype[1].items())[int(variant_index)][1]["slotName"]
+#         formatedSlot = str(inputSlot).split("input", 2)[1]
+#         if(slotName != formatedSlot):
+#             #loop through all slots that selected item will take up
+#             ItemClothingGenre = list(atttype[1].items())[int(variant_index)][1]["clothingGenre"]
+#             UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+#             if UsedUpSlotArray:
+#                 for i in ItemUsedBodySlot.get(ItemClothingGenre):
+#                     SlotUpdateValue = {i : True}
+#                     attributeUsedDict.update(SlotUpdateValue)
+#         else:
+#             attributes = slot
+#             indexToEdit =  strand
+#             currentVarient = variant
 
-                newDNAString = '-'.join(DNAStrand)
-                # DNAString[indexToEdit] = str(typeIndex) + '-' + str(varientIndex)
-                DNAString[indexToEdit] = newDNAString
-                DNAString.insert(0, character)
-                FormattedDNA = ','.join(DNAString)
-                return FormattedDNA
-        attempts -= 1
-    return CurrentDNA
+
+#     attempts = 100
+#     while attempts > 0:
+#         typeChoosen, typeIndex = PickWeightedAttributeType(attributes[1])
+#         varientChoosen, varientIndex = PickWeightedTypeVarient(attributes[1][typeChoosen])
+#         textureChoosen, textureIndex = PickWeightedTextureVarient(attributes[1][typeChoosen][varientChoosen]["textures"])
+#         if(varientChoosen != currentVarient):
+#             willItemFit =  True
+#             ItemClothingGenre = hierarchy[attributes[0]][typeChoosen][varientChoosen]["clothingGenre"]
+#             UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+#             if UsedUpSlotArray:
+#                 for i in UsedUpSlotArray:
+#                     if attributeUsedDict.get(i):
+#                         willItemFit = False
+#             if(willItemFit):       
+#                 DNAStrand = [str(typeIndex), str(varientIndex), str(textureIndex)]
+
+#                 newDNAString = '-'.join(DNAStrand)
+#                 # DNAString[indexToEdit] = str(typeIndex) + '-' + str(varientIndex)
+#                 DNAString[indexToEdit] = newDNAString
+#                 DNAString.insert(0, character)
+#                 FormattedDNA = ','.join(DNAString)
+#                 return FormattedDNA
+#         attempts -= 1
+#     return CurrentDNA
 
 def setBodySlotsValue(ItemClothingGenre, ValueToSet):
     #loop through all slots that selected item will take up
