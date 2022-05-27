@@ -54,11 +54,17 @@ ItemUsedBodySlot = {
 "FeetLong" : ["10-Calf", "11-Ankle", "12-Feet"],
 "FeetMid" : ["11-Ankle", "12-Feet"],
 "FeetShort" : ["12-Feet"],
+"Calf" : ["10-Calf"],
 "Neck" : ["13-Neck"],
-"HeadUpper" : ["17-UpperHead", "16-Earings"],
+"HeadUpper" : ["17-UpperHead"],
+"HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
+"HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-BackPack", "16-Earings"],
 "HeadMiddle" : ["15-MiddleHead"],
 "HeadLower" : ["14-LowerHead"],
-"HeadFull" : ["15-MiddleHead", "14-LowerHead"],
+"FaceFull" : ["15-MiddleHead", "14-LowerHead"],
+"HeadFull" : ["15-MiddleHead", "14-LowerHead", "13-Neck", "17-UpperHead", "16-Earings"],
+"EaringShort" : ["16-Earings"], 
+"EaringLong" : ["16-Earings", "13-Neck"], 
 "Backpack" : ["19-Backpack"],
 "BackpackHigh" : ["19-Backpack"],
 "ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
@@ -285,7 +291,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         character = PickCharacter()
-        style = "Temp"
         ColorGen.SetUpCharacterStyle()
 
         # letterstyles = 'abcdefghijkl'
@@ -381,7 +386,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
             VarientDict = {}
             current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
-            current_entry["Style"] = style
             current_entry["TextureSet"] = textureIndex
             current_entry["color_style"] = ColorGen.styleKey
             current_entry["color_key"] = ColorGen.colorkey

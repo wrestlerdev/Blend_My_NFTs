@@ -6,6 +6,7 @@ import bpy
 import os
 import json
 from . import config
+from . import ColorGen
 from random import randrange
 
 enableGeneration = False
@@ -99,12 +100,14 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
                resolution = 4096
             else:
                resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+            ColorGen.PickOutfitColors(slot, meshes, style)
             set_texture_on_mesh(meshes, texture, resolution)
          # else:
          #    print("texture where")
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
    print(CDNA)
+
 
 def set_texture_on_mesh(meshes, texture_mesh, resolution):
    suffix = config.texture_suffixes[resolution]
@@ -160,9 +163,6 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
                      # print("This node ({}) doesn't have an image".format(n.name))
                      # then should it look for an image?
 
-
-
-
          child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
    return
 
@@ -207,6 +207,8 @@ def get_null_dna(character="Kae"):
 
 
 def set_from_collection(slot_coll, variant_name): # hide all in coll and show given variant based on name
+   print("*")
+   print(ColorGen.colorkey)
    if not variant_name:
       type_null = slot_coll.children[0]
       variant_name = type_null.children[0].name
@@ -220,6 +222,7 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    DNAString = lastDNA.split(",")
    character = DNAString.pop(0)
    style = DNAString.pop(0)
+
 
    for type_coll in slot_coll.children: # get type, variant index by going through collection hierarchy
       if variant_name in type_coll.children:
@@ -254,6 +257,9 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
                for mesh in meshes:
                   mesh.hide_viewport = False
                   mesh.hide_render = False
+               # print("ggggggggggg")
+               # print(slot_coll.name)
+               # ColorGen.PickOutfitColors(slot_coll.name, meshes, style)
                child.hide_viewport = False
                child.hide_render = False
             else:
@@ -279,7 +285,7 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
          dna_string = update_DNA_with_strand(new_dnastrand, coll_name)
          
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
-         bpy.context.scene.my_tool.lastDNA = dna_string
+         # bpy.context.scene.my_tool.lastDNA = dna_string
          bpy.context.scene.my_tool.inputDNA = dna_string
       else:
          print("is not valid || clear")
@@ -298,7 +304,7 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
 
          bpy.context.scene.my_tool[slots_key] = None
          bpy.context.scene.my_tool[last_key] = null_var_coll
-         bpy.context.scene.my_tool.lastDNA = dna_string
+         # bpy.context.scene.my_tool.lastDNA = dna_string
          bpy.context.scene.my_tool.inputDNA = dna_string
 
 
@@ -317,10 +323,10 @@ def update_DNA_with_strand(new_dnastrand, coll_name):
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
    if DNA != lastDNA:
       DNA = DNA.replace('"', '')
-      show_nft_from_dna(DNA)
       bpy.context.scene.my_tool.lastDNA = DNA
       bpy.context.scene.my_tool.inputDNA = DNA
       fill_pointers_from_dna(DNA, DNA)
+      show_nft_from_dna(DNA)
       # try:
       #    show_nft_from_dna(DNA)
       #    bpy.context.scene.my_tool.lastDNA = DNA

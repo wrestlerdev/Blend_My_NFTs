@@ -159,9 +159,7 @@ colorkey = ""
 
 def SetUpCharacterStyle():
     global availableColorStyleKeys, styleKey
-    save_path = bpy.context.scene.my_tool.root_dir
-    color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
-    globalStyleInfo = json.load(open(color_style_path))
+    globalStyleInfo = GetColorStyleJSON()
 
     styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
     styleKey = list(globalStyleInfo.keys())[styleIndex]
@@ -179,9 +177,20 @@ def CheckAndFormatPath(path, pathTojoin = ""):
         return ""
     return new_path
 
-def PickOutfitColors(attribute, chidlrenObjs):
+def GetColorStyleJSON():
+    save_path = bpy.context.scene.my_tool.root_dir
+    color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
+    globalStyleInfo = json.load(open(color_style_path))
+
+    return globalStyleInfo
+
+def PickOutfitColors(attribute, chidlrenObjs, style_key=None):
     global styleKey, availableColorStyleKeys
     global colorkey
+
+    if style_key:
+        globalStyleInfo = GetColorStyleJSON()
+        availableColorStyleKeys = globalStyleInfo[style_key]
 
     save_path = save_path = bpy.context.scene.my_tool.root_dir
     if(attribute == "17-UpperHead"):
