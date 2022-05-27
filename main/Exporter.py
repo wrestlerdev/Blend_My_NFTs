@@ -312,12 +312,13 @@ def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, 
     SingleDict = json.load(open(json_path))
 
     DNA = SingleDict["DNAList"]
+    NFTDict = SingleDict["CharacterItems"]
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
     nft_name = file_name[:-len(".json")]
 
     image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
-    Previewer.show_nft_from_dna(DNA)
+    Previewer.show_nft_from_dna(DNA, NFTDict)
 
     bpy.context.scene.render.filepath = image_path
     bpy.context.scene.render.image_settings.file_format = image_file_format
@@ -337,11 +338,12 @@ def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDN
 
     SingleDict = json.load(open(json_path))
     DNA = SingleDict["DNAList"]
+    NFTDict = SingleDict["CharacterItems"]
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Rendering Video: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
     nft_name = file_name[:-len(".json")] + ".mp4"
-    Previewer.show_nft_from_dna(DNA)
+    Previewer.show_nft_from_dna(DNA, NFTDict)
 
     video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
     bpy.context.scene.render.filepath = video_path
@@ -366,13 +368,14 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
     dnaDictionary = SingleDict["CharacterItems"]
 
     DNA = SingleDict["DNAList"]
+    NFTDict = SingleDict["CharacterItems"]
     total_index = totalDNAList.index(DNA) + 1
     print(f"{bcolors.OK}Generating 3D Model: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
     nft_name = file_name[:-len(".json")]
     modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
 
-    Previewer.show_nft_from_dna(DNA)
+    Previewer.show_nft_from_dna(DNA, NFTDict)
 
     for i in dnaDictionary:
         if dnaDictionary[i] != 'Null':
