@@ -23,7 +23,7 @@ class bcolors:
 
 
 
-def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy based on index to hide/show DNA
+def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
    print(NFTDict)
    for attribute in hierarchy: # hide all
@@ -52,7 +52,10 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
 
    for key in keys:
       for itemKey in NFTDict[key]:
-         if("Null" not in itemKey):
+         if(NFTDict[key] != "Null"):
+            print("----------------------")
+            print(NFTDict[key])
+            print(NFTDict[key][itemKey])
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
 
@@ -88,6 +91,10 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
             varient = bpy.data.collections[list(NFTDict[key])[0]]
             varient.hide_viewport = False
             varient.hide_render = False
+   newTempDict = {}
+   newTempDict["DNAList"] = DNA
+   newTempDict["CharacterItems"] = NFTDict
+   OverideTempDNADict(NFTDict)
             
 
 def set_texture_on_mesh(variant, meshes, texture_mesh, resolution):
@@ -466,14 +473,16 @@ def HexToRGB(hex):
 
 #-----------------------------------------------------------------------------------
 
-def OverideTempDNADict(TempNFTDict, single_record_path):
-   try:
-      ledger = json.dumps(TempNFTDict, indent=1, ensure_ascii=True)
-      with open(single_record_path, 'w') as outfile:
-         outfile.write(ledger + '\n')
-         print("Success update {}". format(single_record_path))
-   except:
-      print("Failed to update {}". format(single_record_path))
+def OverideTempDNADict(TempNFTDict):
+   print(os.getcwd())
+   print(bpy.path.abspath("//"))
+   # try:
+   #    ledger = json.dumps(TempNFTDict, indent=1, ensure_ascii=True)
+   #    with open(single_record_path, 'w') as outfile:
+   #       outfile.write(ledger + '\n')
+   #       print("Success update {}". format(single_record_path))
+   # except:
+   #    print("Failed to update {}". format(single_record_path))
 
 
 if __name__ == '__main__':
