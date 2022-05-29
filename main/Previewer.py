@@ -51,12 +51,11 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
    for key in keys:
       for itemKey in NFTDict[key]:
          if(itemKey != "Null"):
-            print(NFTDict[key][itemKey])
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"]
-            print(color_key)
+            
 
-            variant_children = bpy.data.collections[NFTDict[key]].children
+            variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
 
             if variant_children:
                for child in variant_children:
