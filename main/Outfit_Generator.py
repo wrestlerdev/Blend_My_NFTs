@@ -260,23 +260,26 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             VarientDict = {}
             current_entry = {}
             # current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
-            current_entry["item_attribute"] = attribute
-            current_entry["item_type"] = typeChoosen
             variant_name = varientChoosen.split('_')[-1]
-            current_entry["item_variant"] = variant_name
-            current_entry["item_texture"] = textureChoosen
-            current_entry["item_index"] = hierarchy[attribute][typeChoosen][varientChoosen]["clothingIndex"]
-            current_entry["texture_index"] = textureIndex
-            current_entry["type_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["type_rarity"]
-            current_entry["variant_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["variant_rarity"]
-            if hierarchy[attribute][typeChoosen][varientChoosen]["textureSets"]:
-                texture_rarity = hierarchy[attribute][typeChoosen][varientChoosen]["textureSets"][textureChoosen]
+            if variant_name in ["Null", 'Nulll']:
+                VarientDict = 'Null'
             else:
-                texture_rarity = 0
-            current_entry["texture_rarity"] = texture_rarity
-            current_entry["color_style"] = ColorGen.styleKey
-            current_entry["color_key"] = ColorGen.colorkey
-            VarientDict[varientChoosen] = current_entry
+                current_entry["item_attribute"] = attribute
+                current_entry["item_type"] = typeChoosen
+                current_entry["item_variant"] = variant_name
+                current_entry["item_texture"] = textureChoosen
+                current_entry["item_index"] = hierarchy[attribute][typeChoosen][varientChoosen]["clothingIndex"]
+                current_entry["texture_index"] = textureIndex
+                current_entry["type_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["type_rarity"]
+                current_entry["variant_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["variant_rarity"]
+                if hierarchy[attribute][typeChoosen][varientChoosen]["textureSets"]:
+                    texture_rarity = hierarchy[attribute][typeChoosen][varientChoosen]["textureSets"][textureChoosen]
+                else:
+                    texture_rarity = 0
+                current_entry["texture_rarity"] = texture_rarity
+                current_entry["color_style"] = ColorGen.styleKey
+                current_entry["color_key"] = ColorGen.colorkey
+                VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict
             
                 
