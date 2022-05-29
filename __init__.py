@@ -65,7 +65,7 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
     "inputMiddleHead": ("15-MiddleHead", "Mid Head Slot"),
     "inputEarings": ("16-Earings", "Earrings Slot"),
     "inputUpperHead": ("17-UpperHead", "Upper Head Slot"),
-    "inputBackPack": ("18-BackPack", "Backpack Slot"),
+    "inputBackpack": ("18-Backpack", "Backpack Slot"),
     "inputBackground": ("19-Background", "Background Slot")}
     
 
@@ -217,7 +217,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings",Slots))
     inputUpperHead: bpy.props.PointerProperty(name="t",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead",Slots))
-    inputBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+    inputBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackPack",Slots))
     inputBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
@@ -241,7 +241,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastBackPack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
@@ -361,12 +361,13 @@ class randomizePreview(bpy.types.Operator):
         save_path = bpy.path.abspath(bpy.context.scene.my_tool.root_dir)
         # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
+
         DNA, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
         SingleDNA = DNA[0]
         SingleNFTDict = NFTDict[DNA[0]]
         Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
-        bpy.context.scene.my_tool.lastDNA = SingleDNA
         bpy.context.scene.my_tool.inputDNA = SingleDNA
+        bpy.context.scene.my_tool.lastDNA = SingleDNA
         return {'FINISHED'}
 
 
@@ -1363,6 +1364,8 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         mytool = scene.my_tool
         row = layout.row()
 
+        row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
+
 
 
 
@@ -1376,7 +1379,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
 
     slots = {"inputUpperTorso": ("MOD_CLOTH"),
     "inputMiddleTorso": ("MOD_CLOTH"),
-    "inputBackPack": ("CON_ARMATURE")}
+    "inputBackpack": ("CON_ARMATURE")}
     
     def draw(self, context):
         layout = self.layout
@@ -1385,6 +1388,10 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
         for name in self.slots:
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
+            label = ''
+            if bpy.context.scene.my_tool[name] is not None:
+                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+            row.label(text=label)
             row.prop(mytool, name, text="")
             # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
@@ -1411,6 +1418,10 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
         for name in self.slots:
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
+            label = ''
+            if bpy.context.scene.my_tool[name] is not None:
+                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+            row.label(text=label)
             row.prop(mytool, name, text="")
             # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
@@ -1437,6 +1448,10 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
         for name in self.slots:
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
+            label = ''
+            if bpy.context.scene.my_tool[name] is not None:
+                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+            row.label(text=label)
             row.prop(mytool, name, text="")
             # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
@@ -1463,6 +1478,10 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
         for name in self.slots:
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
+            label = ''
+            if bpy.context.scene.my_tool[name] is not None:
+                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+            row.label(text=label)
             row.prop(mytool, name, text="")
             # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
@@ -1483,6 +1502,10 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
         for name in self.slots:
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
+            label = ''
+            if bpy.context.scene.my_tool[name] is not None:
+                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+            row.label(text=label)
             row.prop(mytool, name, text="")
             # row.operator(randomizeModel.bl_idname, text=randomizeModel.bl_label).collection_name = name
             # row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
