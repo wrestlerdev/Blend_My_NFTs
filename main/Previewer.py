@@ -27,18 +27,11 @@ class bcolors:
 
 def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
-   #Check to see if NFT dictionary passed through is valid or not 
-   #If valid get collor key used for each item 
-   #If not valid look at texture varient for RGBAW tint 
-   print(NFTDict)
 
-   keys = list(NFTDict.keys())
-   DNAString = DNA.split(",")
-   character = DNAString.pop(0)
-   style = DNAString.pop(0)
-   show_character(character)
    for attribute in hierarchy: # hide all
       for type in hierarchy[attribute]:
+            bpy.data.collections[type].hide_viewport = True
+            bpy.data.collections[type].hide_render = True
             for variant in hierarchy[attribute][type]:
                bpy.data.collections[variant].hide_viewport = True
                bpy.data.collections[variant].hide_render = True
@@ -47,66 +40,47 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
                   if bpy.data.collections.get(char_var) is not None:
                      bpy.data.collections.get(char_var).hide_viewport = True
                      bpy.data.collections.get(char_var).hide_render = True
-
-                     # for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
-                     #    obj.hide_viewport = True
-                     #    obj.hide_render = True
-   CDNA = []
-   for strand in range(len(DNAString)):
-      itemDict = NFTDict[keys[strand]]
-      if(itemDict != "Null"):
-         itemKey = list(itemDict)[0]
-         itemValues = itemDict[itemKey]
-         colorKey = itemValues["color_key"]
-         print(colorKey)
-         CDNA.append(colorKey)
-      else:
-         CDNA.append("null")
-      meshes = None
-      DNASplit = DNAString[strand].split('-')
-      atttype_index = DNASplit[0]
-      variant_index = DNASplit[1]
-      texture_index = int(DNASplit[2])
-
-      slot = list(hierarchy.items())[strand]
-      atttype = list(slot[1].items())[int(atttype_index)]
-      variant = list(atttype[1].items())[int(variant_index)][0]
-      variant_children = bpy.data.collections[variant].children
+                     for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                        obj.hide_viewport = True
+                        obj.hide_render = True
    
-      textures = bpy.data.collections[variant].objects
-      if textures:
-         texture = textures[texture_index]
+   keys = list(NFTDict.keys())
+   DNAString = DNA.split(",")
+   character = DNAString.pop(0)
+   style = DNAString.pop(0)
+   show_character(character)
 
-      if variant_children:
-         for child in variant_children:
-            if child.name.split('_')[-1] == character:
-               meshes = child.objects
-               child.hide_viewport = False
-               child.hide_render = False
-               for obj in meshes: # Should we re hide the object meshes?
-                  obj.hide_viewport = False
-                  obj.hide_render = False
-            else:
-               child.hide_viewport = True
-               child.hide_render = True
-      else:
-         meshes = bpy.data.collections.get(list(variant)).objects
+   for key in keys:
+      for itemKey in NFTDict[key]:
+         if(itemKey != "Null"):
+            itemDictionary = NFTDict[key][itemKey]
+            color_key = itemDictionary["color_key"]
+            
 
-      if meshes:
-         set_armature_for_meshes(character, meshes)
-         if textures:
-            resolution = '_' + bpy.context.scene.my_tool.textureSize
-            if resolution == '_4k':
-               resolution = 4096
-            else:
-               resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
-            ColorGen.PickOutfitColors(slot, meshes, style)
-            set_texture_on_mesh(meshes, texture, resolution)
-         # else:
-         #    print("texture where")
+            variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
+
+            if variant_children:
+               for child in variant_children:
+                  if child.name.split('_')[-1] == character:
+                     meshes = child.objects
+                     child.hide_viewport = False
+                     child.hide_render = False
+                     for obj in meshes: # Should we re hide the object meshes?
+                        obj.hide_viewport = False
+                        obj.hide_render = False
+
+                     set_armature_for_meshes(character, meshes)
+                     textureSet = bpy.data.objects["textureSet"]
+
+                     resolution = '_' + bpy.context.scene.my_tool.textureSize
+                     if resolution == '_4k':
+                        resolution = 4096
+                     else:
+                        resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+                     set_texture_on_mesh(meshes, textureSet, resolution)
+                     
       bpy.data.collections[variant].hide_viewport = False
       bpy.data.collections[variant].hide_render = False
-   print(CDNA)
 
 
 def set_texture_on_mesh(meshes, texture_mesh, resolution):
@@ -125,7 +99,6 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
                      texture_info = get_new_texture_name(n, suffix)
                      if texture_info:
                         new_texture, new_texture_path, _type = texture_info
-
                         if os.path.exists(new_texture_path):
                            file = new_texture_path.replace('/', '\\')
 
@@ -162,7 +135,6 @@ def set_texture_on_mesh(meshes, texture_mesh, resolution):
                   # else:
                      # print("This node ({}) doesn't have an image".format(n.name))
                      # then should it look for an image?
-
          child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
    return
 
