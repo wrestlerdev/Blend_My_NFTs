@@ -23,7 +23,7 @@ class bcolors:
 
 
 
-def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy based on index to hide/show DNA
+def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
    print(NFTDict)
    for attribute in hierarchy: # hide all
@@ -52,7 +52,10 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
 
    for key in keys:
       for itemKey in NFTDict[key]:
-         if("Null" not in itemKey):
+         if(NFTDict[key] != "Null"):
+            print("----------------------")
+            print(NFTDict[key])
+            print(NFTDict[key][itemKey])
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
 
@@ -88,7 +91,29 @@ def show_nft_from_dna(DNA, NFTDict = {}): # goes through collection hiearchy bas
             varient = bpy.data.collections[list(NFTDict[key])[0]]
             varient.hide_viewport = False
             varient.hide_render = False
+   newTempDict = {}
+   newTempDict["DNAList"] = DNA
+   newTempDict["CharacterItems"] = NFTDict
+   SaveTempDNADict(newTempDict)
             
+
+def SaveTempDNADict(TempNFTDict):
+   save_path = os.getcwd()
+   file_name = os.path.join(save_path, "NFT_Temp.json")
+   print(TempNFTDict)
+   try:
+      ledger = json.dumps(TempNFTDict, indent=1, ensure_ascii=True)
+      with open(file_name, 'w') as outfile:
+         outfile.write(ledger + '\n')
+         print("Success update {}". format(file_name))
+   except:
+      print("Failed to update {}". format(file_name))
+
+def LoadTempDNADict():
+   save_path = os.getcwd()
+   file_name = os.path.join(save_path, "NFT_Temp.json")
+   TempNFTDict = json.load(open(file_name))
+   return TempNFTDict
 
 def set_texture_on_mesh(variant, meshes, texture_mesh, resolution):
    suffix = config.texture_suffixes[resolution]
@@ -466,14 +491,6 @@ def HexToRGB(hex):
 
 #-----------------------------------------------------------------------------------
 
-def OverideTempDNADict(TempNFTDict, single_record_path):
-   try:
-      ledger = json.dumps(TempNFTDict, indent=1, ensure_ascii=True)
-      with open(single_record_path, 'w') as outfile:
-         outfile.write(ledger + '\n')
-         print("Success update {}". format(single_record_path))
-   except:
-      print("Failed to update {}". format(single_record_path))
 
 
 if __name__ == '__main__':
