@@ -1521,23 +1521,24 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
 
         record_path = os.path.join(mytool.batch_json_save_path, '_NFTRecord.json')
         record = json.load(open(record_path))
-        char_dict = record['numCharacters']
+        if record.get('numCharacters'): # CHECK THIS
+            char_dict = record['numCharacters']
 
-        row = box.row()
-        row.label(text="Total:")
-        for char in config.Characters:
-            row.label(text="{}: {}".format(char, char_dict[char]))
-        # row.label(text=str(record['numCharacter'])) # how slow is this?, need numbers for single batch too?
+            row = box.row()
+            row.label(text="Total:")
+            for char in config.Characters:
+                row.label(text="{}: {}".format(char, char_dict[char]))
+            # row.label(text=str(record['numCharacter'])) # how slow is this?, need numbers for single batch too?
 
-        single_path = os.path.join(nft_save_path, '_NFTRecord_{:03d}.json'.format(index))
-        single = json.load(open(single_path))
-        single_dict = single['numCharacters']
+            single_path = os.path.join(nft_save_path, '_NFTRecord_{:03d}.json'.format(index))
+            single = json.load(open(single_path))
+            single_dict = single['numCharacters']
 
-        row = box.row()
-        row.label(text="Batch:")
-        for char in config.Characters:
-            row.label(text="{}: {}".format(char, single_dict[char]))
-        # row.label(text=str(record['numCharacter'])) # how slow is this?, need numbers for single batch too?
+            row = box.row()
+            row.label(text="Batch:")
+            for char in config.Characters:
+                row.label(text="{}: {}".format(char, single_dict[char]))
+            # row.label(text=str(record['numCharacter'])) # how slow is this?, need numbers for single batch too?
 
 
         row = layout.row()
