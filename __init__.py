@@ -181,8 +181,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
     inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Exporter.Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
 
-    lastC: bpy.props.StringProperty(name='lastC')
-    inputC: bpy.props.StringProperty(name="CDNA")
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso",Slots))
@@ -369,17 +367,6 @@ class randomizePreview(bpy.types.Operator):
         Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
         bpy.context.scene.my_tool.inputDNA = SingleDNA
         bpy.context.scene.my_tool.lastDNA = SingleDNA
-        return {'FINISHED'}
-
-
-class randomizeColour(bpy.types.Operator):
-    bl_idname = 'randomize.col'
-    bl_label = 'Randomize Colour'
-    bl_description = "Randomize Colour"
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
-        print(":>")
         return {'FINISHED'}
 
 # class randomizeModel(bpy.types.Operator):
@@ -1285,10 +1272,6 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
-        row = layout.row()
-        row.prop(mytool, "inputC")
-        row.operator(randomizeColour.bl_idname, text=randomizeColour.bl_label)
-
         row = layout.separator()
         # row = layout.separator(factor=0.0)
         row = layout.row()
@@ -1334,10 +1317,7 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
-        record_path = os.path.join(mytool.batch_json_save_path, '_NFTRecord.json')
-        record = json.load(open(record_path))
-        row.label(text=str(record['numNFTsGenerated'])) # how slow is this?, need numbers for single batch too?
+
         row = layout.row()
 
         for char in config.Characters:
@@ -1518,6 +1498,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
 
 #-----------------------------------------------------------------------
 
+
 class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
     bl_label = "Load from File"
     bl_idname = "WCUSTOM_PT_ELoadFromFile"
@@ -1530,14 +1511,35 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        row = layout.row()
+        box = layout.box()
+        row = box.row()
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
 
         if os.path.exists(nft_save_path):
-            row.label(text="Current Generated: " + str(len(next(os.walk(nft_save_path))[1])))
-        else:
-            print()
+            row.label(text="Total Generated: " + str(len(next(os.walk(nft_save_path))[1])))
+
+        record_path = os.path.join(mytool.batch_json_save_path, '_NFTRecord.json')
+        record = json.load(open(record_path))
+        char_dict = record['numCharacters']
+
+        row = box.row()
+        row.label(text="Total:")
+        for char in config.Characters:
+            row.label(text="{}: {}".format(char, char_dict[char]))
+        # row.label(text=str(record['numCharacter'])) # how slow is this?, need numbers for single batch too?
+
+        single_path = os.path.join(nft_save_path, '_NFTRecord_{:03d}.json'.format(index))
+        single = json.load(open(single_path))
+        single_dict = single['numCharacters']
+
+        row = box.row()
+        row.label(text="Batch:")
+        for char in config.Characters:
+            row.label(text="{}: {}".format(char, single_dict[char]))
+        # row.label(text=str(record['numCharacter'])) # how slow is this?, need numbers for single batch too?
+
+
         row = layout.row()
         row.prop(mytool, "loadNFTIndex")
         row.operator(loadNFT.bl_idname, text=loadNFT.bl_label)
@@ -1573,7 +1575,7 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
+        row = layout.box().row()
         if os.path.exists(bpy.context.scene.my_tool.batch_json_save_path):
             batch_path = bpy.context.scene.my_tool.batch_json_save_path
             row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(os.listdir(batch_path)) - 1))
@@ -1625,12 +1627,6 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
 
         row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
-
-        row = layout.row()
-        row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
-
-        # row = layout.row()
-        row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
 
 
 #-----------------------------------------------------------------------
@@ -1974,7 +1970,6 @@ classes = (
     saveBatch,
     saveNewBatch,
     resetBatch,
-    randomizeColour,
     # randomizeModel,
     # randomizeColor,
     clearSlots,

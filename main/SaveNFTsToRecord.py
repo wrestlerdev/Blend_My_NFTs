@@ -57,7 +57,8 @@ def UpdateNFTRecord(DNASetToAdd, CharacterCount, DataDictionary, single_record_p
     updatedMasterDictionary["numNFTsGenerated"] = int(MasterDictionary["numNFTsGenerated"]) + len(DNASetToAdd)
     totalDNASet = MasterDictionary["DNAList"]
 
-
+    numMasterCharDict = {}
+    numSingleCharDict = {}
 
     # updatedMasterDictionary["numCharacters"] = newNumMasterCharDict
 
@@ -193,8 +194,8 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
     print(old_char)
     newMasterCharDict[old_char] = int(newMasterCharDict[old_char]) - 1
     newSingleCharDict[old_char] = int(newSingleCharDict[old_char]) - 1
-    MasterDictionary["numCharacters"] = newMasterCharDict
-    DataDictionary["numCharacters"] = newSingleCharDict
+    updatedMasterDictionary["numCharacters"] = newMasterCharDict
+    updatedDictionary["numCharacters"] = newSingleCharDict
 
     DNAList = DataDictionary["DNAList"]
     if DNAToDelete in DNAList:
