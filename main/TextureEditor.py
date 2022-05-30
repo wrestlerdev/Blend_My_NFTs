@@ -120,7 +120,7 @@ def create_downres_textures(input_path, dims):
 
 
 def downres_all_textures_in_folder(path, dims):
-    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D']
+    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
 
     texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]
     original_textures = [fn for fn in texture_images if any((fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
