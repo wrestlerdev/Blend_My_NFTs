@@ -18,6 +18,8 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
     MasterDictionary = json.load(open(master_record_save_path))
     totalDNAList = MasterDictionary["DNAList"]
 
+    character_count = [0] * len(config.Characters)
+
     uniqueDNASetToAdd = []
     for nft in DNASetToAdd:
         if nft not in totalDNAList:
@@ -32,9 +34,14 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
                 outfile.write(singleNFTObject)
             single_i += 1
             uniqueDNASetToAdd.append(nft)
+            character = nft.partition(",")[0]
+            print(nft.partition(","))
+            char_index = config.Characters.index(character)
+            character_count[char_index] += 1
+
 
     if uniqueDNASetToAdd:
-        UpdateNFTRecord(uniqueDNASetToAdd, DataDictionary, single_record_path, master_record_save_path)
+        UpdateNFTRecord(uniqueDNASetToAdd, character_count, DataDictionary, single_record_path, master_record_save_path)
         print("{} NFTs have been saved (ノಠ vಠ)ノ彡( {}o)". format(len(uniqueDNASetToAdd), "o°"*len(uniqueDNASetToAdd)))
         return True
     else:
@@ -42,7 +49,7 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
         return False
 
 
-def UpdateNFTRecord(DNASetToAdd, DataDictionary, single_record_path, master_record_save_path):
+def UpdateNFTRecord(DNASetToAdd, CharacterCount, DataDictionary, single_record_path, master_record_save_path):
     print("This should updated record.json with new nft DNA and number")
 
     updatedMasterDictionary = {}
@@ -50,12 +57,31 @@ def UpdateNFTRecord(DNASetToAdd, DataDictionary, single_record_path, master_reco
     updatedMasterDictionary["numNFTsGenerated"] = int(MasterDictionary["numNFTsGenerated"]) + len(DNASetToAdd)
     totalDNASet = MasterDictionary["DNAList"]
 
+
+
+    # updatedMasterDictionary["numCharacters"] = newNumMasterCharDict
+
     currentNFTNumber = DataDictionary["numNFTsGenerated"]
     currentDNASet = DataDictionary["DNAList"]
 
     updatedDataDictionary = {}
     updatedDataDictionary["numNFTsGenerated"] = int(currentNFTNumber) + len(DNASetToAdd)
     updatedDataDictionary["hierarchy"] = DataDictionary["hierarchy"]
+
+    numMasterCharDict = MasterDictionary["numCharacters"]
+    numSingleCharDict = DataDictionary["numCharacters"]
+
+    newNumMasterCharDict = {}
+    newNumSingleCharDict = {}
+
+    for i in range(len(CharacterCount)):
+        character = config.Characters[i]
+        newNumMasterCharDict[character] = numMasterCharDict[character] + CharacterCount[i]
+        newNumSingleCharDict[character] = numSingleCharDict[character] + CharacterCount[i]
+
+    updatedDataDictionary["numCharacters"] = newNumSingleCharDict
+    updatedMasterDictionary["numCharacters"] = newNumMasterCharDict
+
     for dna in DNASetToAdd:
         currentDNASet.append(dna)
         totalDNASet.append(dna)
@@ -96,9 +122,23 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
     updatedDictionary["numNFTsGenerated"] = DataDictionary["numNFTsGenerated"]
 
+    newSingleCharDict = DataDictionary["numCharacters"]
+    newMasterCharDict = MasterDictionary["numCharacters"]
+
     DNAList = DataDictionary["DNAList"]
 
     oldDNA = DNAList[nft_index - 1]
+    old_char = oldDNA.partition(',')[0]
+    new_char = DNAToAdd.partition(',')[0]
+
+    newMasterCharDict[old_char] = newMasterCharDict[old_char] - 1
+    newMasterCharDict[new_char] = newMasterCharDict[new_char] + 1
+    newSingleCharDict[old_char] = newSingleCharDict[old_char] - 1
+    newSingleCharDict[new_char] = newSingleCharDict[new_char] + 1
+
+    MasterDictionary["numNFTsGenerated"] = newMasterCharDict
+    DataDictionary["numNFTsGenerated"] = newSingleCharDict
+
     DNAList[nft_index - 1] = DNAToAdd
     updatedDictionary["DNAList"] = DNAList
 
@@ -145,6 +185,16 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
     updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
     updatedMasterDictionary = {}
     updatedMasterDictionary["numNFTsGenerated"] = MasterDictionary["numNFTsGenerated"] - 1
+
+    newSingleCharDict = DataDictionary["numCharacters"]
+    newMasterCharDict = MasterDictionary["numCharacters"]
+
+    old_char = DNAToDelete.partition(',')[0]
+    print(old_char)
+    newMasterCharDict[old_char] = int(newMasterCharDict[old_char]) - 1
+    newSingleCharDict[old_char] = int(newSingleCharDict[old_char]) - 1
+    MasterDictionary["numCharacters"] = newMasterCharDict
+    DataDictionary["numCharacters"] = newSingleCharDict
 
     DNAList = DataDictionary["DNAList"]
     if DNAToDelete in DNAList:

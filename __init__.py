@@ -20,6 +20,7 @@ import time
 import os
 import importlib
 from .main import config
+import json
 
 # Import files from main directory:
 
@@ -606,7 +607,7 @@ class deleteNFT(bpy.types.Operator):
         batch_index = bpy.context.scene.my_tool.CurrentBatchIndex
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
-        TotalDNA, DNA = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
+        TotalDNA, DNA, Dict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
         master_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "_NFTRecord.json")
         
         if TotalDNA > 0 and DNA != '':
@@ -1333,6 +1334,10 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+        row = layout.row()
+        record_path = os.path.join(mytool.batch_json_save_path, '_NFTRecord.json')
+        record = json.load(open(record_path))
+        row.label(text=str(record['numNFTsGenerated'])) # how slow is this?, need numbers for single batch too?
         row = layout.row()
 
         for char in config.Characters:
