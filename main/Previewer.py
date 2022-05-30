@@ -400,6 +400,7 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
 
 
 def create_item_dict(DNA): # make dict from DNA to save to file
+   return
    ohierarchy = get_hierarchy_ordered()
    coll_keys = list(ohierarchy.keys())
    uhierarchy = get_hierarchy_unordered()

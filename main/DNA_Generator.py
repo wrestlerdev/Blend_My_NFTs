@@ -361,7 +361,6 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
 
 def send_To_Record_JSON(NFTRecord_save_path):
-
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
@@ -370,25 +369,23 @@ def send_To_Record_JSON(NFTRecord_save_path):
    DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
 
-
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
       with open(NFTRecord_save_path, 'w') as outfile:
          outfile.write(ledger + '\n')
-
    except:
       print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
 
    return DataDictionary
 
 
-def create_default_rarity_Record(NFTRecord_save_path):
+def reset_rarity_Record(NFTRecord_save_path):
+   OriginalDataDictionary = json.load(open(NFTRecord_save_path))
    DataDictionary = {}
-   DataDictionary["numNFTsGenerated"] = 0
-   numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
-   DataDictionary["numCharacters"] = numCharacters
+   DataDictionary["numNFTsGenerated"] = OriginalDataDictionary["numNFTsGenerated"]
+   DataDictionary["numCharacters"] = OriginalDataDictionary["numCharacters"]
+   DataDictionary["DNAList"] = OriginalDataDictionary["DNAList"]
    hierarchy = NFTHirachy.createHirachy()
-   DataDictionary["DNAList"] = []
 
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):
@@ -400,33 +397,25 @@ def create_default_rarity_Record(NFTRecord_save_path):
                rarity = 0
             hierarchy[slot][type][variant]["variant_rarity"] = rarity
             hierarchy[slot][type][variant]["type_rarity"] = rarity
-            # for texture in list(hierarchy[slot][type][variant].keys()):
-            #    hierarchy[slot][type][variant][texture]["texture_rarity"] = 50
    DataDictionary["hierarchy"] = hierarchy
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
-      print("woo")
       with open(NFTRecord_save_path, 'w') as outfile:
          outfile.write(ledger + '\n')
    except:
       print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
-
    return DataDictionary
 
-def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
-   # OriginalDictionary = json.load(open(NFTRecord_save_path))
-   # original_hierarchy = OriginalDictionary["hierarchy"]
 
+def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
-   # DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
    DataDictionary["numCharacters"] = numCharacters
 
    hierarchy = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
-
 
    exists_in_original = True
    for slot in list(hierarchy.keys()):
@@ -443,14 +432,12 @@ def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
             if exists_in_original and variant in original_hierarchy[slot][type]:
                hierarchy[slot][type][variant]["variant_rarity"]   = original_hierarchy[slot][type][variant]["variant_rarity"]
                hierarchy[slot][type][variant]["type_rarity"]      = original_hierarchy[slot][type][variant]["type_rarity"]
-               # print(original_hierarchy[slot][type][variant][texture] is not None)
    DataDictionary["hierarchy"] = hierarchy
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
       with open(NFTRecord_save_path, 'w') as outfile:
          outfile.write(ledger + '\n')
-
    except:
       print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
 
@@ -464,7 +451,6 @@ def set_up_master_Record(save_path):
    DataDictionary["numCharacters"] = numCharacters
    
    DataDictionary["numNFTsGenerated"] = 0
-
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)

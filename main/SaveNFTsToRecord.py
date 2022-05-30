@@ -24,8 +24,8 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
     for nft in DNASetToAdd:
         if nft not in totalDNAList:
             singleNFT = {}
-            singleNFT["DNAList"] = nft 
             singleNFT["CharacterItems"] = NFTDict[nft]
+            singleNFT["DNAList"] = nft
 
             singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
             if not os.path.exists(os.path.join(single_batch_save_path, "NFT_{:04d}".format(single_i + 1))):
@@ -35,7 +35,6 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
             single_i += 1
             uniqueDNASetToAdd.append(nft)
             character = nft.partition(",")[0]
-            print(nft.partition(","))
             char_index = config.Characters.index(character)
             character_count[char_index] += 1
 
@@ -137,8 +136,8 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     newSingleCharDict[old_char] = newSingleCharDict[old_char] - 1
     newSingleCharDict[new_char] = newSingleCharDict[new_char] + 1
 
-    MasterDictionary["numNFTsGenerated"] = newMasterCharDict
-    DataDictionary["numNFTsGenerated"] = newSingleCharDict
+    updatedMasterDictionary["numCharacters"] = newMasterCharDict
+    updatedDictionary["numCharacters"] = newSingleCharDict
 
     DNAList[nft_index - 1] = DNAToAdd
     updatedDictionary["DNAList"] = DNAList
