@@ -235,7 +235,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
             
 
-                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["clothingGenre"]
+                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["item_type"][3:]
                 #loop through all slots that selected item will take up
                 if ItemClothingGenre in ItemUsedBodySlot:
                     UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
@@ -268,7 +268,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 current_entry["item_type"] = typeChoosen
                 current_entry["item_variant"] = variant_name
                 current_entry["item_texture"] = textureChoosen
-                current_entry["item_index"] = hierarchy[attribute][typeChoosen][varientChoosen]["clothingIndex"]
+                current_entry["item_index"] = hierarchy[attribute][typeChoosen][varientChoosen]["item_index"]
                 current_entry["texture_index"] = textureIndex
                 current_entry["type_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["type_rarity"]
                 current_entry["variant_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["variant_rarity"]

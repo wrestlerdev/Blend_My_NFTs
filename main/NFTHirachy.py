@@ -46,7 +46,7 @@ def createHirachy():
          for j in range(len(_varients)):
 
             if not _varients[j].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
-               Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i])
+               Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i], attribute)
 
          #Varients.sort()
          unsortedAttributeType[_attributeTypes[i].name] = Varients
@@ -60,7 +60,7 @@ def createHirachy():
    return sortedAttibutes
 
 
-def attributeData(attributeVariantColl, attributeTypeColl):
+def attributeData(attributeVariantColl, attributeTypeColl, attribute):
    attributeVariant = attributeVariantColl.name
    eachObject={}
    """
@@ -96,25 +96,25 @@ def attributeData(attributeVariantColl, attributeTypeColl):
       # else:
       #    a[3] = attributeTextureColl['rarity'] = 50
 
-      if(attributeVariantColl.get('Style') is not None):
-         a[3] = attributeVariantColl.get('Style')
-      else:
-         a[3] = attributeVariantColl['Style'] = "Temp_Style"
+      # if(attributeVariantColl.get('Style') is not None):
+      #    a[3] = attributeVariantColl.get('Style')
+      # else:
+      #    a[3] = attributeVariantColl['Style'] = "Temp_Style"
 
-      if(attributeVariantColl.get('color_primary') is not None):
-         a[4] = attributeVariantColl.get('color_primary')
-      else:
-         a[4] = attributeVariantColl['color_primary'] = "0"
+      # if(attributeVariantColl.get('color_primary') is not None):
+      #    a[4] = attributeVariantColl.get('color_primary')
+      # else:
+      #    a[4] = attributeVariantColl['color_primary'] = "0"
 
-      if(attributeVariantColl.get('color_secondary') is not None):
-         a[5] = attributeVariantColl.get('color_secondary')
-      else:
-         a[5] = attributeVariantColl['color_secondary'] = "0"
+      # if(attributeVariantColl.get('color_secondary') is not None):
+      #    a[5] = attributeVariantColl.get('color_secondary')
+      # else:
+      #    a[5] = attributeVariantColl['color_secondary'] = "0"
 
-      if(attributeVariantColl.get('color_tertiary') is not None):
-         a[6] = attributeVariantColl.get('color_tertiary')
-      else:
-         a[6] = attributeVariantColl['color_tertiary'] = "0"
+      # if(attributeVariantColl.get('color_tertiary') is not None):
+      #    a[6] = attributeVariantColl.get('color_tertiary')
+      # else:
+      #    a[6] = attributeVariantColl['color_tertiary'] = "0"
 
       # x = re.sub(r'[a-zA-Z]', "", i)
       # a = x.split("_")
@@ -139,26 +139,21 @@ def attributeData(attributeVariantColl, attributeTypeColl):
 
    elif len(orderRarity) > 0:
       
-      slotName = name[0]
-      clothingGenre = name[1]
+      item_attribute = attribute
+      item_type = attributeTypeColl.name
       number = name[2]
-      clothingItem = name[3]
+      item_variant = name[3]
       textureSets = get_textureSets(attributeVariantColl)
 
-      if(clothingGenre != "Null"):
+      if(item_type != "Null"):
          type_rarity = orderRarity[1]
          variant_rarity = orderRarity[2]
       else:
          type_rarity = 0.0
          variant_rarity = 0.0
 
-      colorstyle = ''.join(str(list(orderRarity[3])))
-      colorprimary = ''.join(str(list(orderRarity[4])))
-      colorseoncdary = ''.join(str(list(orderRarity[5])))
-      colortertiary = ''.join(str(list(orderRarity[6])))    
       
-      eachObject = {"slotName" : slotName, "clothingGenre": clothingGenre, "clothingItem": clothingItem, "clothingIndex": number,
-                     "textureSets": textureSets, "variant_rarity": variant_rarity, "type_rarity": type_rarity,
-                     "Style": colorstyle, "color_primary": colorprimary, "color_secondary": colorseoncdary, "color_tertiary": colortertiary}
+      eachObject = {"item_attribute" : item_attribute, "item_type": item_type, "item_variant": item_variant, "item_index": number,
+                     "type_rarity": type_rarity, "variant_rarity": variant_rarity, "textureSets": textureSets}
       
    return eachObject

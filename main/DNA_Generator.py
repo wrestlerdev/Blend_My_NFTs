@@ -9,6 +9,7 @@ import time
 import json
 import importlib
 from functools import partial
+from. import config
 
 from . import Rarity_Sorter
 importlib.reload(Rarity_Sorter)
@@ -354,17 +355,21 @@ def generateNFT_DNA(nftName, maxNFTs, nftsPerBatch, save_path, enableRarity):
 
    return DataDictionary, possibleCombinations, DNAList
 
+
+
+# ----------------------------------------------------------------------------------------
+
+
 def send_To_Record_JSON(NFTRecord_save_path):
-   """
-   Creates NFTRecord.json file and sends "batchDataDictionary" to it. NFTRecord.json is a permanent record of all DNA
-   you've generated with all attribute variants. If you add new variants or attributes to your .blend file, other scripts
-   need to reference this .json file to generate new DNA and make note of the new attributes and variants to prevent
-   repeate DNA.
-   """
+
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
+   numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
+   DataDictionary["numCharacters"] = numCharacters
+
    DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
+
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
@@ -380,16 +385,23 @@ def send_To_Record_JSON(NFTRecord_save_path):
 def create_default_rarity_Record(NFTRecord_save_path):
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
+   numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
+   DataDictionary["numCharacters"] = numCharacters
    hierarchy = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
 
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):
          for variant in list(hierarchy[slot][type].keys()):
-            for texture in list(hierarchy[slot][type][variant].keys()):
-               hierarchy[slot][type][variant][texture]["texture_rarity"] = 50
-               hierarchy[slot][type][variant][texture]["variant_rarity"] = 50
-               hierarchy[slot][type][variant][texture]["type_rarity"] = 50
+            variant_name = variant.split('_')[-1]
+            if variant_name not in ['Null', 'Nulll']:
+               rarity = 50
+            else: 
+               rarity = 0
+            hierarchy[slot][type][variant]["variant_rarity"] = rarity
+            hierarchy[slot][type][variant]["type_rarity"] = rarity
+            # for texture in list(hierarchy[slot][type][variant].keys()):
+            #    hierarchy[slot][type][variant][texture]["texture_rarity"] = 50
    DataDictionary["hierarchy"] = hierarchy
 
    try:
@@ -409,8 +421,12 @@ def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
    # DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
+   numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
+   DataDictionary["numCharacters"] = numCharacters
+
    hierarchy = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
+
 
    exists_in_original = True
    for slot in list(hierarchy.keys()):
@@ -444,7 +460,11 @@ def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path):
 def set_up_master_Record(save_path):
    DataDictionary = {}
    DataDictionary["DNAList"] = []
+   numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
+   DataDictionary["numCharacters"] = numCharacters
+   
    DataDictionary["numNFTsGenerated"] = 0
+
 
    try:
       ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
