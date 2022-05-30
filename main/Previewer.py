@@ -25,7 +25,6 @@ class bcolors:
 
 def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on index to hide/show DNA
    hierarchy = get_hierarchy_ordered()
-   print(NFTDict)
    for attribute in hierarchy: # hide all
       bpy.data.collections[attribute].hide_viewport = True
       bpy.data.collections[attribute].hide_render = True
@@ -53,11 +52,9 @@ def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on
    for key in keys:
       for itemKey in NFTDict[key]:
          if(NFTDict[key] != "Null"):
-            print("----------------------")
-            print(NFTDict[key])
-            print(NFTDict[key][itemKey])
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
+            print(color_key)
 
             variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
 
@@ -79,7 +76,7 @@ def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on
                         resolution = 4096
                      else:
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
-                     set_texture_on_mesh(variant, meshes, texture_mesh, resolution)
+                     set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
             attr = bpy.data.collections.get(itemDictionary["item_attribute"])
             attr.hide_viewport = False
             attr.hide_render = False
@@ -100,7 +97,6 @@ def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on
 def SaveTempDNADict(TempNFTDict):
    save_path = os.getcwd()
    file_name = os.path.join(save_path, "NFT_Temp.json")
-   print(TempNFTDict)
    try:
       ledger = json.dumps(TempNFTDict, indent=1, ensure_ascii=True)
       with open(file_name, 'w') as outfile:
@@ -115,10 +111,18 @@ def LoadTempDNADict():
    TempNFTDict = json.load(open(file_name))
    return TempNFTDict
 
-def set_texture_on_mesh(variant, meshes, texture_mesh, resolution):
+def OpenGlobalColorList():
+    root_dir = bpy.context.scene.my_tool.root_dir
+    path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
+    GlobalColorList = json.load(open(path))
+    return GlobalColorList
+
+def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    suffix = config.texture_suffixes[resolution]
    # if suffix == '':
    #    print("this should be 4k okay")
+   GlobalColorList = OpenGlobalColorList()
+   colorChoice = GlobalColorList[color_key]
    for child in meshes:
       #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
       for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
@@ -127,13 +131,11 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, resolution):
             for n in mat.node_tree.nodes:
                if n.type == 'TEX_IMAGE':
                   if n.image is not None:
-
                      texture_info = get_new_texture_name(n, suffix)
                      if texture_info:
                         new_texture, new_texture_path, _type = texture_info
                         if os.path.exists(new_texture_path):
                            file = new_texture_path.replace('/', '\\')
-
                            if _type == '_N':
                               newImage = bpy.data.images.load(file, check_existing=False)
                               mat.node_tree.nodes["NormalNode"].image = newImage
@@ -161,18 +163,35 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, resolution):
                            elif _type == '_E':
                               newImage = bpy.data.images.load(file, check_existing=False)
                               mat.node_tree.nodes["EmissiveNode"].image = newImage 
+                              mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'Linear'
                               mat.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
+                           elif _type == '_O':
+                              newImage = bpy.data.images.load(file, check_existing=False)
+                              mat.node_tree.nodes["OpacityNode"].image = newImage 
+                              mat.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
+                              mat.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
                      # else:
                         # print("Texture image within this node is not named properly (e.g. missing _N)")
-                  # else:
+               elif n.type == 'RGB':
+                  if (n.label == "RTint"):
+                     n.outputs["Color"].default_value = colorChoice["R"]
+                  if (n.label == "GTint"):
+                     n.outputs["Color"].default_value = colorChoice["G"]
+                  if (n.label == "BTint"):
+                     n.outputs["Color"].default_value = colorChoice["B"]
+                  if (n.label == "AlphaTint"):
+                     n.outputs["Color"].default_value = colorChoice["A"]
+                  if (n.label == "WhiteTint"):
+                     n.outputs["Color"].default_value = colorChoice["W"]
                      # print("This node ({}) doesn't have an image".format(n.name))
                      # then should it look for an image?
+               
          child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
    return
 
 
 def get_new_texture_name(node, suffix):
-   types = ['_E', '_ID', '_M', '_N', '_R', '_D']
+   types = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
    for _type in types:
       filepath, partition, filename = node.image.filepath.rpartition('\\')
       if _type in filename:

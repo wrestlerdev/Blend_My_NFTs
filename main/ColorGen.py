@@ -204,23 +204,6 @@ def PickOutfitColors(attribute, chidlrenObjs, style_key=None):
     colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
     colorkey = availableColorStyleKeys[colorkeyindex]
     colorChoice = globalColorInfo[colorkey]
-
-    for child in chidlrenObjs:
-        obj = bpy.data.objects[child.name]
-        material_slots = obj.material_slots
-        for m in material_slots:
-            material = m.material
-            for node in material.node_tree.nodes:
-                if (node.label == "RTint"):
-                    node.outputs["Color"].default_value = colorChoice["R"]
-                if (node.label == "GTint"):
-                    node.outputs["Color"].default_value = colorChoice["G"]
-                if (node.label == "BTint"):
-                    node.outputs["Color"].default_value = colorChoice["B"]
-                if (node.label == "AlphaTint"):
-                    node.outputs["Color"].default_value = colorChoice["A"]
-                if (node.label == "WhiteTint"):
-                    node.outputs["Color"].default_value = colorChoice["W"]
                 
     return colorkey
 
@@ -368,8 +351,6 @@ def OpenGlobalColorList():
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     GlobalColorList = json.load(open(path))
-    print(root_dir)
-    print(GlobalColorList)
     return GlobalColorList
 
 def WriteToGlobalColorList(GlobalColorList):
@@ -394,7 +375,6 @@ def WriteToGlobalStyleList(GlobalStyleList):
     path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
     try:
       ledger = json.dumps(GlobalStyleList, indent=1, ensure_ascii=True)
-      print(ledger)
       with open(path, 'w') as outfile:
          outfile.write(ledger + '\n')
     except:

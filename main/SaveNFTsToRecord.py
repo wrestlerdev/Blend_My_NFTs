@@ -392,21 +392,20 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
                     if childObj.material_slots[i]:                                                                  
                         if childObj.material_slots[i].material not in mats:
                             mats.add(childObj.material_slots[i].material)
-        print("------------------------")
-        print(mats)
         matfolderlink = {}
         for mat in mats:
             for matset in materialSets:
                 if matset.partition("_")[0] == mat.name.partition("_")[0]:
                     matfolderlink[mat.name] = matset
         i = 0
-        print(matfolderlink)
         for m in matfolderlink.keys():         
             if i >= len(obj.material_slots):
-                print("********************************")
-                print(obj.name)
-                tempmaterial = bpy.data.materials['MasterV01']
-                tempcopy = tempmaterial.copy()
+                result = [s for s in os.listdir(texture_path) if "_O." in s]
+                if result != []:
+                    material = bpy.data.materials['MasterTransparentV01']
+                else:
+                    material = bpy.data.materials['MasterV01']
+                tempcopy = material.copy()
                 tempcopy.name = m
                 # bpy.data.objects[obj.name].select_set(True)
                 # bpy.ops.object.material_slot_add()
@@ -421,14 +420,17 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
                 #obj.data.materials.pop(index = i) 
             else:
                 print("Slot Exists")
-                tempmaterial = bpy.data.materials['MasterV01']
-                tempcopy = tempmaterial.copy()
+                result = [s for s in os.listdir(texture_path) if "_O." in s]
+                if result != []:
+                    material = bpy.data.materials['MasterTransparentV01']
+                else:
+                    material = bpy.data.materials['MasterV01']
+                tempcopy = material.copy()
                 tempcopy.name = m
                 #obj.material_slots[i].link = 'OBJECT'
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m     
     
-            print(m)
             # material = bpy.data.materials['MasterV01']
             # material.use_nodes = True
             # matcopy = material.copy()
@@ -440,11 +442,14 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
         for m in material_slots:
             #material = m.material
             #m.link = 'OBJECT' 
-            material = bpy.data.materials['MasterV01']
+            result = [s for s in os.listdir(texture_path) if "_O." in s]
+            if result != []:
+                material = bpy.data.materials['MasterTransparentV01']
+            else:
+                material = bpy.data.materials['MasterV01']
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
-            print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             LinkImagesToNodes(matcopy, texture_path)
     
     
@@ -507,6 +512,14 @@ def LinkImagesToNodes(matcopy, texture_path):
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["EmissiveNode"].image = newImage 
                 matcopy.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
+
+            if "O" == mapType:
+                file = file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["OpacityNode"].image = newImage 
+                matcopy.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
+                matcopy.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
             # if node.label == "RTint":
             #     node.outputs["Color"].default_value = parent["color_primary"]
 
