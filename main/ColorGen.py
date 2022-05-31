@@ -150,58 +150,6 @@ availableColorStyleKeys = []
 styleKey = ""
 colorkey = ""
 
-
-
-def SetUpCharacterStyle():
-    global availableColorStyleKeys, styleKey
-    globalStyleInfo = GetColorStyleJSON()
-
-    styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
-    styleKey = list(globalStyleInfo.keys())[styleIndex]
-    availableColorStyleKeys =  globalStyleInfo[styleKey]
-    print("STYLE: " + styleKey )
-    return styleKey
-
-def CheckAndFormatPath(path, pathTojoin = ""):
-    if pathTojoin != "" :
-        path = os.path.join(path, pathTojoin)
-
-    new_path = path.replace('\\', '/')
-
-    if not os.path.exists(new_path):
-        return ""
-    return new_path
-
-def GetColorStyleJSON():
-    save_path = bpy.context.scene.my_tool.root_dir
-    color_style_path = CheckAndFormatPath(save_path, "INPUT/GlobalStyles.json")
-    globalStyleInfo = json.load(open(color_style_path))
-
-    return globalStyleInfo
-
-def PickOutfitColors(attribute, chidlrenObjs, style_key=None):
-    global styleKey, availableColorStyleKeys
-    global colorkey
-
-    if style_key:
-        globalStyleInfo = GetColorStyleJSON()
-        availableColorStyleKeys = globalStyleInfo[style_key]
-
-    save_path = save_path = bpy.context.scene.my_tool.root_dir
-    if(attribute == "17-UpperHead"):
-        colIndex = random.randrange(0, len(haircols) ) 
-        col = haircols[colIndex]
-
-    colors = [(random.uniform(0,1.0), random.uniform(0,1.0), random.uniform(0,1.0), 1.0)] * 3
-    color_list_path = CheckAndFormatPath(save_path, "INPUT/GlobalColorList.json")
-    globalColorInfo = json.load(open(color_list_path))
-
-    colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
-    colorkey = availableColorStyleKeys[colorkeyindex]
-    colorChoice = globalColorInfo[colorkey]
-                
-    return colorkey
-
 def RGBtoHex(vals, rgbtype=1):
     """Converts RGB values in a variety of formats to Hex values.
 
@@ -228,6 +176,49 @@ def RGBtoHex(vals, rgbtype=1):
 
 #----------------------------------------------------------------------------------------------
 
+
+
+
+def SetUpCharacterStyle():
+    global availableColorStyleKeys, styleKey
+    globalStyleInfo = OpenGlobalStyleList()
+
+    styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
+    styleKey = list(globalStyleInfo.keys())[styleIndex]
+    availableColorStyleKeys =  globalStyleInfo[styleKey]
+    print("STYLE: " + styleKey )
+    return styleKey
+
+def CheckAndFormatPath(path, pathTojoin = ""):
+    if pathTojoin != "" :
+        path = os.path.join(path, pathTojoin)
+
+    new_path = path.replace('\\', '/')
+
+    if not os.path.exists(new_path):
+        return ""
+    return new_path
+
+def PickOutfitColors(attribute, style_key=None):
+    global styleKey, availableColorStyleKeys
+    global colorkey
+
+    if style_key:
+        globalStyleInfo = OpenGlobalStyleList()
+        availableColorStyleKeys = globalStyleInfo[style_key]
+
+    globalColorInfo = OpenGlobalColorList()
+
+    #This needs to be thought about, will leave for now but hair styles might become wack
+    if(attribute == "17-UpperHead"):
+        colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
+    else:
+        colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
+        
+    colorkey = availableColorStyleKeys[colorkeyindex]
+    colorChoice = globalColorInfo[colorkey]
+                
+    return colorkey, colorChoice
 
 def NextStyle(direction):
     GlobalStyleList = OpenGlobalStyleList()
