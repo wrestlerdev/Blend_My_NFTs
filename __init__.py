@@ -766,6 +766,8 @@ class swapCharacter(bpy.types.Operator):
         DNAString[0] = self.character_name
         DNA = ','.join(DNAString)
         bpy.context.scene.my_tool.inputDNA = DNA
+        NFTDict = Exporter.Previewer.LoadTempDNADict()["CharacterItems"]
+        Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
         return {'FINISHED'}
 
 
