@@ -1,13 +1,8 @@
-from ctypes import sizeof
 import bpy
 import os
-import re
-import copy
 import time
 import json
 import random
-import importlib
-from functools import partial
 from mathutils import Color
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
