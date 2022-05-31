@@ -5,7 +5,9 @@ import collections
 import bpy
 import os
 import json
+
 from . import config
+from . import ColorGen
 
 enableGeneration = False
 colorList = []
@@ -337,6 +339,7 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
          # bpy.context.scene.my_tool[slots_key] = None
 
+
 def update_DNA_with_strand(new_dnastrand, coll_name):
    NFTDict = LoadTempDNADict()
    CharacterItems = NFTDict["CharacterItems"]
@@ -367,7 +370,9 @@ def update_DNA_with_strand(new_dnastrand, coll_name):
    else:
       print("get new colour key in here")
       last_cstyle = dna_string.split(',')[1]
-      last_ckey = "008" # TODO FIND A COLOUR KEY
+      last_ckey, color_choice = ColorGen.PickOutfitColors(coll_name, last_cstyle)
+
+      
 
    new_tex = list(record_item['textureSets'].keys())[0]
    new_tex_rarity = record_item['textureSets'][new_tex]

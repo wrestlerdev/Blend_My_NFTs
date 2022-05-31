@@ -217,7 +217,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     inputUpperHead: bpy.props.PointerProperty(name="Upper Head Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead",Slots))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackPack",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack",Slots))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
 
