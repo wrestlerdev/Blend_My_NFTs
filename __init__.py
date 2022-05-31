@@ -221,6 +221,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
 
+    inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.general_pointer_updated(Slots))
+
     inputColorListSceneObject: bpy.props.PointerProperty(name="ColorListObject", type=bpy.types.Object)
 
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -1326,8 +1329,14 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
+        box = layout.box()
+        row = box.row()
+        row.label(text='Any Slot', icon='OUTLINER_COLLECTION')
+        row.prop(mytool, "inputGeneral", text='')
 
+        row = layout.row()
+        row.separator(factor=1.5)
+        row = layout.row()
         row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
 
 

@@ -257,26 +257,67 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
    return new_dna_strand # return dna strand or empty string if not valid
 
 
+def general_pointer_updated(Slots):
+   if bpy.context.scene.my_tool.inputGeneral is not None:
+      inputted_item = bpy.context.scene.my_tool.inputGeneral
+      item = inputted_item.name
+      try:
+         att_name, type_name, i, var_name = item.split('_')
+      except:
+         print("Wrong type of collection")
+         bpy.context.scene.my_tool.inputGeneral = None
+         return
+      input_name = 'input' + att_name
+      att_coll = bpy.data.collections[Slots[input_name][0]]
+      for types in att_coll.children:
+         if types.name.endswith(type_name):
+            for vars in types.children:
+               if vars.name.endswith(var_name):
+                  pointers_have_updated(input_name, Slots, vars.name)
+                  break
+      bpy.context.scene.my_tool.inputGeneral = None
+   return
 
-def pointers_have_updated(slots_key, Slots): # this is called from init properties if pointerproperty updates
+
+def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called from init properties if pointerproperty updates
    last_key = slots_key.replace("input", "last")
    coll_name, label = Slots[slots_key]
-   if bpy.context.scene.my_tool.get(slots_key) is not None: # pointer has been filled
+   if variant_name != '': # from general pointer
+      new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name)
+      if new_dnastrand != '': # if is from correct collection
+         dna_string, CharacterItems = update_DNA_with_strand(new_dnastrand, coll_name)
+         
+         bpy.context.scene.my_tool[last_key] = bpy.data.collections[variant_name]
+         bpy.context.scene.my_tool.inputDNA = dna_string
+         bpy.context.scene.my_tool.lastDNA = dna_string
+         show_nft_from_dna(dna_string, CharacterItems)
+      else:
+         print("is not valid || clear")
+         last_type = variant_name.rpartition('_')[2]
+         if last_type not in ['Null', 'Nulll']:
+            bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool[last_key]
+         else:
+            bpy.context.scene.my_tool[slots_key] = None
 
+   elif bpy.context.scene.my_tool.get(slots_key) is not None: # pointer has been filled
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], bpy.context.scene.my_tool.get(slots_key).name)
       if new_dnastrand != '': # if is from correct collection
       # if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
          dna_string, CharacterItems = update_DNA_with_strand(new_dnastrand, coll_name)
-         
+
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
          bpy.context.scene.my_tool.inputDNA = dna_string
          bpy.context.scene.my_tool.lastDNA = dna_string
-
          show_nft_from_dna(dna_string, CharacterItems)
       else:
          print("is not valid || clear")
-         bpy.context.scene.my_tool[slots_key] = None
-   else:
+         last_type = bpy.context.scene.my_tool[last_key].name.rpartition('_')[2]
+         if last_type not in ['Null', 'Nulll']:
+            bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool[last_key]
+         else:
+            bpy.context.scene.my_tool[slots_key] = None
+
+   else: # remove item
       last_variant = bpy.context.scene.my_tool.get(last_key)
       last_type = last_variant.name.split('_')[1]
       if last_type not in ['Null', 'Nulll']: # gets null variant then fills pointer with it
@@ -292,12 +333,9 @@ def pointers_have_updated(slots_key, Slots): # this is called from init properti
             bpy.context.scene.my_tool.inputDNA = dna_string
             bpy.context.scene.my_tool.lastDNA = dna_string
             show_nft_from_dna(dna_string, CharacterItems)
-            
-
       else: # will refill pointer with null
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
-
-
+         # bpy.context.scene.my_tool[slots_key] = None
 
 def update_DNA_with_strand(new_dnastrand, coll_name):
    NFTDict = LoadTempDNADict()
