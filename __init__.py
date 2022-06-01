@@ -217,9 +217,12 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     inputUpperHead: bpy.props.PointerProperty(name="Upper Head Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead",Slots))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackPack",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack",Slots))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
+
+    inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.general_pointer_updated(Slots))
 
     inputColorListSceneObject: bpy.props.PointerProperty(name="ColorListObject", type=bpy.types.Object)
 
@@ -386,23 +389,20 @@ class randomizePreview(bpy.types.Operator):
 #         return {'FINISHED'}
 
 
-# class randomizeColor(bpy.types.Operator):
-#     bl_idname = 'randomize.color'
-#     bl_label = 'Randomize Color/Texture'
-#     bl_description = "Randomize color of current slot"
-#     bl_options = {"REGISTER", "UNDO"}
-#     collection_name: bpy.props.StringProperty(default="")
+class randomizeColor(bpy.types.Operator):
+    bl_idname = 'randomize.color'
+    bl_label = 'Randomize Color'
+    bl_description = "Randomize color of current slot"
+    bl_options = {"REGISTER", "UNDO"}
+    collection_name: bpy.props.StringProperty(default="")
 
-#     def execute(self, context):
-#         if self.collection_name != "":
-#             LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-#             inputDNA = bpy.context.scene.my_tool.inputDNA
-#             inputSlot = self.collection_name
-#             slotCollection = Slots[inputSlot][0]
-#             save_path = ''
-#             DNA = DNA_Generator.Outfit_Generator.RandomizeSingleDNAStrandColor(inputSlot, slotCollection, inputDNA,save_path)
-#             bpy.context.scene.my_tool.inputDNA = DNA
-#         return {'FINISHED'}
+    def execute(self, context):
+        if self.collection_name != "":
+            LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
+            input_slot = self.collection_name
+            slot_coll = Slots[input_slot][0]
+            Exporter.Previewer.update_colour_random(slot_coll)
+        return {'FINISHED'}
 
 
 class clearSlots(bpy.types.Operator):
@@ -1336,8 +1336,14 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
+        box = layout.box()
+        row = box.row()
+        row.label(text='Any Slot', icon='OUTLINER_COLLECTION')
+        row.prop(mytool, "inputGeneral", text='')
 
+        row = layout.row()
+        row.separator(factor=1.5)
+        row = layout.row()
         row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
 
 
@@ -1365,6 +1371,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
             row.label(text=label)
             row.prop(mytool, name, text="")
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
@@ -1394,6 +1401,8 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
             row.label(text=label)
             row.prop(mytool, name, text="")
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+
 
 
 class WCUSTOM_PT_LegSlots(bpy.types.Panel):
@@ -1423,6 +1432,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
             row.label(text=label)
             row.prop(mytool, name, text="")
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
@@ -1452,6 +1462,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
             row.label(text=label)
             row.prop(mytool, name, text="")
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
@@ -1475,6 +1486,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
             row.label(text=label)
             row.prop(mytool, name, text="")
+            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
 
 
 #-----------------------------------------------------------------------
@@ -1951,7 +1963,7 @@ classes = (
     saveNewBatch,
     resetBatch,
     # randomizeModel,
-    # randomizeColor,
+    randomizeColor,
     clearSlots,
     initializeRecord,
     randomizePreview,

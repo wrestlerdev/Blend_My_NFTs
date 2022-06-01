@@ -116,7 +116,10 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedMasterDictionary["numNFTsGenerated"] = MasterDictionary["numNFTsGenerated"]
 
     if DNAToAdd in totalDNAList:
-        return False
+        oldDNA_index = totalDNAList.index(DNAToAdd)
+        newDNA_index = nft_index -1
+        if oldDNA_index != newDNA_index: # if nft exists but isnt current index (for if colours have been adjusted)
+            return False
 
     updatedDictionary = {}
     updatedDictionary["hierarchy"] = DataDictionary["hierarchy"]
