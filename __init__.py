@@ -379,7 +379,6 @@ class randomizeAllColor(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        print("uwu")
         dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
 
         bpy.context.scene.my_tool.inputDNA = dna_string
