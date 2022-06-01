@@ -28,7 +28,6 @@ MetadataAttributeDict = {
                          ([""], "Element")]
     for new_key in keys
 }
-
 MetaDataKeys = [
     "Null",
     "Character",
@@ -47,73 +46,105 @@ MetaDataKeys = [
 MetadataAttributeOrder = {MetaDataKeys[v]: v for v in range(len(MetaDataKeys))} 
 
 
-def returnCardanoMetaData(name, NFT_DNA, NFT_Variants):
-    metaDataDictCardano = {"721": {
-        "<policy_id>": {
-            name: {
-                "name": name,
-                "image": "",
-                "mediaType": "",
-                "description": "",
 
-            }
-        },
-        "version": "1.0"
-    }}
+KeywordAttributeDict = {
+    new_key: new_val
+    for keys, new_val in [(["Shirt"], "Tops"),
+                         (["Pant"], "Bottoms"),
+                         (["Outfit"], "Outfit"),
+                         (["Feet"], "Shoes"),
+                         (["Head", "Face"], "Head"),
+                         (["Earing", "Back", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
+                         (["Plane", "Background"], "Background")]
+    for new_key in keys
+}
 
-    for i in NFT_Variants:
-        metaDataDictCardano["721"]["<policy_id>"][name][i] = NFT_Variants[i]
+KeywordKeys = [
+    "Null",
+    "Character",
+    "Color Style",
+    "Head",
+    "Outfit",
+    "Tops",
+    "Bottoms",
+    "Shoes",
+    "Accessories",
+    "Background"
+    ]
 
-    return metaDataDictCardano
+KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))} 
 
-def returnSolanaMetaData(name, NFT_DNA, NFT_Variants):
-    metaDataDictSolana = {"name": name, "symbol": "", "description": "", "seller_fee_basis_points": None,
-                          "image": "", "animation_url": "", "external_url": ""}
 
-    attributes = []
 
-    for i in NFT_Variants:
-        dictionary = {
-            "trait_type": i,
-            "value": NFT_Variants[i]
-        }
 
-        attributes.append(dictionary)
 
-    metaDataDictSolana["attributes"] = attributes
-    metaDataDictSolana["collection"] = {
-        "name": "",
-        "family": ""
-    }
+# def returnCardanoMetaData(name, NFT_DNA, NFT_Variants):
+#     metaDataDictCardano = {"721": {
+#         "<policy_id>": {
+#             name: {
+#                 "name": name,
+#                 "image": "",
+#                 "mediaType": "",
+#                 "description": "",
 
-    metaDataDictSolana["properties"] = {
-        "files": [{"uri": "", "type": ""}],
-        "category": "",
-        "creators": [{"address": "", "share": None}]
-    }
-    return metaDataDictSolana
+#             }
+#         },
+#         "version": "1.0"
+#     }}
 
-def returnErc721MetaData(name, NFT_DNA, NFT_Variants):
-    metaDataDictErc721 = {
-        "name": name,
-        "description": "",
-        "image": "",
-        "attributes": None,
-    }
+#     for i in NFT_Variants:
+#         metaDataDictCardano["721"]["<policy_id>"][name][i] = NFT_Variants[i]
 
-    attributes = []
+#     return metaDataDictCardano
 
-    for i in NFT_Variants:
-        dictionary = {
-            "trait_type": i,
-            "value": NFT_Variants[i]
-        }
+# def returnSolanaMetaData(name, NFT_DNA, NFT_Variants):
+#     metaDataDictSolana = {"name": name, "symbol": "", "description": "", "seller_fee_basis_points": None,
+#                           "image": "", "animation_url": "", "external_url": ""}
 
-        attributes.append(dictionary)
+#     attributes = []
 
-    metaDataDictErc721["attributes"] = attributes
+#     for i in NFT_Variants:
+#         dictionary = {
+#             "trait_type": i,
+#             "value": NFT_Variants[i]
+#         }
 
-    return metaDataDictErc721
+#         attributes.append(dictionary)
+
+#     metaDataDictSolana["attributes"] = attributes
+#     metaDataDictSolana["collection"] = {
+#         "name": "",
+#         "family": ""
+#     }
+
+#     metaDataDictSolana["properties"] = {
+#         "files": [{"uri": "", "type": ""}],
+#         "category": "",
+#         "creators": [{"address": "", "share": None}]
+#     }
+#     return metaDataDictSolana
+
+# def returnErc721MetaData(name, NFT_DNA, NFT_Variants):
+#     metaDataDictErc721 = {
+#         "name": name,
+#         "description": "",
+#         "image": "",
+#         "attributes": None,
+#     }
+
+#     attributes = []
+
+#     for i in NFT_Variants:
+#         dictionary = {
+#             "trait_type": i,
+#             "value": NFT_Variants[i]
+#         }
+
+#         attributes.append(dictionary)
+
+#     metaDataDictErc721["attributes"] = attributes
+
+#     return metaDataDictErc721
 
 
 
@@ -125,21 +156,20 @@ def returnERC721MetaDataCustom(name, DNA):
 
     metaDataDictErc721 = {
         "name": name,
-        # "name": "Kae #0257",
         "description": "This is a test meta data file",
         "image": "Link to IPFS?",
         "attributes": None,
     }
 
     attributes = []
-
     DNAString = DNA.split(",")
     character = DNAString.pop(0)
     style = DNAString.pop(0)
-    # metaDataDictErc721["name"] = str(character + ": #0123")
 
     attributes.append({"trait_type": "Character", "value": character})
-    attributes.append({"trait_type": "Style", "value": style})
+
+    split_col_style = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', style)).split())
+    attributes.append({"trait_type": "Color Style", "value": split_col_style})
     
     for strand in range(len(DNAString)):
         DNASplit = DNAString[strand].split('-')
@@ -148,39 +178,31 @@ def returnERC721MetaDataCustom(name, DNA):
         texture_index = DNASplit[2]
 
         slot = list(hierarchy.items())[strand]
+        att_type = list(slot[1].items())[int(atttype_index)]
+        variant = list(att_type[1].items())[int(variant_index)][0]
 
-        atttype = list(slot[1].items())[int(atttype_index)]
-        variant = list(atttype[1].items())[int(variant_index)][0]
+        variant_name = variant.split('_')[-1]
+        split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant_name)).split())
 
-        variant_type = variant.split('_')[1]
-        description = variant.split('_')[2]
-        split_description = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', description)).split())
-        split_variant_type = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant_type)).split())
-
-        attribute_type = "{} {} {}".format(str(texture_index), split_variant_type, split_description)
-        print(MetadataAttributeDict.get(variant.split('_')[1]))
-        if MetadataAttributeDict.get(variant.split('_')[1]) is not None:
-            attribute = MetadataAttributeDict[variant.split('_')[1]]
-            if variant_type not in ["Null", "Nulll", "Block"]:
-                dict = {"trait_type": attribute, "value": attribute_type}
-                attributes.append(dict)
-        else:
-            attribute = "Temp: " + variant.split('_')[1]
-            if variant_type not in ["Null", "Nulll", "Block"]:
-                dict = {"trait_type": attribute, "value": attribute_type}
+        full_variant_name = "{} {}".format(split_variant_name, str(chr(int(texture_index) + 65)))
+        type_name = str(att_type[0])[3:]
+        keyword = None
+        for key in list(KeywordAttributeDict.keys()):
+            if type_name.startswith(key):
+                keyword = KeywordAttributeDict[key]
+                break
+            
+        if keyword:
+            if not variant_name.endswith("Null"):
+                dict = {"trait_type": keyword, "value": full_variant_name}
                 attributes.append(dict)
 
-
-
-    # attributes = sorted(attributes, key = lambda i:MetadataAttributeOrder[i["trait_type"]])
+    attributes = sorted(attributes, key = lambda i:KeywordAttributeOrder[i["trait_type"]])
     metaDataDictErc721["attributes"] = attributes
-    
 
     return metaDataDictErc721
 
 
 
 if __name__ == '__main__':
-    returnSolanaMetaData()
-    returnCardanoMetaData()
-    returnErc721MetaData()
+    returnERC721MetaDataCustom()
