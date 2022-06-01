@@ -248,7 +248,14 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 def create_blender_saves(batch_path):
     #print(os.listdir(batch_path))
     for subdir, dirs, files in os.walk(batch_path):
-        print(subdir)
+        if(subdir != batch_path):
+            json_name = subdir.rsplit('\\')[-2] + "_" + subdir.rsplit('\\')[-1] + ".json"
+            json_path = os.path.join(subdir, json_name)
+            NFTDict = json.load(open(json_path))
+            Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
+            blend_name = json_name = subdir.rsplit('\\')[-2] + "_" + subdir.rsplit('\\')[-1] + ".blend"
+            blend_save  = os.path.join(subdir, blend_name)
+            bpy.ops.save_selected.save(filepath=blend_save)
 
 def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
     folder = os.path.join(save_path, "OUTPUT")

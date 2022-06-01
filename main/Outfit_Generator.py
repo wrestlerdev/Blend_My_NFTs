@@ -66,25 +66,7 @@ ItemUsedBodySlot = {
 "EaringShort" : ["16-Earings"], 
 "EaringLong" : ["16-Earings", "13-Neck"], 
 "Backpack" : ["18-Backpack"],
-"BackpackHigh" : ["18-Backpack"],
-"ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
-"CoatSlots" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm", "13-Neck"],
-"LongCoatsSlot" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "08-PelvisThick", "13-Neck"],
-"VestHoodiesSlot" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "18-Backpack"],
-"CropShirtsSlot" : ["01-UpperTorso"],
-"TShirtsSlot" : ["01-UpperTorso", "02-MiddleTorso"],
-"LongShirtSlots" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
-"LSleaveSlots" : ["03-LForeArm", "04-LWrist", "07-Hands"],
-"RSleaveSlots" : ["05-RForeArm", "06-RWrist", "07-Hands"],
-"ThickPantsSlots" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"],
-"ThinPantsSlots" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
-"ShoesHighSlots" : ["10-Calf", "11-Ankle", "12-Feet"],
-"ShoesMiddleSlots" : ["11-Ankle", "12-Feet"],
-"ThickQuarterPantsSlot" : ["08-PelvisThick", "09-PelvisThin", "10-Calf"],
-"ThinQuarterPantsSlot" : ["09-PelvisThin", "10-Calf"],
-"ThickShortsSlot" : ["08-PelvisThick", "09-PelvisThin"],
-"ThinShortsSlot" : ["09-PelvisThin"],
-"NeckWearSlots" : ["13-Neck"],
+"BackpackHigh" : ["18-Backpack"]
 }
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors

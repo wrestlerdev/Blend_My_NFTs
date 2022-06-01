@@ -25,7 +25,9 @@ class bcolors:
 
 
 
-def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on index to hide/show DNA
+def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection hiearchy based on index to hide/show DNA
+   bpy.ops.object.select_all(action='DESELECT')
+   
    hierarchy = get_hierarchy_ordered()
    for attribute in hierarchy: # hide all
       bpy.data.collections[attribute].hide_viewport = True
@@ -49,7 +51,7 @@ def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
    style = DNAString.pop(0)
-   show_character(character)
+   show_character(character, Select)
 
    for key in keys:
       for itemKey in NFTDict[key]:
@@ -60,25 +62,6 @@ def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on
 
             variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
 
-            if variant_children:
-               for child in variant_children:
-                  if child.name.split('_')[-1] == character:
-                     meshes = child.objects
-                     child.hide_viewport = False
-                     child.hide_render = False
-                     for obj in meshes: # Should we re hide the object meshes?
-                        obj.hide_viewport = False
-                        obj.hide_render = False
-
-                     set_armature_for_meshes(character, meshes)
-                     texture_mesh = bpy.data.objects[itemDictionary["item_texture"]]
-
-                     resolution = '_' + bpy.context.scene.my_tool.textureSize
-                     if resolution == '_4k':
-                        resolution = 4096
-                     else:
-                        resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
-                     set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
             attr = bpy.data.collections.get(itemDictionary["item_attribute"])
             attr.hide_viewport = False
             attr.hide_render = False
@@ -90,6 +73,29 @@ def show_nft_from_dna(DNA, NFTDict): # goes through collection hiearchy based on
             varient = bpy.data.collections[list(NFTDict[key])[0]]
             varient.hide_viewport = False
             varient.hide_render = False
+
+            if variant_children:
+               for child in variant_children:
+                  if child.name.split('_')[-1] == character:
+                     meshes = child.objects
+                     child.hide_viewport = False
+                     child.hide_render = False
+                     for obj in meshes: # Should we re hide the object meshes?
+                        obj.hide_viewport = False
+                        obj.hide_render = False
+                        if Select:
+                           obj.select_set(True)
+
+                     set_armature_for_meshes(character, meshes)
+                     texture_mesh = bpy.data.objects[itemDictionary["item_texture"]]
+
+                     resolution = '_' + bpy.context.scene.my_tool.textureSize
+                     if resolution == '_4k':
+                        resolution = 4096
+                     else:
+                        resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+                     set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
+
    newTempDict = {}
    newTempDict["DNAList"] = DNA
    newTempDict["CharacterItems"] = NFTDict
@@ -132,11 +138,11 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    colorChoice = GlobalColorList[color_key]
    for child in meshes:
       for childMatSlot in child.material_slots:
+         print("!--------------------------------!")
          print("Child Name: " + childMatSlot.name)
          for textureMatSlot in texture_mesh.material_slots:
             print("Texture Name: " + textureMatSlot.name)
             if textureMatSlot.material.name in childMatSlot.material.name:
-               print("!--------------------------------!")
                print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
                #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
                #for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
@@ -199,8 +205,8 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
                            n.outputs["Color"].default_value = colorChoice["W"]
                            # print("This node ({}) doesn't have an image".format(n.name))
                            # then should it look for an image?
-               
                childMatSlot.material = textureMatSlot.material #Check this - update to loop through all material slots
+         print("*******************************") 
    return
 
 
@@ -557,14 +563,19 @@ def get_hierarchy_unordered(index=0):
    return None
 
 
-def show_character(char_name):
+def show_character(char_name, Select = False):
    for c in config.Characters:
         if char_name == c:
             bpy.data.collections[c].hide_viewport = False
             bpy.data.collections[c].hide_render = False
+            if Select:
+               for child in bpy.data.collections[c].children:
+                  for obj in child.objects:
+                     obj.select_set(True)
         else:
             bpy.data.collections[c].hide_viewport = True
             bpy.data.collections[c].hide_render = True
+
 
 
 def HexToRGB(hex):
