@@ -6,6 +6,7 @@ except:
 from sys import prefix
 from . import config
 import os
+import bpy
 
 def check_PIL():
     try:
@@ -149,4 +150,41 @@ def downres_single_texture(path, image_name, dims):
             else:
                 resized.save(new_path, quality=95, optimize=True)
             print(new_path)
+    return
+
+
+# ------------------------------------------------------------------------------
+
+
+
+def reimport_lights(blend_path):
+    parent_name = "Rendering"
+    folder_name = "Lighting"
+    print(blend_path)
+
+    if bpy.data.collections.get(parent_name) is None:
+        render_folder = bpy.data.collections.new(parent_name)
+        bpy.data.collections["Script_Ignore"].children.link(render_folder)
+    else:
+        render_folder = bpy.data.collections[parent_name]
+
+    if bpy.data.collections.get(folder_name) is None:
+        folder = bpy.data.collections.new(folder_name)
+        bpy.data.collections[parent_name].children.link(folder)
+    else:
+        folder = bpy.data.collections[folder_name]
+        for coll in folder.children:
+            for obj in coll.objects:
+                coll.objects.unlink(obj)
+            bpy.data.collections.remove(coll)
+        bpy.ops.outliner.orphans_purge() 
+    print(bpy.context.view_layer.layer_collection)
+    layer_collection = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[render_folder.name].children[folder.name]
+    bpy.context.view_layer.active_layer_collection = layer_collection
+
+    file_path   = os.path.join(blend_path, "Collection", "light_setup")
+    directory = os.path.join(blend_path, "Collection")
+    filename = 'light_setup'
+
+    bpy.ops.wm.append(filepath=file_path, directory=directory, filename=filename)
     return

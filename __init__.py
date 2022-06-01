@@ -1085,7 +1085,7 @@ class purgeData(bpy.types.Operator):
 
 
 
-# -------------------------------------------------------------
+# ---------------------------- Colours ---------------------------------
 
 class addNewColourStyle(bpy.types.Operator):
     bl_idname = 'add.colorstyle'
@@ -1248,6 +1248,39 @@ class renameAllOriginalTextures(bpy.types.Operator):
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
         TextureEditor.rename_all_original_textures(input_path)
+        return {'FINISHED'}
+
+
+
+# -------------------------------------------------------------------------------------
+
+class reimportCharacters(bpy.types.Operator):
+    bl_idname = 'reimport.chars'
+    bl_label = 'Re-import Character objects'
+    bl_description = 'Re-import Character mesh, armature and etc'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+
+        return {'FINISHED'}
+
+
+class reimportLight(bpy.types.Operator):
+    bl_idname = 'reimport.light'
+    bl_label = 'Re-import Lights'
+    bl_description = 'Re-import Character mesh, armature and etc'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        charinfo_path = os.path.join(input_path, 'CHARACTERS')
+        for dir in os.listdir(charinfo_path):
+            if dir.endswith('.blend') and 'light' in dir:
+                light_path = os.path.join(charinfo_path, dir)
+                TextureEditor.reimport_lights(light_path)
+                break
+
         return {'FINISHED'}
 
 
@@ -1837,7 +1870,10 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.label(text="Collections:")
         row = layout.row()
         
-        row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
+        row.operator(reimportLight.bl_idname, text=createSlotFolders.bl_label)
+        row = layout.row()
+        row.operator(reimportCharacters.bl_idname, text=reimportCharacters.bl_label)
+        row.operator(reimportLight.bl_idname, text=reimportLight.bl_label)
 
         row = layout.row()
         row.label(text="Textures:")
@@ -2057,6 +2093,8 @@ classes = (
     deleteColourStyle,
     confirmRefactor,
     refactorExports,
+    reimportCharacters,
+    reimportLight,
 
     downresTextures,
     renameAllOriginalTextures
