@@ -245,7 +245,10 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 
 # -------------------------------- Custom render --------------------------------------
-
+def create_blender_saves(batch_path):
+    #print(os.listdir(batch_path))
+    for subdir, dirs, files in os.walk(batch_path):
+        print(subdir)
 
 def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
     folder = os.path.join(save_path, "OUTPUT")

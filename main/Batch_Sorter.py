@@ -9,7 +9,7 @@ import random
 
 
 def makeBatches(nftName, maxNFTs, nftsPerBatch, save_path, batch_json_save_path):
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output", "NFT_Data")
+    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFT", "NFT_Data")
     NFTRecord_save_path = os.path.join(Blend_My_NFTs_Output, "NFTRecord.json")
 
     DataDictionary = json.load(open(NFTRecord_save_path))
