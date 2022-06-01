@@ -173,7 +173,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
     loadNFTIndex: bpy.props.IntProperty(name="Number to Load:", min=1, max=9999, default=1)
     CurrentBatchIndex : bpy.props.IntProperty(name="Current Batch", min=1, max=10, default=1)
-    currentColorStyleKey : bpy.props.StringProperty(name="Color Style Key", default="N/A")
+    currentColorStyleKey : bpy.props.StringProperty(name="Color Style Key", default="N/A", update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.UIColorKey_has_updated())
 
     BatchSliderIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.batch_property_updated())
     lastBatchSliderIndex: bpy.props.IntProperty(default=1)
@@ -266,9 +266,14 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     WhiteTint: bpy.props.FloatVectorProperty(name="W Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
-
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
+
+    RTintPreview: bpy.props.FloatVectorProperty(name="R Tint Preview", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
+    GTintPreview: bpy.props.FloatVectorProperty(name="G Tint Preview", subtype="COLOR", default=(0.0,1.0,0.0,1.0), size=4, min=0.0, max=1)
+    BTintPreview: bpy.props.FloatVectorProperty(name="B Tint Preview", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
+    AlphaTintPreview: bpy.props.FloatVectorProperty(name="A Tint Preview", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
+    WhiteTintPreview: bpy.props.FloatVectorProperty(name="W Tint Preview", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
 
 canRefactor = False
 
@@ -1879,7 +1884,6 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
 
         row = layout.row()
         row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
-
         # if DNA_Generator.Outfit_Generator.ColorGen.DoesGlobalColorExist():
         #     row = layout.row()
         #     row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
@@ -1891,9 +1895,26 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
         row = layout.row()
         row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
-        layout.separator()
-        row = layout.row()
 
+        layout.separator()
+
+        
+
+
+class WCUSTOM_PT_TintUI(bpy.types.Panel):
+    bl_label ="Tint Panel"
+    bl_idname = "WCUSTOM_PT_TintUI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ARTIST'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        
+        row = layout.row()
         row.prop(mytool, "colorSetName", text="")
         row = layout.row()
         row.prop(mytool, "RTint", text="Red Tint")
@@ -1906,29 +1927,47 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "WhiteTint", text="White Tint")
 
-        layout.separator()
-
+        layout.separator(factor=5)
 
         row = layout.row()
-        
-        row = layout.row()
-        layout.separator()
-        row = layout.row()
-
         row.operator(prevGlobalColorSet.bl_idname, text=prevGlobalColorSet.bl_label)
         row.operator(nextGlobalColorSet.bl_idname, text=nextGlobalColorSet.bl_label)
         row = layout.row()
         row.operator(addGlobalColorSet.bl_idname, text=addGlobalColorSet.bl_label)
         row = layout.row()
         row.operator(deleteGlobalColorSet.bl_idname, text=deleteGlobalColorSet.bl_label)
-        
-
 
         layout.separator()
 
         box = layout.box()
         box.prop(mytool, "inputColorListSceneObject", text='')
-        
+
+
+
+class WCUSTOM_PT_TintPreviewUI(bpy.types.Panel):
+    bl_label ="Preview Panel"
+    bl_idname = "WCUSTOM_PT_TintPreviewUI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ARTIST'
+    bl_parent_id = 'WCUSTOM_PT_ArtistUI'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "RTintPreview", text="Red Tint")
+        row = layout.row()
+        row.prop(mytool, "GTintPreview", text="Green Tint")
+        row = layout.row()
+        row.prop(mytool, "BTintPreview", text="Blue Tint")
+        row = layout.row()
+        row.prop(mytool, "AlphaTintPreview", text="Alpha Tint")
+        row = layout.row()
+        row.prop(mytool, "WhiteTintPreview", text="White Tint")
+
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
 #     bl_label = "Documentation"
@@ -1969,6 +2008,8 @@ classes = (
     WCUSTOM_PT_CreateMetadata,
     WCUSTOM_PT_RefactorExports,
     WCUSTOM_PT_ArtistUI,
+    WCUSTOM_PT_TintPreviewUI,
+    WCUSTOM_PT_TintUI,
     # BMNFTS_PT_Documentation,
 
 
