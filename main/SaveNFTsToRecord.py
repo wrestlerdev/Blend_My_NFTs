@@ -433,6 +433,7 @@ def CreateSlotsFolderHierarchy(save_path):
 
 def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol): 
     materialSets = next(os.walk(texture_path))[1] 
+    #is there more than one material group
     if len(materialSets) > 0:
         mats = set()
         for char in config.Characters:                                     
