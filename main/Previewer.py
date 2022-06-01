@@ -131,69 +131,76 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    GlobalColorList = OpenGlobalColorList()
    colorChoice = GlobalColorList[color_key]
    for child in meshes:
-      #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
-      for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
-         mat = texture_mesh.material_slots[i].material
-         if mat.use_nodes:
-            for n in mat.node_tree.nodes:
-               if n.type == 'TEX_IMAGE':
-                  if n.image is not None:
-                     texture_info = get_new_texture_name(n, suffix)
-                     if texture_info:
-                        new_texture, new_texture_path, _type = texture_info
-                        if os.path.exists(new_texture_path):
-                           file = new_texture_path.replace('/', '\\')
-                           if _type == '_N':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["NormalNode"].image = newImage
-                              mat.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
-                              mat.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
-                           elif _type == '_D':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["DiffuseNode"].image = newImage
-                              mat.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
-                           elif _type == '_ID':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["ColorIDNode"].image = newImage
-                              mat.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
-                              mat.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
-                           elif _type == '_M':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["MetallicNode"].image = newImage
-                              mat.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
-                              mat.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
-                           elif _type == '_R':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["RoughnessNode"].image = newImage
-                              mat.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
-                              mat.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
-                           elif _type == '_E':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["EmissiveNode"].image = newImage 
-                              mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'Linear'
-                              mat.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
-                           elif _type == '_O':
-                              newImage = bpy.data.images.load(file, check_existing=False)
-                              mat.node_tree.nodes["OpacityNode"].image = newImage 
-                              mat.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
-                              mat.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
-                     # else:
-                        # print("Texture image within this node is not named properly (e.g. missing _N)")
-               elif n.type == 'RGB':
-                  if (n.label == "RTint"):
-                     n.outputs["Color"].default_value = colorChoice["R"]
-                  if (n.label == "GTint"):
-                     n.outputs["Color"].default_value = colorChoice["G"]
-                  if (n.label == "BTint"):
-                     n.outputs["Color"].default_value = colorChoice["B"]
-                  if (n.label == "AlphaTint"):
-                     n.outputs["Color"].default_value = colorChoice["A"]
-                  if (n.label == "WhiteTint"):
-                     n.outputs["Color"].default_value = colorChoice["W"]
-                     # print("This node ({}) doesn't have an image".format(n.name))
-                     # then should it look for an image?
+      for childMatSlot in child.material_slots:
+         print("Child Name: " + childMatSlot.name)
+         for textureMatSlot in texture_mesh.material_slots:
+            print("Texture Name: " + textureMatSlot.name)
+            if textureMatSlot.material.name in childMatSlot.material.name:
+               print("!--------------------------------!")
+               print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
+               #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
+               #for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
+               mat = textureMatSlot.material
+               if mat.use_nodes:
+                  for n in mat.node_tree.nodes:
+                     if n.type == 'TEX_IMAGE':
+                        if n.image is not None:
+                           texture_info = get_new_texture_name(n, suffix)
+                           if texture_info:
+                              new_texture, new_texture_path, _type = texture_info
+                              if os.path.exists(new_texture_path):
+                                 file = new_texture_path.replace('/', '\\')
+                                 if _type == '_N':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["NormalNode"].image = newImage
+                                    mat.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
+                                    mat.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_D':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["DiffuseNode"].image = newImage
+                                    mat.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_ID':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["ColorIDNode"].image = newImage
+                                    mat.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_M':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["MetallicNode"].image = newImage
+                                    mat.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_R':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["RoughnessNode"].image = newImage
+                                    mat.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_E':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["EmissiveNode"].image = newImage 
+                                    mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_O':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["OpacityNode"].image = newImage 
+                                    mat.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
+                           # else:
+                              # print("Texture image within this node is not named properly (e.g. missing _N)")
+                     elif n.type == 'RGB':
+                        if (n.label == "RTint"):
+                           n.outputs["Color"].default_value = colorChoice["R"]
+                        if (n.label == "GTint"):
+                           n.outputs["Color"].default_value = colorChoice["G"]
+                        if (n.label == "BTint"):
+                           n.outputs["Color"].default_value = colorChoice["B"]
+                        if (n.label == "AlphaTint"):
+                           n.outputs["Color"].default_value = colorChoice["A"]
+                        if (n.label == "WhiteTint"):
+                           n.outputs["Color"].default_value = colorChoice["W"]
+                           # print("This node ({}) doesn't have an image".format(n.name))
+                           # then should it look for an image?
                
-         child.material_slots[i].material = texture_mesh.material_slots[i].material #Check this - update to loop through all material slots
+               childMatSlot.material = textureMatSlot.material #Check this - update to loop through all material slots
    return
 
 

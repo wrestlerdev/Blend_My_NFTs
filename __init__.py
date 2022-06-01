@@ -150,8 +150,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             items=[
                 ('4k', '4k', '4096x4096'),
                 # ('2k', '2k', '2048x2048'),
-                ('1k', '1k', '1024x1024')
-                # ('512', '512', '512x512')
+                ('1k', '1k', '1024x1024'),
+                ('512', '512', '512x512')
             ]
         )
 
@@ -953,6 +953,16 @@ class renderBatch(bpy.types.Operator):
             self.report({"ERROR"}, "Failed: This Batch does not exist")
         return {'FINISHED'}
 
+class createBlenderSave(bpy.types.Operator):
+    bl_idname = "createblendersave.batch"
+    bl_label = "Create Blender Saves"
+    bl_description = "Create Blender Saves"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    def execute(self, context):
+        print("SAVE NEW BLENDER SCENES")
+        return {'FINISHED'}
+
 
 
 class chooseExportFolder(bpy.types.Operator):
@@ -1218,7 +1228,7 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [1024]
+        resolutions = [1024, 512]
         TextureEditor.create_downres_textures(input_path, resolutions)
         return {'FINISHED'}
 
@@ -1727,7 +1737,9 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
 
             layout.separator()
             box = layout.box()
+            box.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label)
             box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
+
 
 
 #-------------------------------------------
@@ -1970,6 +1982,7 @@ classes = (
     organizeScene,
     createCharacterCollections,
     renderBatch,
+    createBlenderSave,
     chooseExportFolder,
     moveDataToLocal,
     purgeData,
