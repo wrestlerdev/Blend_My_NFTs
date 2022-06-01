@@ -427,6 +427,44 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
 
 
 
+def randomize_color_style(): # if dna_strand is given, update dna with new strand else randomize colour
+   NFTDict = LoadTempDNADict()
+   CharacterItems = NFTDict["CharacterItems"]
+   dna_string = bpy.context.scene.my_tool.inputDNA
+   hierarchy = get_hierarchy_ordered()
+   DNASplit = dna_string.split(',') 
+
+   new_style = ColorGen.SetUpCharacterStyle()
+
+   if DNASplit[1] == new_style:
+      return dna_string, CharacterItems
+
+   DNASplit[1] = new_style
+   dna_string = ','.join(DNASplit)
+   print(DNASplit)
+
+   for coll_name in list(NFTDict["CharacterItems"].keys()):
+      if CharacterItems[coll_name] != 'Null':
+         index = list(NFTDict["CharacterItems"].keys()).index(coll_name)
+         dna_strand = DNASplit[index + 2]
+
+         type_index, var_index, tex_index = dna_strand.split('-')
+         type_coll = bpy.data.collections[coll_name].children[int(type_index)]
+         var_coll = type_coll.children[int(var_index)]
+
+         new_key, color_choice = ColorGen.PickOutfitColors(coll_name, new_style)
+         new_item = CharacterItems[coll_name][var_coll.name]
+         new_item["color_style"] = new_style
+         new_item["color_key"] = new_key
+
+         variant_dict = {}
+         variant_dict[var_coll.name] = new_item
+         CharacterItems[coll_name] = variant_dict
+      
+   return dna_string, CharacterItems
+
+
+
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
    if DNA != lastDNA:
       DNA = DNA.replace('"', '')
