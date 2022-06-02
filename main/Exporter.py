@@ -246,20 +246,21 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 
 # -------------------------------- Custom render --------------------------------------
-def create_blender_saves(batch_path):
+def create_blender_saves(batch_path, batch_num, nft_range):
     #print(os.listdir(batch_path))
-    for subdir, dirs, files in os.walk(batch_path):
-        if(subdir != batch_path):
-            json_name = subdir.rsplit('\\')[-2] + "_" + subdir.rsplit('\\')[-1] + ".json"
-            json_path = os.path.join(subdir, json_name)
-            NFTDict = json.load(open(json_path))
-            Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
-            select_hierarchy(bpy.data.collections["Rendering"])
-            bpy.data.objects["CameraStill"].select_set(True)
-            bpy.data.objects["CameraVideo"].select_set(True)
-            blend_name = json_name = subdir.rsplit('\\')[-2] + "_" + subdir.rsplit('\\')[-1] + ".blend"
-            blend_save  = os.path.join(subdir, blend_name)
-            bpy.ops.save_selected.save(filepath=blend_save)
+    for i in range(nft_range[0], nft_range[1] + 1):
+        file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
+        json_path = os.path.join(batch_path, "NFT_{:04d}".format(i), file_name)
+        print(json_path)
+
+        NFTDict = json.load(open(json_path))
+        Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
+        select_hierarchy(bpy.data.collections["Rendering"])
+        bpy.data.objects["CameraStill"].select_set(True)
+        bpy.data.objects["CameraVideo"].select_set(True)
+        blend_name = "Batch_{:03d}_NFT_{:04d}.blend".format(batch_num, i)
+        blend_save  = os.path.join(batch_path, "NFT_{:04d}".format(i), blend_name)
+        bpy.ops.save_selected.save(filepath=blend_save)
             
     
     #os.system("D:\Desktop\Blender\ExportBatch.bat")

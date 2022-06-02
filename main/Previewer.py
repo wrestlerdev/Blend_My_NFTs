@@ -139,13 +139,11 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    for child in meshes:
       for childMatSlot in child.material_slots:
          print("!--------------------------------!")
-         print("Child Name: " + childMatSlot.name)
+         print("Child Name: " + child.name  + " || Child Mat" + childMatSlot.name)
          for textureMatSlot in texture_mesh.material_slots:
-            print("Texture Name: " + textureMatSlot.name)
-            if textureMatSlot.material.name in childMatSlot.material.name:
+            print("Texture Mat: " + textureMatSlot.name)
+            if textureMatSlot.material.name in childMatSlot.material.name or len(texture_mesh.material_slots) == 1 :
                print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
-               #for i in range(0, len(child.material_slots)):  # CHECK THIS ADD TO PREVIEWER
-               #for i in range(0, 1):  # CHECK THIS ADD TO PREVIEWER
                mat = textureMatSlot.material
                if mat.use_nodes:
                   for n in mat.node_tree.nodes:

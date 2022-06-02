@@ -965,7 +965,12 @@ class createBlenderSave(bpy.types.Operator):
         export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
-        Exporter.create_blender_saves(batch_path)
+        range_start = bpy.context.scene.my_tool.renderSectionIndex
+        batch_count = len(next(os.walk(batch_path))[1])
+        range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
+        if range_start <= batch_count and range_end >= range_start:
+            range = [range_start, range_end]
+        Exporter.create_blender_saves(batch_path, render_batch_num, range)
         print("SAVE NEW BLENDER SCENES: " + batch_path)
         return {'FINISHED'}
 

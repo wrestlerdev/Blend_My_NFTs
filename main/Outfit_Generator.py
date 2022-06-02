@@ -232,8 +232,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             if(len(bpy.data.collections.get(varientChoosen).objects) > 0):
                 textureIndex = random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))
                 textureVarient = bpy.data.collections.get(varientChoosen).objects[textureIndex]
-                for child in chidlrenObjs:
-                    child.material_slots[0].material = textureVarient.material_slots[0].material #Check this - update to loop through all material slots
             ColorGen.PickOutfitColors(attribute)
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
 
