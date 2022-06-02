@@ -247,10 +247,14 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 # -------------------------------- Custom render --------------------------------------
 def create_blender_saves(batch_path, batch_num, nft_range):
-    #print(os.listdir(batch_path))
+    
+
+    print(os.listdir(batch_path))
     for i in range(nft_range[0], nft_range[1] + 1):
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
-        json_path = os.path.join(batch_path, "NFT_{:04d}".format(i), file_name)
+        folder_name = "NFT_{:04d}".format(i)
+        folder_path = os.path.join(batch_path, folder_name)
+        json_path = os.path.join(folder_path, file_name)
         print(json_path)
 
         NFTDict = json.load(open(json_path))
@@ -261,9 +265,17 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         blend_name = "Batch_{:03d}_NFT_{:04d}.blend".format(batch_num, i)
         blend_save  = os.path.join(batch_path, "NFT_{:04d}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
-            
-    
-    #os.system("D:\Desktop\Blender\ExportBatch.bat")
+        python_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
+        
+        blenderExecutable = bpy.app.binary_path
+        blenderFolder = blenderExecutable.rpartition("\\")[0] + "\\"
+        blenderFolder = '"' + blenderFolder + '"'
+        folder_path = folder_path.replace('\\', '/')
+
+        batch_file_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
+        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path + " " +  folder_path 
+        
+        os.system(batch_script_path)
     
 def select_hierarchy(parent_col):
     # Go over all the objects in the hierarchy like @zeffi suggested:
