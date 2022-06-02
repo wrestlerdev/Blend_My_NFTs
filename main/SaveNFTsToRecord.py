@@ -259,10 +259,12 @@ def delete_hierarchy(parent_col):
 
 def CreateSlotsFolderHierarchy(save_path):
     #Clears scene and delets all hirachy except for ignore folder
+    print("Hello")
     delete_hierarchy(bpy.context.scene.collection)
     bpy.ops.outliner.orphans_purge()
 
     slots_path = CheckAndFormatPath(save_path, "INPUT/SLOTS")
+    print(slots_path)
     if(slots_path != ""):
         for slot in os.listdir(slots_path):
             type_path = CheckAndFormatPath(slots_path, slot)
