@@ -1262,7 +1262,9 @@ class reimportCharacters(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        charinfo_path = os.path.join(input_path, 'CHARACTERS')
 
+        TextureEditor.reimport_all_character_objects(charinfo_path)
         return {'FINISHED'}
 
 
@@ -1856,7 +1858,7 @@ class WCUSTOM_PT_RefactorExports(bpy.types.Panel):
 #------------------------------------
 
 class WCUSTOM_PT_Initialize(bpy.types.Panel):
-    bl_label = "Render NFTs"
+    bl_label = "Files Set Up"
     bl_idname = "WCUSTOM_PT_Initialize"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -1866,29 +1868,30 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
+
+        box = layout.box()
+        row = box.row()
         row.label(text="Collections:")
-        row = layout.row()
-        
+        row = box.row()
         row.operator(reimportLight.bl_idname, text=createSlotFolders.bl_label)
-        row = layout.row()
+        row = box.row()
         row.operator(reimportCharacters.bl_idname, text=reimportCharacters.bl_label)
         row.operator(reimportLight.bl_idname, text=reimportLight.bl_label)
 
-        row = layout.row()
+        layout.separator(factor=1.5)
+        box = layout.box()
+        row = box.row()
         row.label(text="Textures:")
-
-        row = layout.row()
+        row = box.row()
         row.operator(renameAllOriginalTextures.bl_idname, text=renameAllOriginalTextures.bl_label)
-        row = layout.row()
+        row = box.row()
         row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
 
-
-        row = layout.row()
-
-        row.label(text="Clean up:")
-        row = layout.row()
-        row.operator(purgeData.bl_idname, text=purgeData.bl_label)
+        # box = layout.box()
+        # row = box.row()
+        # row.label(text="Clean up:")
+        # row = box.row()
+        # row.operator(purgeData.bl_idname, text=purgeData.bl_label)
 
 
 
