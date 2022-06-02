@@ -162,13 +162,18 @@ def reimport_lights(blend_path):
     folder_name = "Lighting"
     print(blend_path)
 
-    if bpy.data.collections.get(parent_name) is None:
+    if bpy.data.collections.get(parent_name) is None: # creates render folder
         render_folder = bpy.data.collections.new(parent_name)
         bpy.data.collections["Script_Ignore"].children.link(render_folder)
     else:
         render_folder = bpy.data.collections[parent_name]
 
-    if bpy.data.collections.get(folder_name) is None:
+    for obj in bpy.data.collections["Script_Ignore"].objects: # imports camera into render folder that exist in script ignore
+        if obj.type == 'CAMERA':
+            bpy.data.collections["Script_Ignore"].objects.unlink(obj)
+            bpy.data.collections[folder_name].objects.link(obj)
+
+    if bpy.data.collections.get(folder_name) is None: # delete all within lighting folder, purge, then reimport from lighting file
         folder = bpy.data.collections.new(folder_name)
         bpy.data.collections[parent_name].children.link(folder)
     else:
@@ -178,7 +183,6 @@ def reimport_lights(blend_path):
                 coll.objects.unlink(obj)
             bpy.data.collections.remove(coll)
         bpy.ops.outliner.orphans_purge() 
-    print(bpy.context.view_layer.layer_collection)
     layer_collection = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[render_folder.name].children[folder.name]
     bpy.context.view_layer.active_layer_collection = layer_collection
 
