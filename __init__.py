@@ -851,6 +851,7 @@ class createSlotFolders(bpy.types.Operator):
 
     def execute(self, context):
         folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
+        print("TEMP SLOTS")
         SaveNFTsToRecord.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
 
         return {'FINISHED'}
@@ -1972,7 +1973,7 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row = box.row()
         row.label(text="Collections:")
         row = box.row()
-        row.operator(reimportLight.bl_idname, text=createSlotFolders.bl_label)
+        row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
         row = box.row()
         row.operator(reimportCharacters.bl_idname, text=reimportCharacters.bl_label)
         row.operator(reimportLight.bl_idname, text=reimportLight.bl_label)
