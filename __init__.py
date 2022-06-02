@@ -1324,18 +1324,44 @@ class colourCopyDown(bpy.types.Operator):
     icon = 'SORT_ASC'
 
     def execute(self, context):
+        DNA_Generator.Outfit_Generator.ColorGen.copy_colour_down()
         return {'FINISHED'}
 
 
 class loadColorOnMesh(bpy.types.Operator):
     bl_idname = 'load.meshcol'
-    bl_label = 'Load Tint'
+    bl_label = 'Force Load Tint'
     bl_description = 'Load Tint onto mesh'
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        return {'FINISHED'} 
+        DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("woo")
+        return {'FINISHED'}
 
+
+class deleteColorStyle(bpy.types.Operator):
+    bl_idname = 'delete.colstyle'
+    bl_label = 'Delete Style'
+    bl_description = 'Delete Colour Style'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+    # i think this is a double up rn
+    def execute(self, context):
+        return {'FINISHED'}
+
+class deleteColorSet(bpy.types.Operator):
+    bl_idname = 'delete.colset'
+    bl_label = 'Delete Set'
+    bl_description = 'Delete Colour Set'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        return {'FINISHED'}
 
 # ------------------------------- Panels ----------------------------------------------
 
@@ -1988,8 +2014,9 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         box.label(text="Some text here as instructions?")
 
         layout.separator()
+        box = layout.box()
 
-        row = layout.row()
+        row = box.row()
         row.operator(prevColorStyle.bl_idname, text=prevColorStyle.bl_label)
         row.scale_x = 1.5
         row.prop(mytool, "colorStyleName", text="")
@@ -1998,20 +2025,35 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.scale_x = 1
         row.operator(nextColorStyle.bl_idname, text=nextColorStyle.bl_label)
 
-        row = layout.row()
+        row = box.row()
         row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
+
+        row = box.row()
+        row.operator(deleteColorStyle.bl_idname, text=deleteColorStyle.bl_label, emboss=False)
+
+        layout.separator(factor=0)
         # if DNA_Generator.Outfit_Generator.ColorGen.DoesGlobalColorExist():
         #     row = layout.row()
         #     row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
         
-        row = layout.row()
+        box = layout.box()
+        row = box.row()
         row.operator(prevStyleColorSet.bl_idname, text=prevStyleColorSet.bl_label)
         #row.prop(mytool, "colorStyleColorListKey", text='')
         row.label(text=bpy.context.scene.my_tool.currentColorStyleKey)
         row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
-        row = layout.row()
+        row = box.row()
         row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
+        row = box.row()
+        row.operator(deleteColorSet.bl_idname, text=deleteColorSet.bl_label, emboss=False)
 
+
+        row = layout.row()
+        row.label(text='')
+        row.scale_x = 2
+        row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
+        row.scale_x = 1
+        row.label(text='')
         
 
 
@@ -2041,7 +2083,7 @@ class WCUSTOM_PT_TintUI(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "WhiteTint", text="White Tint")
 
-        layout.separator(factor=5)
+        layout.separator(factor=1.5)
 
         row = layout.row()
         row.operator(prevGlobalColorSet.bl_idname, text=prevGlobalColorSet.bl_label)
@@ -2056,6 +2098,7 @@ class WCUSTOM_PT_TintUI(bpy.types.Panel):
         box = layout.box()
         row = box.row()
         row.prop(mytool, "inputColorListSceneObject", text='')
+        row.scale_x = 0.5
         row.operator(loadColorOnMesh.bl_idname, text=loadColorOnMesh.bl_label)
 
 
@@ -2088,7 +2131,7 @@ class WCUSTOM_PT_TintPreviewUI(bpy.types.Panel):
 
         box = layout.box()
         row = box.row()
-        row.operator(colourCopyUp.bl_idname, text=colourCopyUp.bl_label, icon=colourCopyUp.icon)
+        # row.operator(colourCopyUp.bl_idname, text=colourCopyUp.bl_label, icon=colourCopyUp.icon)
         row.operator(colourCopyDown.bl_idname, text=colourCopyDown.bl_label, icon=colourCopyDown.icon)
 
 # # Documentation Panel:
@@ -2185,6 +2228,8 @@ classes = (
     colourCopyUp,
     colourCopyDown,
     loadColorOnMesh,
+    deleteColorStyle,
+    deleteColorSet,
 
     downresTextures,
     renameAllOriginalTextures
