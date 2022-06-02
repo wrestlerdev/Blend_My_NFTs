@@ -268,12 +268,13 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
+    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, max=100)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
 
 canRefactor = False
 
 def make_directories(save_path):
-    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFTs Output")
+    Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFT")
     batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "OUTPUT")
 
     if not os.path.exists(Blend_My_NFTs_Output):
@@ -844,7 +845,7 @@ class createSlotFolders(bpy.types.Operator):
 
 
     def execute(self, context):
-        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
+        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
         SaveNFTsToRecord.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
 
         return {'FINISHED'}
@@ -860,7 +861,7 @@ class organizeScene(bpy.types.Operator):
 
 
     def execute(self, context):
-        # folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
+        # folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
         # SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
         original_hierarchy = Exporter.Previewer.get_hierarchy_ordered(1)
         DNA_Generator.save_rarity_To_Record(original_hierarchy)
@@ -878,7 +879,7 @@ class createCharacterCollections(bpy.types.Operator):
 
 
     def execute(self, context):
-        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFTs Output")
+        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
         record_path = os.path.join(folder_dir, "OUTPUT", "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
         SaveNFTsToRecord.SearchForMeshesAndCreateCharacterDuplicates(record_path)
         return {'FINISHED'}
@@ -898,7 +899,7 @@ class renderBatch(bpy.types.Operator):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
         export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
-        export_path = os.path.join(export_path, "Blend_My_NFTs Output")
+        export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
 
@@ -958,7 +959,18 @@ class createBlenderSave(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        print("SAVE NEW BLENDER SCENES")
+        render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
+        export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        export_path = os.path.join(export_path, "Blend_My_NFT")
+        batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
+        record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
+        range_start = bpy.context.scene.my_tool.renderSectionIndex
+        batch_count = len(next(os.walk(batch_path))[1])
+        range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
+        if range_start <= batch_count and range_end >= range_start:
+            range = [range_start, range_end]
+        Exporter.create_blender_saves(batch_path, render_batch_num, range)
+        print("SAVE NEW BLENDER SCENES: " + batch_path)
         return {'FINISHED'}
 
 
@@ -998,7 +1010,7 @@ class moveDataToLocal(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        bath_path_end = os.path.join("Blend_My_NFTs Output", "OUTPUT")
+        bath_path_end = os.path.join("Blend_My_NFT", "OUTPUT")
         record_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), bath_path_end)
         local_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bath_path_end)
 
@@ -1017,7 +1029,7 @@ class exportMetadata(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        bacth_path_end = os.path.join("Blend_My_NFTs Output", "OUTPUT")
+        bacth_path_end = os.path.join("Blend_My_NFT", "OUTPUT")
         path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bacth_path_end)
         Exporter.save_all_metadata_files(path)
         return {'FINISHED'}
@@ -1035,7 +1047,7 @@ class refactorExports(bpy.types.Operator):
 
     def execute(self, context):
         export_dir = bpy.context.scene.my_tool.separateExportPath
-        batches_path = os.path.join(export_dir, "Blend_My_NFTs Output", "OUTPUT")
+        batches_path = os.path.join(export_dir, "Blend_My_NFT", "OUTPUT")
         render_record_path = os.path.join(batches_path, "_RenderRecord.json")
         Exporter.refactor_all_batches(batches_path, render_record_path)
 
@@ -1655,7 +1667,7 @@ class WCUSTOM_PT_OutputSettings(bpy.types.Panel):
 
         row = layout.row()
         row.operator(moveDataToLocal.bl_idname, text=moveDataToLocal.bl_label)
-        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFT", "OUTPUT")
 
 
 
@@ -1671,9 +1683,9 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
         
-        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFT", "OUTPUT")
         if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
-            batches_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+            batches_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFT", "OUTPUT")
             batch_path = os.path.join(batches_path, "Batch_{:03d}".format(mytool.BatchRenderIndex))
             box = layout.box()
             boxbox = box.box()
@@ -1774,7 +1786,7 @@ class WCUSTOM_PT_CreateMetadata(bpy.types.Panel):
 
         row = layout.row()
 
-        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFT", "OUTPUT")
         if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
             row.operator(exportMetadata.bl_idname, text=exportMetadata.bl_label, emboss=True)
 
@@ -1795,7 +1807,7 @@ class WCUSTOM_PT_RefactorExports(bpy.types.Panel):
 
 
         if canRefactor:
-            export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFTs Output", "OUTPUT")
+            export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFT", "OUTPUT")
             if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
 
                 row = layout.row()
@@ -1875,6 +1887,7 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row = layout.row()
         row.operator(prevColorStyle.bl_idname, text=prevColorStyle.bl_label)
         row.prop(mytool, "colorStyleName", text="")
+        row.prop(mytool, "colorStyleRarity", text="")
         row.operator(nextColorStyle.bl_idname, text=nextColorStyle.bl_label)
 
         row = layout.row()
