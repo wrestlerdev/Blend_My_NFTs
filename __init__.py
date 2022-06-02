@@ -173,7 +173,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     maxNFTs: bpy.props.IntProperty(name="Max NFTs to Generate",default=1, min=1, max=9999)
     loadNFTIndex: bpy.props.IntProperty(name="Number to Load:", min=1, max=9999, default=1)
     CurrentBatchIndex : bpy.props.IntProperty(name="Current Batch", min=1, max=10, default=1)
-    currentColorStyleKey : bpy.props.StringProperty(name="Color Style Key", default="N/A")
+    currentColorStyleKey : bpy.props.StringProperty(name="Color Style Key", default="N/A", update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.UIColorKey_has_updated())
 
     BatchSliderIndex : bpy.props.IntProperty(name="Batch", min=1, max=10, default=1, update=lambda s,c:LoadNFT.batch_property_updated())
     lastBatchSliderIndex: bpy.props.IntProperty(default=1)
@@ -266,10 +266,15 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     WhiteTint: bpy.props.FloatVectorProperty(name="W Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
-
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
     colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, max=100)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
+
+    RTintPreview: bpy.props.FloatVectorProperty(name="R Tint Preview", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
+    GTintPreview: bpy.props.FloatVectorProperty(name="G Tint Preview", subtype="COLOR", default=(0.0,1.0,0.0,1.0), size=4, min=0.0, max=1)
+    BTintPreview: bpy.props.FloatVectorProperty(name="B Tint Preview", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
+    AlphaTintPreview: bpy.props.FloatVectorProperty(name="A Tint Preview", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
+    WhiteTintPreview: bpy.props.FloatVectorProperty(name="W Tint Preview", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1)
 
 canRefactor = False
 
@@ -1092,7 +1097,7 @@ class purgeData(bpy.types.Operator):
 
 
 
-# -------------------------------------------------------------
+# ---------------------------- Colours ---------------------------------
 
 class addNewColourStyle(bpy.types.Operator):
     bl_idname = 'add.colorstyle'
@@ -1206,7 +1211,7 @@ class deleteGlobalColorSet(bpy.types.Operator):
 
 class nextStyleColorSet(bpy.types.Operator):
     bl_idname = 'next.stylecolorset'
-    bl_label = 'Next Style Color'
+    bl_label = 'Next Set'
     bl_description = 'Next Style Color'
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -1216,7 +1221,7 @@ class nextStyleColorSet(bpy.types.Operator):
 
 class prevStyleColorSet(bpy.types.Operator):
     bl_idname = 'prev.stylecolorset'
-    bl_label = 'Prev Style Color'
+    bl_label = 'Prev Set'
     bl_description = 'Prev Style Color'
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -1256,6 +1261,80 @@ class renameAllOriginalTextures(bpy.types.Operator):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
         TextureEditor.rename_all_original_textures(input_path)
         return {'FINISHED'}
+
+
+
+# -------------------------------------------------------------------------------------
+
+class reimportCharacters(bpy.types.Operator):
+    bl_idname = 'reimport.chars'
+    bl_label = 'Re-import Character objects'
+    bl_description = 'Re-import Character mesh, armature and etc'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        charinfo_path = os.path.join(input_path, 'CHARACTERS')
+
+        TextureEditor.reimport_all_character_objects(charinfo_path)
+        return {'FINISHED'}
+
+
+class reimportLight(bpy.types.Operator):
+    bl_idname = 'reimport.light'
+    bl_label = 'Re-import Lights'
+    bl_description = 'Re-import Character mesh, armature and etc'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        charinfo_path = os.path.join(input_path, 'CHARACTERS')
+        for dir in os.listdir(charinfo_path):
+            if dir.endswith('.blend') and 'light' in dir:
+                light_path = os.path.join(charinfo_path, dir)
+                TextureEditor.reimport_lights(light_path)
+                break
+
+        return {'FINISHED'}
+
+
+
+
+# -------------------------------------------------------------------------------
+
+class colourCopyUp(bpy.types.Operator):
+    bl_idname = 'colour.copyup'
+    bl_label = 'Copy Colour Up'
+    bl_description = "This can't be undone okay!!!!!!"
+    bl_options = {'REGISTER', 'UNDO'}
+    icon = 'SORT_DESC'
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+
+class colourCopyDown(bpy.types.Operator):
+    bl_idname = 'colour.copydown'
+    bl_label = 'Copy Colour Down'
+    bl_description = 'Copy Colour Down'
+    bl_options = {'REGISTER', 'UNDO'}
+    icon = 'SORT_ASC'
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+
+class loadColorOnMesh(bpy.types.Operator):
+    bl_idname = 'load.meshcol'
+    bl_label = 'Load Tint'
+    bl_description = 'Load Tint onto mesh'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        return {'FINISHED'} 
 
 
 # ------------------------------- Panels ----------------------------------------------
@@ -1321,6 +1400,7 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
         for char in config.Characters:
             inputDNA = bpy.context.scene.my_tool.inputDNA
             DNASplit = inputDNA.split(',')
+            row.scale_y = 1.5
             if char == DNASplit[0]:
                 row.operator(swapCharacter.bl_idname, text=char, emboss=False).character_name = char
             else:
@@ -1348,8 +1428,10 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         mytool = scene.my_tool
         box = layout.box()
         row = box.row()
+        row.scale_x = 1.3
         row.label(text='Any Slot', icon='OUTLINER_COLLECTION')
         row.prop(mytool, "inputGeneral", text='')
+        row.scale_x = 1
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
 
         row = layout.row()
@@ -1378,13 +1460,16 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
+            row.scale_x = 0.5
             if bpy.context.scene.my_tool[name] is not None:
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.label(text='')
 
@@ -1412,13 +1497,16 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
+            row.scale_x = 0.5
             if bpy.context.scene.my_tool[name] is not None:
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.label(text='')
 
@@ -1447,13 +1535,16 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
+            row.scale_x = 0.5
             if bpy.context.scene.my_tool[name] is not None:
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.label(text='')
 
@@ -1481,13 +1572,16 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
+            row.scale_x = 0.5
             if bpy.context.scene.my_tool[name] is not None:
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
+                row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.label(text='')
                 # row.operator(randomizeColor.bl_idname, text='',emboss=False).collection_name = name
@@ -1510,11 +1604,18 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
+            row.scale_x = 0.5
             if bpy.context.scene.my_tool[name] is not None:
                 label = bpy.context.scene.my_tool[name].name.split('_')[3]
-            row.label(text=label)
-            row.prop(mytool, name, text="")
-            row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.label(text=label)
+                row.scale_x = 1
+                row.prop(mytool, name, text="")
+                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+            else:
+                row.label(text=label)
+                row.scale_x = 1
+                row.prop(mytool, name, text="")
+                row.label(text='')
 
 
 #-----------------------------------------------------------------------
@@ -1830,7 +1931,7 @@ class WCUSTOM_PT_RefactorExports(bpy.types.Panel):
 #------------------------------------
 
 class WCUSTOM_PT_Initialize(bpy.types.Panel):
-    bl_label = "Render NFTs"
+    bl_label = "Files Set Up"
     bl_idname = "WCUSTOM_PT_Initialize"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -1840,26 +1941,30 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
+
+        box = layout.box()
+        row = box.row()
         row.label(text="Collections:")
-        row = layout.row()
-        
-        row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
+        row = box.row()
+        row.operator(reimportLight.bl_idname, text=createSlotFolders.bl_label)
+        row = box.row()
+        row.operator(reimportCharacters.bl_idname, text=reimportCharacters.bl_label)
+        row.operator(reimportLight.bl_idname, text=reimportLight.bl_label)
 
-        row = layout.row()
+        layout.separator(factor=1.5)
+        box = layout.box()
+        row = box.row()
         row.label(text="Textures:")
-
-        row = layout.row()
+        row = box.row()
         row.operator(renameAllOriginalTextures.bl_idname, text=renameAllOriginalTextures.bl_label)
-        row = layout.row()
+        row = box.row()
         row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
 
-
-        row = layout.row()
-
-        row.label(text="Clean up:")
-        row = layout.row()
-        row.operator(purgeData.bl_idname, text=purgeData.bl_label)
+        # box = layout.box()
+        # row = box.row()
+        # row.label(text="Clean up:")
+        # row = box.row()
+        # row.operator(purgeData.bl_idname, text=purgeData.bl_label)
 
 
 
@@ -1886,13 +1991,15 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
 
         row = layout.row()
         row.operator(prevColorStyle.bl_idname, text=prevColorStyle.bl_label)
+        row.scale_x = 1.5
         row.prop(mytool, "colorStyleName", text="")
+        row.scale_x = 0.25
         row.prop(mytool, "colorStyleRarity", text="")
+        row.scale_x = 1
         row.operator(nextColorStyle.bl_idname, text=nextColorStyle.bl_label)
 
         row = layout.row()
         row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
-
         # if DNA_Generator.Outfit_Generator.ColorGen.DoesGlobalColorExist():
         #     row = layout.row()
         #     row.operator(deleteColourStyle.bl_idname, text=deleteColourStyle.bl_label, emboss=False)
@@ -1904,9 +2011,24 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
         row = layout.row()
         row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
-        layout.separator()
-        row = layout.row()
 
+        
+
+
+class WCUSTOM_PT_TintUI(bpy.types.Panel):
+    bl_label ="Tint Panel"
+    bl_idname = "WCUSTOM_PT_TintUI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ARTIST'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        
+        row = layout.row()
         row.prop(mytool, "colorSetName", text="")
         row = layout.row()
         row.prop(mytool, "RTint", text="Red Tint")
@@ -1919,29 +2041,56 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "WhiteTint", text="White Tint")
 
-        layout.separator()
-
+        layout.separator(factor=5)
 
         row = layout.row()
-        
-        row = layout.row()
-        layout.separator()
-        row = layout.row()
-
         row.operator(prevGlobalColorSet.bl_idname, text=prevGlobalColorSet.bl_label)
         row.operator(nextGlobalColorSet.bl_idname, text=nextGlobalColorSet.bl_label)
         row = layout.row()
         row.operator(addGlobalColorSet.bl_idname, text=addGlobalColorSet.bl_label)
         row = layout.row()
         row.operator(deleteGlobalColorSet.bl_idname, text=deleteGlobalColorSet.bl_label)
-        
-
 
         layout.separator()
 
         box = layout.box()
-        box.prop(mytool, "inputColorListSceneObject", text='')
-        
+        row = box.row()
+        row.prop(mytool, "inputColorListSceneObject", text='')
+        row.operator(loadColorOnMesh.bl_idname, text=loadColorOnMesh.bl_label)
+
+
+
+class WCUSTOM_PT_TintPreviewUI(bpy.types.Panel):
+    bl_label ="Preview Panel"
+    bl_idname = "WCUSTOM_PT_TintPreviewUI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ARTIST'
+    bl_parent_id = 'WCUSTOM_PT_ArtistUI'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "RTintPreview", text="Red Tint")
+        row = layout.row()
+        row.prop(mytool, "GTintPreview", text="Green Tint")
+        row = layout.row()
+        row.prop(mytool, "BTintPreview", text="Blue Tint")
+        row = layout.row()
+        row.prop(mytool, "AlphaTintPreview", text="Alpha Tint")
+        row = layout.row()
+        row.prop(mytool, "WhiteTintPreview", text="White Tint")
+
+        layout.separator(factor=0.75)
+
+        box = layout.box()
+        row = box.row()
+        row.operator(colourCopyUp.bl_idname, text=colourCopyUp.bl_label, icon=colourCopyUp.icon)
+        row.operator(colourCopyDown.bl_idname, text=colourCopyDown.bl_label, icon=colourCopyDown.icon)
+
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
 #     bl_label = "Documentation"
@@ -1982,6 +2131,8 @@ classes = (
     WCUSTOM_PT_CreateMetadata,
     WCUSTOM_PT_RefactorExports,
     WCUSTOM_PT_ArtistUI,
+    WCUSTOM_PT_TintPreviewUI,
+    WCUSTOM_PT_TintUI,
     # BMNFTS_PT_Documentation,
 
 
@@ -2029,6 +2180,11 @@ classes = (
     deleteColourStyle,
     confirmRefactor,
     refactorExports,
+    reimportCharacters,
+    reimportLight,
+    colourCopyUp,
+    colourCopyDown,
+    loadColorOnMesh,
 
     downresTextures,
     renameAllOriginalTextures

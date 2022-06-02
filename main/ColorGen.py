@@ -388,3 +388,15 @@ def ColorHasbeenUpdated(ColorTint):
                 if (node.label == "WhiteTint"):
                     node.outputs["Color"].default_value = Wtint
     return None
+
+
+
+
+def UIColorKey_has_updated():
+    # bpy.context.scene.my_tool.RTintPreview
+    # bpy.context.scene.my_tool.GTintPreview
+    # bpy.context.scene.my_tool.BTintPreview
+    # bpy.context.scene.my_tool.AlphaTintPreview
+    # bpy.context.scene.my_tool.WhiteTintPreview
+
+    return

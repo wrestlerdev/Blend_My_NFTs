@@ -3,9 +3,10 @@ try:
 except:
     pass
 
-from sys import prefix
 from . import config
 import os
+import bpy
+from . import config
 
 def check_PIL():
     try:
@@ -149,4 +150,82 @@ def downres_single_texture(path, image_name, dims):
             else:
                 resized.save(new_path, quality=95, optimize=True)
             print(new_path)
+    return
+
+
+# ------------------------------------------------------------------------------
+
+
+def reimport_all_character_objects(folder_path):
+    for dir in os.listdir(folder_path):
+        if dir.endswith('.blend') and 'Rig' in dir:
+            rig_blendfile_path = os.path.join(folder_path, dir)
+    for char in config.Characters:
+        reimport_character_objects(char, rig_blendfile_path)
+    return
+
+def reimport_character_objects(character, rig_blendfile_path):
+    clear_old_character_objects(character)
+
+    bpy.data.collections[character].hide_viewport = False
+    bpy.data.collections[character].hide_render = False
+    bpy.ops.outliner.orphans_purge()
+
+    layer_collection = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[character]
+    bpy.context.view_layer.active_layer_collection = layer_collection
+    
+    filename = character + '_Rig'
+    file_path   = os.path.join(rig_blendfile_path, "Collection", filename)
+    directory = os.path.join(rig_blendfile_path, "Collection")
+    bpy.ops.wm.append(filepath=file_path, directory=directory, filename=filename)
+    return
+
+def clear_old_character_objects(char_name):
+    coll = bpy.data.collections[char_name]
+    recurse_delete_collection(coll)
+    bpy.ops.outliner.orphans_purge()
+    return
+
+def recurse_delete_collection(collection):
+    for obj in collection.objects:
+        collection.objects.unlink(obj)
+        bpy.data.objects.remove(obj)
+    for child in collection.children:
+        recurse_delete_collection(child)
+        collection.children.unlink(child)
+    return
+
+
+def reimport_lights(blend_path):
+    parent_name = "Rendering"
+    folder_name = "Lighting"
+
+    if bpy.data.collections.get(parent_name) is None: # creates render folder
+        render_folder = bpy.data.collections.new(parent_name)
+        bpy.data.collections["Script_Ignore"].children.link(render_folder)
+    else:
+        render_folder = bpy.data.collections[parent_name]
+
+    for obj in bpy.data.collections["Script_Ignore"].objects: # imports camera into render folder that exist in script ignore
+        if obj.type == 'CAMERA':
+            bpy.data.collections["Script_Ignore"].objects.unlink(obj)
+            bpy.data.collections[folder_name].objects.link(obj)
+
+    if bpy.data.collections.get(folder_name) is None: # delete all within lighting folder, purge, then reimport from lighting file
+        folder = bpy.data.collections.new(folder_name)
+        bpy.data.collections[parent_name].children.link(folder)
+    else:
+        folder = bpy.data.collections[folder_name]
+        for coll in folder.children:
+            for obj in coll.objects:
+                coll.objects.unlink(obj)
+            bpy.data.collections.remove(coll)
+        bpy.ops.outliner.orphans_purge()
+    layer_collection = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[render_folder.name].children[folder.name]
+    bpy.context.view_layer.active_layer_collection = layer_collection
+
+    file_path   = os.path.join(blend_path, "Collection", "light_setup")
+    directory = os.path.join(blend_path, "Collection")
+    filename = 'light_setup'
+    bpy.ops.wm.append(filepath=file_path, directory=directory, filename=filename)
     return
