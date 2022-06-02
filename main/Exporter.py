@@ -535,6 +535,14 @@ def export_record_data(record_batch_root, local_batch_root): # copy all record d
     clear_all_export_data(record_batch_root, local_batch_root) # CHECK THIS
     recurse_copy_data('', record_batch_root, local_batch_root)
     # recurse_delete_data('', record_batch_root, local_batch_root)
+    
+    src_batchscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), "ExportBatchSingle.bat")
+    dst_batscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), "ExportBatchSingle.bat")
+    shutil.copy(src_batchscript_path, dst_batscript_path)
+
+    src_pyscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), "Exporter.py")
+    dst_pyscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), "Exporter.py")
+    shutil.copy(src_pyscript_path, dst_pyscript_path)
     return True
 
 
