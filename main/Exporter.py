@@ -11,6 +11,7 @@ import json
 import importlib
 import shutil
 from datetime import datetime
+import subprocess
 
 from . import Previewer
 importlib.reload(Previewer)
@@ -253,9 +254,25 @@ def create_blender_saves(batch_path):
             json_path = os.path.join(subdir, json_name)
             NFTDict = json.load(open(json_path))
             Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
+            select_hierarchy(bpy.data.collections["Rendering"])
+            bpy.data.objects["CameraStill"].select_set(True)
+            bpy.data.objects["CameraVideo"].select_set(True)
             blend_name = json_name = subdir.rsplit('\\')[-2] + "_" + subdir.rsplit('\\')[-1] + ".blend"
             blend_save  = os.path.join(subdir, blend_name)
             bpy.ops.save_selected.save(filepath=blend_save)
+            
+    
+    #os.system("D:\Desktop\Blender\ExportBatch.bat")
+    
+def select_hierarchy(parent_col):
+    # Go over all the objects in the hierarchy like @zeffi suggested:
+    def get_child_names(obj):
+        for child in obj.children:
+            if child.children:
+                get_child_names(child)
+            for obj in child.objects:
+                obj.select_set(True)       
+    get_child_names(parent_col)
 
 def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
     folder = os.path.join(save_path, "OUTPUT")
