@@ -453,29 +453,24 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
                 if matset.partition("_")[0] == mat.name.partition("_")[0]:
                     matfolderlink[mat.name] = matset
         i = 0
+
         for m in matfolderlink.keys():         
             if i >= len(obj.material_slots):
-                result = [s for s in os.listdir(texture_path) if "_O." in s]
+                result = [s for s in os.listdir( (texture_path + "/" + matfolderlink[m]) ) if "_O." in s]
                 if result != []:
                     material = bpy.data.materials['MasterTransparentV01']
                 else:
                     material = bpy.data.materials['MasterV01']
                 tempcopy = material.copy()
                 tempcopy.name = m
-                # bpy.data.objects[obj.name].select_set(True)
-                # bpy.ops.object.material_slot_add()
-                # bpy.ops.material.new()
-                # obj.material_slots[i].link = 'OBJECT'
-                # #bpy.ops.object.material_slot_remove()
-                # bpy.data.objects[obj.name].select_set(False)
                 obj.data.materials.append(None)
-                #obj.material_slots[i].link = 'OBJECT'
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m
-                #obj.data.materials.pop(index = i) 
             else:
                 print("Slot Exists")
-                result = [s for s in os.listdir(texture_path) if "_O." in s]
+                result = [s for s in os.listdir( (texture_path + "/" + matfolderlink[m]) ) if "_O." in s]
+                print(result)
+                print((texture_path + "/" + matfolderlink[m]))
                 if result != []:
                     material = bpy.data.materials['MasterTransparentV01']
                 else:
@@ -498,6 +493,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
             #material = m.material
             #m.link = 'OBJECT' 
             result = [s for s in os.listdir(texture_path) if "_O." in s]
+            print(result)
             if result != []:
                 material = bpy.data.materials['MasterTransparentV01']
             else:
