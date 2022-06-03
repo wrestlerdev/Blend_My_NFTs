@@ -532,7 +532,7 @@ def export_record_data(record_batch_root, local_batch_root): # copy all record d
         return False
     # if os.path.exists(local_batch_root):
     #     shutil.rmtree(local_batch_root)
-    clear_all_export_data(record_batch_root, local_batch_root) # CHECK THIS
+    # clear_all_export_data(record_batch_root, local_batch_root) # CHECK THIS
     recurse_copy_data('', record_batch_root, local_batch_root)
     # recurse_delete_data('', record_batch_root, local_batch_root)
     
