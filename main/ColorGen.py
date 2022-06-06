@@ -390,13 +390,23 @@ def ColorHasbeenUpdated(ColorTint):
     return None
 
 
-
+# -------------------------------------------------------
 
 def UIColorKey_has_updated():
-    # bpy.context.scene.my_tool.RTintPreview
-    # bpy.context.scene.my_tool.GTintPreview
-    # bpy.context.scene.my_tool.BTintPreview
-    # bpy.context.scene.my_tool.AlphaTintPreview
-    # bpy.context.scene.my_tool.WhiteTintPreview
+    GlobalColorList = OpenGlobalColorList()
+    ColorSet = GlobalColorList[bpy.context.scene.my_tool.currentColorStyleKey]
+    bpy.context.scene.my_tool.RTintPreview = ColorSet["R"]
+    bpy.context.scene.my_tool.GTintPreview = ColorSet["G"]
+    bpy.context.scene.my_tool.BTintPreview = ColorSet["B"]
+    bpy.context.scene.my_tool.AlphaTintPreview = ColorSet["A"]
+    bpy.context.scene.my_tool.WhiteTintPreview = ColorSet["W"]
+    return
 
+
+def copy_colour_down():
+    bpy.context.scene.my_tool.RTint = bpy.context.scene.my_tool.RTintPreview
+    bpy.context.scene.my_tool.GTint = bpy.context.scene.my_tool.GTintPreview
+    bpy.context.scene.my_tool.BTint = bpy.context.scene.my_tool.BTintPreview
+    bpy.context.scene.my_tool.AlphaTint = bpy.context.scene.my_tool.AlphaTintPreview
+    bpy.context.scene.my_tool.WhiteTint = bpy.context.scene.my_tool.WhiteTintPreview
     return
