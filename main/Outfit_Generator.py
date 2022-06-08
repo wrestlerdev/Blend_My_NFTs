@@ -66,7 +66,10 @@ ItemUsedBodySlot = {
 "EaringShort" : ["16-Earings"], 
 "EaringLong" : ["16-Earings", "13-Neck"], 
 "Backpack" : ["18-Backpack"],
-"BackpackHigh" : ["18-Backpack"]
+"BackpackHigh" : ["18-Backpack"],
+"ExpressionLow" : ["20-Expression"],
+"ExpressionHigh" : ["14-LowerHead", "20-Expression"],
+"ExpressionFull" : ["14-LowerHead", "15-MiddleHead", "20-Expression"]
 }
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors

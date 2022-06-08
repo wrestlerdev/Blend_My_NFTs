@@ -49,32 +49,32 @@ else:
 
     from .ui_Lists import UIList
 
-Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
-    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso Slot"),
-    "inputLForeArm": ("03-LForeArm", "Left Forearm Slot"),
-    "inputLWrist": ("04-LWrist", "Left Wrist Slot"),
-    "inputRForeArm": ("05-RForeArm", "Right Forearm Slot"),
-    "inputRWrist": ("06-RWrist", "Right Wrist Slot"),
-    "inputHands": ("07-Hands", "Hands Slot"),
-    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick Slot"),
-    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin Slot"),
-    "inputCalf": ("10-Calf", "Calf Slot"),
-    "inputAnkle": ("11-Ankle", "Ankle Slot"),
-    "inputFeet": ("12-Feet", "Feet Slot"),
-    "inputNeck": ("13-Neck", "Neck Slot"),
-    "inputLowerHead": ("14-LowerHead", "Lower Head Slot"),
-    "inputMiddleHead": ("15-MiddleHead", "Mid Head Slot"),
-    "inputEarings": ("16-Earings", "Earrings Slot"),
-    "inputUpperHead": ("17-UpperHead", "Upper Head Slot"),
-    "inputBackpack": ("18-Backpack", "Backpack Slot"),
-    "inputBackground": ("19-Background", "Background Slot")}
+Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
+    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),
+    "inputLForeArm": ("03-LForeArm", "Left Forearm"),
+    "inputLWrist": ("04-LWrist", "Left Wrist"),
+    "inputRForeArm": ("05-RForeArm", "Right Forearm"),
+    "inputRWrist": ("06-RWrist", "Right Wrist"),
+    "inputHands": ("07-Hands", "Hands"),
+    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick"),
+    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin"),
+    "inputCalf": ("10-Calf", "Calf"),
+    "inputAnkle": ("11-Ankle", "Ankle"),
+    "inputFeet": ("12-Feet", "Feet"),
+    "inputNeck": ("13-Neck", "Neck"),
+    "inputLowerHead": ("14-LowerHead", "Lower Head"),
+    "inputMiddleHead": ("15-MiddleHead", "Mid Head"),
+    "inputEarings": ("16-Earings", "Earrings"),
+    "inputUpperHead": ("17-UpperHead", "Upper Head"),
+    "inputBackpack": ("18-Backpack", "Backpack"),
+    "inputBackground": ("19-Background", "Background"),
+    "inputExpression": ("20-Expression", "Expression")}
     
 
 # User input Property Group:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Main BMNFTS Panel properties: 
-    
     nftName: bpy.props.StringProperty(name="NFT Name")
 
     collectionSize: bpy.props.IntProperty(name="NFT Collection Size", default=1, min=1)  # max=(combinations - offset)
@@ -132,10 +132,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         ]
     )
 
-
-    cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
-    solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
-    erc721MetaData: bpy.props.BoolProperty(name="ERC721")
+    # cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
+    # solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
+    # erc721MetaData: bpy.props.BoolProperty(name="ERC721")
 
     # API Panel properties:
     apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
@@ -220,6 +219,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack",Slots))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
+    inputExpression: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression",Slots))
 
     inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.general_pointer_updated(Slots))
@@ -245,6 +246,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.colourindex_has_been_updated("colourStyleIndex", "lastStyleIndex"))
@@ -297,7 +299,7 @@ offset: int = 0
 def update_combinations(dummy1, dummy2):
     global combinations
     global offset
-
+    
     #combinations = (get_combinations.get_combinations_from_scene()) - offset
 
     # redraw_panel()
@@ -1575,7 +1577,6 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 row.prop(mytool, name, text="")
                 row.label(text='')
 
-
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_label = "Head Slots"
     bl_idname = "WCUSTOM_PT_HeadSlots"
@@ -1585,11 +1586,12 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
+    "inputExpression": ("GHOST_ENABLED"),
     "inputUpperHead": ("MESH_CONE"),
     "inputMiddleHead": ("HIDE_OFF"),
     "inputLowerHead": ("USER"),
     "inputEarings": ("PMARKER_ACT"),
-    "inputNeck": ("NODE_INSERT_OFF"),}
+    "inputNeck": ("NODE_INSERT_OFF")}
     
     def draw(self, context):
         layout = self.layout
