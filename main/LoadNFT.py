@@ -68,50 +68,58 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
         scene_type_colls = bpy.data.collections[slot].children
         for scene_type_coll in scene_type_colls:
             type = scene_type_coll.name
-            variants = list(hierarchy[slot][type].keys())
             #This checks if a type has any varinets in it BETA_1.0
-            if len(variants) > 0:
-                #This checks if a varients has any texture sets in it BETA_1.0
-                for h_variant in variants: # check if any valid variants do exist
-                    h_variant_exists = False # hierarchy variant
-                    if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
-                        h_variant_exists = True
-                        break
-                if h_variant_exists: #
-                    type_rarity = hierarchy[slot][type][h_variant]["type_rarity"]
-                    if type in types:
-                        scene_type_coll["rarity"] =  int(float(type_rarity))
-                        update_rarity_color(type, type_rarity)
-                    else:
-                        scene_type_coll["rarity"] =  0
-                        update_rarity_color(type, 0)
-
-                    scene_var_colls = scene_type_coll.children
-
-                    for scene_var_coll in scene_var_colls:
-                        variant = scene_var_coll.name
-                        if variant in variants and type in types:
-                            variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
-                            update_rarity_color(variant, int(float(variant_rarity)))
-                            scene_var_coll["rarity"] = int(float(variant_rarity))
-                            # textures = list(hierarchy[slot][type][variant].keys())
+            print(slot)
+            print(type)
+            print('**************')
+            if type in  hierarchy[slot].keys() != None:
+                variants = list(hierarchy[slot][type].keys())
+                if len(variants) > 0:
+                    #This checks if a varients has any texture sets in it BETA_1.0
+                    for h_variant in variants: # check if any valid variants do exist
+                        h_variant_exists = False # hierarchy variant
+                        if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
+                            h_variant_exists = True
+                            break
+                    if h_variant_exists: #
+                        type_rarity = hierarchy[slot][type][h_variant]["type_rarity"]
+                        if type in types:
+                            scene_type_coll["rarity"] =  int(float(type_rarity))
+                            update_rarity_color(type, type_rarity)
                         else:
-                            update_rarity_color(variant, 0)
-                            scene_var_coll["rarity"] = 0
-                            # textures = []
+                            scene_type_coll["rarity"] =  0
+                            update_rarity_color(type, 0)
 
-                else: # BETA_1.0 || has no textures so is not a valid collection
-                    current_var_coll = bpy.data.collections[h_variant]
-                    if current_var_coll.get("rarity") is not None:
-                        del(current_var_coll["rarity"])
+                        scene_var_colls = scene_type_coll.children
+
+                        for scene_var_coll in scene_var_colls:
+                            variant = scene_var_coll.name
+                            if variant in variants and type in types:
+                                variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
+                                update_rarity_color(variant, int(float(variant_rarity)))
+                                scene_var_coll["rarity"] = int(float(variant_rarity))
+                                # textures = list(hierarchy[slot][type][variant].keys())
+                            else:
+                                update_rarity_color(variant, 0)
+                                scene_var_coll["rarity"] = 0
+                                # textures = []
+
+                    else: # BETA_1.0 || has no textures so is not a valid collection
+                        current_var_coll = bpy.data.collections[h_variant]
+                        if current_var_coll.get("rarity") is not None:
+                            del(current_var_coll["rarity"])
+                        if scene_type_coll.get("rarity") is not None:
+                            del(scene_type_coll["rarity"])
+                        
+                        update_rarity_color(type, 0)
+                        update_rarity_color(h_variant, 0)
+                else: # BETA_1.0
                     if scene_type_coll.get("rarity") is not None:
                         del(scene_type_coll["rarity"])
-                    
                     update_rarity_color(type, 0)
-                    update_rarity_color(h_variant, 0)
-            else: # BETA_1.0
-                if scene_type_coll.get("rarity") is not None:
-                    del(scene_type_coll["rarity"])
+
+            else:
+                print(type)
                 update_rarity_color(type, 0)
     return
 

@@ -148,7 +148,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             description="texture",
             items=[
                 ('4k', '4k', '4096x4096'),
-                # ('2k', '2k', '2048x2048'),
+                ('2k', '2k', '2048x2048'),
                 ('1k', '1k', '1024x1024'),
                 ('512', '512', '512x512')
             ]

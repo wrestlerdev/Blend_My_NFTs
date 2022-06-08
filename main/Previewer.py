@@ -55,6 +55,9 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
    for key in keys:
       for itemKey in NFTDict[key]:
+         if key.endswith('Expression'):
+            print("is expression")
+
          if(NFTDict[key] != "Null"):
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
@@ -93,6 +96,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      if resolution == '_4k':
                         resolution = 4096
                      else:
+                        print(resolution)
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
                      set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
 
