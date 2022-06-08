@@ -1975,6 +1975,8 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row = box.row()
         row.label(text="Collections:")
         row = box.row()
+        row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
+        row = box.row()
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
         row = box.row()
         row.operator(reimportCharacters.bl_idname, text=reimportCharacters.bl_label)

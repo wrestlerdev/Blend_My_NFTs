@@ -69,9 +69,6 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
         for scene_type_coll in scene_type_colls:
             type = scene_type_coll.name
             #This checks if a type has any varinets in it BETA_1.0
-            print(slot)
-            print(type)
-            print('**************')
             if type in  hierarchy[slot].keys() != None:
                 variants = list(hierarchy[slot][type].keys())
                 if len(variants) > 0:

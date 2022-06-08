@@ -51,17 +51,18 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
    style = DNAString.pop(0)
+   reset_shape_keys(character + '_Rig')
    show_character(character, Select)
+
 
    for key in keys:
       for itemKey in NFTDict[key]:
-         if key.endswith('Expression'):
-            print("is expression")
+
 
          if(NFTDict[key] != "Null"):
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
-            print(color_key)
+            # print(color_key)
 
             variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
 
@@ -96,9 +97,15 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      if resolution == '_4k':
                         resolution = 4096
                      else:
-                        print(resolution)
+                        # print(resolution)
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
-                     set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
+                     # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
+                     set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution)
+
+            if 'Expression' in type.name:
+               variant_name = varient.name.rpartition('_')[2]
+               set_shape_keys(character + '_Rig', variant_name)
+
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -133,6 +140,30 @@ def OpenGlobalColorList():
 
 # -----------------------------------------------------
 
+def set_shape_keys(rig_name, variant_name):
+   print("is expression")
+   character_coll = bpy.data.collections[rig_name]
+   for obj in character_coll.objects:
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+            for shape_key in obj.data.shape_keys.key_blocks:
+               if shape_key.name == variant_name:
+                  print(variant_name)
+                  print(shape_key.name)
+                  shape_key.value = 1
+                  break
+   return
+
+def reset_shape_keys(rig_name):
+   character_coll = bpy.data.collections[rig_name]
+   for obj in character_coll.objects:
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+            for shape_key in obj.data.shape_keys.key_blocks:
+               if shape_key.name != 'Basis':
+                  shape_key.value = 0
+   return
+
 
 def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    suffix = config.texture_suffixes[resolution]
@@ -142,12 +173,12 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    colorChoice = GlobalColorList[color_key]
    for child in meshes:
       for childMatSlot in child.material_slots:
-         print("!--------------------------------!")
-         print("Child Name: " + child.name  + " || Child Mat" + childMatSlot.name)
+         # print("!--------------------------------!")
+         # print("Child Name: " + child.name  + " || Child Mat" + childMatSlot.name)
          for textureMatSlot in texture_mesh.material_slots:
-            print("Texture Mat: " + textureMatSlot.name)
+            # print("Texture Mat: " + textureMatSlot.name)
             if textureMatSlot.material.name in childMatSlot.material.name or len(texture_mesh.material_slots) == 1 :
-               print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
+               # print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
                mat = textureMatSlot.material
                if mat.use_nodes:
                   for n in mat.node_tree.nodes:
@@ -208,7 +239,6 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
                            # print("This node ({}) doesn't have an image".format(n.name))
                            # then should it look for an image?
                childMatSlot.material = textureMatSlot.material #Check this - update to loop through all material slots
-         print("*******************************") 
    return
 
 
@@ -449,7 +479,7 @@ def randomize_color_style(): # if dna_strand is given, update dna with new stran
 
    DNASplit[1] = new_style
    dna_string = ','.join(DNASplit)
-   print(DNASplit)
+   # print(DNASplit)
 
    for coll_name in list(NFTDict["CharacterItems"].keys()):
       if CharacterItems[coll_name] != 'Null':
@@ -500,8 +530,6 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
       texture_index = DNASplit[2]
 
       slot = list(ohierarchy.items())[i]
-      print(slot)
-      print(atttype_index)
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
       # texture = list(variant[1].items())[int(texture_index)][0]
