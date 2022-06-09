@@ -141,7 +141,8 @@ def downres_single_texture(path, image_name, dims, should_overwrite):
 
         if not should_overwrite:
             if os.path.exists(new_path):
-                return
+                # print(new_path)
+                continue
 
         with Image.open(image_path) as image:
             resized = image.resize([size, size])

@@ -2,7 +2,7 @@ Characters = ["Nef", "Kae", "Rem"]
 
 MasterMaterialName = 'MasterV01'
 
-texture_suffixes = {128: '_128', 256: '_256', 512: '_512', 1024: '_1k', 2048: '_2k', 4096: ''}
+texture_suffixes = {64: '_64', 128: '_128', 256: '_256', 512: '_512', 1024: '_1k', 2048: '_2k', 4096: ''}
 image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
 
 class bcolors:

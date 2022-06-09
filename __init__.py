@@ -152,7 +152,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('4k', '4k', '4096x4096'),
                 ('2k', '2k', '2048x2048'),
                 ('1k', '1k', '1024x1024'),
-                ('512', '512', '512x512')
+                ('512', '512', '512x512'),
+                ('64', '64', '64x64')
             ]
         )
 
@@ -1253,7 +1254,7 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [2048, 1024, 512]
+        resolutions = [2048, 1024, 512, 64]
         should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
         TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}
