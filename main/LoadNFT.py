@@ -128,6 +128,8 @@ def batch_property_updated(): # check if batch is out of range then set in range
         Batch_save_path = bpy.context.scene.my_tool.batch_json_save_path
         newIndex = bpy.context.scene.my_tool.BatchSliderIndex
         batches = len(os.listdir(Batch_save_path))
+        if batches == 0: # stop recursion?
+            return
         if newIndex > batches:
             bpy.context.scene.my_tool.BatchSliderIndex = batches
             bpy.context.scene.my_tool.lastBatchSliderIndex = batches

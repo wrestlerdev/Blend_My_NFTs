@@ -262,9 +262,9 @@ def get_new_texture_name(node, suffix):
 
 #------------------------------------------------------------------------------------
 
-def get_null_dna(character="Kae"):
+def get_null_dna(character="Kae", style=""):
    hierarchy = get_hierarchy_unordered()
-   DNASplit = [character]
+   DNASplit = [character, style]
    for slot in list(hierarchy.keys()):
       null_strand = '0-0-0'
       DNASplit.append(null_strand)

@@ -12,38 +12,38 @@ import importlib
 import json
 import re
 
-MetadataAttributeDict = {
-    new_key: new_val
-    for keys, new_val in [(['Null', 'Nulll'], "Null"),
-                         (['Coats','TShirts','LongShirts', 'LongCoats', 'VestHoodie', 'CropShirts'], "Tops"),
-                         (["ThickShorts", "Shorts", "ThickPants", "ThickQuaterPants", "ThinPants", "ThinShorts"], "Bottoms"),
-                         (["ShoesHigh", "ShoesMiddle", "ShoesLow"], "Shoes"),
-                         (["HairLong", "HairShort"], "Headstyle"),
-                         (["Mask", "Glasses"], "Head"),
-                         (["Pack"], "Bag"),
-                         (["Gloves", "LSleave", "RSleave"], "Hands"),
-                         (["NeckWear", "EaringSmall"], "Jewellery"),
-                         (["Plane"], "Background"),
-                         ([""], "Character"),
-                         ([""], "Element")]
-    for new_key in keys
-}
-MetaDataKeys = [
-    "Null",
-    "Character",
-    "Tops",
-    "Bottoms",
-    "Shoes",
-    "Headstyle",
-    "Head",
-    "Bag",
-    "Hands",
-    "Jewellery",
-    "Background",
-    "Element"
-    ]
-# make dict with metadata keys to sort order later
-MetadataAttributeOrder = {MetaDataKeys[v]: v for v in range(len(MetaDataKeys))} 
+# MetadataAttributeDict = {
+#     new_key: new_val
+#     for keys, new_val in [(['Null', 'Nulll'], "Null"),
+#                          (['Coats','TShirts','LongShirts', 'LongCoats', 'VestHoodie', 'CropShirts'], "Tops"),
+#                          (["ThickShorts", "Shorts", "ThickPants", "ThickQuaterPants", "ThinPants", "ThinShorts"], "Bottoms"),
+#                          (["ShoesHigh", "ShoesMiddle", "ShoesLow"], "Shoes"),
+#                          (["HairLong", "HairShort"], "Headstyle"),
+#                          (["Mask", "Glasses"], "Head"),
+#                          (["Pack"], "Bag"),
+#                          (["Gloves", "LSleave", "RSleave"], "Hands"),
+#                          (["NeckWear", "EaringSmall"], "Jewellery"),
+#                          (["Plane"], "Background"),
+#                          ([""], "Character"),
+#                          ([""], "Element")]
+#     for new_key in keys
+# }
+# MetaDataKeys = [
+#     "Null",
+#     "Character",
+#     "Tops",
+#     "Bottoms",
+#     "Shoes",
+#     "Headstyle",
+#     "Head",
+#     "Bag",
+#     "Hands",
+#     "Jewellery",
+#     "Background",
+#     "Element"
+#     ]
+# # make dict with metadata keys to sort order later
+# MetadataAttributeOrder = {MetaDataKeys[v]: v for v in range(len(MetaDataKeys))} 
 
 
 
@@ -54,16 +54,16 @@ KeywordAttributeDict = {
                          (["Outfit"], "Outfit"),
                          (["Feet"], "Shoes"),
                          (["Head", "Face"], "Head"),
-                         (["Earing", "Back", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
+                         (["Earing", "Backpack", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
                          (["Plane", "Background"], "Background"),
-                         ]
+                         (["Expression"], "Character")]
     for new_key in keys
 }
 
 KeywordKeys = [
     "Null",
     "Character",
-    "Color Style",
+    # "Color Style",
     "Head",
     "Outfit",
     "Tops",
@@ -149,11 +149,13 @@ KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))}
 
 
 
-def returnERC721MetaDataCustom(name, DNA):
+def returnERC721MetaDataCustom(name, DNA, NFTDict):
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))      
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
+
+    keys = list(NFTDict.keys())
 
     metaDataDictErc721 = {
         "name": name,
@@ -169,34 +171,61 @@ def returnERC721MetaDataCustom(name, DNA):
 
     attributes.append({"trait_type": "Character", "value": character})
 
-    split_col_style = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', style)).split())
-    attributes.append({"trait_type": "Color Style", "value": split_col_style})
+    for key in keys:
+        for itemKey in NFTDict[key]:
+            if(NFTDict[key] != "Null"):
+                itemDictionary = NFTDict[key][itemKey]
+                color_key = itemDictionary["color_key"] 
+                slot = itemDictionary["item_attribute"]
+                type = itemDictionary["item_type"]
+                variant = itemDictionary["item_variant"]
+                texture = itemDictionary["item_texture"].rpartition('_')[2]
+
+                split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split())
+
+                full_variant_name = "{} {} {}".format(split_variant_name, color_key, texture)
+                type_name = type[3:]
+                print(type_name)
+                keyword = None
+                for key in list(KeywordAttributeDict.keys()):
+                    if type_name.startswith(key):
+                        keyword = KeywordAttributeDict[key]
+                        break
+                    
+                if keyword:
+                    if not variant.endswith("Null"):
+                        dict = {"trait_type": keyword, "value": full_variant_name}
+                        attributes.append(dict)
+
+
+    # split_col_style = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', style)).split())
+    # attributes.append({"trait_type": "Color Style", "value": split_col_style})
     
-    for strand in range(len(DNAString)):
-        DNASplit = DNAString[strand].split('-')
-        atttype_index = DNASplit[0]
-        variant_index = DNASplit[1]
-        texture_index = DNASplit[2]
+    # for strand in range(len(DNAString)):
+    #     DNASplit = DNAString[strand].split('-')
+    #     atttype_index = DNASplit[0]
+    #     variant_index = DNASplit[1]
+    #     texture_index = DNASplit[2]
 
-        slot = list(hierarchy.items())[strand]
-        att_type = list(slot[1].items())[int(atttype_index)]
-        variant = list(att_type[1].items())[int(variant_index)][0]
+    #     slot = list(hierarchy.items())[strand]
+    #     att_type = list(slot[1].items())[int(atttype_index)]
+    #     variant = list(att_type[1].items())[int(variant_index)][0]
 
-        variant_name = variant.split('_')[-1]
-        split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant_name)).split())
+    #     variant_name = variant.split('_')[-1]
+    #     split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant_name)).split())
 
-        full_variant_name = "{} {}".format(split_variant_name, str(chr(int(texture_index) + 65)))
-        type_name = str(att_type[0])[3:]
-        keyword = None
-        for key in list(KeywordAttributeDict.keys()):
-            if type_name.startswith(key):
-                keyword = KeywordAttributeDict[key]
-                break
+    #     full_variant_name = "{} {}".format(split_variant_name, str(chr(int(texture_index) + 65)))
+    #     type_name = str(att_type[0])[3:]
+    #     keyword = None
+    #     for key in list(KeywordAttributeDict.keys()):
+    #         if type_name.startswith(key):
+    #             keyword = KeywordAttributeDict[key]
+    #             break
             
-        if keyword:
-            if not variant_name.endswith("Null"):
-                dict = {"trait_type": keyword, "value": full_variant_name}
-                attributes.append(dict)
+    #     if keyword:
+    #         if not variant_name.endswith("Null"):
+    #             dict = {"trait_type": keyword, "value": full_variant_name}
+    #             attributes.append(dict)
 
     attributes = sorted(attributes, key = lambda i:KeywordAttributeOrder[i["trait_type"]])
     metaDataDictErc721["attributes"] = attributes

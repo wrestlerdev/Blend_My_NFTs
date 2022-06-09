@@ -391,7 +391,9 @@ def reset_rarity_Record(NFTRecord_save_path):
       for type in list(hierarchy[slot].keys()):
          for variant in list(hierarchy[slot][type].keys()):
             variant_name = variant.split('_')[-1]
-            if variant_name not in ['Null', 'Nulll']:
+            if type == "00-PelvisThickNull":
+               rarity = 50
+            elif variant_name not in ['Null', 'Nulll']:
                rarity = 50
             else: 
                rarity = 0

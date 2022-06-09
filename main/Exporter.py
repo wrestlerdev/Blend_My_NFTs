@@ -589,14 +589,11 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # dele
 
 # -----------------------------------------------------------------
 
-def save_metadata_file(path, nft_name, batch_num, nft_num, DNA):
-    nft_path = os.path.join(path, nft_name)
-    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA)
-
+def save_metadata_file(path, nft_name, batch_num, nft_num, DNA, NFTDict):
+    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA, NFTDict)
     metaDataObj = json.dumps(metadata, indent=1, ensure_ascii=True)
     with open(os.path.join(path, "ERC721_{}_{}.json".format(batch_num, nft_num)), "w") as outfile:
             outfile.write(metaDataObj)
-
 
 
 def save_all_metadata_files(output_path):
@@ -619,10 +616,11 @@ def save_all_metadata_files(output_path):
                             nft_record = os.path.join(nft_path, nft_data)
                             single_record = json.load(open(nft_record))
                             DNA = single_record["DNAList"]
+                            NFTDict = single_record["CharacterItems"]
                             name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
                             index = total_DNA.index(DNA) + 1
                             nft_name = name_prefix + "{:04d}".format(index)
-                            save_metadata_file(nft_path, nft_name, batch_index, nft_index, DNA)
+                            save_metadata_file(nft_path, nft_name, batch_index, nft_index, DNA, NFTDict)
                             count += 1
     print("{} metadata files have been created".format(count))
     return
