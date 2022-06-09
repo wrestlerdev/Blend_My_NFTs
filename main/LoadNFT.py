@@ -164,7 +164,8 @@ def update_current_batch(index, batch_path): # updates current batch record path
 
 def check_if_paths_exist(batch_num=1): # may be redundant now
     if bpy.context.scene.my_tool.batch_json_save_path == '':
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        # save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        save_path = bpy.context.scene.my_tool.save_path
         Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFT")
         bpy.context.scene.my_tool.batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "OUTPUT")
         bpy.context.scene.my_tool.CurrentBatchIndex = batch_num

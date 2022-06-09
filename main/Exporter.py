@@ -514,7 +514,7 @@ def return_export_log_data(batch_path, batch_num, file_format):
 def clear_all_export_data(record_path, local_output_path): # clear all nft, record, render data from export dir
     if not os.path.exists(local_output_path):
         return
-    if os.path.abspath(record_path) == os.path.abspath(local_output_path):
+    if record_path == local_output_path:
         return
     
     for dir in os.listdir(local_output_path):
@@ -528,7 +528,7 @@ def clear_all_export_data(record_path, local_output_path): # clear all nft, reco
 
 def export_record_data(record_batch_root, local_batch_root): # copy all record data to export dir
                                                             # keep any currently existing render data in export dir unless NFT count < render index
-    if os.path.abspath(record_batch_root) == os.path.abspath(local_batch_root):
+    if record_batch_root == local_batch_root:
         return False
     # if os.path.exists(local_batch_root):
     #     shutil.rmtree(local_batch_root)
@@ -536,12 +536,12 @@ def export_record_data(record_batch_root, local_batch_root): # copy all record d
     recurse_copy_data('', record_batch_root, local_batch_root)
     # recurse_delete_data('', record_batch_root, local_batch_root)
     
-    src_batchscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), "ExportBatchSingle.bat")
-    dst_batscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), "ExportBatchSingle.bat")
+    src_batchscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "ExportBatchSingle.bat")
+    dst_batscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
     shutil.copy(src_batchscript_path, dst_batscript_path)
 
-    src_pyscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), "Exporter.py")
-    dst_pyscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), "Exporter.py")
+    src_pyscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Exporter.py")
+    dst_pyscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
     shutil.copy(src_pyscript_path, dst_pyscript_path)
     return True
 

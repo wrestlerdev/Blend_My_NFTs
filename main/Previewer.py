@@ -54,16 +54,12 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    reset_shape_keys(character + '_Rig')
    show_character(character, Select)
 
-
    for key in keys:
       for itemKey in NFTDict[key]:
-
-
          if(NFTDict[key] != "Null"):
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
             # print(color_key)
-
             variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
 
             attr = bpy.data.collections.get(itemDictionary["item_attribute"])
@@ -105,7 +101,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
             if 'Expression' in type.name:
                variant_name = varient.name.rpartition('_')[2]
                set_shape_keys(character + '_Rig', variant_name)
-
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -250,8 +245,8 @@ def get_new_texture_name(node, suffix):
          filesplit = filename.split(_type)
          file_suffix, f, file_type = filesplit[1].rpartition('.')
          if file_suffix == suffix:
-            # print(filepath)
             # print("then this should be the same texture?")
+            return None
             return filename, node.image.filepath, _type
          else:
             # print("this is a different texture?")

@@ -325,7 +325,8 @@ class initializeRecord(bpy.types.Operator):
 
     def execute(self, context):
         if bpy.context.scene.my_tool.root_dir == '':
-            save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+            # save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+            save_path = bpy.context.scene.my_tool.save_path
         elif not os.path.exists(bpy.context.scene.my_tool.root_dir):
             self.report({"ERROR"}, "Failed: The root directory folder does not exist")
             save_path = bpy.context.scene.my_tool.root_dir
@@ -370,7 +371,7 @@ class randomizePreview(bpy.types.Operator):
 
     def execute(self, context):
         maxNFTs = bpy.context.scene.my_tool.collectionSize
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.root_dir)
+        save_path = bpy.context.scene.my_tool.root_dir
         # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
 
@@ -819,7 +820,8 @@ class loadDirectory(bpy.types.Operator):
                 return {'FINISHED'}
         else:
             print("is empty")
-            save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+            # save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+            save_path = bpy.context.scene.my_tool.save_path
 
         Blend_My_NFTs_Output, batch_json_save_path = make_directories(save_path)
         batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
@@ -908,7 +910,8 @@ class renderBatch(bpy.types.Operator):
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
-        export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        # export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        export_path = bpy.context.scene.my_tool.separateExportPath
         export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
@@ -970,7 +973,8 @@ class createBlenderSave(bpy.types.Operator):
     
     def execute(self, context):
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
-        export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        # export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        export_path = bpy.context.scene.my_tool.separateExportPath
         export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
@@ -1021,8 +1025,8 @@ class moveDataToLocal(bpy.types.Operator):
 
     def execute(self, context):
         bath_path_end = os.path.join("Blend_My_NFT", "OUTPUT")
-        record_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), bath_path_end)
-        local_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bath_path_end)
+        record_save_path = os.path.join(bpy.context.scene.my_tool.root_dir, bath_path_end)
+        local_save_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, bath_path_end)
 
         success = Exporter.export_record_data(record_save_path, local_save_path)
         if not success:
@@ -1040,7 +1044,8 @@ class exportMetadata(bpy.types.Operator):
 
     def execute(self, context):
         bacth_path_end = os.path.join("Blend_My_NFT", "OUTPUT")
-        path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bacth_path_end)
+        # path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bacth_path_end)
+        path = os.path.join(bpy.context.scene.my_tool.separateExportPath, bacth_path_end)
         Exporter.save_all_metadata_files(path)
         return {'FINISHED'}
 
@@ -1132,7 +1137,7 @@ class updateColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+        save_path = bpy.context.scene.my_tool.save_path
         DNA_Generator.Outfit_Generator.ColorGen.AddColorSetToStyle()
         return {'FINISHED'}
 
