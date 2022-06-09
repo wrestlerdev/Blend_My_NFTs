@@ -143,6 +143,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
+
     textureSize: bpy.props.EnumProperty(
             name='textuuuuuuuuures',
             description="texture",
@@ -1246,8 +1248,9 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [1024, 512]
-        TextureEditor.create_downres_textures(input_path, resolutions)
+        resolutions = [2048, 1024, 512]
+        should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
+        TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}
 
 
@@ -1990,6 +1993,8 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.operator(renameAllOriginalTextures.bl_idname, text=renameAllOriginalTextures.bl_label)
         row = box.row()
         row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
+        row.scale_x = 0.4
+        row.prop(mytool, 'shouldForceDownres')
 
         # box = layout.box()
         # row = box.row()
