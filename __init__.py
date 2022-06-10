@@ -373,15 +373,12 @@ class randomizePreview(bpy.types.Operator):
     def execute(self, context):
         maxNFTs = bpy.context.scene.my_tool.collectionSize
         save_path = bpy.context.scene.my_tool.root_dir
-        # some randomize dna code here
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
 
         DNA, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
         SingleDNA = DNA[0]
         SingleNFTDict = NFTDict[DNA[0]]
         Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
-        bpy.context.scene.my_tool.inputDNA = SingleDNA
-        bpy.context.scene.my_tool.lastDNA = SingleDNA
         return {'FINISHED'}
 
 class randomizeAllColor(bpy.types.Operator):
@@ -392,9 +389,6 @@ class randomizeAllColor(bpy.types.Operator):
 
     def execute(self, context):
         dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
-
-        bpy.context.scene.my_tool.inputDNA = dna_string
-        bpy.context.scene.my_tool.lastDNA = dna_string
         Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
@@ -455,9 +449,6 @@ class createBatch(bpy.types.Operator):
         DNA = DNASet[len(DNASet) - 1] # show last DNA created
         print(NFTDict[DNA])
         Exporter.Previewer.show_nft_from_dna(DNA, NFTDict[DNA])
-        bpy.context.scene.my_tool.lastDNA = DNA
-        bpy.context.scene.my_tool.inputDNA = DNA
-        Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 
@@ -480,9 +471,6 @@ class loadNFT(bpy.types.Operator):
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         if TotalDNA > 0 and DNA != '':
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
 
@@ -508,9 +496,6 @@ class loadNextNFT(bpy.types.Operator):
             TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 
@@ -530,9 +515,6 @@ class loadPrevNFT(bpy.types.Operator):
             TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 
@@ -552,8 +534,7 @@ class saveNewNFT(bpy.types.Operator):
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDicts = {}
         SingleNFTDict = Exporter.Previewer.LoadTempDNADict()
-        NFTDicts[context.scene.my_tool.inputDNA] = SingleNFTDict["CharacterItems"]
-        print(NFTDicts)
+        NFTDicts[SingleNFTDict["DNAList"]] = SingleNFTDict["CharacterItems"]
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
 
         master_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
@@ -577,11 +558,11 @@ class saveCurrentNFT(bpy.types.Operator):
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        DNA = context.scene.my_tool.inputDNA
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDicts = {}
         SingleNFTDict = Exporter.Previewer.LoadTempDNADict()
+        DNA = SingleNFTDict["DNAList"]
         NFTDicts[DNA] = SingleNFTDict["CharacterItems"]
         index = bpy.context.scene.my_tool.CurrentBatchIndex
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
@@ -618,9 +599,6 @@ class deleteNFT(bpy.types.Operator):
 
             bpy.context.scene.my_tool.loadNFTIndex = new_index
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
         return {'FINISHED'}
@@ -676,9 +654,6 @@ class loadBatch(bpy.types.Operator):
         TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(index, 1)
         if DNA != '':
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
 
         print(bpy.context.scene.my_tool.BatchSliderIndex)
         return {'FINISHED'}
@@ -702,8 +677,6 @@ class saveBatch(bpy.types.Operator):
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
-
-        # LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
@@ -728,7 +701,6 @@ class saveNewBatch(bpy.types.Operator):
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
-        # LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
         bpy.context.scene.my_tool.BatchSliderIndex = index
@@ -777,7 +749,6 @@ class swapCharacter(bpy.types.Operator):
         DNAString = DNA.split(',')
         DNAString[0] = self.character_name
         DNA = ','.join(DNAString)
-        # bpy.context.scene.my_tool.inputDNA = DNA
         Exporter.Previewer.show_nft_from_dna(DNA, NFTDict["CharacterItems"])
         return {'FINISHED'}
 
@@ -1451,9 +1422,8 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
         row = layout.row()
         for char in config.Characters:
             inputDNA = bpy.context.scene.my_tool.inputDNA
-            DNASplit = inputDNA.split(',')
             row.scale_y = 1.5
-            if char == DNASplit[0]:
+            if inputDNA.startswith(char):
                 row.operator(swapCharacter.bl_idname, text=char, emboss=False).character_name = char
             else:
                 row.operator(swapCharacter.bl_idname, text=char).character_name = char

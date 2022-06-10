@@ -59,7 +59,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
          if(NFTDict[key] != "Null"):
             itemDictionary = NFTDict[key][itemKey]
             color_key = itemDictionary["color_key"] 
-            # print(color_key)
             variant_children = bpy.data.collections[list(NFTDict[key])[0]].children
 
             attr = bpy.data.collections.get(itemDictionary["item_attribute"])
@@ -98,8 +97,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
                      set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution)
 
-            # if type.name[3:].startswith('Expression'):
-            if 'Expression' in type.name:
+            if type.name[3:].startswith('Expression'):
+            # if 'Expression' in type.name:
                variant_name = varient.name.rpartition('_')[2]
                set_shape_keys(character + '_Rig', variant_name)
 
@@ -107,10 +106,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    newTempDict["DNAList"] = DNA
    newTempDict["CharacterItems"] = NFTDict
    SaveTempDNADict(newTempDict)
-
    bpy.context.scene.my_tool.lastDNA = DNA
    bpy.context.scene.my_tool.inputDNA = DNA
-   print(DNA)
    fill_pointers_from_dna(DNA, '')
 
 
@@ -138,6 +135,9 @@ def OpenGlobalColorList():
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     GlobalColorList = json.load(open(path))
     return GlobalColorList
+
+
+# ------------------------------------------------------------
 
 
 def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender scene UI (e.g. inputDNA)
@@ -317,7 +317,6 @@ def get_new_texture_name(node, suffix):
             new_texture_path = new_path + new_texture
 
             return new_texture, new_texture_path, _type
-   # print(filepath)
    return None
 
 
@@ -330,7 +329,6 @@ def get_null_dna(character="Kae", style=""):
    for slot in list(hierarchy.keys()):
       null_strand = '0-0-0'
       DNASplit.append(null_strand)
-      # DNASplit.append(null_strand)
    DNA = ','.join(DNASplit)
    return DNA
 
@@ -338,7 +336,7 @@ def get_null_dna(character="Kae", style=""):
 
 
 
-def set_from_collection(slot_coll, variant_name): # hide all in coll and show given variant based on name
+def set_from_collection(slot_coll, variant_name): # get new dna strand from variant name
    new_dna_strand = ''
    type_index = 0
    variant_index = 0
@@ -362,7 +360,6 @@ def set_from_collection(slot_coll, variant_name): # hide all in coll and show gi
          break # CHECK THIS
       else:
          type_index += 1
-         # stop putting a break here lmao
    return new_dna_strand # return dna strand or empty string if not valid
 
 
@@ -395,10 +392,7 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name)
       if new_dnastrand != '': # if is from correct collection
          dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
-         
          bpy.context.scene.my_tool[last_key] = bpy.data.collections[variant_name]
-         # bpy.context.scene.my_tool.inputDNA = dna_string
-         # bpy.context.scene.my_tool.lastDNA = dna_string
          show_nft_from_dna(dna_string, CharacterItems)
       else:
          print("is not valid || clear")
@@ -413,10 +407,7 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
       if new_dnastrand != '': # if is from correct collection
       # if new_dnastrand != '' and not(bpy.context.scene.my_tool.get(slots_key).hide_viewport): # if is from correct collection
          dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
-
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
-         # bpy.context.scene.my_tool.inputDNA = dna_string
-         # bpy.context.scene.my_tool.lastDNA = dna_string
          show_nft_from_dna(dna_string, CharacterItems)
       else:
          print("is not valid || clear")
@@ -439,8 +430,6 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
 
             bpy.context.scene.my_tool[slots_key] = None
             bpy.context.scene.my_tool[last_key] = null_var_coll
-            # bpy.context.scene.my_tool.inputDNA = dna_string
-            # bpy.context.scene.my_tool.lastDNA = dna_string
             show_nft_from_dna(dna_string, CharacterItems)
       else: # will refill pointer with null
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
@@ -449,9 +438,6 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
 
 def update_colour_random(coll_name):
    dna_string, CharacterItems = update_DNA_with_strand(coll_name)
-
-   # bpy.context.scene.my_tool.inputDNA = dna_string
-   # bpy.context.scene.my_tool.lastDNA = dna_string
    show_nft_from_dna(dna_string, CharacterItems)
    return
 
@@ -460,7 +446,6 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    NFTDict = LoadTempDNADict()
    CharacterItems = NFTDict["CharacterItems"]
    dna_string = NFTDict["DNAList"]
-   # dna_string = bpy.context.scene.my_tool.inputDNA
    hierarchy = get_hierarchy_ordered()
    coll_index = list(hierarchy.keys()).index(coll_name)
    DNA = dna_string.split(',') 
@@ -537,7 +522,6 @@ def randomize_color_style(): # if dna_strand is given, update dna with new stran
 
    DNASplit[1] = new_style
    dna_string = ','.join(DNASplit)
-   # print(DNASplit)
 
    for coll_name in list(NFTDict["CharacterItems"].keys()):
       if CharacterItems[coll_name] != 'Null':
@@ -589,14 +573,6 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
       slot = list(ohierarchy.items())[i]
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
-      # texture = list(variant[1].items())[int(texture_index)][0]
-
-      # print('LLLLLLLLLLLLLLLLLLLLLLLLLLLLL')
-      # print(slot)
-      # print("")
-      # print(atttype)
-      # print("")
-      # print(variant)
 
       coll_name = slot[0][3:len(slot[0])] # CHECK THIS FOR NEW HIERARCHY
       last_coll_name = "last" + str(coll_name)
@@ -669,7 +645,6 @@ def show_character(char_name, Select = False):
         else:
             bpy.data.collections[c].hide_viewport = True
             bpy.data.collections[c].hide_render = True
-
 
 
 def HexToRGB(hex):
