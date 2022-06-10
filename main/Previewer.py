@@ -98,6 +98,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
                      set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution)
 
+            # if type.name[3:].startswith('Expression'):
             if 'Expression' in type.name:
                variant_name = varient.name.rpartition('_')[2]
                set_shape_keys(character + '_Rig', variant_name)
@@ -106,6 +107,11 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    newTempDict["DNAList"] = DNA
    newTempDict["CharacterItems"] = NFTDict
    SaveTempDNADict(newTempDict)
+
+   bpy.context.scene.my_tool.lastDNA = DNA
+   bpy.context.scene.my_tool.inputDNA = DNA
+   print(DNA)
+   fill_pointers_from_dna(DNA, '')
 
 
 # -----------------------------------------------------
@@ -132,6 +138,62 @@ def OpenGlobalColorList():
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     GlobalColorList = json.load(open(path))
     return GlobalColorList
+
+
+def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender scene UI (e.g. inputDNA)
+   CurrentDict = LoadTempDNADict()
+   CurrentDNA = CurrentDict["DNAList"]
+   DNA = bpy.context.scene.my_tool.inputDNA
+   NewDict = {}
+   if DNA != CurrentDNA:
+      DNAString = DNA.split(',')
+      character = DNAString.pop(0)
+      style = DNAString.pop(0)
+      show_character(character)
+      ohierarchy = get_hierarchy_ordered()
+
+      ItemsUsed = {}
+      for i in range(len(DNAString)):
+         VarientDict = {}
+         current_entry = {}
+         DNASplit = DNAString[i].split('-')
+         atttype_index = DNASplit[0]
+         variant_index = DNASplit[1]
+         texture_index = DNASplit[2]
+
+         attribute = list(ohierarchy.items())[i]
+         type = list(attribute[1].items())[int(atttype_index)]
+         variant = list(type[1].items())[int(variant_index)][0]
+
+         variant_name = variant.rpartition('_')[2]
+         item_index = variant.split('_')[-2]
+         if len(list(bpy.data.collections[variant].objects)) > 0:
+            last_texture = list(bpy.data.collections[variant].objects)[int(texture_index)].name
+         else:
+            last_texture = None
+
+         if variant_name == 'Null':
+            VarientDict = 'Null'
+         else:
+            current_entry["item_attribute"] = attribute[0]
+            current_entry["item_type"] = type[0]
+            current_entry["item_variant"] = variant_name
+            current_entry["item_texture"] = last_texture
+            current_entry["item_index"] = item_index
+            current_entry["texture_index"] = int(texture_index)
+            current_entry["type_rarity"] = bpy.data.collections[type[0]]['rarity']
+            current_entry["variant_rarity"] = bpy.data.collections[variant]['rarity']
+            current_entry["texture_rarity"] = ohierarchy[attribute[0]][type[0]][variant]["textureSets"][last_texture]
+            current_entry["color_style"] = style
+            current_entry["color_key"] = ColorGen.PickOutfitColors(attribute[0], style)[0]
+            VarientDict[variant] = current_entry
+         ItemsUsed[attribute[0]] = VarientDict
+      NewDict["DNAList"] = DNA
+      NewDict["CharacterItems"] = ItemsUsed
+      SaveTempDNADict(NewDict)
+      show_nft_from_dna(DNA, ItemsUsed)
+   return
+
 
 # -----------------------------------------------------
 
@@ -335,8 +397,8 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
          dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
          
          bpy.context.scene.my_tool[last_key] = bpy.data.collections[variant_name]
-         bpy.context.scene.my_tool.inputDNA = dna_string
-         bpy.context.scene.my_tool.lastDNA = dna_string
+         # bpy.context.scene.my_tool.inputDNA = dna_string
+         # bpy.context.scene.my_tool.lastDNA = dna_string
          show_nft_from_dna(dna_string, CharacterItems)
       else:
          print("is not valid || clear")
@@ -353,8 +415,8 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
          dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
 
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
-         bpy.context.scene.my_tool.inputDNA = dna_string
-         bpy.context.scene.my_tool.lastDNA = dna_string
+         # bpy.context.scene.my_tool.inputDNA = dna_string
+         # bpy.context.scene.my_tool.lastDNA = dna_string
          show_nft_from_dna(dna_string, CharacterItems)
       else:
          print("is not valid || clear")
@@ -377,8 +439,8 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
 
             bpy.context.scene.my_tool[slots_key] = None
             bpy.context.scene.my_tool[last_key] = null_var_coll
-            bpy.context.scene.my_tool.inputDNA = dna_string
-            bpy.context.scene.my_tool.lastDNA = dna_string
+            # bpy.context.scene.my_tool.inputDNA = dna_string
+            # bpy.context.scene.my_tool.lastDNA = dna_string
             show_nft_from_dna(dna_string, CharacterItems)
       else: # will refill pointer with null
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
@@ -388,8 +450,8 @@ def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called f
 def update_colour_random(coll_name):
    dna_string, CharacterItems = update_DNA_with_strand(coll_name)
 
-   bpy.context.scene.my_tool.inputDNA = dna_string
-   bpy.context.scene.my_tool.lastDNA = dna_string
+   # bpy.context.scene.my_tool.inputDNA = dna_string
+   # bpy.context.scene.my_tool.lastDNA = dna_string
    show_nft_from_dna(dna_string, CharacterItems)
    return
 
@@ -397,7 +459,8 @@ def update_colour_random(coll_name):
 def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, update dna with new strand else randomize colour
    NFTDict = LoadTempDNADict()
    CharacterItems = NFTDict["CharacterItems"]
-   dna_string = bpy.context.scene.my_tool.inputDNA
+   dna_string = NFTDict["DNAList"]
+   # dna_string = bpy.context.scene.my_tool.inputDNA
    hierarchy = get_hierarchy_ordered()
    coll_index = list(hierarchy.keys()).index(coll_name)
    DNA = dna_string.split(',') 
@@ -463,7 +526,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
 def randomize_color_style(): # if dna_strand is given, update dna with new strand else randomize colour
    NFTDict = LoadTempDNADict()
    CharacterItems = NFTDict["CharacterItems"]
-   dna_string = bpy.context.scene.my_tool.inputDNA
+   dna_string = NFTDict["DNAList"]
    hierarchy = get_hierarchy_ordered()
    DNASplit = dna_string.split(',') 
 
@@ -499,18 +562,17 @@ def randomize_color_style(): # if dna_strand is given, update dna with new stran
 
 
 def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if user has updated dna manually
-   if DNA != lastDNA:
-      DNA = DNA.replace('"', '')
-      bpy.context.scene.my_tool.lastDNA = DNA
-      bpy.context.scene.my_tool.inputDNA = DNA
-      fill_pointers_from_dna(DNA, DNA)
+   # if DNA != lastDNA:
+   #    DNA = DNA.replace('"', '')
+   #    bpy.context.scene.my_tool.lastDNA = DNA
+   #    bpy.context.scene.my_tool.inputDNA = DNA
+   #    fill_pointers_from_dna(DNA, DNA)
 
    return
 
 
 
 def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with variants
-   # return
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
    style = DNAString.pop(0)
@@ -528,6 +590,13 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
       atttype = list(slot[1].items())[int(atttype_index)]
       variant = list(atttype[1].items())[int(variant_index)][0]
       # texture = list(variant[1].items())[int(texture_index)][0]
+
+      # print('LLLLLLLLLLLLLLLLLLLLLLLLLLLLL')
+      # print(slot)
+      # print("")
+      # print(atttype)
+      # print("")
+      # print(variant)
 
       coll_name = slot[0][3:len(slot[0])] # CHECK THIS FOR NEW HIERARCHY
       last_coll_name = "last" + str(coll_name)

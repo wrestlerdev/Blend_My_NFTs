@@ -772,13 +772,13 @@ class swapCharacter(bpy.types.Operator):
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        DNA = bpy.context.scene.my_tool.inputDNA
+        NFTDict = Exporter.Previewer.LoadTempDNADict()
+        DNA = NFTDict["DNAList"]
         DNAString = DNA.split(',')
         DNAString[0] = self.character_name
         DNA = ','.join(DNAString)
-        bpy.context.scene.my_tool.inputDNA = DNA
-        NFTDict = Exporter.Previewer.LoadTempDNADict()["CharacterItems"]
-        Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
+        # bpy.context.scene.my_tool.inputDNA = DNA
+        Exporter.Previewer.show_nft_from_dna(DNA, NFTDict["CharacterItems"])
         return {'FINISHED'}
 
 
@@ -1364,6 +1364,7 @@ class deleteColorStyle(bpy.types.Operator):
     def execute(self, context):
         return {'FINISHED'}
 
+
 class deleteColorSet(bpy.types.Operator):
     bl_idname = 'delete.colset'
     bl_label = 'Delete Set'
@@ -1375,6 +1376,18 @@ class deleteColorSet(bpy.types.Operator):
 
     def execute(self, context):
         return {'FINISHED'}
+
+
+class forceLoadDNAFromUI(bpy.types.Operator):
+    bl_idname = 'forceload.dna'
+    bl_label = 'Force Load DNA'
+    bl_description = 'Force Load DNA from UI'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        Exporter.Previewer.CreateDNADictFromUI()
+        return {'FINISHED'}
+
 
 # ------------------------------- Panels ----------------------------------------------
 
@@ -1787,6 +1800,22 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
 
+
+class WCUSTOM_PT_GenerationExtra(bpy.types.Panel):
+    bl_label = "Extras"
+    bl_idname = "WCUSTOM_PT_GenerationExtra"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.operator(forceLoadDNAFromUI.bl_idname, text=forceLoadDNAFromUI.bl_label)
+
 #-----------------------------------------------------------------------
 
 class WCUSTOM_PT_OutputSettings(bpy.types.Panel):
@@ -2185,6 +2214,7 @@ classes = (
     WCUSTOM_PT_ArmSlots,
     WCUSTOM_PT_LegSlots,
     WCUSTOM_PT_OtherSlots,
+    WCUSTOM_PT_GenerationExtra,
     GU_PT_collection_custom_properties,
     WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
@@ -2249,15 +2279,26 @@ classes = (
     deleteColorSet,
 
     downresTextures,
-    renameAllOriginalTextures
+    renameAllOriginalTextures,
+
+    forceLoadDNAFromUI
 
 )
+
+addon_keymaps = []
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=BMNFTS_PGT_MyProperties)
+
+    # wm = bpy.context.window_manager
+    # kc = wm.keyconfigs.addon
+    # if kc:
+    #     km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+    #     kmi = km.keymap_items.new(test.bl_idname, type='Z', value='PRESS', ctrl=True)
+    #     addon_keymaps.append((km, kmi))  
 
     # UIList1:
 
@@ -2270,6 +2311,10 @@ def unregister():
         bpy.utils.unregister_class(cls)
 
     del bpy.types.Scene.my_tool
+
+    # for km, kmi in addon_keymaps:
+    #     km.keymap_items.remove(kmi)
+    # addon_keymaps.clear()
 
     # UIList 1:
 
