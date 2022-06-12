@@ -10,6 +10,7 @@ bl_info = {
 
 # Import handling:
 
+from ast import Load
 import bpy
 from bpy.app.handlers import persistent
 from rna_prop_ui import PropertyPanel
@@ -729,6 +730,31 @@ class resetBatch(bpy.types.Operator):
 
         nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
         DNA_Generator.reset_rarity_Record(nftrecord_path)
+        LoadNFT.update_collection_rarity_property(nftrecord_path)
+        return {'FINISHED'}
+
+
+class updateBatch(bpy.types.Operator):
+    bl_idname = 'update.batch'
+    bl_label = "Update Batch"
+    bl_description = "Update batch to include new items"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        batch_index = bpy.context.scene.my_tool.BatchSliderIndex
+        LoadNFT.check_if_paths_exist(batch_index)
+        batch_path = bpy.context.scene.my_tool.batch_json_save_path
+        total_batches = len(os.listdir(batch_path)) - 1
+        
+        if batch_index > total_batches:
+            self.report({"ERROR"}, "Failed: Not a valid batch")
+            return {'FINISHED'}
+
+        nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+        LoadNFT.update_batch_items(batch_index, nftrecord_path)
         LoadNFT.update_collection_rarity_property(nftrecord_path)
         return {'FINISHED'}
 
@@ -1732,7 +1758,12 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
         row = layout.row()
+        box = row.box()
+        box.scale_y = 0.6
+        box.operator(updateBatch.bl_idname, text=updateBatch.bl_label, emboss=False)
+        
         row.operator(resetBatch.bl_idname, text=resetBatch.bl_label, emboss=False)
+
 
 
 
@@ -2247,6 +2278,7 @@ classes = (
     loadColorOnMesh,
     deleteColorStyle,
     deleteColorSet,
+    updateBatch,
 
     downresTextures,
     renameAllOriginalTextures,

@@ -6,6 +6,8 @@ import os
 import json
 import shutil
 
+from . import config
+
 col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green" : "COLOR_04",
          "blue" : "COLOR_05", "purple" : "COLOR_06", "pink" : "COLOR_07", "brown" : "COLOR_08"}
 
@@ -119,6 +121,64 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                 print(type)
                 update_rarity_color(type, 0)
     return
+
+
+
+def update_batch_items(batch_num, record_path):
+    default_type_rarity = 0 # for new items
+    default_var_rarity = 0
+
+    record = json.load(open(record_path))
+    hierarchy = record['hierarchy']
+    for attribute_coll in bpy.context.scene.collection.children: # go through scene collections to see if coll exists in hierarchy
+        if attribute_coll.name in hierarchy.keys():
+            pass
+        elif attribute_coll.name != 'Script_Ignore':
+            attribute_dict = {}
+            hierarchy[attribute_coll.name] = attribute_dict
+        else:
+            # this is script_ignore
+            continue
+
+        for type_coll in attribute_coll.children:
+            if type_coll.name in hierarchy[attribute_coll.name].keys():
+                pass
+            else:
+                type_dict = {}
+                hierarchy[attribute_coll.name][type_coll.name] = type_dict
+
+            for variant_coll in type_coll.children:
+                if variant_coll.name in hierarchy[attribute_coll.name][type_coll.name].keys():
+                    pass
+                else:
+                    variant_split = variant_coll.name.split('_')
+                    
+                    item_dict = {}
+                    item_dict["item_attribute"] = attribute_coll.name
+                    item_dict["item_type"] = type_coll.name
+                    item_dict["item_variant"] = variant_split[-1]
+                    item_dict["item_index"] = variant_split[2]
+                    item_dict["type_rarity"] = default_type_rarity
+                    item_dict["variant_rarity"] = default_var_rarity
+                    item_dict["textureSets"] = get_texture_sets(variant_coll)
+
+                    hierarchy[attribute_coll.name][type_coll.name][variant_coll.name] = item_dict
+    record['hierarchy'] = hierarchy
+    try:
+        ledger = json.dumps(record, indent=1, ensure_ascii=True)
+        with open(record_path, 'w') as outfile:
+            outfile.write(ledger + '\n')
+    except:
+        print(f"{config.bcolors.ERROR} ERROR:\nBatch ({str(batch_num)}) could not be updated at {record}\n {config.bcolors.RESET}")
+    return
+
+
+def get_texture_sets(variant_coll):
+    default_texture_rarity = 50
+    texture_dict = {}
+    for obj in variant_coll.objects:
+        texture_dict[obj.name] = default_texture_rarity
+    return texture_dict
 
 
 
