@@ -514,7 +514,7 @@ def return_export_log_data(batch_path, batch_num, file_format):
 def clear_all_export_data(record_path, local_output_path): # clear all nft, record, render data from export dir
     if not os.path.exists(local_output_path):
         return
-    if os.path.abspath(record_path) == os.path.abspath(local_output_path):
+    if record_path == local_output_path:
         return
     
     for dir in os.listdir(local_output_path):
@@ -528,7 +528,7 @@ def clear_all_export_data(record_path, local_output_path): # clear all nft, reco
 
 def export_record_data(record_batch_root, local_batch_root): # copy all record data to export dir
                                                             # keep any currently existing render data in export dir unless NFT count < render index
-    if os.path.abspath(record_batch_root) == os.path.abspath(local_batch_root):
+    if record_batch_root == local_batch_root:
         return False
     # if os.path.exists(local_batch_root):
     #     shutil.rmtree(local_batch_root)
@@ -536,12 +536,12 @@ def export_record_data(record_batch_root, local_batch_root): # copy all record d
     recurse_copy_data('', record_batch_root, local_batch_root)
     # recurse_delete_data('', record_batch_root, local_batch_root)
     
-    src_batchscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), "ExportBatchSingle.bat")
-    dst_batscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), "ExportBatchSingle.bat")
+    src_batchscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "ExportBatchSingle.bat")
+    dst_batscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
     shutil.copy(src_batchscript_path, dst_batscript_path)
 
-    src_pyscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), "Exporter.py")
-    dst_pyscript_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), "Exporter.py")
+    src_pyscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Exporter.py")
+    dst_pyscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
     shutil.copy(src_pyscript_path, dst_pyscript_path)
     return True
 
@@ -589,14 +589,11 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # dele
 
 # -----------------------------------------------------------------
 
-def save_metadata_file(path, nft_name, batch_num, nft_num, DNA):
-    nft_path = os.path.join(path, nft_name)
-    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA)
-
+def save_metadata_file(path, nft_name, batch_num, nft_num, DNA, NFTDict):
+    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA, NFTDict)
     metaDataObj = json.dumps(metadata, indent=1, ensure_ascii=True)
     with open(os.path.join(path, "ERC721_{}_{}.json".format(batch_num, nft_num)), "w") as outfile:
             outfile.write(metaDataObj)
-
 
 
 def save_all_metadata_files(output_path):
@@ -619,10 +616,11 @@ def save_all_metadata_files(output_path):
                             nft_record = os.path.join(nft_path, nft_data)
                             single_record = json.load(open(nft_record))
                             DNA = single_record["DNAList"]
+                            NFTDict = single_record["CharacterItems"]
                             name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
                             index = total_DNA.index(DNA) + 1
                             nft_name = name_prefix + "{:04d}".format(index)
-                            save_metadata_file(nft_path, nft_name, batch_index, nft_index, DNA)
+                            save_metadata_file(nft_path, nft_name, batch_index, nft_index, DNA, NFTDict)
                             count += 1
     print("{} metadata files have been created".format(count))
     return

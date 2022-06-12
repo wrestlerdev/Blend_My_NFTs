@@ -6,6 +6,8 @@ import os
 import json
 import shutil
 
+from . import config
+
 col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green" : "COLOR_04",
          "blue" : "COLOR_05", "purple" : "COLOR_06", "pink" : "COLOR_07", "brown" : "COLOR_08"}
 
@@ -68,52 +70,115 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
         scene_type_colls = bpy.data.collections[slot].children
         for scene_type_coll in scene_type_colls:
             type = scene_type_coll.name
-            variants = list(hierarchy[slot][type].keys())
             #This checks if a type has any varinets in it BETA_1.0
-            if len(variants) > 0:
-                #This checks if a varients has any texture sets in it BETA_1.0
-                for h_variant in variants: # check if any valid variants do exist
-                    h_variant_exists = False # hierarchy variant
-                    if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
-                        h_variant_exists = True
-                        break
-                if h_variant_exists: #
-                    type_rarity = hierarchy[slot][type][h_variant]["type_rarity"]
-                    if type in types:
-                        scene_type_coll["rarity"] =  int(float(type_rarity))
-                        update_rarity_color(type, type_rarity)
-                    else:
-                        scene_type_coll["rarity"] =  0
-                        update_rarity_color(type, 0)
-
-                    scene_var_colls = scene_type_coll.children
-
-                    for scene_var_coll in scene_var_colls:
-                        variant = scene_var_coll.name
-                        if variant in variants and type in types:
-                            variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
-                            update_rarity_color(variant, int(float(variant_rarity)))
-                            scene_var_coll["rarity"] = int(float(variant_rarity))
-                            # textures = list(hierarchy[slot][type][variant].keys())
+            if type in  hierarchy[slot].keys() != None:
+                variants = list(hierarchy[slot][type].keys())
+                if len(variants) > 0:
+                    #This checks if a varients has any texture sets in it BETA_1.0
+                    for h_variant in variants: # check if any valid variants do exist
+                        h_variant_exists = False # hierarchy variant
+                        if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
+                            h_variant_exists = True
+                            break
+                    if h_variant_exists: #
+                        type_rarity = hierarchy[slot][type][h_variant]["type_rarity"]
+                        if type in types:
+                            scene_type_coll["rarity"] =  int(float(type_rarity))
+                            update_rarity_color(type, type_rarity)
                         else:
-                            update_rarity_color(variant, 0)
-                            scene_var_coll["rarity"] = 0
-                            # textures = []
+                            scene_type_coll["rarity"] =  0
+                            update_rarity_color(type, 0)
 
-                else: # BETA_1.0 || has no textures so is not a valid collection
-                    current_var_coll = bpy.data.collections[h_variant]
-                    if current_var_coll.get("rarity") is not None:
-                        del(current_var_coll["rarity"])
+                        scene_var_colls = scene_type_coll.children
+
+                        for scene_var_coll in scene_var_colls:
+                            variant = scene_var_coll.name
+                            if variant in variants and type in types:
+                                variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
+                                update_rarity_color(variant, int(float(variant_rarity)))
+                                scene_var_coll["rarity"] = int(float(variant_rarity))
+                                # textures = list(hierarchy[slot][type][variant].keys())
+                            else:
+                                update_rarity_color(variant, 0)
+                                scene_var_coll["rarity"] = 0
+                                # textures = []
+
+                    else: # BETA_1.0 || has no textures so is not a valid collection
+                        current_var_coll = bpy.data.collections[h_variant]
+                        if current_var_coll.get("rarity") is not None:
+                            del(current_var_coll["rarity"])
+                        if scene_type_coll.get("rarity") is not None:
+                            del(scene_type_coll["rarity"])
+                        
+                        update_rarity_color(type, 0)
+                        update_rarity_color(h_variant, 0)
+                else: # BETA_1.0
                     if scene_type_coll.get("rarity") is not None:
                         del(scene_type_coll["rarity"])
-                    
                     update_rarity_color(type, 0)
-                    update_rarity_color(h_variant, 0)
-            else: # BETA_1.0
-                if scene_type_coll.get("rarity") is not None:
-                    del(scene_type_coll["rarity"])
+
+            else:
+                print(type)
                 update_rarity_color(type, 0)
     return
+
+
+
+def update_batch_items(batch_num, record_path):
+    default_type_rarity = 0 # for new items
+    default_var_rarity = 0
+
+    record = json.load(open(record_path))
+    hierarchy = record['hierarchy']
+    for attribute_coll in bpy.context.scene.collection.children: # go through scene collections to see if coll exists in hierarchy
+        if attribute_coll.name in hierarchy.keys():
+            pass
+        elif attribute_coll.name != 'Script_Ignore':
+            attribute_dict = {}
+            hierarchy[attribute_coll.name] = attribute_dict
+        else:
+            # this is script_ignore
+            continue
+
+        for type_coll in attribute_coll.children:
+            if type_coll.name in hierarchy[attribute_coll.name].keys():
+                pass
+            else:
+                type_dict = {}
+                hierarchy[attribute_coll.name][type_coll.name] = type_dict
+
+            for variant_coll in type_coll.children:
+                if variant_coll.name in hierarchy[attribute_coll.name][type_coll.name].keys():
+                    pass
+                else:
+                    variant_split = variant_coll.name.split('_')
+                    
+                    item_dict = {}
+                    item_dict["item_attribute"] = attribute_coll.name
+                    item_dict["item_type"] = type_coll.name
+                    item_dict["item_variant"] = variant_split[-1]
+                    item_dict["item_index"] = variant_split[2]
+                    item_dict["type_rarity"] = default_type_rarity
+                    item_dict["variant_rarity"] = default_var_rarity
+                    item_dict["textureSets"] = get_texture_sets(variant_coll)
+
+                    hierarchy[attribute_coll.name][type_coll.name][variant_coll.name] = item_dict
+    record['hierarchy'] = hierarchy
+    try:
+        ledger = json.dumps(record, indent=1, ensure_ascii=True)
+        with open(record_path, 'w') as outfile:
+            outfile.write(ledger + '\n')
+    except:
+        print(f"{config.bcolors.ERROR} ERROR:\nBatch ({str(batch_num)}) could not be updated at {record}\n {config.bcolors.RESET}")
+    return
+
+
+def get_texture_sets(variant_coll):
+    default_texture_rarity = 50
+    texture_dict = {}
+    for obj in variant_coll.objects:
+        texture_dict[obj.name] = default_texture_rarity
+    return texture_dict
 
 
 
@@ -123,6 +188,8 @@ def batch_property_updated(): # check if batch is out of range then set in range
         Batch_save_path = bpy.context.scene.my_tool.batch_json_save_path
         newIndex = bpy.context.scene.my_tool.BatchSliderIndex
         batches = len(os.listdir(Batch_save_path))
+        if batches == 0: # stop recursion?
+            return
         if newIndex > batches:
             bpy.context.scene.my_tool.BatchSliderIndex = batches
             bpy.context.scene.my_tool.lastBatchSliderIndex = batches
@@ -159,7 +226,8 @@ def update_current_batch(index, batch_path): # updates current batch record path
 
 def check_if_paths_exist(batch_num=1): # may be redundant now
     if bpy.context.scene.my_tool.batch_json_save_path == '':
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        # save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+        save_path = bpy.context.scene.my_tool.save_path
         Blend_My_NFTs_Output = os.path.join(save_path, "Blend_My_NFT")
         bpy.context.scene.my_tool.batch_json_save_path = os.path.join(Blend_My_NFTs_Output, "OUTPUT")
         bpy.context.scene.my_tool.CurrentBatchIndex = batch_num

@@ -66,7 +66,10 @@ ItemUsedBodySlot = {
 "EaringShort" : ["16-Earings"], 
 "EaringLong" : ["16-Earings", "13-Neck"], 
 "Backpack" : ["18-Backpack"],
-"BackpackHigh" : ["18-Backpack"]
+"BackpackHigh" : ["18-Backpack"],
+"ExpressionLow" : ["20-Expression"],
+"ExpressionHigh" : ["14-LowerHead", "20-Expression"],
+"ExpressionFull" : ["14-LowerHead", "15-MiddleHead", "20-Expression"]
 }
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
@@ -228,10 +231,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     for i in ItemUsedBodySlot.get(ItemClothingGenre):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
-            textureIndex = 0
-            if(len(bpy.data.collections.get(varientChoosen).objects) > 0):
-                textureIndex = random.randrange(0, len(bpy.data.collections.get(varientChoosen).objects))
-                textureVarient = bpy.data.collections.get(varientChoosen).objects[textureIndex]
+
             ColorGen.PickOutfitColors(attribute)
             SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
 
@@ -333,39 +333,40 @@ def PickWeightedTypeVarient(Varients):
 
 
 
-def PickWeightedTextureVarient(Textures):
+def PickWeightedTextureVarient(VariantInfo):
     number_List_Of_i = []
     rarity_List_Of_i = []
 
-    for texture in Textures['textureSets'].keys():
-        rarity = float(Textures['textureSets'][texture])
+    for texture in VariantInfo['textureSets'].keys():
+        rarity = float(VariantInfo['textureSets'][texture])
         if rarity > 0.0:
             number_List_Of_i.append(texture)
             rarity_List_Of_i.append(float(rarity))
 
     if len(number_List_Of_i) > 0:
-        textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)  
-        return textureChoosen[0], list(Textures['textureSets'].keys()).index(textureChoosen[0])
+        textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+        print(textureChoosen[0])
+        print(list(VariantInfo['textureSets'].keys()).index(textureChoosen[0]))
+        return textureChoosen[0], list(VariantInfo['textureSets'].keys()).index(textureChoosen[0])
     else:
-        # first_texture = list(Textures['textureSets'].keys())[0] # TODO CHECK IF ANY TEXTURES EXIST?
-        first_texture = None
-        print("no texture attributes had rarity > 0, so chose first texture attribute: {}".format(first_texture))
-        return first_texture, 0
-
+        if len(VariantInfo["textureSets"].keys()) > 0:
+            first_texture = list(VariantInfo["textureSets"].keys())[0]
+            print("no texture attributes had rarity > 0, so chose first texture attribute: {}".format(first_texture))
+            return first_texture, 0
+        else:
+            print("no texture attributes, so chose None")
+            return None, 0
 
 
 
  
-def PickCharacter(default_char=''):
-    if default_char == '':
-        if bpy.context.scene.my_tool.isCharacterLocked:
-            inputDNA = bpy.context.scene.my_tool.inputDNA
-            DNASplit = inputDNA.split(',')
-            char = DNASplit[0]
-        else:
-            char = random.choice(config.Characters)
+def PickCharacter():
+    if bpy.context.scene.my_tool.isCharacterLocked:
+        inputDNA = bpy.context.scene.my_tool.inputDNA
+        DNASplit = inputDNA.split(',')
+        char = DNASplit[0]
     else:
-        char = default_char
+        char = random.choice(config.Characters)
     return char
 
 

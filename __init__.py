@@ -10,6 +10,7 @@ bl_info = {
 
 # Import handling:
 
+from ast import Load
 import bpy
 from bpy.app.handlers import persistent
 from rna_prop_ui import PropertyPanel
@@ -49,32 +50,32 @@ else:
 
     from .ui_Lists import UIList
 
-Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso Slot"),
-    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso Slot"),
-    "inputLForeArm": ("03-LForeArm", "Left Forearm Slot"),
-    "inputLWrist": ("04-LWrist", "Left Wrist Slot"),
-    "inputRForeArm": ("05-RForeArm", "Right Forearm Slot"),
-    "inputRWrist": ("06-RWrist", "Right Wrist Slot"),
-    "inputHands": ("07-Hands", "Hands Slot"),
-    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick Slot"),
-    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin Slot"),
-    "inputCalf": ("10-Calf", "Calf Slot"),
-    "inputAnkle": ("11-Ankle", "Ankle Slot"),
-    "inputFeet": ("12-Feet", "Feet Slot"),
-    "inputNeck": ("13-Neck", "Neck Slot"),
-    "inputLowerHead": ("14-LowerHead", "Lower Head Slot"),
-    "inputMiddleHead": ("15-MiddleHead", "Mid Head Slot"),
-    "inputEarings": ("16-Earings", "Earrings Slot"),
-    "inputUpperHead": ("17-UpperHead", "Upper Head Slot"),
-    "inputBackpack": ("18-Backpack", "Backpack Slot"),
-    "inputBackground": ("19-Background", "Background Slot")}
+Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
+    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),
+    "inputLForeArm": ("03-LForeArm", "Left Forearm"),
+    "inputLWrist": ("04-LWrist", "Left Wrist"),
+    "inputRForeArm": ("05-RForeArm", "Right Forearm"),
+    "inputRWrist": ("06-RWrist", "Right Wrist"),
+    "inputHands": ("07-Hands", "Hands"),
+    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick"),
+    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin"),
+    "inputCalf": ("10-Calf", "Calf"),
+    "inputAnkle": ("11-Ankle", "Ankle"),
+    "inputFeet": ("12-Feet", "Feet"),
+    "inputNeck": ("13-Neck", "Neck"),
+    "inputLowerHead": ("14-LowerHead", "Lower Head"),
+    "inputMiddleHead": ("15-MiddleHead", "Mid Head"),
+    "inputEarings": ("16-Earings", "Earrings"),
+    "inputUpperHead": ("17-UpperHead", "Upper Head"),
+    "inputBackpack": ("18-Backpack", "Backpack"),
+    "inputBackground": ("19-Background", "Background"),
+    "inputExpression": ("20-Expression", "Expression")}
     
 
 # User input Property Group:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Main BMNFTS Panel properties: 
-    
     nftName: bpy.props.StringProperty(name="NFT Name")
 
     collectionSize: bpy.props.IntProperty(name="NFT Collection Size", default=1, min=1)  # max=(combinations - offset)
@@ -132,10 +133,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         ]
     )
 
-
-    cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
-    solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
-    erc721MetaData: bpy.props.BoolProperty(name="ERC721")
+    # cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
+    # solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
+    # erc721MetaData: bpy.props.BoolProperty(name="ERC721")
 
     # API Panel properties:
     apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
@@ -144,6 +144,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
+
     textureSize: bpy.props.EnumProperty(
             name='textuuuuuuuuures',
             description="texture",
@@ -151,7 +153,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('4k', '4k', '4096x4096'),
                 ('2k', '2k', '2048x2048'),
                 ('1k', '1k', '1024x1024'),
-                ('512', '512', '512x512')
+                ('512', '512', '512x512'),
+                ('64', '64', '64x64')
             ]
         )
 
@@ -220,6 +223,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack",Slots))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
+    inputExpression: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression",Slots))
 
     inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.general_pointer_updated(Slots))
@@ -245,6 +250,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.colourindex_has_been_updated("colourStyleIndex", "lastStyleIndex"))
@@ -297,7 +303,7 @@ offset: int = 0
 def update_combinations(dummy1, dummy2):
     global combinations
     global offset
-
+    
     #combinations = (get_combinations.get_combinations_from_scene()) - offset
 
     # redraw_panel()
@@ -321,7 +327,8 @@ class initializeRecord(bpy.types.Operator):
 
     def execute(self, context):
         if bpy.context.scene.my_tool.root_dir == '':
-            save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+            # save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+            save_path = bpy.context.scene.my_tool.save_path
         elif not os.path.exists(bpy.context.scene.my_tool.root_dir):
             self.report({"ERROR"}, "Failed: The root directory folder does not exist")
             save_path = bpy.context.scene.my_tool.root_dir
@@ -366,16 +373,13 @@ class randomizePreview(bpy.types.Operator):
 
     def execute(self, context):
         maxNFTs = bpy.context.scene.my_tool.collectionSize
-        save_path = bpy.path.abspath(bpy.context.scene.my_tool.root_dir)
-        # some randomize dna code here
+        save_path = bpy.context.scene.my_tool.root_dir
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
 
         DNA, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
         SingleDNA = DNA[0]
         SingleNFTDict = NFTDict[DNA[0]]
         Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
-        bpy.context.scene.my_tool.inputDNA = SingleDNA
-        bpy.context.scene.my_tool.lastDNA = SingleDNA
         return {'FINISHED'}
 
 class randomizeAllColor(bpy.types.Operator):
@@ -386,9 +390,6 @@ class randomizeAllColor(bpy.types.Operator):
 
     def execute(self, context):
         dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
-
-        bpy.context.scene.my_tool.inputDNA = dna_string
-        bpy.context.scene.my_tool.lastDNA = dna_string
         Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
@@ -420,7 +421,8 @@ class clearSlots(bpy.types.Operator):
         lastDNA = bpy.context.scene.my_tool.inputDNA
         DNASplit = lastDNA.split(',')
         character = DNASplit.pop(0)
-        DNA = Exporter.Previewer.get_null_dna(character)
+        style = DNASplit.pop(0)
+        DNA = Exporter.Previewer.get_null_dna(character, style)
         print(DNA)
         bpy.context.scene.my_tool.inputDNA = DNA
         return {'FINISHED'}
@@ -448,9 +450,6 @@ class createBatch(bpy.types.Operator):
         DNA = DNASet[len(DNASet) - 1] # show last DNA created
         print(NFTDict[DNA])
         Exporter.Previewer.show_nft_from_dna(DNA, NFTDict[DNA])
-        bpy.context.scene.my_tool.lastDNA = DNA
-        bpy.context.scene.my_tool.inputDNA = DNA
-        Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 
@@ -473,9 +472,6 @@ class loadNFT(bpy.types.Operator):
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
         if TotalDNA > 0 and DNA != '':
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
 
@@ -501,9 +497,6 @@ class loadNextNFT(bpy.types.Operator):
             TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 
@@ -523,9 +516,6 @@ class loadPrevNFT(bpy.types.Operator):
             TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         return {'FINISHED'}
 
 
@@ -545,8 +535,7 @@ class saveNewNFT(bpy.types.Operator):
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDicts = {}
         SingleNFTDict = Exporter.Previewer.LoadTempDNADict()
-        NFTDicts[context.scene.my_tool.inputDNA] = SingleNFTDict["CharacterItems"]
-        print(NFTDicts)
+        NFTDicts[SingleNFTDict["DNAList"]] = SingleNFTDict["CharacterItems"]
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
 
         master_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
@@ -570,11 +559,11 @@ class saveCurrentNFT(bpy.types.Operator):
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        DNA = context.scene.my_tool.inputDNA
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         NFTDicts = {}
         SingleNFTDict = Exporter.Previewer.LoadTempDNADict()
+        DNA = SingleNFTDict["DNAList"]
         NFTDicts[DNA] = SingleNFTDict["CharacterItems"]
         index = bpy.context.scene.my_tool.CurrentBatchIndex
         loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
@@ -611,9 +600,6 @@ class deleteNFT(bpy.types.Operator):
 
             bpy.context.scene.my_tool.loadNFTIndex = new_index
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
         return {'FINISHED'}
@@ -669,9 +655,6 @@ class loadBatch(bpy.types.Operator):
         TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(index, 1)
         if DNA != '':
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
-            bpy.context.scene.my_tool.lastDNA = DNA
-            bpy.context.scene.my_tool.inputDNA = DNA
-            Exporter.Previewer.fill_pointers_from_dna(DNA, Slots)
 
         print(bpy.context.scene.my_tool.BatchSliderIndex)
         return {'FINISHED'}
@@ -695,8 +678,6 @@ class saveBatch(bpy.types.Operator):
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
-
-        # LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
@@ -721,7 +702,6 @@ class saveNewBatch(bpy.types.Operator):
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
-        # LoadNFT.save_collection_rarity_property(index, NFTRecord_save_path, batch_json_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
         bpy.context.scene.my_tool.BatchSliderIndex = index
@@ -753,6 +733,31 @@ class resetBatch(bpy.types.Operator):
         LoadNFT.update_collection_rarity_property(nftrecord_path)
         return {'FINISHED'}
 
+
+class updateBatch(bpy.types.Operator):
+    bl_idname = 'update.batch'
+    bl_label = "Update Batch"
+    bl_description = "Update batch to include new items"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        batch_index = bpy.context.scene.my_tool.BatchSliderIndex
+        LoadNFT.check_if_paths_exist(batch_index)
+        batch_path = bpy.context.scene.my_tool.batch_json_save_path
+        total_batches = len(os.listdir(batch_path)) - 1
+        
+        if batch_index > total_batches:
+            self.report({"ERROR"}, "Failed: Not a valid batch")
+            return {'FINISHED'}
+
+        nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+        LoadNFT.update_batch_items(batch_index, nftrecord_path)
+        LoadNFT.update_collection_rarity_property(nftrecord_path)
+        return {'FINISHED'}
+
 #----------------------------------------------------------------
 
 
@@ -765,13 +770,12 @@ class swapCharacter(bpy.types.Operator):
 
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        DNA = bpy.context.scene.my_tool.inputDNA
+        NFTDict = Exporter.Previewer.LoadTempDNADict()
+        DNA = NFTDict["DNAList"]
         DNAString = DNA.split(',')
         DNAString[0] = self.character_name
         DNA = ','.join(DNAString)
-        bpy.context.scene.my_tool.inputDNA = DNA
-        NFTDict = Exporter.Previewer.LoadTempDNADict()["CharacterItems"]
-        Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
+        Exporter.Previewer.show_nft_from_dna(DNA, NFTDict["CharacterItems"])
         return {'FINISHED'}
 
 
@@ -815,7 +819,8 @@ class loadDirectory(bpy.types.Operator):
                 return {'FINISHED'}
         else:
             print("is empty")
-            save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+            # save_path = bpy.path.abspath(bpy.context.scene.my_tool.save_path)
+            save_path = bpy.context.scene.my_tool.save_path
 
         Blend_My_NFTs_Output, batch_json_save_path = make_directories(save_path)
         batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
@@ -904,7 +909,8 @@ class renderBatch(bpy.types.Operator):
     def execute(self, context):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
-        export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        # export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        export_path = bpy.context.scene.my_tool.separateExportPath
         export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
@@ -966,7 +972,8 @@ class createBlenderSave(bpy.types.Operator):
     
     def execute(self, context):
         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
-        export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        # export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+        export_path = bpy.context.scene.my_tool.separateExportPath
         export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
@@ -1017,8 +1024,8 @@ class moveDataToLocal(bpy.types.Operator):
 
     def execute(self, context):
         bath_path_end = os.path.join("Blend_My_NFT", "OUTPUT")
-        record_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.root_dir), bath_path_end)
-        local_save_path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bath_path_end)
+        record_save_path = os.path.join(bpy.context.scene.my_tool.root_dir, bath_path_end)
+        local_save_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, bath_path_end)
 
         success = Exporter.export_record_data(record_save_path, local_save_path)
         if not success:
@@ -1036,7 +1043,8 @@ class exportMetadata(bpy.types.Operator):
 
     def execute(self, context):
         bacth_path_end = os.path.join("Blend_My_NFT", "OUTPUT")
-        path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bacth_path_end)
+        # path = os.path.join(os.path.abspath(bpy.context.scene.my_tool.separateExportPath), bacth_path_end)
+        path = os.path.join(bpy.context.scene.my_tool.separateExportPath, bacth_path_end)
         Exporter.save_all_metadata_files(path)
         return {'FINISHED'}
 
@@ -1128,7 +1136,7 @@ class updateColourStyle(bpy.types.Operator):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        save_path = os.path.abspath(bpy.context.scene.my_tool.save_path)
+        save_path = bpy.context.scene.my_tool.save_path
         DNA_Generator.Outfit_Generator.ColorGen.AddColorSetToStyle()
         return {'FINISHED'}
 
@@ -1244,8 +1252,9 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [2048, 1024, 512]
-        TextureEditor.create_downres_textures(input_path, resolutions)
+        resolutions = [2048, 1024, 512, 64]
+        should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
+        TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}
 
 
@@ -1352,6 +1361,7 @@ class deleteColorStyle(bpy.types.Operator):
     def execute(self, context):
         return {'FINISHED'}
 
+
 class deleteColorSet(bpy.types.Operator):
     bl_idname = 'delete.colset'
     bl_label = 'Delete Set'
@@ -1363,6 +1373,18 @@ class deleteColorSet(bpy.types.Operator):
 
     def execute(self, context):
         return {'FINISHED'}
+
+
+class forceLoadDNAFromUI(bpy.types.Operator):
+    bl_idname = 'forceload.dna'
+    bl_label = 'Force Load DNA'
+    bl_description = 'Force Load DNA from UI'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        Exporter.Previewer.CreateDNADictFromUI()
+        return {'FINISHED'}
+
 
 # ------------------------------- Panels ----------------------------------------------
 
@@ -1426,9 +1448,8 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
         row = layout.row()
         for char in config.Characters:
             inputDNA = bpy.context.scene.my_tool.inputDNA
-            DNASplit = inputDNA.split(',')
             row.scale_y = 1.5
-            if char == DNASplit[0]:
+            if inputDNA.startswith(char):
                 row.operator(swapCharacter.bl_idname, text=char, emboss=False).character_name = char
             else:
                 row.operator(swapCharacter.bl_idname, text=char).character_name = char
@@ -1575,7 +1596,6 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 row.prop(mytool, name, text="")
                 row.label(text='')
 
-
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_label = "Head Slots"
     bl_idname = "WCUSTOM_PT_HeadSlots"
@@ -1585,11 +1605,12 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
+    "inputExpression": ("GHOST_ENABLED"),
     "inputUpperHead": ("MESH_CONE"),
     "inputMiddleHead": ("HIDE_OFF"),
     "inputLowerHead": ("USER"),
     "inputEarings": ("PMARKER_ACT"),
-    "inputNeck": ("NODE_INSERT_OFF"),}
+    "inputNeck": ("NODE_INSERT_OFF")}
     
     def draw(self, context):
         layout = self.layout
@@ -1737,7 +1758,12 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
         row = layout.row()
+        box = row.box()
+        box.scale_y = 0.6
+        box.operator(updateBatch.bl_idname, text=updateBatch.bl_label, emboss=False)
+        
         row.operator(resetBatch.bl_idname, text=resetBatch.bl_label, emboss=False)
+
 
 
 
@@ -1774,6 +1800,22 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
+
+
+class WCUSTOM_PT_GenerationExtra(bpy.types.Panel):
+    bl_label = "Extras"
+    bl_idname = "WCUSTOM_PT_GenerationExtra"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.operator(forceLoadDNAFromUI.bl_idname, text=forceLoadDNAFromUI.bl_label)
 
 #-----------------------------------------------------------------------
 
@@ -1973,6 +2015,8 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row = box.row()
         row.label(text="Collections:")
         row = box.row()
+        row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
+        row = box.row()
         row.operator(createSlotFolders.bl_idname, text=createSlotFolders.bl_label)
         row = box.row()
         row.operator(reimportCharacters.bl_idname, text=reimportCharacters.bl_label)
@@ -1986,6 +2030,8 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.operator(renameAllOriginalTextures.bl_idname, text=renameAllOriginalTextures.bl_label)
         row = box.row()
         row.operator(downresTextures.bl_idname, text=downresTextures.bl_label)
+        row.scale_x = 0.4
+        row.prop(mytool, 'shouldForceDownres')
 
         # box = layout.box()
         # row = box.row()
@@ -2169,6 +2215,7 @@ classes = (
     WCUSTOM_PT_ArmSlots,
     WCUSTOM_PT_LegSlots,
     WCUSTOM_PT_OtherSlots,
+    WCUSTOM_PT_GenerationExtra,
     GU_PT_collection_custom_properties,
     WCUSTOM_PT_OutputSettings,
     WCUSTOM_PT_Render,
@@ -2231,17 +2278,29 @@ classes = (
     loadColorOnMesh,
     deleteColorStyle,
     deleteColorSet,
+    updateBatch,
 
     downresTextures,
-    renameAllOriginalTextures
+    renameAllOriginalTextures,
+
+    forceLoadDNAFromUI
 
 )
+
+addon_keymaps = []
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=BMNFTS_PGT_MyProperties)
+
+    # wm = bpy.context.window_manager
+    # kc = wm.keyconfigs.addon
+    # if kc:
+    #     km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+    #     kmi = km.keymap_items.new(test.bl_idname, type='Z', value='PRESS', ctrl=True)
+    #     addon_keymaps.append((km, kmi))  
 
     # UIList1:
 
@@ -2254,6 +2313,10 @@ def unregister():
         bpy.utils.unregister_class(cls)
 
     del bpy.types.Scene.my_tool
+
+    # for km, kmi in addon_keymaps:
+    #     km.keymap_items.remove(kmi)
+    # addon_keymaps.clear()
 
     # UIList 1:
 
