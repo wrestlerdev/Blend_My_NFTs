@@ -137,7 +137,7 @@ def update_batch_items(batch_num, record_path):
             attribute_dict = {}
             hierarchy[attribute_coll.name] = attribute_dict
         else:
-            print("this is script_ignore")
+            # this is script_ignore
             continue
 
         for type_coll in attribute_coll.children:
