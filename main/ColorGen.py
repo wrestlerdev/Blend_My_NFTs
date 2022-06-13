@@ -251,20 +251,30 @@ def NextStyleColor(direction):
             nextIndex = 0
         bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[nextIndex]
 
+
 def AddColorSetToStyle():
     GlobalStyleList = OpenGlobalStyleList()
-    if bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
-        StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
-        print(StyleColorSetList)
-        StyleColorSetList.append(bpy.context.scene.my_tool.colorSetName)
-        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = StyleColorSetList
-        WriteToGlobalStyleList(GlobalStyleList)
+    GlobalColorSetList = OpenGlobalColorList()
+    if not bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
+        print("This is not a valid Style ({}) name".format(bpy.context.scene.my_tool.colorStyleName))
+        return
+    elif not bpy.context.scene.my_tool.colorSetName in GlobalColorSetList:
+        print("This is not an existing Set ({}) name".format(bpy.context.scene.my_tool.colorSetName))
+        return
+    StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
+    print(StyleColorSetList)
+    StyleColorSetList.append(bpy.context.scene.my_tool.colorSetName)
+    GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = StyleColorSetList
+    WriteToGlobalStyleList(GlobalStyleList)
+
 
 def SaveNewColorStyle():
     GlobalStyleList = OpenGlobalStyleList()
     if bpy.context.scene.my_tool.colorStyleName not in GlobalStyleList:
         GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = []
     WriteToGlobalStyleList(GlobalStyleList)
+    AddColorSetToStyle()
+
 
 def NextGlobalColorSet(direction):
     GlobalColorList = OpenGlobalColorList()
@@ -298,40 +308,98 @@ def UpdateColorWheels():
 def AddNewGlobalColorSet():
     R = bpy.context.scene.my_tool.RTint
     G = bpy.context.scene.my_tool.GTint
-    B= bpy.context.scene.my_tool.BTint
-    A= bpy.context.scene.my_tool.AlphaTint
+    B = bpy.context.scene.my_tool.BTint
+    A = bpy.context.scene.my_tool.AlphaTint
     W = bpy.context.scene.my_tool.WhiteTint
-    root_dir = bpy.context.scene.my_tool.root_dir
     ColorListName = bpy.context.scene.my_tool.colorSetName
 
     NewColorStyle = {}
-    NewColorStyle["ComonName"] = ColorListName
+    NewColorStyle["CommonName"] = ColorListName
     NewColorStyle["R"] = [R[0],R[1],R[2],R[3]]
     NewColorStyle["G"] = [G[0],G[1],G[2],G[3]]
     NewColorStyle["B"] = [B[0],B[1],B[2],B[3]]
     NewColorStyle["A"] = [A[0],A[1],A[2],A[3]]
     NewColorStyle["W"] = [W[0],W[1],W[2],W[3]]
-    print(NewColorStyle)
     GlobalColorList = OpenGlobalColorList()
     GlobalColorList[ColorListName] = NewColorStyle
     WriteToGlobalColorList(GlobalColorList)
 
-def DeleteGlobalColor():
-    ColorListName = bpy.context.scene.my_tool.colorSetName
+
+def DeleteGlobalColorSet():
+    if not DoesGlobalColorSetExist():
+        print("this is not a valid colour set to delete")
+        return
+
+    Set = bpy.context.scene.my_tool.colorSetName
+    GlobalStyle = OpenGlobalStyleList()
+
+    styles = GlobalStyle.keys()
+    for style in styles:
+        sets = GlobalStyle[style]
+        sets.remove(Set)
+        GlobalStyle[style] = sets
+
+    WriteToGlobalStyleList(GlobalStyle)
+
     GlobalColorList = OpenGlobalColorList()
-    GlobalColorList.pop(ColorListName, None)
+    GlobalColorList.pop(Set)
+    
     WriteToGlobalColorList(GlobalColorList)
+    return
 
 
-def DoesGlobalColorExist():
-    root_dir = bpy.context.scene.my_tool.root_dir
-    path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
-    GlobalColorList = json.load(open(path))
-    if GlobalColorList.get(bpy.context.scene.my_tool.colorStyleName) is not None:
+def DeleteGlobalColorStyle():
+    LastColorStyleName = bpy.context.scene.my_tool.colorStyleName
+    if DoesStyleExist():
+        NextStyle(1)
+        GlobalStyleList = OpenGlobalStyleList()
+        GlobalStyleList.pop(LastColorStyleName)
+        WriteToGlobalStyleList(GlobalStyleList)
+    else:
+        print(bpy.context.scene.my_tool.colorStyleName)
+        print("This isn't a valid colour style key?")
+
+
+def DeleteSetFromStyle(Style, Set):
+    if not DoesStyleExist(Style):
+        print("This style doesn't exist")
+        return
+
+    if not DoesGlobalColorSetExist(Set):
+        print(Set)
+        print("This set doesn't exist")
+        return
+
+    GlobalStyle = OpenGlobalStyleList()
+    sets = GlobalStyle[Style]
+    sets.remove(Set)
+    GlobalStyle[Style] = sets
+    NextStyleColor(1)
+    WriteToGlobalStyleList(GlobalStyle)
+    return
+
+
+def DoesGlobalColorSetExist(Set=''):
+    GlobalColorList = OpenGlobalColorList()
+    if not Set:
+        Set = bpy.context.scene.my_tool.colorSetName
+    if GlobalColorList.get(Set) is not None:
         doesListExist = True
     else:
         doesListExist = False
     return doesListExist
+
+
+def DoesStyleExist(Style=''):
+    GlobalStyles = OpenGlobalStyleList()
+    if not Style:
+        Style = bpy.context.scene.my_tool.colorStyleName
+    if GlobalStyles.get(Style) is not None:
+        doesStyleExist = True
+    else:
+        doesStyleExist = False
+    return doesStyleExist
+
 
 def OpenGlobalColorList():
     root_dir = bpy.context.scene.my_tool.root_dir

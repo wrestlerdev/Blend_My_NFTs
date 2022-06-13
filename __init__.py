@@ -1105,8 +1105,8 @@ class purgeData(bpy.types.Operator):
 
 
 
-
 # ---------------------------- Colours ---------------------------------
+
 
 class addNewColourStyle(bpy.types.Operator):
     bl_idname = 'add.colorstyle'
@@ -1115,22 +1115,27 @@ class addNewColourStyle(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def invoke(self, context, event):
-        if DNA_Generator.Outfit_Generator.ColorGen.DoesGlobalColorExist():
+        if DNA_Generator.Outfit_Generator.ColorGen.DoesStyleExist():
             return context.window_manager.invoke_confirm(self, event)
         else:
             return self.execute(context)
 
     def execute(self, context):
-        print(">:3c")
-        self.report({'INFO'}, '>:3c')
-        DNA_Generator.Outfit_Generator.ColorGen.SaveNewColorStyle()
+        if DNA_Generator.Outfit_Generator.ColorGen.DoesStyleExist():
+            print("This colour style already  ໒(⊙ᴗ⊙)७✎▤")
+        else:
+            print("New colour style has been added ໒(⊙ᴗ⊙)७✎▤")
+            self.report({'INFO'}, '໒(⊙ᴗ⊙)७✎▤')
+            DNA_Generator.Outfit_Generator.ColorGen.SaveNewColorStyle()
         return {'FINISHED'}
+
 
 class updateColourStyle(bpy.types.Operator):
     bl_idname = 'update.colorstyle'
     bl_label = 'Add Color Set To Style'
     bl_description = 'This will overwrite the current colour style, are you sure?'
     bl_options = {'REGISTER', 'UNDO'}
+    icon = 'SORT_ASC'
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
@@ -1169,7 +1174,7 @@ class nextColorStyle(bpy.types.Operator):
 class prevColorStyle(bpy.types.Operator):
     bl_idname = 'prev.colorstyle'
     bl_label = 'Prev Style'
-    bl_description = 'Next colour style'
+    bl_description = 'Previous colour Style'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1179,8 +1184,8 @@ class prevColorStyle(bpy.types.Operator):
 
 class nextGlobalColorSet(bpy.types.Operator):
     bl_idname = 'next.globalcolorset'
-    bl_label = 'Next Global Color'
-    bl_description = 'Next Global Color'
+    bl_label = 'Next Global Color Set'
+    bl_description = 'Next Global Color Set'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1190,8 +1195,8 @@ class nextGlobalColorSet(bpy.types.Operator):
 
 class prevGlobalColorSet(bpy.types.Operator):
     bl_idname = 'prev.globalcolorset'
-    bl_label = 'Prev Global Color'
-    bl_description = 'Prev Global Color'
+    bl_label = 'Prev Global Color Set'
+    bl_description = 'Previous Global Color Set'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1200,8 +1205,8 @@ class prevGlobalColorSet(bpy.types.Operator):
 
 class addGlobalColorSet(bpy.types.Operator):
     bl_idname = 'add.globalcolorset'
-    bl_label = 'Add / Update Global Color'
-    bl_description = 'Add / Update Global Color'
+    bl_label = 'Add / Update Global Color Set'
+    bl_description = 'Add / Update Global Color Set'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1215,13 +1220,13 @@ class deleteGlobalColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.add_to_textureindex(-1)
+        DNA_Generator.Outfit_Generator.ColorGen.DeleteGlobalColorSet()
         return {'FINISHED'}
 
 class nextStyleColorSet(bpy.types.Operator):
     bl_idname = 'next.stylecolorset'
     bl_label = 'Next Set'
-    bl_description = 'Next Style Color'
+    bl_description = 'Next Set from Style'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1231,86 +1236,17 @@ class nextStyleColorSet(bpy.types.Operator):
 class prevStyleColorSet(bpy.types.Operator):
     bl_idname = 'prev.stylecolorset'
     bl_label = 'Prev Set'
-    bl_description = 'Prev Style Color'
+    bl_description = 'Prev Set from Style'
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.NextStyleColor(-1)
         return {'FINISHED'}
 
-# --------------------------------- Textures ---------------------------------------------
-
-
-class downresTextures(bpy.types.Operator):
-    bl_idname = 'downres.textures'
-    bl_label = 'Create Down-res Textures'
-    bl_description = 'Create Down-res Textures'
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
-
-    def execute(self, context):
-        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [2048, 1024, 512, 64]
-        should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
-        TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
-        return {'FINISHED'}
-
-
-class renameAllOriginalTextures(bpy.types.Operator):
-    bl_idname = 'rename.textures'
-    bl_label = 'Rename All Textures'
-    bl_description = "This can't be undone okay!!!!!!"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
-
-    def execute(self, context):
-        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        TextureEditor.rename_all_original_textures(input_path)
-        return {'FINISHED'}
-
 
 
 # -------------------------------------------------------------------------------------
 
-class reimportCharacters(bpy.types.Operator):
-    bl_idname = 'reimport.chars'
-    bl_label = 'Re-import Character objects'
-    bl_description = 'Re-import Character mesh, armature and etc'
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        charinfo_path = os.path.join(input_path, 'CHARACTERS')
-
-        TextureEditor.reimport_all_character_objects(charinfo_path)
-        return {'FINISHED'}
-
-
-class reimportLight(bpy.types.Operator):
-    bl_idname = 'reimport.light'
-    bl_label = 'Re-import Lights'
-    bl_description = 'Re-import Character mesh, armature and etc'
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        charinfo_path = os.path.join(input_path, 'CHARACTERS')
-        for dir in os.listdir(charinfo_path):
-            if dir.endswith('.blend') and 'light' in dir:
-                light_path = os.path.join(charinfo_path, dir)
-                TextureEditor.reimport_lights(light_path)
-                break
-
-        return {'FINISHED'}
-
-
-
-
-# -------------------------------------------------------------------------------
 
 class colourCopyUp(bpy.types.Operator):
     bl_idname = 'colour.copyup'
@@ -1352,26 +1288,99 @@ class loadColorOnMesh(bpy.types.Operator):
 class deleteColorStyle(bpy.types.Operator):
     bl_idname = 'delete.colstyle'
     bl_label = 'Delete Style'
-    bl_description = 'Delete Colour Style'
+    bl_description = 'This cannot be undone, are you sure?'
     bl_options = {'REGISTER', 'UNDO'}
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
-    # i think this is a double up rn
+
     def execute(self, context):
+        DNA_Generator.Outfit_Generator.ColorGen.DeleteGlobalColorStyle()
         return {'FINISHED'}
 
 
 class deleteColorSet(bpy.types.Operator):
     bl_idname = 'delete.colset'
-    bl_label = 'Delete Set'
-    bl_description = 'Delete Colour Set'
+    bl_label = 'Delete Set from Style'
+    bl_description = 'This cannot be undone, are you sure?'
+    bl_options = {'REGISTER', 'UNDO'}
+    icon = 'SORT_DESC'
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        DNA_Generator.Outfit_Generator.ColorGen.DeleteSetFromStyle(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.currentColorStyleKey)
+        return {'FINISHED'}
+
+
+# --------------------------------- Textures ---------------------------------------------
+
+
+class downresTextures(bpy.types.Operator):
+    bl_idname = 'downres.textures'
+    bl_label = 'Create Down-res Textures'
+    bl_description = 'Create Down-res Textures'
     bl_options = {'REGISTER', 'UNDO'}
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        resolutions = [2048, 1024, 512, 64]
+        should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
+        TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
+        return {'FINISHED'}
+
+
+class renameAllOriginalTextures(bpy.types.Operator):
+    bl_idname = 'rename.textures'
+    bl_label = 'Rename All Textures'
+    bl_description = "This can't be undone okay!!!!!!"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        TextureEditor.rename_all_original_textures(input_path)
+        return {'FINISHED'}
+
+
+# -------------------------------------------------------------------------------
+
+
+class reimportCharacters(bpy.types.Operator):
+    bl_idname = 'reimport.chars'
+    bl_label = 'Re-import Character objects'
+    bl_description = 'Re-import Character mesh, armature and etc'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        charinfo_path = os.path.join(input_path, 'CHARACTERS')
+
+        TextureEditor.reimport_all_character_objects(charinfo_path)
+        return {'FINISHED'}
+
+
+class reimportLight(bpy.types.Operator):
+    bl_idname = 'reimport.light'
+    bl_label = 'Re-import Lights'
+    bl_description = 'Re-import Character mesh, armature and etc'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        charinfo_path = os.path.join(input_path, 'CHARACTERS')
+        for dir in os.listdir(charinfo_path):
+            if dir.endswith('.blend') and 'light' in dir:
+                light_path = os.path.join(charinfo_path, dir)
+                TextureEditor.reimport_lights(light_path)
+                break
+
         return {'FINISHED'}
 
 
@@ -2087,12 +2096,14 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row = box.row()
         row.operator(prevStyleColorSet.bl_idname, text=prevStyleColorSet.bl_label)
         #row.prop(mytool, "colorStyleColorListKey", text='')
-        row.label(text=bpy.context.scene.my_tool.currentColorStyleKey)
+        current_key = bpy.context.scene.my_tool.currentColorStyleKey
+        tint_key = bpy.context.scene.my_tool.colorSetName
+        row.label(text=current_key)
         row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
         row = box.row()
-        row.operator(updateColourStyle.bl_idname, text=updateColourStyle.bl_label)
-        row = box.row()
-        row.operator(deleteColorSet.bl_idname, text=deleteColorSet.bl_label, emboss=False)
+        row.operator(updateColourStyle.bl_idname, text="Add Set ({}) to Style".format(tint_key), icon=updateColourStyle.icon)
+        # row = box.row()
+        row.operator(deleteColorSet.bl_idname, text="Delete Set ({}) from Style".format(current_key),icon=deleteColorSet.icon, emboss=False)
 
 
         row = layout.row()
@@ -2163,16 +2174,18 @@ class WCUSTOM_PT_TintPreviewUI(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
+        current_key = bpy.context.scene.my_tool.currentColorStyleKey
+
         row = layout.row()
-        row.prop(mytool, "RTintPreview", text="Red Tint")
+        row.prop(mytool, "RTintPreview", text="{} Red Tint".format(current_key))
         row = layout.row()
-        row.prop(mytool, "GTintPreview", text="Green Tint")
+        row.prop(mytool, "GTintPreview", text="{} Green Tint".format(current_key))
         row = layout.row()
-        row.prop(mytool, "BTintPreview", text="Blue Tint")
+        row.prop(mytool, "BTintPreview", text="{} Blue Tint".format(current_key))
         row = layout.row()
-        row.prop(mytool, "AlphaTintPreview", text="Alpha Tint")
+        row.prop(mytool, "AlphaTintPreview", text="{} Alpha Tint".format(current_key))
         row = layout.row()
-        row.prop(mytool, "WhiteTintPreview", text="White Tint")
+        row.prop(mytool, "WhiteTintPreview", text="{} White Tint".format(current_key))
 
         layout.separator(factor=0.75)
 
