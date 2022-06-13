@@ -67,8 +67,9 @@ ItemUsedBodySlot = {
 "EaringLong" : ["16-Earings", "13-Neck"], 
 "Backpack" : ["18-Backpack"],
 "BackpackHigh" : ["18-Backpack"],
-"ExpressionLow" : ["20-Expression"],
-"ExpressionHigh" : ["14-LowerHead", "20-Expression"],
+"Expression" : ["20-Expression"],
+"ExpressionLower" : ["14-LowerHead", "20-Expression"],
+"ExpressionUpper" : ["15-MiddleHead", "20-Expression"],
 "ExpressionFull" : ["14-LowerHead", "15-MiddleHead", "20-Expression"]
 }
 
