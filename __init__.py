@@ -423,7 +423,6 @@ class clearSlots(bpy.types.Operator):
         character = DNASplit.pop(0)
         style = DNASplit.pop(0)
         DNA = Exporter.Previewer.get_null_dna(character, style)
-        print(DNA)
         bpy.context.scene.my_tool.inputDNA = DNA
         return {'FINISHED'}
 
@@ -490,7 +489,6 @@ class loadNextNFT(bpy.types.Operator):
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
 
         nftnum = len(next(os.walk(nft_save_path))[1])
-        print(nftnum)
         if  nftnum > 0 and bpy.context.scene.my_tool.loadNFTIndex < nftnum:
             bpy.context.scene.my_tool.loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex + 1
             loadNFTIndex = bpy.context.scene.my_tool.loadNFTIndex
@@ -2101,9 +2099,11 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.label(text=current_key)
         row.operator(nextStyleColorSet.bl_idname, text=nextStyleColorSet.bl_label)
         row = box.row()
-        row.operator(updateColourStyle.bl_idname, text="Add Set ({}) to Style".format(tint_key), icon=updateColourStyle.icon)
+        # row.operator(updateColourStyle.bl_idname, text="Add Set ({}) to Style".format(tint_key), icon=updateColourStyle.icon)
+        row.operator(updateColourStyle.bl_idname, text="Add Set ({}) to Style".format(tint_key))
         # row = box.row()
-        row.operator(deleteColorSet.bl_idname, text="Delete Set ({}) from Style".format(current_key),icon=deleteColorSet.icon, emboss=False)
+        # row.operator(deleteColorSet.bl_idname, text="Delete Set ({}) from Style".format(current_key),icon=deleteColorSet.icon, emboss=False)
+        row.operator(deleteColorSet.bl_idname, text="Delete Set ({}) from Style".format(current_key), emboss=False)
 
 
         row = layout.row()

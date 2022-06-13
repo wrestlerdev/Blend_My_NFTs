@@ -4,6 +4,7 @@ import time
 import json
 import random
 from mathutils import Color
+from . import config
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
@@ -256,13 +257,12 @@ def AddColorSetToStyle():
     GlobalStyleList = OpenGlobalStyleList()
     GlobalColorSetList = OpenGlobalColorList()
     if not bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
-        print("This is not a valid Style ({}) name".format(bpy.context.scene.my_tool.colorStyleName))
+        print(f"{config.bcolors.ERROR}This is not a valid Style ({bpy.context.scene.my_tool.colorStyleName}) name{config.bcolors.RESET}")
         return
     elif not bpy.context.scene.my_tool.colorSetName in GlobalColorSetList:
-        print("This is not an existing Set ({}) name".format(bpy.context.scene.my_tool.colorSetName))
+        print(f"{config.bcolors.ERROR}This is not an existing Set ({bpy.context.scene.my_tool.colorSetName}) name{config.bcolors.RESET}")
         return
     StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
-    print(StyleColorSetList)
     StyleColorSetList.append(bpy.context.scene.my_tool.colorSetName)
     GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = StyleColorSetList
     WriteToGlobalStyleList(GlobalStyleList)
@@ -302,7 +302,6 @@ def UpdateColorWheels():
     bpy.context.scene.my_tool.BTint = ColorSet["B"]
     bpy.context.scene.my_tool.AlphaTint = ColorSet["A"]
     bpy.context.scene.my_tool.WhiteTint = ColorSet["W"]
-    print("Hello")
 
 
 def AddNewGlobalColorSet():
@@ -327,18 +326,23 @@ def AddNewGlobalColorSet():
 
 def DeleteGlobalColorSet():
     if not DoesGlobalColorSetExist():
-        print("this is not a valid colour set to delete")
+        print(f"{config.bcolors.ERROR}This is not a valid colour set to delete{config.bcolors.RESET}")
         return
 
     Set = bpy.context.scene.my_tool.colorSetName
     GlobalStyle = OpenGlobalStyleList()
 
+    if bpy.context.scene.my_tool.currentColorStyleKey == Set:
+        NextStyleColor(1)
+
     styles = GlobalStyle.keys()
     for style in styles:
         sets = GlobalStyle[style]
-        sets.remove(Set)
-        GlobalStyle[style] = sets
+        if Set in sets:
+            sets.remove(Set)
+            GlobalStyle[style] = sets
 
+    NextGlobalColorSet(1)
     WriteToGlobalStyleList(GlobalStyle)
 
     GlobalColorList = OpenGlobalColorList()
@@ -356,18 +360,16 @@ def DeleteGlobalColorStyle():
         GlobalStyleList.pop(LastColorStyleName)
         WriteToGlobalStyleList(GlobalStyleList)
     else:
-        print(bpy.context.scene.my_tool.colorStyleName)
-        print("This isn't a valid colour style key?")
+        print(f"{config.bcolors.ERROR}This ({bpy.context.scene.my_tool.colorStyleName}) isn't a valid colour style key?{config.bcolors.ERROR}")
 
 
 def DeleteSetFromStyle(Style, Set):
     if not DoesStyleExist(Style):
-        print("This style doesn't exist")
+        print(f"{config.bcolors.ERROR}This style ({Style}) doesn't exist{config.bcolors.ERROR}")
         return
 
     if not DoesGlobalColorSetExist(Set):
-        print(Set)
-        print("This set doesn't exist")
+        print(f"{config.bcolors.ERROR}This set ({Set}) doesn't exist{config.bcolors.ERROR}")
         return
 
     GlobalStyle = OpenGlobalStyleList()
@@ -412,11 +414,10 @@ def WriteToGlobalColorList(GlobalColorList):
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     try:
       ledger = json.dumps(GlobalColorList, indent=1, ensure_ascii=True)
-      print(ledger)
       with open(path, 'w') as outfile:
          outfile.write(ledger + '\n')
     except:
-      print("ColorStyle was not sent")
+      print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
 
 def OpenGlobalStyleList():
     root_dir = bpy.context.scene.my_tool.root_dir
@@ -432,7 +433,7 @@ def WriteToGlobalStyleList(GlobalStyleList):
       with open(path, 'w') as outfile:
          outfile.write(ledger + '\n')
     except:
-      print("ColorStyle was not sent")
+      print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
 
 def ColorHasbeenUpdated(ColorTint):
     inputColorListSceneObject = bpy.context.scene.my_tool.inputColorListSceneObject
