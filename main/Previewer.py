@@ -258,16 +258,21 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
 
 def set_shape_keys(rig_name, variant_name):
    print("is expression")
+   shape_key_names = [variant_name, 
+                     variant_name + "_mouth",
+                     variant_name + "_eyes",
+                     variant_name + "_brow",]
    character_coll = bpy.data.collections[rig_name]
    for obj in character_coll.objects:
       if obj.type == 'MESH':
          if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
             for shape_key in obj.data.shape_keys.key_blocks:
-               if shape_key.name == variant_name:
-                  print(variant_name)
-                  print(shape_key.name)
-                  shape_key.value = 1
-                  break
+               for shape_key_name in shape_key_names:
+                  if shape_key.name == shape_key_name:
+                     print(shape_key_name)
+                     print(shape_key.name)
+                     shape_key.value = 1
+                     break
    return
 
 def reset_shape_keys(rig_name):
