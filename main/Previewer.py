@@ -5,6 +5,8 @@ import collections
 import bpy
 import os
 import json
+from mathutils import Vector
+from mathutils import Matrix
 
 from . import config
 from . import ColorGen
@@ -101,6 +103,11 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
             # if 'Expression' in type.name:
                variant_name = varient.name.rpartition('_')[2]
                set_shape_keys(character + '_Rig', variant_name)
+            elif type.name[3:].startswith('Backpack'):
+            # if backpack in type.name
+               print("Backoroni")
+               print(type.name[3:])
+               RaycastPackpack(type.name[3:], character, NFTDict) 
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -112,6 +119,58 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 # -----------------------------------------------------
+
+
+def RaycastPackpack(backpackType, character, NFTDict):
+   torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
+   torsoObj = torsoObj + "_" + character
+   objects = bpy.data.collections[torsoObj].objects
+   if len(objects) > 0:
+      cb = objects[0]
+      src = bpy.data.objects[character + '_src']
+      dst = bpy.data.objects[character + '_dst']
+      null_loc = bpy.data.objects[character + '_loc']
+
+      mw = cb.matrix_world
+      mwi = mw.inverted()
+
+      # src and dst in local space of cb
+
+      origin = mwi @ src.matrix_world.translation
+      dest = mwi @ dst.matrix_world.translation
+      direction = (dest - origin).normalized()
+
+      hit, loc, norm, face = cb.ray_cast(origin, direction)
+
+      if hit:
+         print("Hit at ", mw @ loc, " (local)")
+         print(dst.matrix_world.to_translation())
+         
+         dir = (mw @ loc) - dst.matrix_world.to_translation()
+         dist = dir.magnitude
+         null_loc.location = Vector([0,2,0])
+         null_loc.location.z -= dist
+         #null_loc.location.z -= backpack.dimensions.z / 2
+
+
+         if backpackType == "BackpackHigh":
+            backpack = list(NFTDict["13-Neck"].keys())[0]
+         else:
+            backpack = list(NFTDict["18-Backpack"].keys())[0]
+         backpack = backpack + "_" + character
+         for obj in bpy.data.collections[backpack].objects:
+            if len(obj.constraints) < 1:
+               obj.constraints.new(type='CHILD_OF')
+            obj.constraints["Child Of"].target = null_loc
+            obj.constraints["Child Of"].inverse_matrix = Matrix(((1.0, 0.0, 0.0, 0.0),
+                                                               (0.0, 1.0, 0.0, 0.0),
+                                                               (0.0, 0.0, 1.0, 0.0),
+                                                               (0.0, 0.0, 0.0, 1.0)))
+            obj.location = Vector([0,0,0])
+      else:
+         print("No HIT")
+
+
 
 def SaveTempDNADict(TempNFTDict):
    save_path = os.getcwd()
