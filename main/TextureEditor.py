@@ -44,7 +44,7 @@ def rename_all_original_textures(input_path):
 
 
 def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix=''):
-    og_texture_suffixes = ['_128', '_256', '_512', '_1k', '_2k']
+    og_texture_suffixes = ['_64', '_128', '_256', '_512', '_1k', '_2k']
     roughness_list = ['_R.', 'R_', 'Roughness', 'roughness']
     id_list = ['_ID.', 'ColorID']
     diffuse_list = ['_D.', 'Diffuse', 'BakedBaseColor', 'LightGreyScale', 'diffuse','BaseColor']
