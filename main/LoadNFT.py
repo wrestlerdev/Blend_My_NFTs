@@ -98,13 +98,18 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                                 update_rarity_color(variant, int(float(variant_rarity)))
                                 scene_var_coll["rarity"] = int(float(variant_rarity))
 
-                                texture_objs = scene_var_coll.objects
-                                print(texture_objs)
-                                # textures = list(hierarchy[slot][type][variant].keys())
                             else:
                                 update_rarity_color(variant, 0)
                                 scene_var_coll["rarity"] = 0
-                                # textures = []
+                            
+                            texture_objs = scene_var_coll.objects
+                            for texture_obj in texture_objs:
+                                texture_name = texture_obj.name
+                                if texture_name in hierarchy[slot][type][variant]["textureSets"].keys():
+                                    texture_rarity = hierarchy[slot][type][variant]["textureSets"][texture_name]
+                                else:
+                                    texture_rarity = 0
+                                texture_obj["rarity"] = texture_rarity
 
                     else: # BETA_1.0 || has no textures so is not a valid collection
                         current_var_coll = bpy.data.collections[h_variant]
@@ -163,9 +168,13 @@ def update_batch_items(batch_num, record_path):
                     item_dict["item_index"] = variant_split[2]
                     item_dict["type_rarity"] = default_type_rarity
                     item_dict["variant_rarity"] = default_var_rarity
-                    item_dict["textureSets"] = get_texture_sets(variant_coll)
+                    item_dict["textureSets"] = []
 
                     hierarchy[attribute_coll.name][type_coll.name][variant_coll.name] = item_dict
+
+                hierarchy[attribute_coll.name][type_coll.name][variant_coll.name]["textureSets"] = get_texture_sets(variant_coll)
+
+
     record['hierarchy'] = hierarchy
     try:
         ledger = json.dumps(record, indent=1, ensure_ascii=True)
@@ -180,7 +189,10 @@ def get_texture_sets(variant_coll):
     default_texture_rarity = 50
     texture_dict = {}
     for obj in variant_coll.objects:
-        texture_dict[obj.name] = default_texture_rarity
+        if obj.get('rarity') is not None:
+            texture_dict[obj.name] = obj.get('rarity')
+        else:
+            texture_dict[obj.name] = default_texture_rarity
     return texture_dict
 
 

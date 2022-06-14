@@ -127,7 +127,10 @@ def attributeData(attributeVariantColl, attributeTypeColl, attribute):
       textures = {}
       for mesh in variant_coll.objects:
          # print(mesh.material_slots[0])
-         textures[mesh.name] = 50
+         if mesh.get('rarity') is not None:
+            textures[mesh.name] = int(mesh.get('rarity'))
+         else:
+            textures[mesh.name] = 50
          # textures.append(mesh.name)
       return textures
       

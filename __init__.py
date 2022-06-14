@@ -859,22 +859,22 @@ class createSlotFolders(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class organizeScene(bpy.types.Operator):
-    bl_idname = 'create.organizescene'
-    bl_label = 'Organize Scene'
-    bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
-    bl_options = {"REGISTER", "UNDO"}
+# class organizeScene(bpy.types.Operator):
+#     bl_idname = 'create.organizescene'
+#     bl_label = 'Organize Scene'
+#     bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
+#     bl_options = {"REGISTER", "UNDO"}
     
-    def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
+#     def invoke(self, context, event):
+#         return context.window_manager.invoke_confirm(self, event)
 
 
-    def execute(self, context):
-        # folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
-        # SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
-        original_hierarchy = Exporter.Previewer.get_hierarchy_ordered(1)
-        DNA_Generator.save_rarity_To_Record(original_hierarchy)
-        return {'FINISHED'}
+#     def execute(self, context):
+#         # folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
+#         # SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
+#         original_hierarchy = Exporter.Previewer.get_hierarchy_ordered(1)
+#         DNA_Generator.save_rarity_To_Record(original_hierarchy)
+#         return {'FINISHED'}
 
 
 class createCharacterCollections(bpy.types.Operator):
@@ -2272,7 +2272,7 @@ classes = (
     deleteNFT,
     deleteAllNFTs,
     createSlotFolders,
-    organizeScene,
+    # organizeScene,
     createCharacterCollections,
     renderBatch,
     createBlenderSave,
