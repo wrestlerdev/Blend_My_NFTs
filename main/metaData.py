@@ -184,6 +184,8 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict):
                 split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split())
 
                 full_variant_name = "{} {} {}".format(split_variant_name, color_key, texture)
+                full_variant_name = full_variant_name[0].upper() + full_variant_name[1:]
+
                 type_name = type[3:]
                 print(type_name)
                 keyword = None

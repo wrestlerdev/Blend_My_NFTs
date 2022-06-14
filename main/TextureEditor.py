@@ -53,41 +53,42 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
     emissive_list = ['_E.', ' Emmissive', 'Emissive', 'emissive', 'emmissive']
     opacity_list = ['_O.', ' Opacity', 'opacity']
 
-    texture_images = [fn for fn in os.listdir(folder_path) if any(fn.endswith(ext) for ext in config.image_extensions)] # find all images
-    not_texture_images = [fn for fn in os.listdir(folder_path) if not any(fn.endswith(ext) for ext in config.image_extensions)]
-    original_textures = [fn for fn in texture_images if not any( (fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
-    not_original_textures = [fn for fn in texture_images if any( (fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)]
+    if os.path.isdir(folder_path): # to avoid .db file issue?
+        texture_images = [fn for fn in os.listdir(folder_path) if any(fn.endswith(ext) for ext in config.image_extensions)] # find all images
+        not_texture_images = [fn for fn in os.listdir(folder_path) if not any(fn.endswith(ext) for ext in config.image_extensions)]
+        original_textures = [fn for fn in texture_images if not any( (fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
+        not_original_textures = [fn for fn in texture_images if any( (fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)]
 
-    if not_original_textures:
-        print(f"{config.bcolors.WARNING}These images ({not_original_textures}) within {folder_path} will not be renamed{config.bcolors.RESET}")
-    if not_texture_images:
-        print(f"{config.bcolors.WARNING}These files ({not_texture_images}) within {folder_path} will not be renamed{config.bcolors.RESET}")
+        if not_original_textures:
+            print(f"{config.bcolors.WARNING}These images ({not_original_textures}) within {folder_path} will not be renamed{config.bcolors.RESET}")
+        if not_texture_images:
+            print(f"{config.bcolors.WARNING}These files ({not_texture_images}) within {folder_path} will not be renamed{config.bcolors.RESET}")
 
-    for texture in original_textures:
-        new_name = texture
-        file_type = texture.rpartition('.')[2]
-        variant_name = name.split('_')[-1]
-        if any(r in texture for r in roughness_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + roughness_list[0] + file_type
-        elif any(id in texture for id in id_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + id_list[0] + file_type
-        elif any(d in texture for d in diffuse_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + diffuse_list[0] + file_type
-        elif any(m in texture for m in metallic_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + metallic_list[0] + file_type
-        elif any(n in texture for n in normal_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + normal_list[0] + file_type
-        elif any(e in texture for e in emissive_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + emissive_list[0] + file_type
-        elif any(o in texture for o in opacity_list):
-            new_name = 'T_' + variant_name + variant_suffix + texture_set + opacity_list[0] + file_type
-        else:
-            print(f"{config.bcolors.ERROR}This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system woops{config.bcolors.RESET}")
-        print(new_name)
-        if new_name != texture:
-            old_texture_path = os.path.join(folder_path, texture)
-            new_texture_path = os.path.join(folder_path, new_name)
-            os.rename(old_texture_path, new_texture_path)
+        for texture in original_textures:
+            new_name = texture
+            file_type = texture.rpartition('.')[2]
+            variant_name = name.split('_')[-1]
+            if any(r in texture for r in roughness_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + roughness_list[0] + file_type
+            elif any(id in texture for id in id_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + id_list[0] + file_type
+            elif any(d in texture for d in diffuse_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + diffuse_list[0] + file_type
+            elif any(m in texture for m in metallic_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + metallic_list[0] + file_type
+            elif any(n in texture for n in normal_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + normal_list[0] + file_type
+            elif any(e in texture for e in emissive_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + emissive_list[0] + file_type
+            elif any(o in texture for o in opacity_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + opacity_list[0] + file_type
+            else:
+                print(f"{config.bcolors.ERROR}This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system woops{config.bcolors.RESET}")
+            print(new_name)
+            if new_name != texture:
+                old_texture_path = os.path.join(folder_path, texture)
+                new_texture_path = os.path.join(folder_path, new_name)
+                os.rename(old_texture_path, new_texture_path)
     return
 
 

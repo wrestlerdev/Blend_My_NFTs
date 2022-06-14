@@ -581,8 +581,8 @@ def randomize_color_style(): # if dna_strand is given, update dna with new stran
 
    new_style = ColorGen.SetUpCharacterStyle()
 
-   if DNASplit[1] == new_style:
-      return dna_string, CharacterItems
+   # if DNASplit[1] == new_style:
+   #    return dna_string, CharacterItems
 
    DNASplit[1] = new_style
    dna_string = ','.join(DNASplit)
