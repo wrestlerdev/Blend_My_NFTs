@@ -273,7 +273,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
-    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, max=100)
+    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=500)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
 
     RTintPreview: bpy.props.FloatVectorProperty(name="R Tint Preview", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
@@ -1244,12 +1244,12 @@ class prevStyleColorSet(bpy.types.Operator):
 
 class saveStyleRarity(bpy.types.Operator):
     bl_idname = 'stylerarity.save'
-    bl_label = 'SAVE RARITY UWU'
-    bl_description = 'SAVE RARITY'
+    bl_label = 'Save Style Rarity'
+    bl_description = 'Save Rarity for Style'
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.temp_styles_reformat()
+        DNA_Generator.Outfit_Generator.ColorGen.UpdateStyleRarity()
         return {'FINISHED'}
 # -------------------------------------------------------------------------------------
 
@@ -2082,7 +2082,7 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
         row.operator(prevColorStyle.bl_idname, text=prevColorStyle.bl_label)
         row.scale_x = 1.5
         row.prop(mytool, "colorStyleName", text="")
-        row.scale_x = 0.25
+        row.scale_x = 0.5
         row.prop(mytool, "colorStyleRarity", text="")
         row.scale_x = 1
         row.operator(nextColorStyle.bl_idname, text=nextColorStyle.bl_label)

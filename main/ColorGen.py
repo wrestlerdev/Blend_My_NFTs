@@ -178,16 +178,26 @@ def RGBtoHex(vals, rgbtype=1):
 #----------------------------------------------------------------------------------------------
 
 
-
-
 def SetUpCharacterStyle():
     global availableColorStyleKeys, styleKey
     globalStyleInfo = OpenGlobalStyleList()
 
-    styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
-    styleKey = list(globalStyleInfo.keys())[styleIndex]
-    availableColorStyleKeys =  globalStyleInfo[styleKey]
-    print("STYLE: " + styleKey )
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    for style in globalStyleInfo.keys():
+        rarity = globalStyleInfo[style]["StyleRarity"]
+        if rarity > 0:
+            number_List_Of_i.append(style)
+            rarity_List_Of_i.append(float(rarity))
+
+    if len(number_List_Of_i) > 0:
+        colorChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+    # styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
+    # styleKey = list(globalStyleInfo.keys())[styleIndex]
+    # print("STYLE: " + styleKey )
+    styleKey = colorChosen[0]
+    availableColorStyleKeys =  globalStyleInfo[styleKey]["ColorSets"]
     return styleKey
 
 def CheckAndFormatPath(path, pathTojoin = ""):
@@ -200,13 +210,14 @@ def CheckAndFormatPath(path, pathTojoin = ""):
         return ""
     return new_path
 
-def PickOutfitColors(attribute, style_key=None):
+
+def PickOutfitColors(attribute, style_key=''):
     global styleKey, availableColorStyleKeys
     global colorkey
 
     if style_key:
         globalStyleInfo = OpenGlobalStyleList()
-        availableColorStyleKeys = globalStyleInfo[style_key]
+        availableColorStyleKeys = globalStyleInfo[style_key]["ColorSets"]
 
     globalColorInfo = OpenGlobalColorList()
 
@@ -220,6 +231,7 @@ def PickOutfitColors(attribute, style_key=None):
     colorChoice = globalColorInfo[colorkey]
                 
     return colorkey, colorChoice
+
 
 def NextStyle(direction):
     GlobalStyleList = OpenGlobalStyleList()
@@ -237,6 +249,7 @@ def NextStyle(direction):
         key = keys_list[ 0 ]
     bpy.context.scene.my_tool.colorStyleName = key
     StyleColorList = GlobalStyleList[key]["ColorSets"]
+    bpy.context.scene.my_tool.colorStyleRarity = GlobalStyleList[key]["StyleRarity"]
     bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[0]
 
 
@@ -271,7 +284,9 @@ def AddColorSetToStyle():
 def SaveNewColorStyle():
     GlobalStyleList = OpenGlobalStyleList()
     if bpy.context.scene.my_tool.colorStyleName not in GlobalStyleList:
-        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = []
+        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = {}
+        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["StyleRarity"] = bpy.context.scene.my_tool.colorStyleRarity
+        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["ColorSets"] = []
     WriteToGlobalStyleList(GlobalStyleList)
     AddColorSetToStyle()
 
@@ -359,8 +374,9 @@ def DeleteGlobalColorStyle():
         GlobalStyleList = OpenGlobalStyleList()
         GlobalStyleList.pop(LastColorStyleName)
         WriteToGlobalStyleList(GlobalStyleList)
+        print("Color style ({}) has been deleted °˖✧◝(⁰▿⁰)◜✧˖°".format(LastColorStyleName))
     else:
-        print(f"{config.bcolors.ERROR}This ({bpy.context.scene.my_tool.colorStyleName}) isn't a valid colour style key?{config.bcolors.ERROR}")
+        print(f"{config.bcolors.ERROR}This ({bpy.context.scene.my_tool.colorStyleName}) isn't a valid colour style key{config.bcolors.ERROR}")
 
 
 def DeleteSetFromStyle(Style, Set):
@@ -409,6 +425,7 @@ def OpenGlobalColorList():
     GlobalColorList = json.load(open(path))
     return GlobalColorList
 
+
 def WriteToGlobalColorList(GlobalColorList):
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
@@ -419,11 +436,13 @@ def WriteToGlobalColorList(GlobalColorList):
     except:
       print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
 
+
 def OpenGlobalStyleList():
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalStyles.json")
     GlobalStyleList = json.load(open(path))
     return GlobalStyleList
+
 
 def WriteToGlobalStyleList(GlobalStyleList):
     root_dir = bpy.context.scene.my_tool.root_dir
@@ -434,6 +453,7 @@ def WriteToGlobalStyleList(GlobalStyleList):
          outfile.write(ledger + '\n')
     except:
       print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
+
 
 def ColorHasbeenUpdated(ColorTint):
     inputColorListSceneObject = bpy.context.scene.my_tool.inputColorListSceneObject
@@ -460,6 +480,34 @@ def ColorHasbeenUpdated(ColorTint):
 
 
 # -------------------------------------------------------
+
+
+def UpdateStyleRarity(Style=''):
+    rarity = bpy.context.scene.my_tool.colorStyleRarity
+    if not Style:
+        Style = bpy.context.scene.my_tool.colorStyleName
+
+    GlobalStyle = OpenGlobalStyleList()
+    if Style in GlobalStyle.keys():
+        GlobalStyle[Style]["StyleRarity"] = rarity
+
+    WriteToGlobalStyleList(GlobalStyle)
+    return
+
+
+def get_style_rarity(style=''):
+    if not style:
+        style = bpy.context.scene.my_tool.colorStyleName
+    GlobalStyle = OpenGlobalStyleList()
+    if style in GlobalStyle.keys():
+        return GlobalStyle[style]["StyleRarity"]
+    else:
+        print(f"{config.bcolors.ERROR}This style ({style}) is not valid{config.bcolors.ERROR}")
+        return
+
+
+# -------------------------------------------------------
+
 
 def UIColorKey_has_updated():
     GlobalColorList = OpenGlobalColorList()
