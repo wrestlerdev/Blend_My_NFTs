@@ -97,6 +97,9 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                                 variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
                                 update_rarity_color(variant, int(float(variant_rarity)))
                                 scene_var_coll["rarity"] = int(float(variant_rarity))
+
+                                texture_objs = scene_var_coll.objects
+                                print(texture_objs)
                                 # textures = list(hierarchy[slot][type][variant].keys())
                             else:
                                 update_rarity_color(variant, 0)
