@@ -1242,7 +1242,15 @@ class prevStyleColorSet(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class saveStyleRarity(bpy.types.Operator):
+    bl_idname = 'stylerarity.save'
+    bl_label = 'SAVE RARITY UWU'
+    bl_description = 'SAVE RARITY'
+    bl_options = {'REGISTER', 'UNDO'}
 
+    def execute(self, context):
+        DNA_Generator.Outfit_Generator.ColorGen.temp_styles_reformat()
+        return {'FINISHED'}
 # -------------------------------------------------------------------------------------
 
 
@@ -2081,6 +2089,7 @@ class WCUSTOM_PT_ArtistUI(bpy.types.Panel):
 
         row = box.row()
         row.operator(addNewColourStyle.bl_idname, text=addNewColourStyle.bl_label)
+        row.operator(saveStyleRarity.bl_idname, text=saveStyleRarity.bl_label)
 
         row = box.row()
         row.operator(deleteColorStyle.bl_idname, text=deleteColorStyle.bl_label, emboss=False)
@@ -2292,6 +2301,7 @@ classes = (
     deleteColorStyle,
     deleteColorSet,
     updateBatch,
+    saveStyleRarity,
 
     downresTextures,
     renameAllOriginalTextures,

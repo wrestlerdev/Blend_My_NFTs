@@ -236,14 +236,14 @@ def NextStyle(direction):
     else:
         key = keys_list[ 0 ]
     bpy.context.scene.my_tool.colorStyleName = key
-    StyleColorList = GlobalStyleList[key]
+    StyleColorList = GlobalStyleList[key]["ColorSets"]
     bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[0]
 
 
 def NextStyleColor(direction):
     GlobalStyleList = OpenGlobalStyleList()
     if bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
-        StyleColorList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
+        StyleColorList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["ColorSets"]
         currentIndex = StyleColorList.index(bpy.context.scene.my_tool.currentColorStyleKey)      
         nextIndex = currentIndex + direction
         if nextIndex < 0:
@@ -262,9 +262,9 @@ def AddColorSetToStyle():
     elif not bpy.context.scene.my_tool.colorSetName in GlobalColorSetList:
         print(f"{config.bcolors.ERROR}This is not an existing Set ({bpy.context.scene.my_tool.colorSetName}) name{config.bcolors.RESET}")
         return
-    StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]
+    StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["ColorSets"]
     StyleColorSetList.append(bpy.context.scene.my_tool.colorSetName)
-    GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = StyleColorSetList
+    GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["ColorSets"] = StyleColorSetList
     WriteToGlobalStyleList(GlobalStyleList)
 
 
@@ -337,10 +337,10 @@ def DeleteGlobalColorSet():
 
     styles = GlobalStyle.keys()
     for style in styles:
-        sets = GlobalStyle[style]
+        sets = GlobalStyle[style]["ColorSets"]
         if Set in sets:
             sets.remove(Set)
-            GlobalStyle[style] = sets
+            GlobalStyle[style]["ColorSets"] = sets
 
     NextGlobalColorSet(1)
     WriteToGlobalStyleList(GlobalStyle)
@@ -373,7 +373,7 @@ def DeleteSetFromStyle(Style, Set):
         return
 
     GlobalStyle = OpenGlobalStyleList()
-    sets = GlobalStyle[Style]
+    sets = GlobalStyle[Style]["ColorSets"]
     sets.remove(Set)
     GlobalStyle[Style] = sets
     NextStyleColor(1)
@@ -478,4 +478,17 @@ def copy_colour_down():
     bpy.context.scene.my_tool.BTint = bpy.context.scene.my_tool.BTintPreview
     bpy.context.scene.my_tool.AlphaTint = bpy.context.scene.my_tool.AlphaTintPreview
     bpy.context.scene.my_tool.WhiteTint = bpy.context.scene.my_tool.WhiteTintPreview
+    return
+
+
+def temp_styles_reformat():
+    # GlobalStyles = OpenGlobalStyleList()
+
+    # for style in GlobalStyles.keys():
+    #     new_dict = {}
+    #     new_dict["StyleRarity"] = 50
+    #     new_dict["ColorSets"] = GlobalStyles[style]
+    #     GlobalStyles[style] = new_dict
+
+    # WriteToGlobalStyleList(GlobalStyles)
     return
