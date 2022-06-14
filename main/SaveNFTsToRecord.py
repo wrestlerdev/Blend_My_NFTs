@@ -456,25 +456,14 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
 
         for m in matfolderlink.keys():         
             if i >= len(obj.material_slots):
-                result = [s for s in os.listdir( (texture_path + "/" + matfolderlink[m]) ) if "_O." in s]
-                if result != []:
-                    material = bpy.data.materials['MasterTransparentV01']
-                else:
-                    material = bpy.data.materials['MasterV01']
+                material = GetMatrialDomain(texture_path, matfolderlink[m])
                 tempcopy = material.copy()
                 tempcopy.name = m
                 obj.data.materials.append(None)
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m
             else:
-                print("Slot Exists")
-                result = [s for s in os.listdir( (texture_path + "/" + matfolderlink[m]) ) if "_O." in s]
-                print(result)
-                print((texture_path + "/" + matfolderlink[m]))
-                if result != []:
-                    material = bpy.data.materials['MasterTransparentV01']
-                else:
-                    material = bpy.data.materials['MasterV01']
+                material = GetMatrialDomain(texture_path, matfolderlink[m])
                 tempcopy = material.copy()
                 tempcopy.name = m
                 #obj.material_slots[i].link = 'OBJECT'
@@ -490,14 +479,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
     else:
         material_slots = obj.material_slots
         for m in material_slots:
-            #material = m.material
-            #m.link = 'OBJECT' 
-            result = [s for s in os.listdir(texture_path) if "_O." in s]
-            print(result)
-            if result != []:
-                material = bpy.data.materials['MasterTransparentV01']
-            else:
-                material = bpy.data.materials['MasterV01']
+            material = GetMatrialDomain(texture_path)
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
@@ -509,7 +491,26 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
     #         print("Deleting: " + str(i))
     #         obj.material_slots[i].link = 'OBJECT'
     #         #obj.data.materials.pop(index = i)
-    
+def GetMatrialDomain(texture_path, matfolderlink = ""):
+    if matfolderlink:
+        resultD = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_D." in s]
+        resultE = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_E." in s]
+        resultO = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_O." in s]
+    else:
+        resultD = [s for s in os.listdir(texture_path) if "_D." in s]
+        resultE = [s for s in os.listdir(texture_path) if "_E." in s]
+        resultO = [s for s in os.listdir(texture_path) if "_O." in s]
+
+    if resultD == [] and resultE != []:
+        material = bpy.data.materials['MasterUnlitV01']
+        print(resultD)
+    elif resultO != []:
+        material = bpy.data.materials['MasterTransparentV01']
+        print(resultO)
+    else:
+        material = bpy.data.materials['MasterV01']
+
+    return material   
 
 def LinkImagesToNodes(matcopy, texture_path):
         # get the nodes
