@@ -413,7 +413,7 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
     # if current_coll_name:
     #     rarity = bpy.data.collections[current_coll_name].get('rarity')
     # else:
-    #     rarity = 100 # i gotta get percentage from the weighted rarity fark
+    #     rarity = 100 # i gotta get percentage from the weighted rarity
 
     if attribute and attribute in filled_slots:
         # if attribute == '08-PelvisThick':

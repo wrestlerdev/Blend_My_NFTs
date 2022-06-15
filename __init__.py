@@ -348,7 +348,7 @@ class initializeRecord(bpy.types.Operator):
         original_hierarchy = Exporter.Previewer.get_hierarchy_unordered(1)
         LoadNFT.init_batch(output_save_path)
         if original_hierarchy != None:
-            DNA_Generator.save_rarity_To_Record(original_hierarchy, first_nftrecord_save_path)
+            DNA_Generator.save_rarity_To_New_Record(original_hierarchy, first_nftrecord_save_path)
         else:
             DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path)
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
@@ -675,7 +675,7 @@ class saveBatch(bpy.types.Operator):
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
-        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
+        DNA_Generator.save_new_rarity_Record(NFTRecord_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
