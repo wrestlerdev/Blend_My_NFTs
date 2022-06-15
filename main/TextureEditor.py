@@ -122,11 +122,14 @@ def create_downres_textures(input_path, dims, should_overwrite):
 def downres_all_textures_in_folder(path, dims, should_overwrite):
     og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
 
-    texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]
-    original_textures = [fn for fn in texture_images if any((fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
-
-    for image in original_textures:
-        downres_single_texture(path, image, dims, should_overwrite)
+    if os.path.isdir(path):
+        texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]
+        
+        original_textures = [fn for fn in texture_images if any((fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
+        print(original_textures)
+        for image in original_textures:
+            print(image)
+            downres_single_texture(path, image, dims, should_overwrite)
     return
 
 
