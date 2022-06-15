@@ -337,7 +337,7 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
                                  elif _type == '_E':
                                     newImage = bpy.data.images.load(file, check_existing=False)
                                     mat.node_tree.nodes["EmissiveNode"].image = newImage 
-                                    mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'sRGB'
                                     mat.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
                                  elif _type == '_O':
                                     newImage = bpy.data.images.load(file, check_existing=False)
