@@ -1401,6 +1401,19 @@ class forceLoadDNAFromUI(bpy.types.Operator):
         return {'FINISHED'}
 
 
+
+
+class countUpAllRarities(bpy.types.Operator):
+    bl_idname = 'rarities.count'
+    bl_label = 'COUNT ALL RARITIES?'
+    bl_description = 'COUNT ALL RARITIES HOVERRRRRRRRRR'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
+        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path)
+        return {'FINISHED'}
+
 # ------------------------------- Panels ----------------------------------------------
 
 #Create Preview Panel
@@ -2048,6 +2061,17 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.scale_x = 0.4
         row.prop(mytool, 'shouldForceDownres')
 
+        row.scale_x = 1
+
+        
+
+        layout.separator(factor=1.5)
+        box = layout.box()
+        box.label(text="THIS IS A TEST:")
+        row = box.row()
+        row.operator(countUpAllRarities.bl_idname, text=countUpAllRarities.bl_label)
+        
+
         # box = layout.box()
         # row = box.row()
         # row.label(text="Clean up:")
@@ -2305,6 +2329,7 @@ classes = (
 
     downresTextures,
     renameAllOriginalTextures,
+    countUpAllRarities,
 
     forceLoadDNAFromUI
 

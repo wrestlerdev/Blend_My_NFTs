@@ -118,8 +118,8 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                         if scene_type_coll.get("rarity") is not None:
                             del(scene_type_coll["rarity"])
                         
-                        update_rarity_color(type, 0)
                         update_rarity_color(h_variant, 0)
+                        update_rarity_color(type, 0)
                 else: # BETA_1.0
                     if scene_type_coll.get("rarity") is not None:
                         del(scene_type_coll["rarity"])

@@ -261,7 +261,9 @@ def set_shape_keys(rig_name, variant_name):
    shape_key_names = [variant_name, 
                      variant_name + "_mouth",
                      variant_name + "_eyes",
-                     variant_name + "_brow",]
+                     variant_name + "_brow",
+                     variant_name + "_brows",
+                     ]
    character_coll = bpy.data.collections[rig_name]
    for obj in character_coll.objects:
       if obj.type == 'MESH':
