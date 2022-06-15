@@ -663,8 +663,9 @@ def set_armature_for_meshes(character, meshes):
                   if mod.type == 'ARMATURE':
                      mod.object = bpy.data.objects[armature_name]
          else:
-            mod = mesh.modifiers.new(name='armature', type='ARMATURE')
-            mod.object = bpy.data.objects[armature_name]
+            #mod = mesh.modifiers.new(name='armature', type='ARMATURE')
+            #mod.object = bpy.data.objects[armature_name]
+            pass
    else:
       # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS 
       return
