@@ -55,9 +55,8 @@ ItemUsedBodySlot = {
 "HeadShort" : ["17-UpperHead"], # IS THIS RIGHT?
 "HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
 "HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-Backpack", "16-Earings"],
-"HeadMiddle" : ["15-MiddleHead"],
-"HeadMidFull" : ["15-MiddleHead", "17-UpperHead", "16-Earings"], # IS THIS RIGHT?
-"HeadMid" : ["15-MiddleHead"], # IS THIS RIGHT?
+"HeadMid" : ["15-MiddleHead"],
+"HeadMidFull" : ["15-MiddleHead", "17-UpperHead"],
 "HeadLower" : ["14-LowerHead"],
 "FaceFull" : ["15-MiddleHead", "14-LowerHead"],
 "HeadFull" : ["15-MiddleHead", "14-LowerHead", "13-Neck", "17-UpperHead", "16-Earings"],

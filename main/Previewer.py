@@ -339,7 +339,7 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
                                  elif _type == '_E':
                                     newImage = bpy.data.images.load(file, check_existing=False)
                                     mat.node_tree.nodes["EmissiveNode"].image = newImage 
-                                    mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["EmissiveNode"].image.colorspace_settings.name = 'sRGB'
                                     mat.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
                                  elif _type == '_O':
                                     newImage = bpy.data.images.load(file, check_existing=False)
@@ -665,8 +665,9 @@ def set_armature_for_meshes(character, meshes):
                   if mod.type == 'ARMATURE':
                      mod.object = bpy.data.objects[armature_name]
          else:
-            mod = mesh.modifiers.new(name='armature', type='ARMATURE')
-            mod.object = bpy.data.objects[armature_name]
+            #mod = mesh.modifiers.new(name='armature', type='ARMATURE')
+            #mod.object = bpy.data.objects[armature_name]
+            pass
    else:
       # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS 
       return
