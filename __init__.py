@@ -273,7 +273,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
-    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=500)
+    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=2000)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
 
     RTintPreview: bpy.props.FloatVectorProperty(name="R Tint Preview", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
@@ -1410,8 +1410,9 @@ class countUpAllRarities(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
-        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path)
+        index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(1))
+        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
         return {'FINISHED'}
 
 # ------------------------------- Panels ----------------------------------------------
