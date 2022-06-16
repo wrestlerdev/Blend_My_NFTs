@@ -87,6 +87,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                         if Select:
                            obj.select_set(True)
 
+                     # set_subdiv_levels(meshes)
                      set_armature_for_meshes(character, meshes)
                      texture_mesh = bpy.data.objects[itemDictionary["item_texture"]]
 
@@ -671,6 +672,20 @@ def set_armature_for_meshes(character, meshes):
    else:
       # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS 
       return
+
+
+
+def set_subdiv_levels(meshes):
+   for mesh in meshes:
+            if mesh.modifiers:
+                  for mod in mesh.modifiers:
+                     if mod.type == 'SUBSURF':
+                        mod.show_viewport = False
+                        mod.show_render = True
+                        mod.levels = mod.render_levels
+   return
+
+
 
 
 #---------------------------------------------------------------------------
