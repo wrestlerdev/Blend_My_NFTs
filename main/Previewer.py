@@ -205,7 +205,7 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
    CurrentDNA = CurrentDict["DNAList"]
    DNA = bpy.context.scene.my_tool.inputDNA
    NewDict = {}
-   if DNA != CurrentDNA:
+   if True:
       DNAString = DNA.split(',')
       character = DNAString.pop(0)
       style = DNAString.pop(0)

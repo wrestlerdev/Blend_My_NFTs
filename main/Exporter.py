@@ -261,7 +261,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
         select_hierarchy(bpy.data.collections["Rendering"])
         bpy.data.objects["CameraStill"].select_set(True)
-        bpy.data.objects["CameraVideo"].select_set(True)
+        #bpy.data.objects["CameraVideo"].select_set(True)
         blend_name = "Batch_{:03d}_NFT_{:04d}.blend".format(batch_num, i)
         blend_save  = os.path.join(batch_path, "NFT_{:04d}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
