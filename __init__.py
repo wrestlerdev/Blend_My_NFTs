@@ -421,8 +421,7 @@ class clearSlots(bpy.types.Operator):
         lastDNA = bpy.context.scene.my_tool.inputDNA
         DNASplit = lastDNA.split(',')
         character = DNASplit.pop(0)
-        style = DNASplit.pop(0)
-        DNA = Exporter.Previewer.get_null_dna(character, style)
+        DNA = Exporter.Previewer.get_null_dna(character)
         bpy.context.scene.my_tool.inputDNA = DNA
         return {'FINISHED'}
 

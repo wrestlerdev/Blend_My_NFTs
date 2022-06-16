@@ -167,7 +167,6 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict):
     attributes = []
     DNAString = DNA.split(",")
     character = DNAString.pop(0)
-    style = DNAString.pop(0)
 
     attributes.append({"trait_type": "Character", "value": character})
 

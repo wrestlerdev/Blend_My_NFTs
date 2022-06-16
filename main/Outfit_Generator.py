@@ -151,7 +151,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         character = PickCharacter()
-        ColorGen.SetUpCharacterStyle()
+        style = ColorGen.SetUpCharacterStyle()
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -234,8 +234,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                         SlotUpdateValue = {i : True}
                         attributeUsedDict.update(SlotUpdateValue)
 
-            ColorGen.PickOutfitColors(attribute)
-            SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
+            color_key, color_choice = ColorGen.PickOutfitColors(attribute)
+            SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
 
             # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
             #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
@@ -251,7 +251,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 current_entry["item_variant"] = variant_name
                 current_entry["item_texture"] = textureChoosen
                 current_entry["item_index"] = hierarchy[attribute][typeChoosen][varientChoosen]["item_index"]
-                current_entry["texture_index"] = textureIndex
                 current_entry["type_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["type_rarity"]
                 current_entry["variant_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["variant_rarity"]
                 if hierarchy[attribute][typeChoosen][varientChoosen]["textureSets"]:
@@ -259,14 +258,14 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 else:
                     texture_rarity = 0
                 current_entry["texture_rarity"] = texture_rarity
-                current_entry["color_style"] = ColorGen.styleKey
-                current_entry["color_key"] = ColorGen.colorkey
+                # current_entry["color_style"] = ColorGen.styleKey
+                current_entry["color_key"] = color_key
                 VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict
             
                 
         SingleDNA.insert(0, character)
-        SingleDNA.insert(1, ColorGen.styleKey) # TODO add color style to dict too
+        # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
@@ -283,6 +282,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     for m in bpy.data.materials: # purge all unused materials for now
         if m.users == 0 and m.name != 'MasterV01':
             bpy.data.materials.remove(m)
+
+    print(DNASet)
 
     return list(DNASet), NFTDict
     
