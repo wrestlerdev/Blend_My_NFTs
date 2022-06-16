@@ -1401,19 +1401,22 @@ class forceLoadDNAFromUI(bpy.types.Operator):
         return {'FINISHED'}
 
 
-
-
 class countUpAllRarities(bpy.types.Operator):
     bl_idname = 'rarities.count'
-    bl_label = 'COUNT ALL RARITIES?'
-    bl_description = 'COUNT ALL RARITIES HOVERRRRRRRRRR'
+    bl_label = 'Calculate Absolute Rarities'
+    bl_description = 'This will take like an entire hot minute, are u sure'
     bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
         nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(1))
         DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
         return {'FINISHED'}
+
+
 
 # ------------------------------- Panels ----------------------------------------------
 
@@ -2068,7 +2071,7 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
 
         layout.separator(factor=1.5)
         box = layout.box()
-        box.label(text="THIS IS A TEST:")
+        box.label(text="Calculator:")
         row = box.row()
         row.operator(countUpAllRarities.bl_idname, text=countUpAllRarities.bl_label)
         
