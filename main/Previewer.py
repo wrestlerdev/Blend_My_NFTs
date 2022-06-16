@@ -87,6 +87,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                         if Select:
                            obj.select_set(True)
 
+                     # set_subdiv_levels(meshes)
                      set_armature_for_meshes(character, meshes)
                      texture_mesh = bpy.data.objects[itemDictionary["item_texture"]]
 
@@ -97,7 +98,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                         # print(resolution)
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
                      # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
-                     set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution)
+                     set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
 
             if type.name[3:].startswith('Expression'):
             # if 'Expression' in type.name:
@@ -288,7 +289,7 @@ def reset_shape_keys(rig_name):
    return
 
 
-def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
+def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution, slot_pathing):
    suffix = config.texture_suffixes[resolution]
    # if suffix == '':
    #    print("this should be 4k okay")
@@ -307,7 +308,7 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
                   for n in mat.node_tree.nodes:
                      if n.type == 'TEX_IMAGE':
                         if n.image is not None:
-                           texture_info = get_new_texture_name(n, suffix)
+                           texture_info = get_new_texture_name(n, suffix, texture_mesh, slot_pathing)
                            if texture_info:
                               new_texture, new_texture_path, _type = texture_info
                               if os.path.exists(new_texture_path):
@@ -365,7 +366,7 @@ def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution):
    return
 
 
-def get_new_texture_name(node, suffix):
+def get_new_texture_name(node, suffix, texture_mesh, slot_pathing):
    types = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
    for _type in types:
       filepath, partition, filename = node.image.filepath.rpartition('\\')
@@ -378,11 +379,19 @@ def get_new_texture_name(node, suffix):
             return filename, node.image.filepath, _type
          else:
             # print("this is a different texture?")
-            new_path = filepath + partition
-            new_texture = filesplit[0] + _type + suffix + '.' + file_type 
-            new_texture_path = new_path + new_texture
-
-            return new_texture, new_texture_path, _type
+            texture_set = texture_mesh.name.rpartition('_')[2]
+            slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
+            variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])
+            texture_folder_path = os.path.join(variant_folder_path, "Textures", texture_set)
+            
+            new_texture_end = _type + suffix + '.' + file_type
+            new_texture = [t for t in os.listdir(texture_folder_path) if t.endswith(new_texture_end)]
+            for t in os.listdir(texture_folder_path):
+               if t.endswith(new_texture_end):
+                  new_texture = t
+                  new_path = filepath + partition
+                  new_texture_path = new_path + new_texture
+                  return new_texture, new_texture_path, _type
    return None
 
 
@@ -671,6 +680,20 @@ def set_armature_for_meshes(character, meshes):
    else:
       # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS 
       return
+
+
+
+def set_subdiv_levels(meshes):
+   for mesh in meshes:
+            if mesh.modifiers:
+                  for mod in mesh.modifiers:
+                     if mod.type == 'SUBSURF':
+                        mod.show_viewport = False
+                        mod.show_render = True
+                        mod.levels = mod.render_levels
+   return
+
+
 
 
 #---------------------------------------------------------------------------

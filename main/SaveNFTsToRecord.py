@@ -369,6 +369,8 @@ def CreateSlotsFolderHierarchy(save_path):
                                                                         if mod.type == 'SUBSURF':
                                                                             print(obj.name)
                                                                             mod.show_viewport = False
+                                                                            mod.show_render = True
+                                                                            mod.levels = mod.render_levels
 
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
                                         if(texture_path != ""):

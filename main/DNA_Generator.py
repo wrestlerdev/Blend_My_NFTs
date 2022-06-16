@@ -411,11 +411,13 @@ def reset_rarity_Record(NFTRecord_save_path):
    DataDictionary["DNAList"] = OriginalDataDictionary["DNAList"]
    hierarchy = NFTHirachy.createHirachy()
 
+   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-UpperHeadNull"]
+
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):
          for variant in list(hierarchy[slot][type].keys()):
             variant_name = variant.split('_')[-1]
-            if type == "00-PelvisThickNull":
+            if type not in zero_null_types:
                rarity = 50
             elif variant_name not in ['Null', 'Nulll']:
                rarity = 50
