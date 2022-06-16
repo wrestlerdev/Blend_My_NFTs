@@ -1738,18 +1738,23 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
             for char in config.Characters:
                 row.label(text="{}: {}".format(char, single_dict[char]))
 
-
-        row = layout.row()
+        box = layout.box()
+        row = box.row()
         row.prop(mytool, "loadNFTIndex")
         row.operator(loadNFT.bl_idname, text=loadNFT.bl_label)
         
-        row = layout.row()
+        row = box.row()
         row.operator(loadPrevNFT.bl_idname, text=loadPrevNFT.bl_label)
         row.operator(loadNextNFT.bl_idname, text=loadNextNFT.bl_label)
 
+        layout.separator(factor=0.0)
+
         row = layout.row()
-        row.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
-        row.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
+        row.scale_y = 0.6
+        box = row.box()
+        box.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
+        box = row.box()
+        box.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
         return
 
 
@@ -1782,11 +1787,13 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
             # row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
             row.label(text="Please create or load directory")
 
-        row = layout.row()
+        box = layout.box()
+
+        row = box.row()
         row.prop(mytool, "BatchSliderIndex")
 
         row.operator(loadBatch.bl_idname, text=loadBatch.bl_label)
-        row = layout.row()
+        row = box.row()
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
         row = layout.row()
@@ -1829,7 +1836,7 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.label(text=output_path)
 
-        row = layout.row()
+        row = layout.box()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
 
@@ -2255,8 +2262,8 @@ classes = (
     WCUSTOM_PT_Initialize,
     WCUSTOM_PT_ARootDirectory,
     WCUSTOM_PT_EditBatch,
-    WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_PreviewNFTs,
+    WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_ModelSettings,
     # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
