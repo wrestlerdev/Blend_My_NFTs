@@ -339,7 +339,8 @@ class initializeRecord(bpy.types.Operator):
         print(save_path)
         Blend_My_NFTs_Output, output_save_path = make_directories(save_path)
 
-        first_nftrecord_save_path = os.path.join(output_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
+        first_batch_path = os.path.join(output_save_path,  "Batch_{:03d}".format(1))
+        first_nftrecord_save_path = os.path.join(first_batch_path, "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(output_save_path, "_NFTRecord.json")
 
         bpy.context.scene.my_tool.batch_json_save_path = output_save_path
@@ -355,6 +356,8 @@ class initializeRecord(bpy.types.Operator):
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
         LoadNFT.update_current_batch(1, output_save_path)
         LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
+
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, 1, True)
         return {'FINISHED'}
 
 
@@ -712,11 +715,14 @@ class saveNewBatch(bpy.types.Operator):
         
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
-        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+        current_batch_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
+        NFTRecord_save_path = os.path.join(current_batch_save_path, "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
         bpy.context.scene.my_tool.BatchSliderIndex = index
+
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(current_batch_save_path, index, True)
         return {'FINISHED'}
 
 
@@ -740,9 +746,12 @@ class resetBatch(bpy.types.Operator):
             self.report({"ERROR"}, "Failed: Invalid batch to reset")
             return {'FINISHED'}
 
-        nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+        current_batch_save_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index))
+        nftrecord_path = os.path.join(current_batch_save_path, "_NFTRecord_{:03d}.json".format(batch_index))
         DNA_Generator.reset_rarity_Record(nftrecord_path)
         LoadNFT.update_collection_rarity_property(nftrecord_path)
+        
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(current_batch_save_path, batch_index, True)
         return {'FINISHED'}
 
 
@@ -1441,6 +1450,19 @@ class countUpAllRarities(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class testButton(bpy.types.Operator):
+    bl_idname = 'test.button'
+    bl_label = 'For tests'
+    bl_description = '(╬ಠิ益ಠิ)'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        print("(╬ಠิ益ಠิ)")
+        index = 4
+        first_batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(index))
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
+        return {'FINISHED'}
+
 
 # ------------------------------- Panels ----------------------------------------------
 
@@ -1545,7 +1567,7 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
         row = layout.row()
         row.prop(mytool, "inputDNA")
         row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
-        
+
         box = layout.box()
         row = box.row()
         row.scale_x = 1.3
@@ -2158,15 +2180,16 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.prop(mytool, 'shouldForceDownres')
 
         row.scale_x = 1
-
-        
-
         layout.separator(factor=1.5)
         box = layout.box()
         box.label(text="Calculator:")
         row = box.row()
         row.operator(countUpAllRarities.bl_idname, text=countUpAllRarities.bl_label)
         
+        layout.separator(factor=1.5)
+
+        row = layout.row()
+        row.operator(testButton.bl_idname, text=testButton.bl_label)
 
         # box = layout.box()
         # row = box.row()
@@ -2429,7 +2452,8 @@ classes = (
     renameAllOriginalTextures,
     countUpAllRarities,
 
-    forceLoadDNAFromUI
+    forceLoadDNAFromUI,
+    testButton
 
 )
 
