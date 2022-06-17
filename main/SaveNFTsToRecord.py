@@ -372,6 +372,23 @@ def CreateSlotsFolderHierarchy(save_path):
                                                                             mod.show_render = True
                                                                             mod.levels = mod.render_levels
 
+                                        for c in config.Characters:
+                                            bpy.ops.object.select_all(action='DESELECT')
+                                            for obj in characterCollectionDict[c].objects:
+                                                obj.hide_viewport = False
+                                                obj.hide_render =  False
+                                                cube = obj
+                                                cube.select_set( state = True, view_layer = bpy.context.view_layer )
+                                                bpy.context.view_layer.objects.active = cube
+
+                                            if len(bpy.context.selected_objects) > 1:
+                                                 
+                                                bpy.ops.object.join()
+
+                                            for obj in characterCollectionDict[c].objects:
+                                                obj.hide_viewport = True
+                                                obj.hide_render =  True
+
                                         texture_path = CheckAndFormatPath(item_path, "Textures")
                                         if(texture_path != ""):
                                             index = 0
