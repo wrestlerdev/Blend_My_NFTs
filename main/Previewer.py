@@ -218,7 +218,6 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
          atttype_index = DNASplit[0]
          variant_index = DNASplit[1]
          texture_index = DNASplit[2]
-         color_key = DNASplit[3]
 
          attribute = list(ohierarchy.items())[i]
          type = list(attribute[1].items())[int(atttype_index)]
@@ -244,6 +243,7 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
             current_entry["variant_rarity"] = bpy.data.collections[variant]['rarity']
             current_entry["texture_rarity"] = ohierarchy[attribute[0]][type[0]][variant]["textureSets"][last_texture]
             # current_entry["color_style"] = style
+            color_key = DNASplit[3]
             current_entry["color_key"] = color_key
             VarientDict[variant] = current_entry
          ItemsUsed[attribute[0]] = VarientDict
@@ -428,7 +428,10 @@ def set_from_collection(slot_coll, variant_name): # get new dna strand from vari
          variant_index = type_list.index(var_coll)
          texture_index = 0 # TODO HOW TO GET TEXTURE INDEX NOW
 
-         dna_string = [str(type_index), str(variant_index), str(texture_index)]
+         if type_coll.name[3:] in config.EmptyTypes:
+            dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']
+         else:
+            dna_string = [str(type_index), str(variant_index), str(texture_index)]
          new_dna_strand = '-'.join(dna_string)
          break # CHECK THIS
       else:
@@ -524,24 +527,31 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    DNA = dna_string.split(',') 
    old_strand = DNA[coll_index + 1]
 
+
    if dna_strand: # append old colour to new dna_string
       new_dnastrand = dna_strand
       if len(dna_strand.split('-')) < 4 and dna_strand != '0-0-0':
          dna_strand += ('-' + old_strand.rpartition('-')[2])
          new_dnasplit = dna_strand.split('-')
          if len(old_strand.split('-')) < 4:
-            new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, "Random") # TODO not just random
+            style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
+            new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style) # TODO not just random
          else:
             new_colorkey = old_strand.rpartition('-')[2]
+            
          new_dnasplit[-1] = new_colorkey
          new_dnastrand = '-'.join(new_dnasplit)
+      else:
+         new_colorkey = dna_strand.rpartition('-')[2]
 
    else: # randomize colour here? # should it check for 0-0-0?
+      # MAKE A CHECK FOR EMPTY TYPES
       new_split = DNA[coll_index + 1].split('-')
       max_attempts = 10
       old_colorkey = old_strand.split('-')[-1]
       for i in range(max_attempts):
-         new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, "Random")
+         style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
+         new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style)
          if new_colorkey != old_colorkey:
             break
       new_split[-1] = new_colorkey
@@ -559,6 +569,10 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    nftrecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
    batch_record = json.load(open(nftrecord_save_path))
    type_coll = bpy.data.collections[coll_name].children[int(type_index)]
+   if type_coll.name[3:] in config.EmptyTypes and color_key != 'Empty':
+      new_colorkey = 'Empty'
+      new_dnastrand = '-'.join([type_index, var_index, tex_index, new_colorkey])
+
    var_coll = type_coll.children[int(var_index)]
 
    record_item = batch_record["hierarchy"][coll_name][type_coll.name][var_coll.name]
@@ -582,14 +596,16 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
 
 
 
-def randomize_color_style():
+def randomize_color_style(new_style=''):
    NFTDict = LoadTempDNADict()
    CharacterItems = NFTDict["CharacterItems"]
    dna_string = NFTDict["DNAList"]
    hierarchy = get_hierarchy_ordered()
    DNASplit = dna_string.split(',') 
 
-   new_style = ColorGen.SetUpCharacterStyle()
+   if not new_style:
+      new_style = ColorGen.SetUpCharacterStyle()
+      bpy.context.scene.my_tool.currentGeneratorStyle = new_style
 
    for coll_name in list(NFTDict["CharacterItems"].keys()):
       if CharacterItems[coll_name] != 'Null':
@@ -600,9 +616,11 @@ def randomize_color_style():
          type_coll = bpy.data.collections[coll_name].children[int(type_index)]
          var_coll = type_coll.children[int(var_index)]
 
-         new_key, color_choice = ColorGen.PickOutfitColors(coll_name, new_style)
+         if type_coll.name[3:] in config.EmptyTypes:
+            new_key = 'Empty'
+         else:
+            new_key, color_choice = ColorGen.PickOutfitColors(coll_name, new_style)
          new_item = CharacterItems[coll_name][var_coll.name]
-         # new_item["color_style"] = new_style
          new_item["color_key"] = new_key
 
          new_dnastrand = dna_strand.split('-')
@@ -642,7 +660,7 @@ def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with varia
       atttype_index = DNASplit[0]
       variant_index = DNASplit[1]
       texture_index = DNASplit[2]
-      color_key = DNASplit[3]
+      # color_key = DNASplit[3]
 
       slot = list(ohierarchy.items())[i]
       atttype = list(slot[1].items())[int(atttype_index)]

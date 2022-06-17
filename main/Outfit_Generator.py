@@ -54,8 +54,7 @@ ItemUsedBodySlot = {
 "FeetShort" : ["12-Feet"],
 "Calf" : ["10-Calf"],
 "Neck" : ["13-Neck"],
-"HeadUpper" : ["17-UpperHead"],
-"HeadShort" : ["17-UpperHead"], # IS THIS RIGHT?
+"HeadShort" : ["17-UpperHead"],
 "HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
 "HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-Backpack", "16-Earings"],
 "HeadMid" : ["15-MiddleHead"],
@@ -69,10 +68,13 @@ ItemUsedBodySlot = {
 "BackpackHigh" : ["18-Backpack"],
 "Expression" : ["20-Expression"],
 "ExpressionLower" : ["14-LowerHead", "20-Expression"],
+"ExpressionLowerNone" : ["14-LowerHead", "20-Expression"],
 "ExpressionUpper" : ["15-MiddleHead", "20-Expression"],
 "ExpressionFull" : ["14-LowerHead", "15-MiddleHead", "20-Expression"],
 "Background" : ["19-Background"]
 }
+
+
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
@@ -152,6 +154,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
         character = PickCharacter()
         style = ColorGen.SetUpCharacterStyle()
+        bpy.context.scene.my_tool.currentGeneratorStyle = style
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -198,50 +201,55 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
 
-                char_variants = bpy.data.collections.get(varientChoosen).children
-                if char_variants:
-                    for char_coll in char_variants:
-                        char_name = char_coll.name.split('_')[-1]
-                        if char_name == character:
-                            chidlrenObjs = char_coll.objects
+                if typeIndex == 0 and varientIndex == 0:
+                    SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0-0"
                 else:
-                    chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
-                    #for obj in chidlrenObjs:
+                    char_variants = bpy.data.collections.get(varientChoosen).children
+                    if char_variants:
+                        for char_coll in char_variants:
+                            char_name = char_coll.name.split('_')[-1]
+                            if char_name == character:
+                                chidlrenObjs = char_coll.objects
+                    else:
+                        chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
+                        #for obj in chidlrenObjs:
 
-                armature_name = "armature_" + str(character).lower()
-                if bpy.data.objects.get(armature_name) is not None:
-                    for obj in chidlrenObjs:
-                        if obj.modifiers:
-                            for mod in obj.modifiers:
-                                if mod.type == 'ARMATURE':
-                                    mod.object = bpy.data.objects[armature_name]
-                        else:
-                            mod = obj.modifiers.new(name='armature', type='ARMATURE')
-                            mod.object = bpy.data.objects[armature_name]
-                # else:
+                    armature_name = "armature_" + str(character).lower()
+                    if bpy.data.objects.get(armature_name) is not None:
+                        for obj in chidlrenObjs:
+                            if obj.modifiers:
+                                for mod in obj.modifiers:
+                                    if mod.type == 'ARMATURE':
+                                        mod.object = bpy.data.objects[armature_name]
+                            else:
+                                mod = obj.modifiers.new(name='armature', type='ARMATURE')
+                                mod.object = bpy.data.objects[armature_name]
+                    # else:
                     # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
             
 
-                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["item_type"][3:]
-                #loop through all slots that selected item will take up
-                if ItemClothingGenre in ItemUsedBodySlot:
-                    UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-                else: 
-                    UsedUpSlotArray = []
+                    ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["item_type"][3:]
+                    #loop through all slots that selected item will take up
+                    if ItemClothingGenre in ItemUsedBodySlot:
+                        UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+                    else: 
+                        UsedUpSlotArray = []
 
-                if UsedUpSlotArray:
-                    for i in ItemUsedBodySlot.get(ItemClothingGenre):
-                        SlotUpdateValue = {i : True}
-                        attributeUsedDict.update(SlotUpdateValue)
+                    if UsedUpSlotArray:
+                        for i in ItemUsedBodySlot.get(ItemClothingGenre):
+                            SlotUpdateValue = {i : True}
+                            attributeUsedDict.update(SlotUpdateValue)
 
-            color_key, color_choice = ColorGen.PickOutfitColors(attribute)
-            SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
 
-            # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
-            #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
+            if not (typeIndex == 0 and varientIndex == 0):
+                if typeChoosen[3:] in config.EmptyTypes:
+                    color_key = 'Empty'
+                else:
+                    color_key, color_choice = ColorGen.PickOutfitColors(attribute)
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
+
             VarientDict = {}
             current_entry = {}
-            # current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
             variant_name = varientChoosen.split('_')[-1]
             if variant_name in ["Null", 'Nulll']:
                 VarientDict = 'Null'
@@ -258,7 +266,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 else:
                     texture_rarity = 0
                 current_entry["texture_rarity"] = texture_rarity
-                # current_entry["color_style"] = ColorGen.styleKey
                 current_entry["color_key"] = color_key
                 VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict

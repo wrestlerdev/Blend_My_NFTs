@@ -272,6 +272,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     WhiteTint: bpy.props.FloatVectorProperty(name="W Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
+    currentGeneratorStyle: bpy.props.StringProperty(name="Style", default='')
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
     colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=2000)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
@@ -393,6 +394,18 @@ class randomizeAllColor(bpy.types.Operator):
         Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
+class randomizeAllSets(bpy.types.Operator):
+    bl_idname = 'randomize.colorsets'
+    bl_label = 'Randomize Color Sets'
+    bl_description = "Randomize colour sets"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
+        dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
+        Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        return {'FINISHED'}
+
 
 class randomizeColor(bpy.types.Operator):
     bl_idname = 'randomize.color'
@@ -406,7 +419,9 @@ class randomizeColor(bpy.types.Operator):
             LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
             input_slot = self.collection_name
             slot_coll = Slots[input_slot][0]
-            Exporter.Previewer.update_colour_random(slot_coll)
+            type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
+            if type not in config.EmptyTypes:
+                Exporter.Previewer.update_colour_random(slot_coll)
         return {'FINISHED'}
 
 
@@ -1319,6 +1334,16 @@ class deleteColorSet(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class clearGeneratorStyle(bpy.types.Operator):
+    bl_idname = 'genstyle.clear'
+    bl_label = 'Clear Style'
+    bl_description = 'Clear Style'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        context.scene.my_tool.currentGeneratorStyle = ''
+        return {'FINISHED'}
+
 # --------------------------------- Textures ---------------------------------------------
 
 
@@ -1447,11 +1472,9 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        row = layout.row()
-        row.prop(mytool, "inputDNA")
-        row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
-        row = layout.separator()
+
+        # row = layout.separator()
         # row = layout.separator(factor=0.0)
         row = layout.row()
         row.prop(mytool, "maxNFTs")
@@ -1495,7 +1518,7 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
 
 
 class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
-    bl_label = "All Slots"
+    bl_label = "Slots"
     bl_idname = "WCUSTOM_PT_ParentSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -1505,18 +1528,40 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+
+
+class WCUSTOM_PT_AllSlots(bpy.types.Panel):
+    bl_label = "All Slots"
+    bl_idname = "WCUSTOM_PT_AllSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        row = layout.row()
+        row.prop(mytool, "inputDNA")
+        row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
+        
         box = layout.box()
         row = box.row()
         row.scale_x = 1.3
         row.label(text='Any Slot', icon='OUTLINER_COLLECTION')
         row.prop(mytool, "inputGeneral", text='')
         row.scale_x = 1
+        row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
+        row.operator(randomizeAllSets.bl_idname, text=randomizeAllSets.bl_label)
 
-        row = layout.row()
-        row.separator(factor=1.5)
-        row = layout.row()
-        row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
+        # row = layout.row()
+        # row.label(text='')
+        row.scale_x = 0.5
+        row.prop(mytool, "currentGeneratorStyle", text='')
+        row.operator(clearGeneratorStyle.bl_idname, text=clearGeneratorStyle.bl_label)
+
 
 
 class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
@@ -1539,17 +1584,25 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(Slots[name][0][:2])
+                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
+                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 1.5
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 1.5
                 row.label(text='')
 
 
@@ -1576,17 +1629,25 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(Slots[name][0][:2])
+                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
+                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 1.5
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 1.5
                 row.label(text='')
 
 
@@ -1614,17 +1675,25 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(Slots[name][0][:2])
+                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
+                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 1.5
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 1.5
                 row.label(text='')
 
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
@@ -1647,21 +1716,30 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+
         for name in self.slots:
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(Slots[name][0][:2])
+                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
+                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 1.5
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 1.5
                 row.label(text='')
                 # row.operator(randomizeColor.bl_idname, text='',emboss=False).collection_name = name
 
@@ -1683,17 +1761,25 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
             row = layout.row()
             row.label(text=Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(Slots[name][0][:2])
+                color_key = inputDNA.split(',')[dna_index + 1].rpartition('-')[2]
+                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 1.5
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 1.5
                 row.label(text='')
 
 
@@ -2261,11 +2347,12 @@ classes = (
     WCUSTOM_PT_Initialize,
     WCUSTOM_PT_ARootDirectory,
     WCUSTOM_PT_EditBatch,
-    WCUSTOM_PT_PreviewNFTs,
     WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_ModelSettings,
+    WCUSTOM_PT_PreviewNFTs,
     # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
+    WCUSTOM_PT_AllSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
@@ -2336,7 +2423,8 @@ classes = (
     deleteColorSet,
     updateBatch,
     saveStyleRarity,
-
+    clearGeneratorStyle,
+    randomizeAllSets,
     downresTextures,
     renameAllOriginalTextures,
     countUpAllRarities,
