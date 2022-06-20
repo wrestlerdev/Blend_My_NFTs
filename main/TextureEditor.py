@@ -165,12 +165,14 @@ def downres_single_texture(path, image_name, dims, should_overwrite):
 
 
 def reimport_all_character_objects(folder_path):
+    delete_all_actions()
     for dir in os.listdir(folder_path):
         if dir.endswith('.blend') and 'Rig' in dir:
             rig_blendfile_path = os.path.join(folder_path, dir)
     for char in config.Characters:
         reimport_character_objects(char, rig_blendfile_path)
     return
+
 
 def reimport_character_objects(character, rig_blendfile_path):
     clear_old_character_objects(character)
@@ -186,7 +188,26 @@ def reimport_character_objects(character, rig_blendfile_path):
     file_path   = os.path.join(rig_blendfile_path, "Collection", filename)
     directory = os.path.join(rig_blendfile_path, "Collection")
     bpy.ops.wm.append(filepath=file_path, directory=directory, filename=filename)
+    import_character_actions(character, rig_blendfile_path)
     return
+
+def import_character_actions(character, rig_blendfile_pathr):
+    actions = []
+    with bpy.data.libraries.load(rig_blendfile_pathr) as (data_from, data_to):
+        #names = [name for name in data_from.collections]
+        actions = [action for action in data_from.actions]
+        for action in actions:
+            if action.endswith(character.lower()):
+                dir = os.path.join(rig_blendfile_pathr, "Action")
+                file_name = action
+                file_path = os.path.join(dir, file_name)      
+                bpy.ops.wm.append(filepath=file_path, directory=dir, filename=file_name, set_fake=True )
+            
+    return actions
+
+def delete_all_actions():
+    for action in bpy.data.actions:
+        bpy.data.actions.remove(action)
 
 def clear_old_character_objects(char_name):
     coll = bpy.data.collections[char_name]
