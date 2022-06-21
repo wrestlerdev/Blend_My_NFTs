@@ -651,6 +651,12 @@ class loadBatch(bpy.types.Operator):
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
 
         print(bpy.context.scene.my_tool.BatchSliderIndex)
+
+        rarity_dict = DNA_Generator.Outfit_Generator.ColorGen.OpenBatchColorRarity(index)
+        if bpy.context.scene.my_tool.colorStyleName in rarity_dict:
+            bpy.context.scene.my_tool.colorStyleRarity = rarity_dict[bpy.context.scene.my_tool.colorStyleName]
+        else:
+            bpy.context.scene.my_tool.colorStyleRarity = 0
         return {'FINISHED'}
 
 

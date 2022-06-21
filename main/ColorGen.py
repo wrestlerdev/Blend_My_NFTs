@@ -469,6 +469,13 @@ def WriteToGlobalStyleList(GlobalStyleList):
       print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
 
 
+def OpenBatchColorRarity(batch_index):
+    path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    GlobalColorList = json.load(open(path))
+    return GlobalColorList
+
+
+
 def ColorHasbeenUpdated(ColorTint):
     inputColorListSceneObject = bpy.context.scene.my_tool.inputColorListSceneObject
     Rtint = bpy.context.scene.my_tool.RTint
