@@ -407,8 +407,8 @@ count = 0
 def count_all_rarities(batch_record_path, index):
     global count
     print("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-    json_name = 'RarityCounter_Batch_{:03d}.json'.format(index)
-    DataDictionary = json.load(open(batch_record_path))
+    json_name = os.path.join(batch_record_path, '_RarityCounter_{:03d}.json'.format(index))
+    DataDictionary = json.load(open(os.path.join(batch_record_path, "_NFTRecord_{:03d}.json".format(index))))
     hierarchy = DataDictionary["hierarchy"]
 
     time_start = time.time()
@@ -426,7 +426,6 @@ def count_all_rarities(batch_record_path, index):
                 rarity_dict[attribute][type][variant]['absolute_rarity'] = 0.0
                 rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[variant], bpy.data.collections[type])[0]
 
-    # filled_slots = set()
     count = 0
     filled_slots = '0' * len(hierarchy.keys())
     rarity_dict = add_rarity_recurse(rarity_dict, 1, hierarchy, filled_slots, attribute='01-UpperTorso')
