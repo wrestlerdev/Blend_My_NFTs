@@ -1210,7 +1210,8 @@ class nextGlobalColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(1)
+        color_key = DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(1)
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 
@@ -1221,7 +1222,8 @@ class prevGlobalColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(-1)
+        color_key = DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(-1)
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 class addGlobalColorSet(bpy.types.Operator):
@@ -1232,6 +1234,7 @@ class addGlobalColorSet(bpy.types.Operator):
     
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.AddNewGlobalColorSet()
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 class deleteGlobalColorSet(bpy.types.Operator):
@@ -1300,6 +1303,7 @@ class colourCopyDown(bpy.types.Operator):
 
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.copy_colour_down()
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 
@@ -1311,6 +1315,7 @@ class loadColorOnMesh(bpy.types.Operator):
 
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("woo")
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 
@@ -1458,9 +1463,11 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        index = 4
-        first_batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(index))
-        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
+        # index = 4
+        # first_batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(index))
+        # DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
+
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 

@@ -410,7 +410,7 @@ def get_null_dna(character="Kae"):
 
 
 
-def set_from_collection(slot_coll, variant_name): # get new dna strand from variant name
+def set_from_collection(slot_coll, variant_name, color_key=''): # get new dna strand from variant name
    new_dna_strand = ''
    type_index = 0
    variant_index = 0
@@ -430,6 +430,8 @@ def set_from_collection(slot_coll, variant_name): # get new dna strand from vari
 
          if type_coll.name[3:] in config.EmptyTypes:
             dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']
+         elif color_key:
+            dna_string = [str(type_index), str(variant_index), str(texture_index), color_key]
          else:
             dna_string = [str(type_index), str(variant_index), str(texture_index)]
          new_dna_strand = '-'.join(dna_string)
@@ -711,6 +713,30 @@ def set_subdiv_levels(meshes):
    return
 
 
+
+
+#---------------------------------------------------------------------------
+
+
+def colorpicker_has_applied():
+   inputColorListSceneObject = bpy.context.scene.my_tool.inputColorListSceneObject
+   tint_key = bpy.context.scene.my_tool.colorSetName
+   if inputColorListSceneObject and tint_key:
+      collection_name = inputColorListSceneObject.users_collection[0].name
+      variant_name = collection_name.rpartition('_')[0]
+
+      ColorList = ColorGen.OpenGlobalColorList()
+
+      if tint_key in ColorList and inputColorListSceneObject:
+         att_name = collection_name.partition('_')[0]
+         slots_key = 'input' + att_name
+         coll_name, label = config.Slots[slots_key]
+         new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name, tint_key)
+         if new_dnastrand != '': # if is from correct collection
+            dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
+            show_nft_from_dna(dna_string, CharacterItems)
+            return True
+   return False
 
 
 #---------------------------------------------------------------------------

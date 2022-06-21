@@ -320,6 +320,7 @@ def NextGlobalColorSet(direction):
         key = keys_list[ 0 ]
     bpy.context.scene.my_tool.colorSetName = key
     UpdateColorWheels()
+    return key
 
 
 def UpdateColorWheels():
@@ -475,6 +476,9 @@ def ColorHasbeenUpdated(ColorTint):
     Btint = bpy.context.scene.my_tool.BTint
     Atint = bpy.context.scene.my_tool.AlphaTint
     Wtint = bpy.context.scene.my_tool.WhiteTint
+    collection_name = inputColorListSceneObject.users_collection[0].name
+    collection_name = collection_name.rpartition('_')[0]
+    print(collection_name)
     if inputColorListSceneObject is not None:
         for m in inputColorListSceneObject.material_slots:
             material = m.material
