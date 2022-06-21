@@ -381,9 +381,19 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 cube.select_set( state = True, view_layer = bpy.context.view_layer )
                                                 bpy.context.view_layer.objects.active = cube
 
-                                            if len(bpy.context.selected_objects) > 1:
-                                                 
+                                            if len(bpy.context.selected_objects) > 1:                    
                                                 bpy.ops.object.join()
+                                            if len(characterCollectionDict[c].objects) > 0:
+                                                objectToCalc = characterCollectionDict[c].objects[0]
+
+                                                x = objectToCalc.dimensions.x
+                                                y = objectToCalc.dimensions.y
+                                                z = objectToCalc.dimensions.z
+                                                vol = x * y * z
+                                                characterCollectionDict[c]["Volume"] = vol / 1000
+                                                print("x: ", x, " y: ", y, " z: ", z, " Volume: ",  vol)
+                                            else:
+                                                characterCollectionDict[c]["Volume"] = 0.0
 
                                             for obj in characterCollectionDict[c].objects:
                                                 obj.hide_viewport = True
