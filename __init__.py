@@ -1460,7 +1460,7 @@ class countUpAllRarities(bpy.types.Operator):
 
     def execute(self, context):
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(1))
+        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
         DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
         return {'FINISHED'}
 
