@@ -115,7 +115,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    SaveTempDNADict(newTempDict)
    bpy.context.scene.my_tool.lastDNA = DNA
    bpy.context.scene.my_tool.inputDNA = DNA
-   fill_pointers_from_dna(DNA, '')
+   fill_pointers_from_dna(DNA)
 
 
 # -----------------------------------------------------
@@ -441,7 +441,7 @@ def set_from_collection(slot_coll, variant_name, color_key=''): # get new dna st
    return new_dna_strand # return dna strand or empty string if not valid
 
 
-def general_pointer_updated(Slots):
+def general_pointer_updated():
    if bpy.context.scene.my_tool.inputGeneral is not None:
       inputted_item = bpy.context.scene.my_tool.inputGeneral
       item = inputted_item.name
@@ -452,20 +452,20 @@ def general_pointer_updated(Slots):
          bpy.context.scene.my_tool.inputGeneral = None
          return
       input_name = 'input' + att_name
-      att_coll = bpy.data.collections[Slots[input_name][0]]
+      att_coll = bpy.data.collections[config.Slots[input_name][0]]
       for types in att_coll.children:
          if types.name.endswith(type_name):
             for vars in types.children:
                if vars.name.endswith(var_name):
-                  pointers_have_updated(input_name, Slots, vars.name)
+                  pointers_have_updated(input_name, vars.name)
                   break
       bpy.context.scene.my_tool.inputGeneral = None
    return
 
 
-def pointers_have_updated(slots_key, Slots, variant_name=''): # this is called from init properties if pointerproperty updates
+def pointers_have_updated(slots_key, variant_name=''): # this is called from init properties if pointerproperty updates
    last_key = slots_key.replace("input", "last")
-   coll_name, label = Slots[slots_key]
+   coll_name, label = config.Slots[slots_key]
    if variant_name != '': # from general pointer
       new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name)
       if new_dnastrand != '': # if is from correct collection
@@ -650,7 +650,7 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 
 
 
-def fill_pointers_from_dna(DNA, Slots): # fill all pointer properties with variants
+def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
    show_character(character)

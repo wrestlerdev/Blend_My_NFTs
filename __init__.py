@@ -49,27 +49,6 @@ else:
         TextureEditor
 
     from .ui_Lists import UIList
-
-Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
-    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),
-    "inputLForeArm": ("03-LForeArm", "Left Forearm"),
-    "inputLWrist": ("04-LWrist", "Left Wrist"),
-    "inputRForeArm": ("05-RForeArm", "Right Forearm"),
-    "inputRWrist": ("06-RWrist", "Right Wrist"),
-    "inputHands": ("07-Hands", "Hands"),
-    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick"),
-    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin"),
-    "inputCalf": ("10-Calf", "Calf"),
-    "inputAnkle": ("11-Ankle", "Ankle"),
-    "inputFeet": ("12-Feet", "Feet"),
-    "inputNeck": ("13-Neck", "Neck"),
-    "inputLowerHead": ("14-LowerHead", "Lower Head"),
-    "inputMiddleHead": ("15-MiddleHead", "Mid Head"),
-    "inputEarings": ("16-Earings", "Earrings"),
-    "inputUpperHead": ("17-UpperHead", "Upper Head"),
-    "inputBackpack": ("18-Backpack", "Backpack"),
-    "inputBackground": ("19-Background", "Background"),
-    "inputExpression": ("20-Expression", "Expression")}
     
 
 # User input Property Group:
@@ -186,48 +165,48 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso"))
     inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso"))
     inputLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLForeArm",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLForeArm"))
     inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist"))
     inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm"))
     inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRWrist",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRWrist"))
     inputPelvisThick: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick"))
     inputPelvisThin: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThin",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThin"))
     inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHands",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHands"))
     inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputCalf",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputCalf"))
     inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAnkle",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAnkle"))
     inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFeet",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFeet"))
     inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputNeck",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputNeck"))
     inputLowerHead: bpy.props.PointerProperty(name="Lower Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead"))
     inputMiddleHead: bpy.props.PointerProperty(name="Middle Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead"))
     inputEarings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings"))
     inputUpperHead: bpy.props.PointerProperty(name="Upper Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead"))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack"))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground"))
     inputExpression: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression"))
 
     inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.general_pointer_updated(Slots))
+                                                update=lambda s,c: Exporter.Previewer.general_pointer_updated())
 
     inputColorListSceneObject: bpy.props.PointerProperty(name="ColorListObject", type=bpy.types.Object)
 
@@ -421,7 +400,7 @@ class randomizeColor(bpy.types.Operator):
         if self.collection_name != "":
             LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
             input_slot = self.collection_name
-            slot_coll = Slots[input_slot][0]
+            slot_coll = config.Slots[input_slot][0]
             type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
             if type not in config.EmptyTypes:
                 Exporter.Previewer.update_colour_random(slot_coll)
@@ -1611,12 +1590,12 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
             row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
-                dna_index = int(Slots[name][0][:2])
+                dna_index = int(config.Slots[name][0][:2])
                 color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
                 label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
@@ -1656,12 +1635,12 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
             row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
-                dna_index = int(Slots[name][0][:2])
+                dna_index = int(config.Slots[name][0][:2])
                 color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
                 label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
@@ -1702,12 +1681,12 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
             row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
-                dna_index = int(Slots[name][0][:2])
+                dna_index = int(config.Slots[name][0][:2])
                 color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
                 label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
@@ -1748,12 +1727,12 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
 
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
             row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
-                dna_index = int(Slots[name][0][:2])
+                dna_index = int(config.Slots[name][0][:2])
                 color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
                 label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
@@ -1788,12 +1767,12 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
             row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
-                dna_index = int(Slots[name][0][:2])
+                dna_index = int(config.Slots[name][0][:2])
                 color_key = inputDNA.split(',')[dna_index + 1].rpartition('-')[2]
                 label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
                 row.label(text=label)
