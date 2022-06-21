@@ -1452,11 +1452,8 @@ class forceLoadDNAFromUI(bpy.types.Operator):
 class countUpAllRarities(bpy.types.Operator):
     bl_idname = 'rarities.count'
     bl_label = 'Calculate Absolute Rarities'
-    bl_description = 'This will take like an entire hot minute, are u sure'
+    bl_description = 'Calculate Absolute Rarities'
     bl_options = {'REGISTER', 'UNDO'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
