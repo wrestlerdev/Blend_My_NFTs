@@ -52,7 +52,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    keys = list(NFTDict.keys())
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
-   reset_shape_keys(character + '_Rig')
+   reset_shape_keys(character)
    show_character(character, Select)
 
    for key in keys:
@@ -102,12 +102,18 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
             if type.name[3:].startswith('Expression'):
             # if 'Expression' in type.name:
                variant_name = varient.name.rpartition('_')[2]
-               set_shape_keys(character + '_Rig', variant_name)
+               set_shape_keys(character, variant_name)
             elif type.name[3:].startswith('Backpack'):
             # if backpack in type.name
                print("Backoroni")
                print(type.name[3:])
-               RaycastPackpack(type.name[3:], character, NFTDict) 
+               RaycastPackpack(type.name[3:], character, NFTDict)
+            elif type.name[3:].startswith('Feet'):
+            # if backpack in type.name
+               print("Feetoroni")
+               print(type.name[3:])
+               SnapFeetToFloor(type.name[3:], character, NFTDict)
+               
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -119,7 +125,39 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 # -----------------------------------------------------
+def SnapFeetToFloor(shoetype, character, NFTDict):
+   torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
+   torsoObj = torsoObj + "_" + character
+   objects = bpy.data.collections[torsoObj].objects
 
+   if shoetype == "FeetLong":
+      shoes = list(NFTDict["10-Calf"].keys())[0]
+   elif shoetype == "FeetMid":
+      shoes = list(NFTDict["11-Ankle"].keys())[0]
+   else:
+      shoes = list(NFTDict["12-Feet"].keys())[0]
+
+   shoesObj = shoes + "_" + character
+   objects = bpy.data.collections[shoesObj].objects
+   if len(objects) > 0:
+      cb = objects[0]
+      depsgraph = bpy.context.evaluated_depsgraph_get()
+      object_evaluated = cb.evaluated_get(depsgraph)
+      #bbox_corners = [cb.matrix_world @ Vector(corner) for corner in cb.bound_box]
+      bbox_corners = object_evaluated.matrix_world @ Vector(object_evaluated.bound_box[0])
+           
+      offset = 1.4 - bbox_corners.z
+      #bpy.ops.object.empty_add(location = bbox_corners)
+
+      #apply inverse of this z height to armature
+      rig_name = character + '_Rig'
+      character_coll = bpy.data.collections[rig_name]
+      for obj in character_coll.objects:
+         if obj.type == 'ARMATURE':
+            name = "root"
+            pb = obj.pose.bones.get(name) # None if no bone named name
+            pb.location = (0, 0, offset)
+            print("Moving: ", rig_name, " Bon found: ", pb, " Offset adjust: ",  offset)
 
 def RaycastPackpack(backpackType, character, NFTDict):
    torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
@@ -256,8 +294,9 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
 
 # -----------------------------------------------------
 
-def set_shape_keys(rig_name, variant_name):
+def set_shape_keys(character, variant_name):
    print("is expression")
+   rig_name = character + '_Rig'
    shape_key_names = [variant_name, 
                      variant_name + "_mouth",
                      variant_name + "_eyes",
@@ -266,20 +305,30 @@ def set_shape_keys(rig_name, variant_name):
                      ]
    character_coll = bpy.data.collections[rig_name]
    for obj in character_coll.objects:
+      if obj.type == 'ARMATURE':
+         print(obj.name, variant_name + "_" + character.lower())
+         if bpy.data.actions.find(variant_name + "_" + character.lower()) > -1:
+            obj.animation_data.action = bpy.data.actions[variant_name + "_" + character.lower()]
       if obj.type == 'MESH':
          if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
             for shape_key in obj.data.shape_keys.key_blocks:
                for shape_key_name in shape_key_names:
-                  if shape_key.name == shape_key_name:
+                  if variant_name in shape_key.name:
                      print(shape_key_name)
                      print(shape_key.name)
                      shape_key.value = 1
                      break
    return
 
-def reset_shape_keys(rig_name):
+def reset_shape_keys(character):
+   rig_name = character + "_Rig"
    character_coll = bpy.data.collections[rig_name]
    for obj in character_coll.objects:
+      if obj.type == 'ARMATURE':
+         obj.animation_data.action = None
+         name = "root"
+         pb = obj.pose.bones.get(name) # None if no bone named name
+         pb.location = (0, 0, 0)
       if obj.type == 'MESH':
          if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
             for shape_key in obj.data.shape_keys.key_blocks:
