@@ -141,10 +141,23 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
    objects = bpy.data.collections[shoesObj].objects
    if len(objects) > 0:
       cb = objects[0]
-      bbox_corners = [cb.matrix_world @ Vector(corner) for corner in cb.bound_box]
-      
-      bpy.ops.object.empty_add(location = bbox_corners[0])
+      depsgraph = bpy.context.evaluated_depsgraph_get()
+      object_evaluated = cb.evaluated_get(depsgraph)
+      #bbox_corners = [cb.matrix_world @ Vector(corner) for corner in cb.bound_box]
+      bbox_corners = object_evaluated.matrix_world @ Vector(object_evaluated.bound_box[0])
+           
+      offset = 1.4 - bbox_corners.z
+      #bpy.ops.object.empty_add(location = bbox_corners)
+
       #apply inverse of this z height to armature
+      rig_name = character + '_Rig'
+      character_coll = bpy.data.collections[rig_name]
+      for obj in character_coll.objects:
+         if obj.type == 'ARMATURE':
+            name = "root"
+            pb = obj.pose.bones.get(name) # None if no bone named name
+            pb.location = (0, 0, offset)
+            print("Moving: ", rig_name, " Bon found: ", pb, " Offset adjust: ",  offset)
 
 def RaycastPackpack(backpackType, character, NFTDict):
    torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
@@ -298,7 +311,7 @@ def set_shape_keys(character, variant_name):
          if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
             for shape_key in obj.data.shape_keys.key_blocks:
                for shape_key_name in shape_key_names:
-                  if shape_key.name == shape_key_name:
+                  if variant_name in shape_key.name:
                      print(shape_key_name)
                      print(shape_key.name)
                      shape_key.value = 1
@@ -311,6 +324,9 @@ def reset_shape_keys(character):
    for obj in character_coll.objects:
       if obj.type == 'ARMATURE':
          obj.animation_data.action = None
+         name = "root"
+         pb = obj.pose.bones.get(name) # None if no bone named name
+         pb.location = (0, 0, 0)
       if obj.type == 'MESH':
          if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
             for shape_key in obj.data.shape_keys.key_blocks:
