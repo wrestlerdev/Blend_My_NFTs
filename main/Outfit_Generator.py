@@ -424,7 +424,8 @@ def count_all_rarities(batch_record_path, index):
                 rarity_dict[attribute][type][variant]['absolute_rarity'] = 0.0
                 rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[variant], bpy.data.collections[type])[0]
 
-    filled_slots = set()
+    # filled_slots = set()
+    filled_slots = '0' * len(hierarchy.keys())
     rarity_dict = add_rarity_recurse(rarity_dict, 1, hierarchy, filled_slots, attribute='01-UpperTorso')
 
     logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -442,7 +443,7 @@ def count_all_rarities(batch_record_path, index):
 
 
 def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', variant=''):
-    if attribute and attribute in filled_slots:
+    if attribute and filled_slots[int(attribute[:2]) - 1] == '1':
         null_type = bpy.data.collections[attribute].children[0]
         null_variant = null_type.children[0]
         rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + current_probability
@@ -460,33 +461,28 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         parent_coll = bpy.data.collections[attribute]
         current_coll = bpy.data.collections[type]
         percentage, weight_total = get_weighted_rarity(current_coll, parent_coll)
-    else: # this is a variant
-        parent_coll = bpy.data.collections[type]
-        current_coll = bpy.data.collections[variant]
-        percentage, weight_total = get_weighted_rarity(current_coll, parent_coll)
 
     new_probability = current_probability * percentage
 
     if new_probability == 0.0: # if 0 then it shouldn't need to go down branch?
         return rarity_dict
 
-    if variant:
-        rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability
-    elif type:
+    if type:
         rarity_dict[attribute][type]["absolute_rarity"] = rarity_dict[attribute][type]["absolute_rarity"] + new_probability
+        for variant in rarity_dict[attribute][type].keys():
+            if variant != "absolute_rarity" and variant != "relative_rarity":
+                type_coll = bpy.data.collections[type]
+                variant_coll = bpy.data.collections[variant]
+                variant_percentage, weight_total = get_weighted_rarity(variant_coll, type_coll)
+                rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability * variant_percentage
     else:
         rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + new_probability
-
 
     if not type: # this is a attribute
         att_coll = bpy.data.collections[attribute]
         for coll in att_coll.children:
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=coll.name)
-    elif not variant: # this is a type
-        type_coll = bpy.data.collections[type]
-        for coll in type_coll.children:
-            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=type, variant=coll.name)
-    else: # this is a variant
+    else: # this is a type
         if 'Null' not in type:
             new_slots = ItemUsedBodySlot[type[3:]]
         else:
@@ -496,25 +492,15 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         #     new_slots.remove(attribute)
         
         if new_slots:
-            list1 = [s for s in new_slots if s not in filled_slots]
-            if list1:
-                new_filled_slots = set(filled_slots)
-                # for slot in filled_slots:
-                #     # new_filled_slots[slot] = filled_slots[slot]
-                #     new_filled_slots.add(slot)
-                for slot in new_slots:
-                    new_filled_slots.add(slot)
-            else:
-                new_filled_slots = filled_slots
-
-        else:
-            new_filled_slots = filled_slots
+            for slot in new_slots:
+                index = int(slot[:2]) - 1
+                if filled_slots[index] == '0':
+                    filled_slots = filled_slots[:index] + '1' + filled_slots[index+1:]
 
         next_index = (list(hierarchy.keys()).index(attribute)) + 1
         if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
-            print(next_att)
-            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, new_filled_slots, attribute=next_att)
+            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=next_att)
     return rarity_dict
 
 
