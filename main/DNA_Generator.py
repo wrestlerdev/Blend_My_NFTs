@@ -379,6 +379,30 @@ def send_To_Record_JSON(NFTRecord_save_path):
    return DataDictionary
 
 
+
+def save_new_rarity_Record(NFTRecord_save_path): # saves new rarity to existing record
+   OriginalDataDictionary = json.load(open(NFTRecord_save_path))
+
+
+   DataDictionary = {}
+   DataDictionary["numNFTsGenerated"] = OriginalDataDictionary["numNFTsGenerated"]
+   numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
+   DataDictionary["numCharacters"] =  OriginalDataDictionary["numCharacters"]
+
+   DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
+   DataDictionary["DNAList"] =  OriginalDataDictionary["DNAList"]
+
+   try:
+      ledger = json.dumps(DataDictionary, indent=1, ensure_ascii=True)
+      with open(NFTRecord_save_path, 'w') as outfile:
+         outfile.write(ledger + '\n')
+   except:
+      print(f"{bcolors.ERROR} ERROR:\nNFT DNA not sent to {NFTRecord_save_path}\n {bcolors.RESET}")
+
+   return DataDictionary
+   
+
+
 def reset_rarity_Record(NFTRecord_save_path):
    OriginalDataDictionary = json.load(open(NFTRecord_save_path))
    DataDictionary = {}
@@ -387,11 +411,13 @@ def reset_rarity_Record(NFTRecord_save_path):
    DataDictionary["DNAList"] = OriginalDataDictionary["DNAList"]
    hierarchy = NFTHirachy.createHirachy()
 
+   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-UpperHeadNull"]
+
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):
          for variant in list(hierarchy[slot][type].keys()):
             variant_name = variant.split('_')[-1]
-            if type == "00-PelvisThickNull":
+            if type not in zero_null_types:
                rarity = 50
             elif variant_name not in ['Null', 'Nulll']:
                rarity = 50
@@ -413,7 +439,7 @@ def reset_rarity_Record(NFTRecord_save_path):
    return DataDictionary
 
 
-def save_rarity_To_Record(original_hierarchy, NFTRecord_save_path): # saves rarity when reinitializes
+def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path): # saves rarity when reinitializes
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}

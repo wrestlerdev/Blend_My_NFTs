@@ -98,18 +98,20 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                                 update_rarity_color(variant, int(float(variant_rarity)))
                                 scene_var_coll["rarity"] = int(float(variant_rarity))
 
+                                texture_objs = scene_var_coll.objects
+                                for texture_obj in texture_objs:
+                                    texture_name = texture_obj.name
+                                    if texture_name in hierarchy[slot][type][variant]["textureSets"].keys():
+                                        texture_rarity = hierarchy[slot][type][variant]["textureSets"][texture_name]
+                                    else:
+                                        texture_rarity = 0
+                                    texture_obj["rarity"] = texture_rarity
+
                             else:
                                 update_rarity_color(variant, 0)
                                 scene_var_coll["rarity"] = 0
                             
-                            texture_objs = scene_var_coll.objects
-                            for texture_obj in texture_objs:
-                                texture_name = texture_obj.name
-                                if texture_name in hierarchy[slot][type][variant]["textureSets"].keys():
-                                    texture_rarity = hierarchy[slot][type][variant]["textureSets"][texture_name]
-                                else:
-                                    texture_rarity = 0
-                                texture_obj["rarity"] = texture_rarity
+
 
                     else: # BETA_1.0 || has no textures so is not a valid collection
                         current_var_coll = bpy.data.collections[h_variant]
@@ -118,8 +120,8 @@ def update_collection_rarity_property(NFTRecord_save_path): # update rarity valu
                         if scene_type_coll.get("rarity") is not None:
                             del(scene_type_coll["rarity"])
                         
-                        update_rarity_color(type, 0)
                         update_rarity_color(h_variant, 0)
+                        update_rarity_color(type, 0)
                 else: # BETA_1.0
                     if scene_type_coll.get("rarity") is not None:
                         del(scene_type_coll["rarity"])

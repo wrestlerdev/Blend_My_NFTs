@@ -273,7 +273,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
-    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=500)
+    colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=2000)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
 
     RTintPreview: bpy.props.FloatVectorProperty(name="R Tint Preview", subtype="COLOR", default=(1.0,0.0,0.0,1.0), size=4, min=0.0, max=1)
@@ -348,7 +348,7 @@ class initializeRecord(bpy.types.Operator):
         original_hierarchy = Exporter.Previewer.get_hierarchy_unordered(1)
         LoadNFT.init_batch(output_save_path)
         if original_hierarchy != None:
-            DNA_Generator.save_rarity_To_Record(original_hierarchy, first_nftrecord_save_path)
+            DNA_Generator.save_rarity_To_New_Record(original_hierarchy, first_nftrecord_save_path)
         else:
             DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path)
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
@@ -675,7 +675,7 @@ class saveBatch(bpy.types.Operator):
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
         NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
-        DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
+        DNA_Generator.save_new_rarity_Record(NFTRecord_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
@@ -1401,6 +1401,23 @@ class forceLoadDNAFromUI(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class countUpAllRarities(bpy.types.Operator):
+    bl_idname = 'rarities.count'
+    bl_label = 'Calculate Absolute Rarities'
+    bl_description = 'This will take like an entire hot minute, are u sure'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(1))
+        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
+        return {'FINISHED'}
+
+
+
 # ------------------------------- Panels ----------------------------------------------
 
 #Create Preview Panel
@@ -2048,6 +2065,17 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.scale_x = 0.4
         row.prop(mytool, 'shouldForceDownres')
 
+        row.scale_x = 1
+
+        
+
+        layout.separator(factor=1.5)
+        box = layout.box()
+        box.label(text="Calculator:")
+        row = box.row()
+        row.operator(countUpAllRarities.bl_idname, text=countUpAllRarities.bl_label)
+        
+
         # box = layout.box()
         # row = box.row()
         # row.label(text="Clean up:")
@@ -2305,6 +2333,7 @@ classes = (
 
     downresTextures,
     renameAllOriginalTextures,
+    countUpAllRarities,
 
     forceLoadDNAFromUI
 
