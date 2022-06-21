@@ -86,6 +86,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                         obj.hide_render = False
                         if Select:
                            obj.select_set(True)
+                     scaleFac = child["Volume"]
 
                      # set_subdiv_levels(meshes)
                      set_armature_for_meshes(character, meshes)
@@ -93,10 +94,20 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
                      resolution = '_' + bpy.context.scene.my_tool.textureSize
                      if resolution == '_4k':
-                        resolution = 4096
+                           resolution = 4096
                      else:
                         # print(resolution)
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+
+                     if True:
+                        apdativeRes = resolution * scaleFac
+                        for suffix in list(config.texture_suffixes):
+                           if apdativeRes < suffix:
+                              resolution = suffix
+                              print("Varient: ", varient.name, "  || Sacle Factor:  ", scaleFac, "  ||  Apdative Res: ", apdativeRes,"  ||  Resolution: ", resolution)
+                              break
+                           
+                        
                      # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
                      set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
 
@@ -338,7 +349,8 @@ def reset_shape_keys(character):
    return
 
 
-def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution, slot_pathing):
+def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, slot_pathing):
+
    suffix = config.texture_suffixes[resolution]
    # if suffix == '':
    #    print("this should be 4k okay")

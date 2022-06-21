@@ -390,7 +390,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 y = objectToCalc.dimensions.y
                                                 z = objectToCalc.dimensions.z
                                                 vol = x * y * z
-                                                characterCollectionDict[c]["Volume"] = vol / 1000
+                                                characterCollectionDict[c]["Volume"] = vol / 850
                                                 print("x: ", x, " y: ", y, " z: ", z, " Volume: ",  vol)
                                             else:
                                                 characterCollectionDict[c]["Volume"] = 0.0
