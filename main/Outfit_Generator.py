@@ -298,6 +298,26 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     
 
 
+def RandomizeSingleTexture(att_name, variant_coll):
+    index = bpy.context.scene.my_tool.CurrentBatchIndex
+    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+
+    DataDictionary = json.load(open(NFTRecord_save_path))
+    hierarchy = DataDictionary["hierarchy"]
+
+    for type in hierarchy[att_name].keys():
+        if type in hierarchy[att_name]:
+            item_info = hierarchy[att_name][type][variant_coll.name]
+
+
+            break
+
+
+
+    return
+
+
 
 
 def PickWeightedAttributeType(AttributeTypes):
@@ -474,16 +494,26 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
 
         # if attribute in new_slots: # CHECK THIS
         #     new_slots.remove(attribute)
-        new_filled_slots = set(filled_slots)
-        # for slot in filled_slots:
-        #     # new_filled_slots[slot] = filled_slots[slot]
-        #     new_filled_slots.add(slot)
-        for slot in new_slots:
-            new_filled_slots.add(slot)
+        
+        if new_slots:
+            list1 = [s for s in new_slots if s not in filled_slots]
+            if list1:
+                new_filled_slots = set(filled_slots)
+                # for slot in filled_slots:
+                #     # new_filled_slots[slot] = filled_slots[slot]
+                #     new_filled_slots.add(slot)
+                for slot in new_slots:
+                    new_filled_slots.add(slot)
+            else:
+                new_filled_slots = filled_slots
+
+        else:
+            new_filled_slots = filled_slots
 
         next_index = (list(hierarchy.keys()).index(attribute)) + 1
         if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
+            print(next_att)
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, new_filled_slots, attribute=next_att)
     return rarity_dict
 

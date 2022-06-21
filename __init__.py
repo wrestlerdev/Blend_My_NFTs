@@ -341,7 +341,7 @@ class initializeRecord(bpy.types.Operator):
 
 
 
-#-------------------------
+#-----------------------------------------
 
 
 class randomizePreview(bpy.types.Operator):
@@ -391,7 +391,7 @@ class randomizeAllSets(bpy.types.Operator):
 
 class randomizeColor(bpy.types.Operator):
     bl_idname = 'randomize.color'
-    bl_label = 'Randomize Color'
+    bl_label = 'COLOR'
     bl_description = "Randomize color of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
@@ -405,6 +405,31 @@ class randomizeColor(bpy.types.Operator):
             if type not in config.EmptyTypes:
                 Exporter.Previewer.update_colour_random(slot_coll)
         return {'FINISHED'}
+
+
+class randomizeTexture(bpy.types.Operator):
+    bl_idname = 'texture.randomize'
+    bl_label = 'TEXTURE'
+    bl_description = "Randomize texture of current slot"
+    bl_options = {"REGISTER", "UNDO"}
+    collection_name: bpy.props.StringProperty(default="")
+
+
+    def execute(self, context):
+        if self.collection_name != "":
+            LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
+            input_slot = self.collection_name
+            slot_coll = config.Slots[input_slot][0]
+            type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
+            if type not in config.EmptyTypes:
+                attribute = config.Slots[self.collection_name][0]
+                variant = bpy.context.scene.my_tool[self.collection_name]
+                DNA_Generator.Outfit_Generator.RandomizeSingleTexture(attribute, variant)
+                # Exporter.Previewer.update_colour_random(slot_coll)
+                pass
+        return {'FINISHED'}
+#-----------------------------------------
+
 
 
 class clearSlots(bpy.types.Operator):
@@ -1731,6 +1756,10 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
+        row = layout.row()
+        row.label(text="")
+        row.scale_x = 0.3
+        row.label(text="RANDOMIZE")
         for name in self.slots:
             row = layout.row()
             row.label(text=config.Slots[name][1], icon=self.slots[name])
@@ -1744,17 +1773,21 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
                 if color_key == 'Empty':
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
                 else:
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+        
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
                 row.label(text='')
+                row.label(text='')
+                
                 # row.operator(randomizeColor.bl_idname, text='',emboss=False).collection_name = name
 
 
@@ -2443,6 +2476,7 @@ classes = (
     downresTextures,
     renameAllOriginalTextures,
     countUpAllRarities,
+    randomizeTexture,
 
     forceLoadDNAFromUI,
     testButton
