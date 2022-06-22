@@ -5,7 +5,7 @@ MasterMaterialName = 'MasterV01'
 texture_suffixes = {64: '_64', 128: '_128', 256: '_256', 512: '_512', 1024: '_1k', 2048: '_2k', 4096: ''}
 image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
 
-EmptyTypes = ["Expression", "ExpressionLowNone", "HeadShortNone", "FeetShortNone"]
+EmptyTypes = ["Expression", "ExpressionLowNone", "HeadShortNone", "FeetShortNone", 'Background']
 
 Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
     "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),

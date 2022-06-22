@@ -414,19 +414,19 @@ class randomizeTexture(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
 
-
     def execute(self, context):
         if self.collection_name != "":
             LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
             input_slot = self.collection_name
             slot_coll = config.Slots[input_slot][0]
             type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
-            if type not in config.EmptyTypes:
-                attribute = config.Slots[self.collection_name][0]
-                variant = bpy.context.scene.my_tool[self.collection_name]
-                DNA_Generator.Outfit_Generator.RandomizeSingleTexture(attribute, variant)
-                # Exporter.Previewer.update_colour_random(slot_coll)
-                pass
+            # if type not in config.EmptyTypes:
+            attribute = config.Slots[self.collection_name][0]
+            variant = bpy.context.scene.my_tool[self.collection_name]
+            texture, index = DNA_Generator.Outfit_Generator.GetRandomSingleTexture(attribute, variant)
+
+            Exporter.Previewer.set_texture_on_slot(slot_coll, variant.name, index)
+
         return {'FINISHED'}
 #-----------------------------------------
 
@@ -1640,21 +1640,30 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
-                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
                 if color_key == 'Empty':
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
                 else:
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                row.label(text='')
                 row.label(text='')
 
 
@@ -1685,21 +1694,30 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
-                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
                 if color_key == 'Empty':
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
                 else:
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                row.label(text='')
                 row.label(text='')
 
 
@@ -1731,21 +1749,30 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
-                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
                 if color_key == 'Empty':
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
                 else:
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                row.label(text='')
                 row.label(text='')
 
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
@@ -1781,17 +1808,23 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                color_key = inputDNA.split(',')[dna_index].rpartition('-')[2]
-                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
                 row.scale_x = 0.8
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
                 if color_key == 'Empty':
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
                 else:
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
-                row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
         
             else:
                 row.label(text=label)
@@ -1825,21 +1858,30 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                color_key = inputDNA.split(',')[dna_index + 1].rpartition('-')[2]
-                label = "{} ({})".format(bpy.context.scene.my_tool[name].name.split('_')[3], color_key)
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
                 if color_key == 'Empty':
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
                 else:
                     row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 1.5
+                row.scale_x = 0.8
+                row.label(text='')
                 row.label(text='')
 
 

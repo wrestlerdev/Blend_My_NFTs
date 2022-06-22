@@ -298,7 +298,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     
 
 
-def RandomizeSingleTexture(att_name, variant_coll):
+def GetRandomSingleTexture(att_name, variant_coll):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
@@ -306,16 +306,31 @@ def RandomizeSingleTexture(att_name, variant_coll):
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    variant = variant_coll.name
     for type in hierarchy[att_name].keys():
-        if type in hierarchy[att_name]:
-            item_info = hierarchy[att_name][type][variant_coll.name]
-
-
+        if variant in hierarchy[att_name][type].keys():
+            item_info = hierarchy[att_name][type][variant]
+            texture_info = item_info["textureSets"]
+            for tex in texture_info.keys():
+                rarity = texture_info[tex]
+                if rarity > 0.0:
+                    rarity_List_Of_i.append(float(rarity))
+                    number_List_Of_i.append(tex)
             break
 
+    if number_List_Of_i:
+        if len(number_List_Of_i) == 1:
+            print("There's only one texture set")
+        textureChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+        return textureChosen[0], list(texture_info.keys()).index(textureChosen[0])
+    elif texture_info:
+        return list(texture_info.keys())[0], 0
+    else: # set has none
+        return None, 0
 
-
-    return
 
 
 
@@ -377,8 +392,8 @@ def PickWeightedTextureVarient(VariantInfo):
 
     if len(number_List_Of_i) > 0:
         textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
-        print(textureChoosen[0])
-        print(list(VariantInfo['textureSets'].keys()).index(textureChoosen[0]))
+        # print(textureChoosen[0])
+        # print(list(VariantInfo['textureSets'].keys()).index(textureChoosen[0]))
         return textureChoosen[0], list(VariantInfo['textureSets'].keys()).index(textureChoosen[0])
     else:
         if len(VariantInfo["textureSets"].keys()) > 0:

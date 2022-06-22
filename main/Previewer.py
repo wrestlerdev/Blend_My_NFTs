@@ -459,11 +459,10 @@ def get_null_dna(character="Kae"):
 
 
 
-def set_from_collection(slot_coll, variant_name, color_key=''): # get new dna strand from variant name
+def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0): # get new dna strand from variant name
    new_dna_strand = ''
    type_index = 0
    variant_index = 0
-   texture_index = 0
 
    lastDNA = bpy.context.scene.my_tool.lastDNA # input or last?
    DNAString = lastDNA.split(",")
@@ -475,7 +474,7 @@ def set_from_collection(slot_coll, variant_name, color_key=''): # get new dna st
 
          type_list = list(type_coll.children)
          variant_index = type_list.index(var_coll)
-         texture_index = 0 # TODO HOW TO GET TEXTURE INDEX NOW
+         # texture_index = 0 # TODO HOW TO GET TEXTURE INDEX NOW
 
          if type_coll.name[3:] in config.EmptyTypes:
             dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']
@@ -780,11 +779,22 @@ def colorpicker_has_applied():
          att_name = collection_name.partition('_')[0]
          slots_key = 'input' + att_name
          coll_name, label = config.Slots[slots_key]
-         new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name, tint_key)
+         new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name, color_key=tint_key)
          if new_dnastrand != '': # if is from correct collection
             dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
             show_nft_from_dna(dna_string, CharacterItems)
             return True
+   return False
+
+
+def set_texture_on_slot(coll_name, variant_name, texture_index):
+
+   new_dnastrand = set_from_collection(bpy.data.collections[coll_name], variant_name, texture_index=texture_index)
+   if new_dnastrand != '': # if is from correct collection
+      dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
+      show_nft_from_dna(dna_string, CharacterItems)
+      return True
+
    return False
 
 
