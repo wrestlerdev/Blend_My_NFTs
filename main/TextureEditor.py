@@ -44,7 +44,10 @@ def rename_all_original_textures(input_path):
 
 
 def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix=''):
-    og_texture_suffixes = ['_64', '_128', '_256', '_512', '_1k', '_2k']
+    #og_texture_suffixes = ['_64', '_128', '_256', '_512', '_1k', '_2k']
+    og_texture_suffixes = list(config.texture_suffixes.values()) 
+    og_texture_suffixes.remove('')
+    print(og_texture_suffixes)
     roughness_list = ['_R.', 'R_', 'Roughness', 'roughness']
     id_list = ['_ID.', 'ColorID']
     diffuse_list = ['_D.', 'Diffuse', 'BakedBaseColor', 'LightGreyScale', 'diffuse','BaseColor']
@@ -52,7 +55,6 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
     normal_list = ['_N.', 'Normal', 'normal']
     emissive_list = ['_E.', ' Emmissive', 'Emissive', 'emissive', 'emmissive']
     opacity_list = ['_O.', ' Opacity', 'opacity']
-
     if os.path.isdir(folder_path): # to avoid .db file issue?
         texture_images = [fn for fn in os.listdir(folder_path) if any(fn.endswith(ext) for ext in config.image_extensions)] # find all images
         not_texture_images = [fn for fn in os.listdir(folder_path) if not any(fn.endswith(ext) for ext in config.image_extensions)]

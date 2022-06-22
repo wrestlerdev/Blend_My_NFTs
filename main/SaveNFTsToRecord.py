@@ -6,6 +6,7 @@ import bpy
 import os
 import json
 import shutil
+import bmesh
 from . import config
 
 
@@ -385,13 +386,11 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 bpy.ops.object.join()
                                             if len(characterCollectionDict[c].objects) > 0:
                                                 objectToCalc = characterCollectionDict[c].objects[0]
+                                                area = find_mesh_area(objectToCalc)
 
-                                                x = objectToCalc.dimensions.x
-                                                y = objectToCalc.dimensions.y
-                                                z = objectToCalc.dimensions.z
-                                                vol = x * y * z
-                                                characterCollectionDict[c]["Volume"] = vol / 850
-                                                print("x: ", x, " y: ", y, " z: ", z, " Volume: ",  vol)
+
+                                                characterCollectionDict[c]["Volume"] = (area * 2) / 1000
+
                                             else:
                                                 characterCollectionDict[c]["Volume"] = 0.0
 
@@ -615,6 +614,76 @@ def CheckAndFormatPath(path, pathTojoin = ""):
         return ""
 
     return new_path
+
+
+
+def bmesh_copy_from_object(obj, transform=True, triangulate=True, apply_modifiers=False):
+    """Returns a transformed, triangulated copy of the mesh"""
+
+    assert obj.type == 'MESH'
+
+    if apply_modifiers and obj.modifiers:
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        obj_eval = obj.evaluated_get(depsgraph)
+        me = obj_eval.to_mesh()
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        obj_eval.to_mesh_clear()
+    else:
+        me = obj.data
+        if obj.mode == 'EDIT':
+            bm_orig = bmesh.from_edit_mesh(me)
+            bm = bm_orig.copy()
+        else:
+            bm = bmesh.new()
+            bm.from_mesh(me)
+
+    # TODO. remove all customdata layers.
+    # would save ram
+
+    if transform:
+        bm.transform(obj.matrix_world)
+
+    if triangulate:
+        bmesh.ops.triangulate(bm, faces=bm.faces)
+
+    return bm
+
+def bmesh_calc_area(bm):
+    """Calculate the surface area."""
+    return sum(f.calc_area() for f in bm.faces)
+
+def bmesh_calc_vol(bm):
+    return bm.calc_volume()
+
+def find_mesh_area(obj):
+    scene = bpy.context.scene
+    unit = scene.unit_settings
+    scale = 1.0 if unit.system == 'NONE' else unit.scale_length
+    #obj = bpy.context.active_object
+
+    # depsgraph = bpy.context.evaluated_depsgraph_get()
+    # obj_eval = obj.evaluated_get(depsgraph)
+    # x = obj_eval.dimensions.x
+    # y = obj_eval.dimensions.y
+    # z = obj_eval.dimensions.z
+    # area = x * y * z
+    #print("x: ", x, " y: ", y, " z: ", z, " Volume: ",  area)
+
+    bm = bmesh_copy_from_object(obj, apply_modifiers=True)
+    area = bmesh_calc_area(bm)
+    #area = bmesh_calc_vol(bm)
+    bm.free()
+
+    return area
+    # if unit.system == 'NONE':
+    #     area_fmt = clean_float(area, 8)
+    # else:
+    #     length, symbol = get_unit(unit.system, unit.length_unit)
+
+    #     area_unit = area * (scale ** 2.0) / (length ** 2.0)
+    #     area_str = clean_float(area_unit, 4)
+    #     area_fmt = f"{area_str} {symbol}"
 
 
 # def SearchForMeshesAndCreateCharacterDuplicates(record_save_path):
