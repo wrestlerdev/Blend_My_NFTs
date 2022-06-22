@@ -391,7 +391,7 @@ class randomizeAllSets(bpy.types.Operator):
 
 class randomizeColor(bpy.types.Operator):
     bl_idname = 'randomize.color'
-    bl_label = 'COLOR'
+    bl_label = 'Color'
     bl_description = "Randomize color of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
@@ -409,7 +409,7 @@ class randomizeColor(bpy.types.Operator):
 
 class randomizeTexture(bpy.types.Operator):
     bl_idname = 'texture.randomize'
-    bl_label = 'TEXTURE'
+    bl_label = 'Texture'
     bl_description = "Randomize texture of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
@@ -432,7 +432,7 @@ class randomizeTexture(bpy.types.Operator):
 
 class randomizeMesh(bpy.types.Operator):
     bl_idname = 'mesh.randomize'
-    bl_label = 'MESH'
+    bl_label = 'Mesh'
     bl_description = "Randomize mesh of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
@@ -1669,7 +1669,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 if len(variant.objects) > 1:
                     row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
@@ -1683,7 +1683,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1711,7 +1711,6 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
         for name in self.slots:
-            print(name)
             row = layout.row()
             row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
@@ -1727,7 +1726,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 # print(len(bpy.data.collections[config.Slots[name][0]].children))
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
@@ -1745,7 +1744,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1788,7 +1787,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1805,7 +1804,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1854,7 +1853,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1871,7 +1870,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1908,7 +1907,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:
@@ -1925,7 +1924,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.scale_x = 0.8
+                row.scale_x = 0.5
                 if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
                     row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
                 else:

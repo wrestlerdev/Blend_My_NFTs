@@ -577,7 +577,6 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    DNA = dna_string.split(',') 
    old_strand = DNA[coll_index + 1]
 
-
    if dna_strand: # append old colour to new dna_string
       new_dnastrand = dna_strand
       if len(dna_strand.split('-')) < 4 and dna_strand != '0-0-0':
@@ -585,7 +584,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
          new_dnasplit = dna_strand.split('-')
          if len(old_strand.split('-')) < 4:
             style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
-            new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style) # TODO not just random
+            new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style)
          else:
             new_colorkey = old_strand.rpartition('-')[2]
             
@@ -607,10 +606,9 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
       new_split[-1] = new_colorkey
       new_dnastrand = '-'.join(new_split)
 
-   DNA[coll_index + 1] = str(new_dnastrand)
-   dna_string = ','.join(DNA)
-
    if new_dnastrand == '0-0-0':
+      DNA[coll_index + 1] = str(new_dnastrand)
+      dna_string = ','.join(DNA)
       CharacterItems[coll_name] = "Null"
       return dna_string, CharacterItems
 
@@ -619,11 +617,13 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    nftrecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
    batch_record = json.load(open(nftrecord_save_path))
    type_coll = bpy.data.collections[coll_name].children[int(type_index)]
-   if type_coll.name[3:] in config.EmptyTypes and color_key != 'Empty':
+   if type_coll.name[3:] in config.EmptyTypes:
       new_colorkey = 'Empty'
       new_dnastrand = '-'.join([type_index, var_index, tex_index, new_colorkey])
-
    var_coll = type_coll.children[int(var_index)]
+
+   DNA[coll_index + 1] = str(new_dnastrand)
+   dna_string = ','.join(DNA)
 
    record_item = batch_record["hierarchy"][coll_name][type_coll.name][var_coll.name]
    new_tex = list(record_item['textureSets'].keys())[int(tex_index)]

@@ -358,8 +358,6 @@ def GetRandomSingleMesh(att_name):
         typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)
         type = typeChosen[0]
         type_index = list(hierarchy[att_name].keys()).index(type)
-        print(typeChosen[0])
-        print(type_index)
     else:
         # null_type = list(hierarchy[att_name].keys())[0]
         # null_variant = list(hierarchy[att_name][null_type].keys())[0]
@@ -377,10 +375,7 @@ def GetRandomSingleMesh(att_name):
 
     if number_List_Of_i:
         variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
-        print(variantChosen[0])
         variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen[0])
-        print(variant_index)
-
     else:
         return "0-0-0"
         variant_index = 0
@@ -388,7 +383,6 @@ def GetRandomSingleMesh(att_name):
 
     texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen[0]])
     dna_strand = '-'.join([str(type_index), str(variant_index), str(texture_index)])
-    # print(dna_strand)
     return dna_strand
 
 # ------------------------------------------------------
