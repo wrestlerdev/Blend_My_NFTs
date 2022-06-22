@@ -298,6 +298,9 @@ def RandomizeFullCharacter(maxNFTs, save_path):
     
 
 
+# ------------------------------------------------------
+
+
 def GetRandomSingleTexture(att_name, variant_coll):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
@@ -332,6 +335,63 @@ def GetRandomSingleTexture(att_name, variant_coll):
         return None, 0
 
 
+
+def GetRandomSingleMesh(att_name):
+    index = bpy.context.scene.my_tool.CurrentBatchIndex
+    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+
+    DataDictionary = json.load(open(NFTRecord_save_path))
+    hierarchy = DataDictionary["hierarchy"]
+    type_number_List_Of_i = []
+    type_rarity_List_Of_i = []
+
+    for type in hierarchy[att_name].keys():
+        if hierarchy[att_name][type].keys():
+            first_variant = list(hierarchy[att_name][type].keys())[0]
+            type_rarity = hierarchy[att_name][type][first_variant]["type_rarity"]
+            if type_rarity:
+                type_number_List_Of_i.append(type)
+                type_rarity_List_Of_i.append(int(type_rarity))
+
+    if type_number_List_Of_i:
+        typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)
+        type = typeChosen[0]
+        type_index = list(hierarchy[att_name].keys()).index(type)
+        print(typeChosen[0])
+        print(type_index)
+    else:
+        # null_type = list(hierarchy[att_name].keys())[0]
+        # null_variant = list(hierarchy[att_name][null_type].keys())[0]
+        # print(null_variant)
+        return "0-0-0"
+
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    for variant in hierarchy[att_name][type]:
+        rarity = hierarchy[att_name][type][variant]["variant_rarity"]
+        if rarity:
+            rarity_List_Of_i.append(float(rarity))
+            number_List_Of_i.append(variant)
+
+    if number_List_Of_i:
+        variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+        print(variantChosen[0])
+        variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen[0])
+        print(variant_index)
+
+    else:
+        return "0-0-0"
+        variant_index = 0
+        variantChosen = [list(hierarchy[att_name][type].keys())[variant_index]]
+
+    texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen[0]])
+    dna_strand = '-'.join([str(type_index), str(variant_index), str(texture_index)])
+    # print(dna_strand)
+    return dna_strand
+
+# ------------------------------------------------------
 
 
 
