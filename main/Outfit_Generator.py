@@ -18,7 +18,8 @@ from . import config
 
 # A list for each caterogry of clothing that states what slots it will fil
 ItemUsedBodySlot = {
-"ShirtCropSleeveless" : ["01-UpperTorso"],
+"ShirtCropSleeveless" : ["01-UpperTorso", "18-Backpack"],
+"ShirtCropSleevelessBack" : ["01-UpperTorso"],
 "ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck"],
 "ShirtCrop" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm"],
 "ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "18-Backpack"],
