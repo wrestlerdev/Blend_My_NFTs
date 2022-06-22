@@ -1334,7 +1334,7 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [2048, 1024, 512, 64]
+        resolutions = [2048, 1024, 512, 256, 128, 64]
         should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
         TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}

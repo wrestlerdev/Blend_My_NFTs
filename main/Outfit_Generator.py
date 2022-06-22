@@ -208,16 +208,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
                     #for obj in chidlrenObjs:
 
-                armature_name = "armature_" + str(character).lower()
-                if bpy.data.objects.get(armature_name) is not None:
-                    for obj in chidlrenObjs:
-                        if obj.modifiers:
-                            for mod in obj.modifiers:
-                                if mod.type == 'ARMATURE':
-                                    mod.object = bpy.data.objects[armature_name]
-                        else:
-                            mod = obj.modifiers.new(name='armature', type='ARMATURE')
-                            mod.object = bpy.data.objects[armature_name]
                 # else:
                     # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
             

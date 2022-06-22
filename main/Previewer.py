@@ -86,6 +86,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                         obj.hide_render = False
                         if Select:
                            obj.select_set(True)
+                     scaleFac = child["Volume"]
 
                      # set_subdiv_levels(meshes)
                      set_armature_for_meshes(character, meshes)
@@ -93,11 +94,22 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
                      resolution = '_' + bpy.context.scene.my_tool.textureSize
                      if resolution == '_4k':
-                        resolution = 4096
+                           resolution = 4096
                      else:
                         # print(resolution)
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
+
+                     if False:
+                        apdativeRes = resolution * scaleFac
+                        for suffix in list(config.texture_suffixes):
+                           if apdativeRes < suffix * 1.5 or resolution == suffix:
+                              resolution = suffix
+                              print("Varient: ", varient.name, "  || Sacle Factor:  ", scaleFac, "  ||  Apdative Res: ", apdativeRes,"  ||  Resolution: ", resolution)
+                              break
+                           
+                        
                      # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
+                     print("setting texture", resolution)
                      set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
 
             if type.name[3:].startswith('Expression'):
@@ -140,6 +152,8 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
 
    shoesObj = shoes + "_" + character
    objects = bpy.data.collections[shoesObj].objects
+   characterHeight = 1.4
+   platformHeight = 1.03
    if len(objects) > 0:
       cb = objects[0]
       depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -147,18 +161,19 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
       #bbox_corners = [cb.matrix_world @ Vector(corner) for corner in cb.bound_box]
       bbox_corners = object_evaluated.matrix_world @ Vector(object_evaluated.bound_box[0])
            
-      offset = 1.4 - bbox_corners.z
+      offset = characterHeight - bbox_corners.z - platformHeight  #orginal character feet heigh, different of shoe, new base height
       #bpy.ops.object.empty_add(location = bbox_corners)
-
+   else:
+      offset = characterHeight - platformHeight
       #apply inverse of this z height to armature
-      rig_name = character + '_Rig'
-      character_coll = bpy.data.collections[rig_name]
-      for obj in character_coll.objects:
-         if obj.type == 'ARMATURE':
-            name = "root"
-            pb = obj.pose.bones.get(name) # None if no bone named name
-            pb.location = (0, 0, offset)
-            print("Moving: ", rig_name, " Bon found: ", pb, " Offset adjust: ",  offset)
+   rig_name = character + '_Rig'
+   character_coll = bpy.data.collections[rig_name]
+   for obj in character_coll.objects:
+      if obj.type == 'ARMATURE':
+         name = "root"
+         pb = obj.pose.bones.get(name) # None if no bone named name
+         pb.location = (0, 0, offset)
+         print("Moving: ", rig_name, " Bone found: ", pb, " Offset adjust: ",  offset)
 
 def RaycastPackpack(backpackType, character, NFTDict):
    torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
@@ -338,7 +353,8 @@ def reset_shape_keys(character):
    return
 
 
-def set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution, slot_pathing):
+def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, slot_pathing):
+
    suffix = config.texture_suffixes[resolution]
    # if suffix == '':
    #    print("this should be 4k okay")
