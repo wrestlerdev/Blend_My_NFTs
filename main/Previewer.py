@@ -152,7 +152,7 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
    shoesObj = shoes + "_" + character
    objects = bpy.data.collections[shoesObj].objects
    characterHeight = 1.4
-   platformHeight = 1.03
+   platformHeight = 0.3
    if len(objects) > 0:
       cb = objects[0]
       depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -160,10 +160,10 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
       #bbox_corners = [cb.matrix_world @ Vector(corner) for corner in cb.bound_box]
       bbox_corners = object_evaluated.matrix_world @ Vector(object_evaluated.bound_box[0])
            
-      offset = characterHeight - bbox_corners.z - platformHeight  #orginal character feet heigh, different of shoe, new base height
+      offset = platformHeight - bbox_corners.z  #orginal character feet heigh, different of shoe, new base height
       #bpy.ops.object.empty_add(location = bbox_corners)
    else:
-      offset = characterHeight - platformHeight
+      offset = platformHeight - characterHeight
       #apply inverse of this z height to armature
    rig_name = character + '_Rig'
    character_coll = bpy.data.collections[rig_name]
