@@ -321,6 +321,7 @@ class initializeRecord(bpy.types.Operator):
         first_batch_path = os.path.join(output_save_path,  "Batch_{:03d}".format(1))
         first_nftrecord_save_path = os.path.join(first_batch_path, "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(output_save_path, "_NFTRecord.json")
+        Rarity_save_path = os.path.join(first_batch_path, "_RarityCounter_{:03d}.json".format(1))
 
         bpy.context.scene.my_tool.batch_json_save_path = output_save_path
         bpy.context.scene.my_tool.loadNFTIndex = 1
@@ -334,7 +335,9 @@ class initializeRecord(bpy.types.Operator):
             DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path)
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
         LoadNFT.update_current_batch(1, output_save_path)
-        LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
+
+        DNA_Generator.Outfit_Generator.count_all_rarities(first_batch_path, 1)
+        LoadNFT.update_collection_rarity_property(first_nftrecord_save_path, Rarity_save_path)
 
         DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, 1, True)
         return {'FINISHED'}
@@ -794,7 +797,6 @@ class resetBatch(bpy.types.Operator):
 
         DNA_Generator.Outfit_Generator.count_all_rarities(current_batch_save_path, batch_index)
         LoadNFT.update_collection_rarity_property(nftrecord_path, Rarity_save_path)
-
         return {'FINISHED'}
 
 
@@ -894,19 +896,22 @@ class loadDirectory(bpy.types.Operator):
         batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
         NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
+        Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{:03d}.json".format(1))
+
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
 
         bpy.context.scene.my_tool.CurrentBatchIndex = 1
         bpy.context.scene.my_tool.loadNFTIndex = 1
         bpy.context.scene.my_tool.BatchSliderIndex = 1
         if os.path.exists(batch_path) and os.path.exists(NFTRecord_save_path):
-            LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+            LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         else:
             LoadNFT.init_batch(batch_json_save_path)
             DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
             DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
             LoadNFT.update_current_batch(1, batch_json_save_path)
-            LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+            DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, 1)
+            LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
             
         return {'FINISHED'}
         
