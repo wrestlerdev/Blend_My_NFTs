@@ -191,6 +191,33 @@ def reimport_character_objects(character, rig_blendfile_path):
     directory = os.path.join(rig_blendfile_path, "Collection")
     bpy.ops.wm.append(filepath=file_path, directory=directory, filename=filename)
     import_character_actions(character, rig_blendfile_path)
+
+    rig = bpy.data.objects['armature_' + character.lower()]
+
+    for obj in bpy.data.objects:
+        if obj.parent == rig:
+            # Do stuff
+            obj.hide_viewport = False
+            obj.hide_render =  False
+            rigMesh = obj
+            rigMesh.select_set( state = True, view_layer = bpy.context.view_layer )
+            bpy.context.view_layer.objects.active = rigMesh
+    if len(bpy.context.selected_objects) > 1:                    
+        bpy.ops.object.join()
+        print("JOINING")
+    
+    # for col in bpy.data.collections[character].children:
+    #     for obj in col.objects:
+    #         if obj.type == 'ARMATURE':
+    #             for bodyMesh in obj.objects:
+    #                 if bodyMesh.type == 'MESH':
+    #                     bodyMesh.hide_viewport = False
+    #                     bodyMesh.hide_render =  False
+    #                     cube = bodyMesh
+    #                     cube.select_set( state = True, view_layer = bpy.context.view_layer )
+    #                     bpy.context.view_layer.objects.active = cube
+    # if len(bpy.context.selected_objects) > 1:                    
+    #     bpy.ops.object.join()
     return
 
 def import_character_actions(character, rig_blendfile_pathr):
