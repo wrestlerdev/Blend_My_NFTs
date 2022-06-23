@@ -137,6 +137,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             ]
         )
 
+    deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
+    deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)
+
     isCharacterLocked: bpy.props.BoolProperty(name="Lock Character", default=False)
 
     separateExportPath: bpy.props.StringProperty(name="Directory")
@@ -648,10 +651,32 @@ class deleteNFT(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class deleteRangeNFT(bpy.types.Operator):
+    bl_idname = 'delete.nftrnge'
+    bl_label = 'Delete NFT in Range'
+    bl_description = "This delete NFTs and cannot be undone. Are you sure?"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        start_range = bpy.context.scene.my_tool.deleteStart
+        end_range = bpy.context.scene.my_tool.deleteEnd
+
+        batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
+        TotalDNA = LoadNFT.get_all_DNA_from_batch(batch_index)
+        master_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "_NFTRecord.json")
+
+        SaveNFTsToRecord.DeleteNFTsinRange(start_range, end_range, TotalDNA, nft_save_path, batch_index, master_save_path)
+        return {'FINISHED'}
+
+
 
 class deleteAllNFTs(bpy.types.Operator):
     bl_idname = 'delete.allnfts'
-    bl_label = 'Delete All NFTs in Batch'
+    bl_label = 'Delete ALL NFTs in Batch'
     bl_description = "This will delete all NFTS from the current Batch. u sure bud?"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -1939,6 +1964,36 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
 
 
 #-----------------------------------------------------------------------
+class WCUSTOM_PT_DeleteRange(bpy.types.Panel):
+    bl_label = "Delete NFTs"
+    bl_idname = "WCUSTOM_PT_DeleteRange"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ELoadFromFile'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        box = layout.box()
+
+        row = box.row()
+        row.scale_y = 0.6
+        box2 = row.box()
+        box2.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
+        box2 = row.box()
+        box2.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
+
+        row = box.row()
+        row.scale_x = 0.5
+        row.prop(mytool, "deleteStart")
+        row.prop(mytool, "deleteEnd")
+        row.scale_x = 1
+        box2 = row.box()
+        box2.scale_y = 0.5
+        box2.operator(deleteRangeNFT.bl_idname, text=deleteRangeNFT.bl_label,emboss=False)
 
 
 class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
@@ -1986,15 +2041,6 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
         row = box.row()
         row.operator(loadPrevNFT.bl_idname, text=loadPrevNFT.bl_label)
         row.operator(loadNextNFT.bl_idname, text=loadNextNFT.bl_label)
-
-        layout.separator(factor=0.0)
-
-        row = layout.row()
-        row.scale_y = 0.6
-        box = row.box()
-        box.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
-        box = row.box()
-        box.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
         return
 
 
@@ -2523,6 +2569,7 @@ classes = (
     WCUSTOM_PT_ArtistUI,
     WCUSTOM_PT_TintPreviewUI,
     WCUSTOM_PT_TintUI,
+    WCUSTOM_PT_DeleteRange,
     # BMNFTS_PT_Documentation,
 
 
@@ -2586,7 +2633,7 @@ classes = (
     countUpAllRarities,
     randomizeTexture,
     randomizeMesh,
-
+    deleteRangeNFT,
     forceLoadDNAFromUI,
     testButton
 

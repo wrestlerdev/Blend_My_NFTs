@@ -55,6 +55,7 @@ ItemUsedBodySlot = {
 "FeetShort" : ["12-Feet"],
 "FeetShortNone" : ["12-Feet"],
 "Calf" : ["10-Calf"],
+"CalfLong" : ["10-Calf", "11-Ankle"],
 "Neck" : ["13-Neck"],
 "HeadShort" : ["17-UpperHead"],
 "HeadShortNone" : ["17-UpperHead"],

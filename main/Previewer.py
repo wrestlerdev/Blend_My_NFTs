@@ -138,9 +138,9 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 # -----------------------------------------------------
 def SnapFeetToFloor(shoetype, character, NFTDict):
-   torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
-   torsoObj = torsoObj + "_" + character
-   objects = bpy.data.collections[torsoObj].objects
+   # torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
+   # torsoObj = torsoObj + "_" + character
+   # objects = bpy.data.collections[torsoObj].objects
 
    if shoetype == "FeetLong":
       shoes = list(NFTDict["10-Calf"].keys())[0]
@@ -565,6 +565,10 @@ def pointers_have_updated(slots_key, variant_name=''): # this is called from ini
       if last_type not in ['Null', 'Nulll']: # gets null variant then fills pointer with it
          coll = bpy.data.collections[coll_name]
          null_type_coll = coll.children[0]
+         # for type in coll.children:
+         #    if type.name.endswith("None") and not type.name[3:].startswith('Expression'):
+         #       null_type_coll = type
+
          null_var_coll = null_type_coll.children[0]
          new_dnastrand = set_from_collection(coll, null_var_coll.name)
          if new_dnastrand != '':

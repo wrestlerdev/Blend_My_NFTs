@@ -172,6 +172,23 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     return True
 
 
+def DeleteNFTsinRange(start, end, TotalDNA, save_path, batch_index, master_record_save_path):
+    if start > end or start > len(TotalDNA):
+        print(f"{config.bcolors.ERROR}This is not a valid range. Nothing was deleted{config.bcolors.RESET}")
+        return
+
+    if end > len(TotalDNA):
+        end = len(TotalDNA)
+        print(f"{config.bcolors.WARNING}This is out of range. New range deleted is {start} ~ {end}{config.bcolors.RESET}")
+
+    for index in range(end, start - 1, -1):
+        DNA = TotalDNA[index - 1]
+        DeleteNFT(DNA, save_path, batch_index, master_record_save_path)
+
+    print(f"{config.bcolors.OK}NFTs from {start} ~ {end} (total {end - start + 1}) deleted{config.bcolors.RESET}")
+    return
+
+
 def DeleteAllNFTs(TotalDNA, save_path, batch_index, master_record_save_path):
     for index in range(len(TotalDNA), 0, -1):
         DNA = TotalDNA[index - 1]
