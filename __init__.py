@@ -1077,9 +1077,22 @@ class createBlenderSave(bpy.types.Operator):
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
         range_start = bpy.context.scene.my_tool.renderSectionIndex
         batch_count = len(next(os.walk(batch_path))[1])
-        range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
-        if range_start <= batch_count and range_end >= range_start:
-            range = [range_start, range_end]
+        range = []
+        if not bpy.context.scene.my_tool.renderFullBatch:
+            if bpy.context.scene.my_tool.rangeBool:
+                size = bpy.context.scene.my_tool.renderSectionSize
+                index = bpy.context.scene.my_tool.renderSectionIndex
+                range_start = size * (index - 1) + 1
+                range_end = min(size * (index), batch_count)
+                if range_start <= batch_count:
+                    range = [range_start, range_end]
+            else:
+                range_start = bpy.context.scene.my_tool.renderSectionIndex
+                range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
+                if range_start <= batch_count and range_end >= range_start:
+                    range = [range_start, range_end]
+        else:
+            range = [1, batch_count]
         Exporter.create_blender_saves(batch_path, render_batch_num, range)
         print("SAVE NEW BLENDER SCENES: " + batch_path)
         return {'FINISHED'}

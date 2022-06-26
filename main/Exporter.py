@@ -247,9 +247,13 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 # -------------------------------- Custom render --------------------------------------
 def create_blender_saves(batch_path, batch_num, nft_range):
-    
 
     print(os.listdir(batch_path))
+    imageBool = bpy.context.scene.my_tool.imageBool
+    animationBool = bpy.context.scene.my_tool.animationBool
+    modelBool = bpy.context.scene.my_tool.modelBool
+    RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
+
     for i in range(nft_range[0], nft_range[1] + 1):
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
         folder_name = "NFT_{:04d}".format(i)
@@ -261,7 +265,6 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
         select_hierarchy(bpy.data.collections["Rendering"])
         bpy.data.objects["CameraStill"].select_set(True)
-        #bpy.data.objects["CameraVideo"].select_set(True)
         blend_name = "Batch_{:03d}_NFT_{:04d}.blend".format(batch_num, i)
         blend_save  = os.path.join(batch_path, "NFT_{:04d}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
@@ -273,8 +276,8 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         folder_path = folder_path.replace('\\', '/')
 
         batch_file_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
-        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path + " " +  folder_path 
-        
+        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + RenderTypes + " " +  folder_path
+
         os.system(batch_script_path)
     
 def select_hierarchy(parent_col):
