@@ -226,7 +226,7 @@ def import_character_actions(character, rig_blendfile_pathr):
         #names = [name for name in data_from.collections]
         actions = [action for action in data_from.actions]
         for action in actions:
-            if action.endswith(character.lower()):
+            if action.endswith(character.lower() + '_action'):
                 dir = os.path.join(rig_blendfile_pathr, "Action")
                 file_name = action
                 file_path = os.path.join(dir, file_name)      

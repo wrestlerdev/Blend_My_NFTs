@@ -322,8 +322,8 @@ def set_shape_keys(character, variant_name):
    for obj in character_coll.objects:
       if obj.type == 'ARMATURE':
          print(obj.name, variant_name + "_" + character.lower())
-         if bpy.data.actions.find(variant_name + "_" + character.lower()) > -1:
-            obj.animation_data.action = bpy.data.actions[variant_name + "_" + character.lower()]
+         if bpy.data.actions.find(variant_name + "_" + character.lower() + '_action') > -1:
+            obj.animation_data.action = bpy.data.actions[variant_name + "_" + character.lower() + '_action']
       if obj.type == 'MESH':
          if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
             for shape_key in obj.data.shape_keys.key_blocks:
