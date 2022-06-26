@@ -10,7 +10,6 @@ bl_info = {
 
 # Import handling:
 
-from ast import Load
 import bpy
 from bpy.app.handlers import persistent
 from rna_prop_ui import PropertyPanel
@@ -137,6 +136,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             ]
         )
 
+    customRenderRange: bpy.props.StringProperty(name="Custom Render Range", default='')
+    customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
+
     deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
     deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)
 
@@ -148,7 +150,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     renderFullBatch: bpy.props.BoolProperty(name= "Render Full Batch", default=True)
     renderSectionSize: bpy.props.IntProperty(name= "Section Size", default=1, min=1, max=9999)
     renderSectionIndex: bpy.props.IntProperty(name= "Section Index", default=1, min=1, max=9999)
-    rangeBool: bpy.props.BoolProperty(name="Use Sections", default=True)
+    rangeBool: bpy.props.BoolProperty(name="Use Sections", default=False)
     BatchRenderIndex: bpy.props.IntProperty(name= "Batch To Render", default=1, min=1, max=10)
     PNGTransparency: bpy.props.BoolProperty(name= 'Transparency', default=True)
 
@@ -1064,8 +1066,8 @@ class renderBatch(bpy.types.Operator):
 
 class createBlenderSave(bpy.types.Operator):
     bl_idname = "createblendersave.batch"
-    bl_label = "Create Blender Saves"
-    bl_description = "Create Blender Saves"
+    bl_label = "Render"
+    bl_description = "Create Blender Saves and Render"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -1077,24 +1079,32 @@ class createBlenderSave(bpy.types.Operator):
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
         range_start = bpy.context.scene.my_tool.renderSectionIndex
         batch_count = len(next(os.walk(batch_path))[1])
-        range = []
+        ranges = []
         if not bpy.context.scene.my_tool.renderFullBatch:
-            if bpy.context.scene.my_tool.rangeBool:
+            if bpy.context.scene.my_tool.customRenderRangeBool:
+                ranges = Exporter.get_custom_range()
+            elif bpy.context.scene.my_tool.rangeBool:
                 size = bpy.context.scene.my_tool.renderSectionSize
                 index = bpy.context.scene.my_tool.renderSectionIndex
                 range_start = size * (index - 1) + 1
                 range_end = min(size * (index), batch_count)
                 if range_start <= batch_count:
-                    range = [range_start, range_end]
+                    ranges = [[range_start, range_end]]
             else:
                 range_start = bpy.context.scene.my_tool.renderSectionIndex
                 range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
                 if range_start <= batch_count and range_end >= range_start:
-                    range = [range_start, range_end]
+                    ranges = [[range_start, range_end]]
         else:
-            range = [1, batch_count]
-        Exporter.create_blender_saves(batch_path, render_batch_num, range)
-        print("SAVE NEW BLENDER SCENES: " + batch_path)
+            ranges = [[1, batch_count]]
+
+        for range in ranges:
+            passed = Exporter.create_blender_saves(batch_path, render_batch_num, range)
+            if passed:
+                print("SAVE NEW BLENDER SCENES: " + batch_path)
+        if not ranges:
+            print("Custom render string is empty or not valid so nothing was rendered :(")
+
         return {'FINISHED'}
 
 
@@ -1554,7 +1564,8 @@ class testButton(bpy.types.Operator):
         # first_batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(index))
         # DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
 
-        Exporter.Previewer.colorpicker_has_applied()
+        # Exporter.Previewer.colorpicker_has_applied()
+        Exporter.get_custom_range()
         return {'FINISHED'}
 
 
@@ -2234,7 +2245,12 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                 row = layout.row()
                 row.prop(mytool, "rangeBool")
 
-                if range_start > batch_count or range_start > range_end:
+                row.prop(mytool, "customRenderRangeBool", toggle=1)
+                row.scale_x=2
+
+                if mytool.customRenderRangeBool:
+                    row.label(text="Render total: ¯\_(ツ)_/¯")
+                elif range_start > batch_count or range_start > range_end:
                     row.label(text="Render range: Out of range")
                 else:
                     if mytool.rangeBool:
@@ -2243,7 +2259,9 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                         row.label(text="Render total: {}".format(range_end - range_start + 1))
 
                 row = layout.row()
-                if mytool.rangeBool:
+                if mytool.customRenderRangeBool:
+                    row.prop(mytool, "customRenderRange")
+                elif mytool.rangeBool:
                     row.prop(mytool, "renderSectionIndex")
                     row.prop(mytool, "renderSectionSize")
                 else:
@@ -2251,30 +2269,30 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     row.prop(mytool, "renderSectionSize", text="Range End")
 
             row = layout.row()
-            row.prop(mytool, "imageBool")
-            row.prop(mytool, "animationBool")
-            row.prop(mytool, "modelBool")
-            if mytool.imageBool:
-                row = layout.row()
-                row.label(text="Image Type:")
-                row.prop(mytool, "imageEnum", expand=True)
-                row = layout.row()
+            row.prop(mytool, "imageBool", toggle=1)
+            row.prop(mytool, "animationBool", toggle=1)
+            row.prop(mytool, "modelBool", toggle=1)
+            # if mytool.imageBool:
+            #     row = layout.row()
+            #     row.label(text="Image Type:")
+            #     row.prop(mytool, "imageEnum", expand=True)
+            #     row = layout.row()
 
-                if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
-                    row.label(text="")
-                    row.label(text="")
-                    row.prop(mytool, "PNGTransparency",toggle=1)
-                    row = layout.row()
-            if mytool.modelBool:
-                row = layout.row()
-                row.label(text="Model Type:")
-                row.prop(mytool, "modelEnum", expand=True)
-                row = layout.row()
+            #     if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
+            #         row.label(text="")
+            #         row.label(text="")
+            #         row.prop(mytool, "PNGTransparency",toggle=1)
+            #         row = layout.row()
+            # if mytool.modelBool:
+            #     row = layout.row()
+            #     row.label(text="Model Type:")
+            #     row.prop(mytool, "modelEnum", expand=True)
+            #     row = layout.row()
 
             layout.separator()
             box = layout.box()
             box.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label)
-            box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
+            # box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 
 

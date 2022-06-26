@@ -2,8 +2,6 @@
 # This file takes a given Batch created by DNA_Generator.py and tells blender to render the image or export a 3D model to
 # the NFT_Output folder.
 
-from doctest import master
-from re import L
 import bpy
 import os
 import time
@@ -246,6 +244,8 @@ def render_and_save_NFTs(nftName, maxNFTs, batchToGenerate, batch_json_save_path
 
 
 # -------------------------------- Custom render --------------------------------------
+
+
 def create_blender_saves(batch_path, batch_num, nft_range):
 
     print(os.listdir(batch_path))
@@ -253,6 +253,10 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     animationBool = bpy.context.scene.my_tool.animationBool
     modelBool = bpy.context.scene.my_tool.modelBool
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
+
+    if not imageBool and not animationBool and not modelBool:
+        print("Please selecta a render output type")
+        return False
 
     for i in range(nft_range[0], nft_range[1] + 1):
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
@@ -279,7 +283,9 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + RenderTypes + " " +  folder_path
 
         os.system(batch_script_path)
+        return True
     
+
 def select_hierarchy(parent_col):
     # Go over all the objects in the hierarchy like @zeffi suggested:
     def get_child_names(obj):
@@ -289,6 +295,7 @@ def select_hierarchy(parent_col):
             for obj in child.objects:
                 obj.select_set(True)       
     get_child_names(parent_col)
+
 
 def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
     folder = os.path.join(save_path, "OUTPUT")
@@ -740,6 +747,37 @@ def change_nftname_in_metadata(metadata_path, new_name):
                 outfile.write(dataObj)
 
     return
+
+
+# -------------------------------------------------
+
+def get_custom_range():
+    render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
+    export_path = bpy.context.scene.my_tool.separateExportPath
+    export_path = os.path.join(export_path, "Blend_My_NFT")
+    batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
+    batch_count = len(next(os.walk(batch_path))[1])
+
+    ranges = []
+    range_string = bpy.context.scene.my_tool.customRenderRange
+    range_string = range_string.replace(" ", '')
+    range_splits = range_string.split(',')
+    for range_split in range_splits:
+        if range_split:
+            if '-' in range_split:
+                splits = range_split.split('-')
+                if splits[0] == '':
+                    ranges.append([1, min(int(splits[1]), batch_count)])
+                elif splits[1] == '':
+                    if not int(splits[0]) > batch_count:
+                        ranges.append([min(int(splits[0]), batch_count), batch_count])
+                else:
+                    ranges.append([min(int(splits[0]), batch_count), min(int(splits[1]), batch_count)])
+            else:
+                range = min(int(range_split), batch_count)
+                ranges.append([range, range])
+    return ranges
+
 
 
 if __name__ == '__main__':
