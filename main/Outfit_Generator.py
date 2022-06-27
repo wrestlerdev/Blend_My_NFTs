@@ -340,8 +340,6 @@ def GetRandomSingleTexture(att_name, variant_coll):
 def GetRandomSingleMesh(att_name):
     pointer_name = "input" + att_name[3:]
     last_variant = bpy.context.scene.my_tool[pointer_name].name if bpy.context.scene.my_tool[pointer_name] else ''
-
-    print(bpy.context.scene.my_tool[pointer_name])
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
