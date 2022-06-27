@@ -1129,6 +1129,7 @@ class moveDataToLocal(bpy.types.Operator):
         record_save_path = os.path.join(bpy.context.scene.my_tool.root_dir, bath_path_end)
         local_save_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, bath_path_end)
 
+        bpy.context.scene.my_tool.BatchRenderIndex = bpy.context.scene.my_tool.CurrentBatchIndex
         success = Exporter.export_record_data(record_save_path, local_save_path)
         if not success:
             self.report({"ERROR"}, "Failed: pls choose a different folder from the root folder")

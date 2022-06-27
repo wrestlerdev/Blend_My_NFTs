@@ -610,7 +610,6 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
       else:
          new_colorkey = dna_strand.rpartition('-')[2]
    else: # randomize colour here? # should it check for 0-0-0?
-      # MAKE A CHECK FOR EMPTY TYPES
       new_split = DNA[coll_index + 1].split('-')
       max_attempts = 10
       old_colorkey = old_strand.split('-')[-1]
@@ -656,7 +655,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    new_item["item_texture"] = new_tex
    new_item["type_rarity"] = type_coll['rarity']
    new_item["variant_rarity"] = var_coll['rarity']
-   new_item["texture_rarity"] = new_tex_rarity # TODO FIND THIS TOO
+   new_item["texture_rarity"] = new_tex_rarity
    new_item["color_key"] = new_colorkey
 
    variant_dict = {}
