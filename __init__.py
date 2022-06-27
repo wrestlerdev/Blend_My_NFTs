@@ -138,6 +138,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     customRenderRange: bpy.props.StringProperty(name="Custom Render Range", default='')
     customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
+    exportDimension: bpy.props.IntProperty(name="Dimensions", default=2048, min=64, max=4096)
+    imageFrame: bpy.props.IntProperty(name="Image Frame", default=1)
+    frameLength: bpy.props.IntProperty(name="Animation Frame Length", default=24)
 
     deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
     deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)
@@ -1995,6 +1998,7 @@ class WCUSTOM_PT_DeleteRange(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ELoadFromFile'
+    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
         layout = self.layout
@@ -2215,12 +2219,13 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             layout.separator()
 
             batch_count = len(os.listdir(batches_path)) - 1
-            row = layout.row()
+            box = layout.box()
+            row = box.row()
             row.label(text="Total Batches: {}".format(batch_count))            
-            row = layout.row()
+            row = box.row()
             row.prop(mytool, "BatchRenderIndex")
 
-            row = layout.row()
+            row = box.row()
             if os.path.exists(batch_path):
                 batch_count = len(next(os.walk(batch_path))[1])
                 row.label(text="Number in batch: {}".format(batch_count))
@@ -2230,6 +2235,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.prop(mytool, "renderFullBatch",toggle=-1)
             layout.separator()
 
+            box = layout.box()
             if not bpy.context.scene.my_tool.renderFullBatch:
                 row = layout.row()
                 size = bpy.context.scene.my_tool.renderSectionSize
@@ -2242,7 +2248,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     range_start = mytool.renderSectionIndex
                     range_end = min(mytool.renderSectionSize, batch_count)
 
-                row = layout.row()
+                row = box.row()
                 row.prop(mytool, "rangeBool")
 
                 row.prop(mytool, "customRenderRangeBool", toggle=1)
@@ -2258,7 +2264,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     else:
                         row.label(text="Render total: {}".format(range_end - range_start + 1))
 
-                row = layout.row()
+                row = box.row()
                 if mytool.customRenderRangeBool:
                     row.prop(mytool, "customRenderRange")
                 elif mytool.rangeBool:
@@ -2268,10 +2274,20 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     row.prop(mytool, "renderSectionIndex", text="Range Start")
                     row.prop(mytool, "renderSectionSize", text="Range End")
 
-            row = layout.row()
+            layout.separator(factor=0)
+            box = layout.box()
+
+            row = box.row()
             row.prop(mytool, "imageBool", toggle=1)
             row.prop(mytool, "animationBool", toggle=1)
             row.prop(mytool, "modelBool", toggle=1)
+
+            row = box.row()
+            row = box.row()
+            row.prop(mytool, "exportDimension")
+            row = box.row()
+            row.prop(mytool, "imageFrame")
+            row.prop(mytool, "frameLength")
             # if mytool.imageBool:
             #     row = layout.row()
             #     row.label(text="Image Type:")
@@ -2291,7 +2307,9 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
 
             layout.separator()
             box = layout.box()
-            box.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label)
+            box2 = box.box()
+            box2.scale_y = 0.6
+            box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper(),emboss=False)
             # box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 

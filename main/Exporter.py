@@ -252,11 +252,14 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     imageBool = bpy.context.scene.my_tool.imageBool
     animationBool = bpy.context.scene.my_tool.animationBool
     modelBool = bpy.context.scene.my_tool.modelBool
-    RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
 
     if not imageBool and not animationBool and not modelBool:
         print("Please selecta a render output type")
         return False
+
+    RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
+    settings = [str(bpy.context.scene.my_tool.exportDimension), str(bpy.context.scene.my_tool.imageFrame), str(bpy.context.scene.my_tool.frameLength)]
+    settings = '_'.join(settings)
 
     for i in range(nft_range[0], nft_range[1] + 1):
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
@@ -280,7 +283,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         folder_path = folder_path.replace('\\', '/')
 
         batch_file_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
-        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + RenderTypes + " " +  folder_path
+        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path
 
         os.system(batch_script_path)
         return True
@@ -536,6 +539,18 @@ def clear_all_export_data(record_path, local_output_path): # clear all nft, reco
     return
 
 
+def export_render_scripts():
+    src_batchscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "ExportBatchSingle.bat")
+    dst_batscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
+    shutil.copy(src_batchscript_path, dst_batscript_path)
+
+    src_pyscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Exporter.py")
+    dst_pyscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
+    shutil.copy(src_pyscript_path, dst_pyscript_path)
+
+    return
+
+
 def export_record_data(record_batch_root, local_batch_root): # copy all record data to export dir
                                                             # keep any currently existing render data in export dir unless NFT count < render index
     if record_batch_root == local_batch_root:
@@ -546,13 +561,7 @@ def export_record_data(record_batch_root, local_batch_root): # copy all record d
     recurse_copy_data('', record_batch_root, local_batch_root)
     # recurse_delete_data('', record_batch_root, local_batch_root)
     
-    src_batchscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "ExportBatchSingle.bat")
-    dst_batscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
-    shutil.copy(src_batchscript_path, dst_batscript_path)
-
-    src_pyscript_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Exporter.py")
-    dst_pyscript_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
-    shutil.copy(src_pyscript_path, dst_pyscript_path)
+    export_render_scripts()
     return True
 
 
