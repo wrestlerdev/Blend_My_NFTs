@@ -300,6 +300,12 @@ def GetRandomSingleTexture(att_name, variant_coll):
     number_List_Of_i = []
     rarity_List_Of_i = []
 
+    att_index = list(hierarchy.keys()).index(att_name)
+    inputDNA = bpy.context.scene.my_tool.inputDNA
+    dna_split = inputDNA.split(',')
+    old_dna_strand = dna_split[att_index + 1]
+    old_texture_index = old_dna_strand.split('-')[2]
+
     variant = variant_coll.name
     for type in hierarchy[att_name].keys():
         if variant in hierarchy[att_name][type].keys():
@@ -312,10 +318,17 @@ def GetRandomSingleTexture(att_name, variant_coll):
                     number_List_Of_i.append(tex)
             break
 
+    max_attempts = 10
     if number_List_Of_i:
         if len(number_List_Of_i) == 1:
             print("There's only one texture set")
-        textureChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+            textureChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+        else:
+            for i in range(max_attempts):
+                textureChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+                index = str(list(texture_info.keys()).index(textureChosen[0]))
+                if index != old_texture_index:
+                    break
         return textureChosen[0], list(texture_info.keys()).index(textureChosen[0])
     elif texture_info:
         return list(texture_info.keys())[0], 0
@@ -325,6 +338,10 @@ def GetRandomSingleTexture(att_name, variant_coll):
 
 
 def GetRandomSingleMesh(att_name):
+    pointer_name = "input" + att_name[3:]
+    last_variant = bpy.context.scene.my_tool[pointer_name].name if bpy.context.scene.my_tool[pointer_name] else ''
+
+    print(bpy.context.scene.my_tool[pointer_name])
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
@@ -361,8 +378,12 @@ def GetRandomSingleMesh(att_name):
             rarity_List_Of_i.append(float(rarity))
             number_List_Of_i.append(variant)
 
+    max_attempts = 10
     if number_List_Of_i:
-        variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+        for i in range(max_attempts):
+            variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+            if variantChosen[0] != last_variant:
+                break
         variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen[0])
     else:
         return "0-0-0"

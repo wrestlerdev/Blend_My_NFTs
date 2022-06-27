@@ -140,7 +140,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
     exportDimension: bpy.props.IntProperty(name="Dimensions", default=2048, min=64, max=4096)
     imageFrame: bpy.props.IntProperty(name="Image Frame", default=1)
-    frameLength: bpy.props.IntProperty(name="Animation Frame Length", default=24)
+    frameLength: bpy.props.IntProperty(name="Animation Frame Length", default=240)
 
     deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
     deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)
@@ -437,7 +437,6 @@ class randomizeTexture(bpy.types.Operator):
             texture, index = DNA_Generator.Outfit_Generator.GetRandomSingleTexture(attribute, variant)
 
             Exporter.Previewer.set_texture_on_slot(slot_coll, variant.name, index)
-
         return {'FINISHED'}
 
 
@@ -456,7 +455,6 @@ class randomizeMesh(bpy.types.Operator):
             dna_strand = DNA_Generator.Outfit_Generator.GetRandomSingleMesh(attribute)
             dna_string, CharacterItems = Exporter.Previewer.update_DNA_with_strand(attribute, dna_strand)
             Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
-
         return {'FINISHED'}
 
 
@@ -949,7 +947,7 @@ class loadDirectory(bpy.types.Operator):
 
 class createSlotFolders(bpy.types.Operator):
     bl_idname = 'create.slotfolers'
-    bl_label = 'Create Slot Folders (TEMP)'
+    bl_label = 'Import All Collections'
     bl_description = 'This will override the current folder which cannot be undone. Are you sure?'
     bl_options = {"REGISTER", "UNDO"}
 
@@ -958,28 +956,8 @@ class createSlotFolders(bpy.types.Operator):
 
 
     def execute(self, context):
-        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
-        print("TEMP SLOTS")
         SaveNFTsToRecord.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
-
         return {'FINISHED'}
-
-# class organizeScene(bpy.types.Operator):
-#     bl_idname = 'create.organizescene'
-#     bl_label = 'Organize Scene'
-#     bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
-#     bl_options = {"REGISTER", "UNDO"}
-    
-#     def invoke(self, context, event):
-#         return context.window_manager.invoke_confirm(self, event)
-
-
-#     def execute(self, context):
-#         # folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
-#         # SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
-#         original_hierarchy = Exporter.Previewer.get_hierarchy_ordered(1)
-#         DNA_Generator.save_rarity_To_Record(original_hierarchy)
-#         return {'FINISHED'}
 
 
 class createCharacterCollections(bpy.types.Operator):
@@ -2308,8 +2286,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             layout.separator()
             box = layout.box()
             box2 = box.box()
-            box2.scale_y = 0.6
-            box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper(),emboss=False)
+            box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper())
             # box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 
