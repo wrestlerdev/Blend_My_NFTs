@@ -173,6 +173,8 @@ def reimport_all_character_objects(folder_path):
             rig_blendfile_path = os.path.join(folder_path, dir)
     for char in config.Characters:
         reimport_character_objects(char, rig_blendfile_path)
+        
+    bpy.ops.file.make_paths_absolute()
     return
 
 
@@ -202,7 +204,8 @@ def reimport_character_objects(character, rig_blendfile_path):
             rigMesh = obj
             rigMesh.select_set( state = True, view_layer = bpy.context.view_layer )
             bpy.context.view_layer.objects.active = rigMesh
-    if len(bpy.context.selected_objects) > 1:                    
+    if len(bpy.context.selected_objects) > 1:
+        bpy.context.view_layer.objects.active = bpy.data.objects[character + "_Body"]            
         bpy.ops.object.join()
         print("JOINING")
     
