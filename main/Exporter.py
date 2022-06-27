@@ -262,6 +262,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     settings = '_'.join(settings)
 
     for i in range(nft_range[0], nft_range[1] + 1):
+        print("BBBBBBBBBBBBBBBBBBB " + str(i))
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
         folder_name = "NFT_{:04d}".format(i)
         folder_path = os.path.join(batch_path, folder_name)
@@ -286,7 +287,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path
 
         os.system(batch_script_path)
-        return True
+    return True
     
 
 def select_hierarchy(parent_col):
