@@ -478,7 +478,7 @@ def CreateSlotsFolderHierarchy(save_path):
     #         for char in list(characterCollectionDict.keys()):
     #             col = bpy.data.collections.new(varient + "_" + texture_set + color_tex_varient + "_" + char)
     #             varient_texture_set.children.link(col)
-
+    bpy.ops.file.make_paths_absolute()
     return
 
 def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol): 
