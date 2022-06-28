@@ -353,7 +353,6 @@ def reset_shape_keys(character):
 
 
 def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, slot_pathing):
-
    suffix = config.texture_suffixes[resolution]
    # if suffix == '':
    #    print("this should be 4k okay")
@@ -564,9 +563,9 @@ def pointers_have_updated(slots_key, variant_name=''): # this is called from ini
       last_type = last_variant.name.split('_')[1]
       if last_type not in ['Null', 'Nulll']: # gets null variant then fills pointer with it
          coll = bpy.data.collections[coll_name]
-         null_type_coll = coll.children[0]
-
-         null_var_coll = null_type_coll.children[0]
+         # null_type_coll = coll.children[0]
+         # null_var_coll = null_type_coll.children[0]
+         null_var_coll = get_null_variant_collection(coll)
          new_dnastrand = set_from_collection(coll, null_var_coll.name)
          if new_dnastrand != '':
             dna_string, CharacterItems = update_DNA_with_strand(coll_name, new_dnastrand)
@@ -577,6 +576,47 @@ def pointers_have_updated(slots_key, variant_name=''): # this is called from ini
       else: # will refill pointer with null
          bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool.get(last_key)
          # bpy.context.scene.my_tool[slots_key] = None
+
+
+def get_null_variant_collection(att_coll):
+
+   def check_collections(info, atts):
+      should_fill = True
+      for i in range(len(atts)):
+         input_name = "input" + atts[i][3:]
+         current_variant = bpy.context.scene.my_tool[input_name]
+         if current_variant:
+            current_type = current_variant.name.split('_')[1]
+            if current_type.startswith(info[0]) and not current_type.endswith(info[1]):
+               should_fill = False
+               break
+      if should_fill:
+         feet_coll = bpy.data.collections[atts[-1]]
+         for type_coll in feet_coll.children:
+            if type_coll.name.endswith("None"):
+               var_coll = type_coll.children[0]
+               if att_coll.name == feet_coll.name:
+                  return var_coll
+               else:
+                  new_dnastrand = set_from_collection(feet_coll, var_coll.name)
+                  dna_string, CharacterItems = update_DNA_with_strand(feet_coll.name, new_dnastrand)
+                  newTempDict = {}
+                  newTempDict["DNAList"] = dna_string
+                  newTempDict["CharacterItems"] = CharacterItems
+                  SaveTempDNADict(newTempDict)
+                  return att_coll.children[0].children[0]
+      return att_coll.children[0].children[0]
+
+   head_info = ["Head", "HeadShortNone"]
+   head_atts = ["13-Neck", "14-LowerHead", "15-MiddleHead", "16-Earings", "17-UpperHead"]
+   feet_info = ["Feet", "FeetShortNone"]
+   feet_atts = ["10-Calf", "11-Ankle", "12-Feet"]
+
+   if att_coll.name in head_atts: # should this account for the hoodie :(, can't differentiate between head and hair types atm
+      return check_collections(head_info, head_atts)
+   elif att_coll.name in feet_atts:
+      return check_collections(feet_info, feet_atts)
+   return att_coll.children[0].children[0]
 
 
 def update_colour_random(coll_name):

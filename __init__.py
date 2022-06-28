@@ -140,7 +140,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
     exportDimension: bpy.props.IntProperty(name="Dimensions", default=2048, min=64, max=4096)
     imageFrame: bpy.props.IntProperty(name="Image Frame", default=1)
-    frameLength: bpy.props.IntProperty(name="Animation Frame Length", default=240)
+    frameLength: bpy.props.FloatProperty(name="Animation Length", default=10.0)
 
     deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
     deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)

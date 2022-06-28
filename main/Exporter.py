@@ -254,15 +254,15 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     modelBool = bpy.context.scene.my_tool.modelBool
 
     if not imageBool and not animationBool and not modelBool:
-        print("Please selecta a render output type")
+        print("Please select a render output type")
         return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
-    settings = [str(bpy.context.scene.my_tool.exportDimension), str(bpy.context.scene.my_tool.imageFrame), str(bpy.context.scene.my_tool.frameLength)]
+    frames = int(bpy.context.scene.my_tool.imageFrame * 24)
+    settings = [str(bpy.context.scene.my_tool.exportDimension), str(frames), str(bpy.context.scene.my_tool.frameLength)]
     settings = '_'.join(settings)
 
     for i in range(nft_range[0], nft_range[1] + 1):
-        print("BBBBBBBBBBBBBBBBBBB " + str(i))
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
         folder_name = "NFT_{:04d}".format(i)
         folder_path = os.path.join(batch_path, folder_name)
