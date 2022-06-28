@@ -206,7 +206,7 @@ def reimport_character_objects(character, rig_blendfile_path):
             bpy.context.view_layer.objects.active = rigMesh
     if len(bpy.context.selected_objects) > 1:
         bpy.context.view_layer.objects.active = bpy.data.objects[character + "_Body"]            
-        bpy.ops.object.join()
+        # bpy.ops.object.join() # OBJECTJOIN
         print("JOINING")
     
     # for col in bpy.data.collections[character].children:

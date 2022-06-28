@@ -399,8 +399,8 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 cube.select_set( state = True, view_layer = bpy.context.view_layer )
                                                 bpy.context.view_layer.objects.active = cube
 
-                                            if len(bpy.context.selected_objects) > 1:                    
-                                                bpy.ops.object.join()
+                                            # if len(bpy.context.selected_objects) > 1:                    
+                                            #     bpy.ops.object.join() # OBJECTJOIN
                                             if len(characterCollectionDict[c].objects) > 0:
                                                 objectToCalc = characterCollectionDict[c].objects[0]
                                                 area = find_mesh_area(objectToCalc)

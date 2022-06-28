@@ -9,8 +9,7 @@ import json
 import importlib
 import shutil
 from datetime import datetime
-import subprocess
-
+from . import config
 from . import Previewer
 importlib.reload(Previewer)
 
@@ -258,15 +257,22 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
-    frames = int(bpy.context.scene.my_tool.imageFrame * 24)
-    settings = [str(bpy.context.scene.my_tool.exportDimension), str(frames), str(bpy.context.scene.my_tool.frameLength)]
+    frames = int(bpy.context.scene.my_tool.frameLength * 24)
+    settings = [str(bpy.context.scene.my_tool.exportDimension), str(bpy.context.scene.my_tool.imageFrame), str(frames)]
     settings = '_'.join(settings)
+    render_types = []
+    render_types.append("IMAGE") if imageBool else None
+    render_types.append("ANIMATION") if animationBool else None
+    render_types.append("MODEL") if modelBool else None
+    render_types = ' || '.join(render_types)
 
+    render_start_time = time.time()
     for i in range(nft_range[0], nft_range[1] + 1):
-        file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
+        start_time = time.time()
+        file_name = "Batch_{:03d}_NFT_{:04d}".format(batch_num, i)
         folder_name = "NFT_{:04d}".format(i)
         folder_path = os.path.join(batch_path, folder_name)
-        json_path = os.path.join(folder_path, file_name)
+        json_path = os.path.join(folder_path, file_name + '.json')
         print(json_path)
 
         NFTDict = json.load(open(json_path))
@@ -277,7 +283,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         blend_save  = os.path.join(batch_path, "NFT_{:04d}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
         python_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
-        
+
         blenderExecutable = bpy.app.binary_path
         blenderFolder = blenderExecutable.rpartition("\\")[0] + "\\"
         blenderFolder = '"' + blenderFolder + '"'
@@ -287,6 +293,12 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path
 
         os.system(batch_script_path)
+        time_taken = time.time() - start_time
+        send_to_export_log(batch_path, batch_num, file_name, time_taken, file_name, True, render_types)
+
+    render_time_taken = time.time() - render_start_time
+    av_time = render_time_taken / (nft_range[1] + 1 - nft_range[0])
+    print(f"{config.bcolors.OK}The average time for this batch of renders was: {av_time}{config.bcolors.RESET}")
     return True
     
 
@@ -311,7 +323,6 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
         os.makedirs(folder)
 
     batch_path = os.path.join(save_path, "OUTPUT", "Batch_{:03d}".format(batch_num))
-
     for i in range(nft_range[0], nft_range[1] + 1):
         file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
         json_path = os.path.join(batch_path, "NFT_{:04d}".format(i), file_name)
@@ -356,7 +367,6 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
     return
-
 
 
 
@@ -496,13 +506,14 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
 
 # ----------------------------------- Export Logs --------------------------------------------
 
-def send_to_export_log(batch_path, batch_num, record_name, nft_name, file_type, file_format, render_time, key, render_sucess):
-    Log, log_name = return_export_log_data(batch_path, batch_num, file_type)
+def send_to_export_log(batch_path, batch_num, nft_name, render_time, key, render_sucess, render_types):
+    Log, log_name = return_export_log_data(batch_path, batch_num)
     log_path = os.path.join(batch_path, log_name)
     logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     Log[key] = {'nft_number': nft_name, 'finished': logged_time, 
-                'time_taken': "{:.2f} seconds".format(render_time), 'file_format': file_format,
-                'has_succeeded': render_sucess}
+                'time_taken': "{:.2f} seconds".format(render_time),
+                'has_succeeded': render_sucess,
+                'export_types': render_types}
     try:
         log = json.dumps(Log, indent=1, ensure_ascii=True)
         with open(log_path, 'w') as outfile:
@@ -513,8 +524,8 @@ def send_to_export_log(batch_path, batch_num, record_name, nft_name, file_type, 
 
 
  
-def return_export_log_data(batch_path, batch_num, file_format):
-    log_name = "LOG_Batch_{:03d}_{}.json".format(batch_num, file_format)
+def return_export_log_data(batch_path, batch_num):
+    log_name = "EXPORTLOG_{:03d}.json".format(batch_num)
     path = os.path.join(batch_path, log_name)
     if os.path.exists(path):
         log = json.load(open(path))
@@ -677,7 +688,7 @@ def refactor_single_batch(batch_path, batch_index, master_record_path):
 
         for dir in os.listdir(nft_path): # checking if files have been renamed
             prefix, suffix = dir.split('.')
-            if suffix != 'json':
+            if suffix not in ['json', 'blend', 'blend1']:
                 if prefix != default_prefix:
                     if prefix != metadata_prefix:
                         break
@@ -728,6 +739,8 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
             else:
                 metadata_path = os.path.join(old_path)
                 change_nftname_in_metadata(metadata_path, new_file_name)
+        elif suffix in ["blend", 'blend1']:
+            pass
         else:
             os.rename(old_path, new_path)
     
