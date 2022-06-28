@@ -556,7 +556,12 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
                 variant_coll = bpy.data.collections[variant]
                 variant_percentage, weight_total = get_weighted_rarity(variant_coll, type_coll)
                 rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability * variant_percentage
-        branch_count = branch_count * (len(rarity_dict[attribute][type].keys()) - 2) # TODO: THIS NEEDS TO ONLY COUNT VALID RARITY COLLECTIONS, NOT ALL
+        var_count = 0
+        for v in bpy.data.collections[type].children:
+            if v.get('rarity') and v.get('rarity') > 0:
+                var_count += 1
+        branch_count = branch_count * var_count
+
     else:
         rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + new_probability
 
