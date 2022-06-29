@@ -483,23 +483,24 @@ def ColorHasbeenUpdated(ColorTint):
     Btint = bpy.context.scene.my_tool.BTint
     Atint = bpy.context.scene.my_tool.AlphaTint
     Wtint = bpy.context.scene.my_tool.WhiteTint
-    collection_name = inputColorListSceneObject.users_collection[0].name
-    collection_name = collection_name.rpartition('_')[0]
-    print(collection_name)
-    if inputColorListSceneObject is not None:
-        for m in inputColorListSceneObject.material_slots:
-            material = m.material
-            for node in material.node_tree.nodes:
-                if (node.label == "RTint"):
-                    node.outputs["Color"].default_value = Rtint
-                if (node.label == "GTint"):
-                    node.outputs["Color"].default_value = Gtint
-                if (node.label == "BTint"):
-                    node.outputs["Color"].default_value = Btint
-                if (node.label == "AlphaTint"):
-                    node.outputs["Color"].default_value = Atint
-                if (node.label == "WhiteTint"):
-                    node.outputs["Color"].default_value = Wtint
+    if inputColorListSceneObject:
+        collection_name = inputColorListSceneObject.users_collection[0].name
+        collection_name = collection_name.rpartition('_')[0]
+        print(collection_name)
+        if inputColorListSceneObject is not None:
+            for m in inputColorListSceneObject.material_slots:
+                material = m.material
+                for node in material.node_tree.nodes:
+                    if (node.label == "RTint"):
+                        node.outputs["Color"].default_value = Rtint
+                    if (node.label == "GTint"):
+                        node.outputs["Color"].default_value = Gtint
+                    if (node.label == "BTint"):
+                        node.outputs["Color"].default_value = Btint
+                    if (node.label == "AlphaTint"):
+                        node.outputs["Color"].default_value = Atint
+                    if (node.label == "WhiteTint"):
+                        node.outputs["Color"].default_value = Wtint
     return None
 
 

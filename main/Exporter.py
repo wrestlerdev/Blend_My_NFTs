@@ -739,6 +739,8 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
             else:
                 metadata_path = os.path.join(old_path)
                 change_nftname_in_metadata(metadata_path, new_file_name)
+                new_file_path = os.path.join(folder_path, "ERC721_" + new_file_name)
+                os.rename(old_path, new_file_path)
         elif suffix in ["blend", 'blend1']:
             pass
         else:
