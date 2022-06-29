@@ -410,6 +410,11 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
                                     mat.node_tree.nodes["OpacityNode"].image = newImage 
                                     mat.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
                                     mat.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
+                                 elif _type == '_I':
+                                    newImage = bpy.data.images.load(file, check_existing=False)
+                                    mat.node_tree.nodes["IntensityNode"].image = newImage 
+                                    mat.node_tree.nodes["IntensityNode"].image.colorspace_settings.name = 'Linear'
+                                    mat.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
                            # else:
                               # print("Texture image within this node is not named properly (e.g. missing _N)")
                      elif n.type == 'RGB':

@@ -617,6 +617,15 @@ def LinkImagesToNodes(matcopy, texture_path):
                 matcopy.node_tree.nodes["OpacityNode"].image = newImage 
                 matcopy.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
+
+            if "I" == mapType:
+                print("I is choosen")
+                file = file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["IntensityNode"].image = newImage 
+                matcopy.node_tree.nodes["IntensityNode"].image.colorspace_settings.name = 'Linear'
+                matcopy.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
             # if node.label == "RTint":
             #     node.outputs["Color"].default_value = parent["color_primary"]
 
