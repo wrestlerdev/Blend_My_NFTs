@@ -62,6 +62,7 @@ ItemUsedBodySlot = {
 "HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
 "HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-Backpack", "16-Earings"],
 "HeadMid" : ["15-MiddleHead"],
+"HeadMidNeutral" : ["15-MiddleHead", "20-Expression"],
 "HeadMidFull" : ["15-MiddleHead", "17-UpperHead"],
 "HeadLower" : ["14-LowerHead"],
 "FaceFull" : ["15-MiddleHead", "14-LowerHead"],
