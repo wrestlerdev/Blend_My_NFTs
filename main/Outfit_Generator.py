@@ -62,6 +62,7 @@ ItemUsedBodySlot = {
 "HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
 "HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-Backpack", "16-Earings"],
 "HeadMid" : ["15-MiddleHead"],
+"HeadMidNeutral" : ["15-MiddleHead", "20-Expression"],
 "HeadMidFull" : ["15-MiddleHead", "17-UpperHead"],
 "HeadLower" : ["14-LowerHead"],
 "FaceFull" : ["15-MiddleHead", "14-LowerHead"],
@@ -570,7 +571,7 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         for coll in att_coll.children:
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=coll.name, branch_count=branch_count)
     else: # this is a type
-        if 'Null' not in type:
+        if 'Null' not in type and type[3:] in ItemUsedBodySlot:
             new_slots = ItemUsedBodySlot[type[3:]]
         else:
             new_slots = []
