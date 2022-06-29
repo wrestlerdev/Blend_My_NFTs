@@ -122,6 +122,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
+    renameSetTo: bpy.props.StringProperty(name='Rename Set To')
     shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
 
     textureSize: bpy.props.EnumProperty(
@@ -1534,6 +1536,25 @@ class countUpAllRarities(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class renameSet(bpy.types.Operator):
+    bl_idname = 'set.rename'
+    bl_label = 'Rename Set'
+    bl_description = 'This cannot be undone are u suuuuuuuuuuuure'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        _from = bpy.context.scene.my_tool.renameSetFrom
+        _to = bpy.context.scene.my_tool.renameSetTo
+        if _from and _to:
+            DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets(_from, _to)
+        else:
+            print("Please fill in the boxes properly")
+        return {'FINISHED'}
+
+
 class testButton(bpy.types.Operator):
     bl_idname = 'test.button'
     bl_label = 'For tests'
@@ -1547,7 +1568,8 @@ class testButton(bpy.types.Operator):
         # DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
 
         # Exporter.Previewer.colorpicker_has_applied()
-        Exporter.get_custom_range()
+        # Exporter.get_custom_range()
+        # DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets("Egypt_01", "WOW")
         return {'FINISHED'}
 
 
@@ -2552,6 +2574,30 @@ class WCUSTOM_PT_TintPreviewUI(bpy.types.Panel):
         # row.operator(colourCopyUp.bl_idname, text=colourCopyUp.bl_label, icon=colourCopyUp.icon)
         row.operator(colourCopyDown.bl_idname, text=colourCopyDown.bl_label, icon=colourCopyDown.icon)
 
+
+class WCUSTOM_PT_RenameColors(bpy.types.Panel):
+    bl_label ="Rename Sets"
+    bl_idname = "WCUSTOM_PT_RenameColors"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ARTIST'
+    bl_parent_id = 'WCUSTOM_PT_ArtistUI'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "renameSetFrom", text='')
+        row.scale_x = 0.1
+        row.label(text="to")
+        row.scale_x = 1
+        row.prop(mytool, "renameSetTo", text='')
+
+        row = layout.row()
+        row.operator(renameSet.bl_idname, text=renameSet.bl_label)
+
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
 #     bl_label = "Documentation"
@@ -2594,6 +2640,7 @@ classes = (
     WCUSTOM_PT_CreateMetadata,
     WCUSTOM_PT_RefactorExports,
     WCUSTOM_PT_ArtistUI,
+    WCUSTOM_PT_RenameColors,
     WCUSTOM_PT_TintPreviewUI,
     WCUSTOM_PT_TintUI,
     WCUSTOM_PT_DeleteRange,
@@ -2662,6 +2709,7 @@ classes = (
     randomizeMesh,
     deleteRangeNFT,
     forceLoadDNAFromUI,
+    renameSet,
     testButton
 
 )

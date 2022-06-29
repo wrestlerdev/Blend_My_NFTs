@@ -599,3 +599,28 @@ def create_batch_color(batch_path, batch_num, contains_all):
     with open(json_path, 'w') as outfile:
         outfile.write(ledger + '\n')
     return
+
+
+#-----------------------------------------------------------
+
+
+def rename_color_sets(old_name, new_name):
+    GlobalColorSetList = OpenGlobalColorList()
+    GlobalStyles = OpenGlobalStyleList()
+
+    old_value = GlobalColorSetList.pop(old_name, None)
+    if old_value:
+        old_value["CommonName"] = new_name
+        GlobalColorSetList[new_name] = old_value
+    else:
+        print("This key does not exist")
+        return
+
+    for style in GlobalStyles.keys():
+        colorset = GlobalStyles[style]["ColorSets"]
+        new_colorset = [i if i != old_name else new_name for i in colorset]
+        GlobalStyles[style]["ColorSets"] = new_colorset
+
+    WriteToGlobalColorList(GlobalColorSetList)
+    WriteToGlobalStyleList(GlobalStyles)
+    return
