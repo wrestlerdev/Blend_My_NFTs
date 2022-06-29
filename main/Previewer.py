@@ -48,8 +48,10 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
                         obj.hide_viewport = True
                         obj.hide_render = True
-                        if obj.type == 'MESH':
-                           pass
+                        if obj.field.type != 'NONE':
+                           obj.field.apply_to_location = False
+                           obj.field.apply_to_rotation = False
+
 
    
    keys = list(NFTDict.keys())
@@ -86,6 +88,10 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      for obj in meshes: # Should we re hide the object meshes?
                         obj.hide_viewport = False
                         obj.hide_render = False
+                        if obj.field.type != 'NONE':
+                           obj.field.apply_to_location = True
+                           obj.field.apply_to_rotation = True
+
                         if Select:
                            obj.select_set(True)
                      scaleFac = child["Volume"]
