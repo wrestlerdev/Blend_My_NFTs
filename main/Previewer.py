@@ -498,7 +498,6 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
 
          type_list = list(type_coll.children)
          variant_index = type_list.index(var_coll)
-         # texture_index = 0 # TODO HOW TO GET TEXTURE INDEX NOW
 
          if type_coll.name[3:] in config.EmptyTypes:
             dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']
