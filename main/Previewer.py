@@ -48,6 +48,9 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
                         obj.hide_viewport = True
                         obj.hide_render = True
+                        if obj.type == 'MESH':
+                           pass
+
    
    keys = list(NFTDict.keys())
    DNAString = DNA.split(",")
