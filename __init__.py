@@ -10,7 +10,6 @@ bl_info = {
 
 # Import handling:
 
-from ast import Load
 import bpy
 from bpy.app.handlers import persistent
 from rna_prop_ui import PropertyPanel
@@ -49,27 +48,6 @@ else:
         TextureEditor
 
     from .ui_Lists import UIList
-
-Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
-    "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),
-    "inputLForeArm": ("03-LForeArm", "Left Forearm"),
-    "inputLWrist": ("04-LWrist", "Left Wrist"),
-    "inputRForeArm": ("05-RForeArm", "Right Forearm"),
-    "inputRWrist": ("06-RWrist", "Right Wrist"),
-    "inputHands": ("07-Hands", "Hands"),
-    "inputPelvisThick": ("08-PelvisThick", "Pelvis Thick"),
-    "inputPelvisThin": ("09-PelvisThin", "Pelvis Thin"),
-    "inputCalf": ("10-Calf", "Calf"),
-    "inputAnkle": ("11-Ankle", "Ankle"),
-    "inputFeet": ("12-Feet", "Feet"),
-    "inputNeck": ("13-Neck", "Neck"),
-    "inputLowerHead": ("14-LowerHead", "Lower Head"),
-    "inputMiddleHead": ("15-MiddleHead", "Mid Head"),
-    "inputEarings": ("16-Earings", "Earrings"),
-    "inputUpperHead": ("17-UpperHead", "Upper Head"),
-    "inputBackpack": ("18-Backpack", "Backpack"),
-    "inputBackground": ("19-Background", "Background"),
-    "inputExpression": ("20-Expression", "Expression")}
     
 
 # User input Property Group:
@@ -144,6 +122,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Custom properties
 
+    renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
+    renameSetTo: bpy.props.StringProperty(name='Rename Set To')
     shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
 
     textureSize: bpy.props.EnumProperty(
@@ -158,6 +138,15 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             ]
         )
 
+    customRenderRange: bpy.props.StringProperty(name="Custom Render Range", default='')
+    customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
+    exportDimension: bpy.props.IntProperty(name="Dimensions", default=2048, min=64, max=4096)
+    imageFrame: bpy.props.IntProperty(name="Image Frame", default=1)
+    frameLength: bpy.props.FloatProperty(name="Animation Length", default=10.0)
+
+    deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
+    deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)
+
     isCharacterLocked: bpy.props.BoolProperty(name="Lock Character", default=False)
 
     separateExportPath: bpy.props.StringProperty(name="Directory")
@@ -166,7 +155,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     renderFullBatch: bpy.props.BoolProperty(name= "Render Full Batch", default=True)
     renderSectionSize: bpy.props.IntProperty(name= "Section Size", default=1, min=1, max=9999)
     renderSectionIndex: bpy.props.IntProperty(name= "Section Index", default=1, min=1, max=9999)
-    rangeBool: bpy.props.BoolProperty(name="Use Sections", default=True)
+    rangeBool: bpy.props.BoolProperty(name="Use Sections", default=False)
     BatchRenderIndex: bpy.props.IntProperty(name= "Batch To Render", default=1, min=1, max=10)
     PNGTransparency: bpy.props.BoolProperty(name= 'Transparency', default=True)
 
@@ -186,48 +175,48 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso"))
     inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso"))
     inputLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLForeArm",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLForeArm"))
     inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist"))
     inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm"))
     inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRWrist",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRWrist"))
     inputPelvisThick: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick"))
     inputPelvisThin: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThin",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThin"))
     inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHands",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHands"))
     inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputCalf",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputCalf"))
     inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAnkle",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAnkle"))
     inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFeet",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFeet"))
     inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputNeck",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputNeck"))
     inputLowerHead: bpy.props.PointerProperty(name="Lower Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead"))
     inputMiddleHead: bpy.props.PointerProperty(name="Middle Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead"))
     inputEarings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings"))
     inputUpperHead: bpy.props.PointerProperty(name="Upper Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead"))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack"))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground"))
     inputExpression: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression",Slots))
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression"))
 
     inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.general_pointer_updated(Slots))
+                                                update=lambda s,c: Exporter.Previewer.general_pointer_updated())
 
     inputColorListSceneObject: bpy.props.PointerProperty(name="ColorListObject", type=bpy.types.Object)
 
@@ -272,6 +261,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     WhiteTint: bpy.props.FloatVectorProperty(name="W Tint", subtype="COLOR", default=(0.0,0.0,1.0,1.0), size=4, min=0.0, max=1,
                                         update=lambda s,c: DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("WhiteTint"))
 
+    currentGeneratorStyle: bpy.props.StringProperty(name="Style", default='')
     colorStyleName : bpy.props.StringProperty(name="Colour Style Name", default="Ocean")
     colorStyleRarity: bpy.props.IntProperty(name= "Colour Style Rarity", default=50, min=0, soft_max=100,max=2000)
     colorSetName : bpy.props.StringProperty(name="Colour Set Name", default="000")
@@ -338,8 +328,10 @@ class initializeRecord(bpy.types.Operator):
         print(save_path)
         Blend_My_NFTs_Output, output_save_path = make_directories(save_path)
 
-        first_nftrecord_save_path = os.path.join(output_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
+        first_batch_path = os.path.join(output_save_path,  "Batch_{:03d}".format(1))
+        first_nftrecord_save_path = os.path.join(first_batch_path, "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(output_save_path, "_NFTRecord.json")
+        Rarity_save_path = os.path.join(first_batch_path, "_RarityCounter_{:03d}.json".format(1))
 
         bpy.context.scene.my_tool.batch_json_save_path = output_save_path
         bpy.context.scene.my_tool.loadNFTIndex = 1
@@ -353,12 +345,16 @@ class initializeRecord(bpy.types.Operator):
             DNA_Generator.send_To_Record_JSON(first_nftrecord_save_path)
         DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
         LoadNFT.update_current_batch(1, output_save_path)
-        LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
+
+        DNA_Generator.Outfit_Generator.count_all_rarities(first_batch_path, 1)
+        LoadNFT.update_collection_rarity_property(first_nftrecord_save_path, Rarity_save_path)
+
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, 1, True)
         return {'FINISHED'}
 
 
 
-#-------------------------
+#-----------------------------------------
 
 
 class randomizePreview(bpy.types.Operator):
@@ -393,10 +389,22 @@ class randomizeAllColor(bpy.types.Operator):
         Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
+class randomizeAllSets(bpy.types.Operator):
+    bl_idname = 'randomize.colorsets'
+    bl_label = 'Randomize Color Sets'
+    bl_description = "Randomize colour sets"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
+        dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
+        Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        return {'FINISHED'}
+
 
 class randomizeColor(bpy.types.Operator):
     bl_idname = 'randomize.color'
-    bl_label = 'Randomize Color'
+    bl_label = 'Color'
     bl_description = "Randomize color of current slot"
     bl_options = {"REGISTER", "UNDO"}
     collection_name: bpy.props.StringProperty(default="")
@@ -405,9 +413,55 @@ class randomizeColor(bpy.types.Operator):
         if self.collection_name != "":
             LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
             input_slot = self.collection_name
-            slot_coll = Slots[input_slot][0]
-            Exporter.Previewer.update_colour_random(slot_coll)
+            slot_coll = config.Slots[input_slot][0]
+            type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
+            if type not in config.EmptyTypes:
+                Exporter.Previewer.update_colour_random(slot_coll)
         return {'FINISHED'}
+
+
+class randomizeTexture(bpy.types.Operator):
+    bl_idname = 'texture.randomize'
+    bl_label = 'Texture'
+    bl_description = "Randomize texture of current slot"
+    bl_options = {"REGISTER", "UNDO"}
+    collection_name: bpy.props.StringProperty(default="")
+
+    def execute(self, context):
+        if self.collection_name != "":
+            LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
+            input_slot = self.collection_name
+            slot_coll = config.Slots[input_slot][0]
+            type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
+            # if type not in config.EmptyTypes:
+            attribute = config.Slots[self.collection_name][0]
+            variant = bpy.context.scene.my_tool[self.collection_name]
+            texture, index = DNA_Generator.Outfit_Generator.GetRandomSingleTexture(attribute, variant)
+
+            Exporter.Previewer.set_texture_on_slot(slot_coll, variant.name, index)
+        return {'FINISHED'}
+
+
+class randomizeMesh(bpy.types.Operator):
+    bl_idname = 'mesh.randomize'
+    bl_label = 'Mesh'
+    bl_description = "Randomize mesh of current slot"
+    bl_options = {"REGISTER", "UNDO"}
+    collection_name: bpy.props.StringProperty(default="")
+
+    def execute(self, context):
+        if self.collection_name != "":
+            LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
+            # if type not in config.EmptyTypes:
+            attribute = config.Slots[self.collection_name][0]
+            dna_strand = DNA_Generator.Outfit_Generator.GetRandomSingleMesh(attribute)
+            dna_string, CharacterItems = Exporter.Previewer.update_DNA_with_strand(attribute, dna_strand)
+            Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        return {'FINISHED'}
+
+
+#-----------------------------------------
+
 
 
 class clearSlots(bpy.types.Operator):
@@ -421,8 +475,7 @@ class clearSlots(bpy.types.Operator):
         lastDNA = bpy.context.scene.my_tool.inputDNA
         DNASplit = lastDNA.split(',')
         character = DNASplit.pop(0)
-        style = DNASplit.pop(0)
-        DNA = Exporter.Previewer.get_null_dna(character, style)
+        DNA = Exporter.Previewer.get_null_dna(character)
         bpy.context.scene.my_tool.inputDNA = DNA
         return {'FINISHED'}
 
@@ -603,10 +656,32 @@ class deleteNFT(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class deleteRangeNFT(bpy.types.Operator):
+    bl_idname = 'delete.nftrnge'
+    bl_label = 'Delete NFT in Range'
+    bl_description = "This delete NFTs and cannot be undone. Are you sure?"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        start_range = bpy.context.scene.my_tool.deleteStart
+        end_range = bpy.context.scene.my_tool.deleteEnd
+
+        batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index))
+        TotalDNA = LoadNFT.get_all_DNA_from_batch(batch_index)
+        master_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "_NFTRecord.json")
+
+        SaveNFTsToRecord.DeleteNFTsinRange(start_range, end_range, TotalDNA, nft_save_path, batch_index, master_save_path)
+        return {'FINISHED'}
+
+
 
 class deleteAllNFTs(bpy.types.Operator):
     bl_idname = 'delete.allnfts'
-    bl_label = 'Delete All NFTs in Batch'
+    bl_label = 'Delete ALL NFTs in Batch'
     bl_description = "This will delete all NFTS from the current Batch. u sure bud?"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -646,8 +721,10 @@ class loadBatch(bpy.types.Operator):
             return {'FINISHED'}
 
         LoadNFT.update_current_batch(index, batch_path)
-        NFTRecord_save_path = os.path.join(batch_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
-        LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+        batch_save_path = os.path.join(batch_path, "Batch_{:03d}".format(index))
+        NFTRecord_save_path = os.path.join(batch_save_path, "_NFTRecord_{:03d}.json".format(index))
+        Rarity_save_path = os.path.join(batch_save_path, "_RarityCounter_{:03d}.json".format(index))
+        LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
 
         bpy.context.scene.my_tool.loadNFTIndex = 1
         TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(index, 1)
@@ -655,6 +732,11 @@ class loadBatch(bpy.types.Operator):
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
 
         print(bpy.context.scene.my_tool.BatchSliderIndex)
+        rarity_dict = DNA_Generator.Outfit_Generator.ColorGen.OpenBatchColorRarity(index)
+        if bpy.context.scene.my_tool.colorStyleName in rarity_dict:
+            bpy.context.scene.my_tool.colorStyleRarity = rarity_dict[bpy.context.scene.my_tool.colorStyleName]
+        else:
+            bpy.context.scene.my_tool.colorStyleRarity = 0
         return {'FINISHED'}
 
 
@@ -674,9 +756,15 @@ class saveBatch(bpy.types.Operator):
         index = bpy.context.scene.my_tool.BatchSliderIndex
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
-        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+        batch_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
+        NFTRecord_save_path = os.path.join(batch_save_path, "_NFTRecord_{:03d}.json".format(index))
+        Rarity_save_path = os.path.join(batch_save_path, "_RarityCounter_{:03d}.json".format(index))
         DNA_Generator.save_new_rarity_Record(NFTRecord_save_path)
-        LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+
+        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
+        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
+
+        LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         return {'FINISHED'}
 
 
@@ -698,11 +786,15 @@ class saveNewBatch(bpy.types.Operator):
         
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
-        NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+        current_batch_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
+        NFTRecord_save_path = os.path.join(current_batch_save_path, "_NFTRecord_{:03d}.json".format(index))
+        Rarity_save_path = os.path.join(current_batch_save_path, "_RarityCounter_{:03d}.json".format(index))
         DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
-        LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
 
         bpy.context.scene.my_tool.BatchSliderIndex = index
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(current_batch_save_path, index, True)
+        DNA_Generator.Outfit_Generator.count_all_rarities(current_batch_save_path, index)
+        LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         return {'FINISHED'}
 
 
@@ -726,9 +818,15 @@ class resetBatch(bpy.types.Operator):
             self.report({"ERROR"}, "Failed: Invalid batch to reset")
             return {'FINISHED'}
 
-        nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+        current_batch_save_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index))
+        nftrecord_path = os.path.join(current_batch_save_path, "_NFTRecord_{:03d}.json".format(batch_index))
+        Rarity_save_path = os.path.join(current_batch_save_path, "_RarityCounter_{:03d}.json".format(batch_index))
+
         DNA_Generator.reset_rarity_Record(nftrecord_path)
-        LoadNFT.update_collection_rarity_property(nftrecord_path)
+        DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(current_batch_save_path, batch_index, True)
+
+        DNA_Generator.Outfit_Generator.count_all_rarities(current_batch_save_path, batch_index)
+        LoadNFT.update_collection_rarity_property(nftrecord_path, Rarity_save_path)
         return {'FINISHED'}
 
 
@@ -751,9 +849,13 @@ class updateBatch(bpy.types.Operator):
             self.report({"ERROR"}, "Failed: Not a valid batch")
             return {'FINISHED'}
 
-        nftrecord_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
-        LoadNFT.update_batch_items(batch_index, nftrecord_path)
-        LoadNFT.update_collection_rarity_property(nftrecord_path)
+        batch_save_path = os.path.join(batch_path, "Batch_{:03d}".format(batch_index))
+        NFTRecord_save_path = os.path.join(batch_save_path, "_NFTRecord_{:03d}.json".format(batch_index))
+        Rarity_save_path = os.path.join(batch_save_path, "_RarityCounter_{:03d}.json".format(batch_index))
+
+        LoadNFT.update_batch_items(batch_index, NFTRecord_save_path)
+        DNA_Generator.Outfit_Generator.count_all_rarities(batch_save_path, batch_index)
+        LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         return {'FINISHED'}
 
 #----------------------------------------------------------------
@@ -824,19 +926,22 @@ class loadDirectory(bpy.types.Operator):
         batch_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1))
         NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(1))
         master_nftrecord_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
+        Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{:03d}.json".format(1))
+
         bpy.context.scene.my_tool.batch_json_save_path = batch_json_save_path
 
         bpy.context.scene.my_tool.CurrentBatchIndex = 1
         bpy.context.scene.my_tool.loadNFTIndex = 1
         bpy.context.scene.my_tool.BatchSliderIndex = 1
         if os.path.exists(batch_path) and os.path.exists(NFTRecord_save_path):
-            LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+            LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         else:
             LoadNFT.init_batch(batch_json_save_path)
             DNA_Generator.send_To_Record_JSON(NFTRecord_save_path)
             DNA_Generator.set_up_master_Record(master_nftrecord_save_path)
             LoadNFT.update_current_batch(1, batch_json_save_path)
-            LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+            DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, 1)
+            LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
             
         return {'FINISHED'}
         
@@ -844,7 +949,7 @@ class loadDirectory(bpy.types.Operator):
 
 class createSlotFolders(bpy.types.Operator):
     bl_idname = 'create.slotfolers'
-    bl_label = 'Create Slot Folders (TEMP)'
+    bl_label = 'Import All Collections'
     bl_description = 'This will override the current folder which cannot be undone. Are you sure?'
     bl_options = {"REGISTER", "UNDO"}
 
@@ -853,28 +958,8 @@ class createSlotFolders(bpy.types.Operator):
 
 
     def execute(self, context):
-        folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
-        print("TEMP SLOTS")
         SaveNFTsToRecord.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
-
         return {'FINISHED'}
-
-# class organizeScene(bpy.types.Operator):
-#     bl_idname = 'create.organizescene'
-#     bl_label = 'Organize Scene'
-#     bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
-#     bl_options = {"REGISTER", "UNDO"}
-    
-#     def invoke(self, context, event):
-#         return context.window_manager.invoke_confirm(self, event)
-
-
-#     def execute(self, context):
-#         # folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
-#         # SaveNFTsToRecord.SearchForTexturesAndCreateDuplicates(folder_dir)
-#         original_hierarchy = Exporter.Previewer.get_hierarchy_ordered(1)
-#         DNA_Generator.save_rarity_To_Record(original_hierarchy)
-#         return {'FINISHED'}
 
 
 class createCharacterCollections(bpy.types.Operator):
@@ -964,8 +1049,8 @@ class renderBatch(bpy.types.Operator):
 
 class createBlenderSave(bpy.types.Operator):
     bl_idname = "createblendersave.batch"
-    bl_label = "Create Blender Saves"
-    bl_description = "Create Blender Saves"
+    bl_label = "Render"
+    bl_description = "Create Blender Saves and Render"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -977,11 +1062,32 @@ class createBlenderSave(bpy.types.Operator):
         record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(render_batch_num))
         range_start = bpy.context.scene.my_tool.renderSectionIndex
         batch_count = len(next(os.walk(batch_path))[1])
-        range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
-        if range_start <= batch_count and range_end >= range_start:
-            range = [range_start, range_end]
-        Exporter.create_blender_saves(batch_path, render_batch_num, range)
-        print("SAVE NEW BLENDER SCENES: " + batch_path)
+        ranges = []
+        if not bpy.context.scene.my_tool.renderFullBatch:
+            if bpy.context.scene.my_tool.customRenderRangeBool:
+                ranges = Exporter.get_custom_range()
+            elif bpy.context.scene.my_tool.rangeBool:
+                size = bpy.context.scene.my_tool.renderSectionSize
+                index = bpy.context.scene.my_tool.renderSectionIndex
+                range_start = size * (index - 1) + 1
+                range_end = min(size * (index), batch_count)
+                if range_start <= batch_count:
+                    ranges = [[range_start, range_end]]
+            else:
+                range_start = bpy.context.scene.my_tool.renderSectionIndex
+                range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
+                if range_start <= batch_count and range_end >= range_start:
+                    ranges = [[range_start, range_end]]
+        else:
+            ranges = [[1, batch_count]]
+
+        for range in ranges:
+            passed = Exporter.create_blender_saves(batch_path, render_batch_num, range)
+            if passed:
+                print("SAVE NEW BLENDER SCENES: " + batch_path)
+        if not ranges:
+            print("Custom render string is empty or not valid so nothing was rendered :(")
+
         return {'FINISHED'}
 
 
@@ -1025,6 +1131,7 @@ class moveDataToLocal(bpy.types.Operator):
         record_save_path = os.path.join(bpy.context.scene.my_tool.root_dir, bath_path_end)
         local_save_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, bath_path_end)
 
+        bpy.context.scene.my_tool.BatchRenderIndex = bpy.context.scene.my_tool.CurrentBatchIndex
         success = Exporter.export_record_data(record_save_path, local_save_path)
         if not success:
             self.report({"ERROR"}, "Failed: pls choose a different folder from the root folder")
@@ -1187,7 +1294,8 @@ class nextGlobalColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(1)
+        color_key = DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(1)
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 
@@ -1198,7 +1306,8 @@ class prevGlobalColorSet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(-1)
+        color_key = DNA_Generator.Outfit_Generator.ColorGen.NextGlobalColorSet(-1)
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 class addGlobalColorSet(bpy.types.Operator):
@@ -1209,6 +1318,7 @@ class addGlobalColorSet(bpy.types.Operator):
     
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.AddNewGlobalColorSet()
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 class deleteGlobalColorSet(bpy.types.Operator):
@@ -1277,6 +1387,7 @@ class colourCopyDown(bpy.types.Operator):
 
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.copy_colour_down()
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 
@@ -1288,6 +1399,7 @@ class loadColorOnMesh(bpy.types.Operator):
 
     def execute(self, context):
         DNA_Generator.Outfit_Generator.ColorGen.ColorHasbeenUpdated("woo")
+        Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
 
@@ -1319,6 +1431,16 @@ class deleteColorSet(bpy.types.Operator):
         DNA_Generator.Outfit_Generator.ColorGen.DeleteSetFromStyle(bpy.context.scene.my_tool.colorStyleName, bpy.context.scene.my_tool.currentColorStyleKey)
         return {'FINISHED'}
 
+
+class clearGeneratorStyle(bpy.types.Operator):
+    bl_idname = 'genstyle.clear'
+    bl_label = 'Clear Style'
+    bl_description = 'Clear Style'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        context.scene.my_tool.currentGeneratorStyle = ''
+        return {'FINISHED'}
 
 # --------------------------------- Textures ---------------------------------------------
 
@@ -1404,18 +1526,51 @@ class forceLoadDNAFromUI(bpy.types.Operator):
 class countUpAllRarities(bpy.types.Operator):
     bl_idname = 'rarities.count'
     bl_label = 'Calculate Absolute Rarities'
-    bl_description = 'This will take like an entire hot minute, are u sure'
+    bl_description = 'Calculate Absolute Rarities'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
+        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
+        return {'FINISHED'}
+
+
+class renameSet(bpy.types.Operator):
+    bl_idname = 'set.rename'
+    bl_label = 'Rename Set'
+    bl_description = 'This cannot be undone are u suuuuuuuuuuuure'
     bl_options = {'REGISTER', 'UNDO'}
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
 
     def execute(self, context):
-        index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
-        nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
-        DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
+        _from = bpy.context.scene.my_tool.renameSetFrom
+        _to = bpy.context.scene.my_tool.renameSetTo
+        if _from and _to:
+            DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets(_from, _to)
+        else:
+            print("Please fill in the boxes properly")
         return {'FINISHED'}
 
+
+class testButton(bpy.types.Operator):
+    bl_idname = 'test.button'
+    bl_label = 'For tests'
+    bl_description = '(╬ಠิ益ಠิ)'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        print("(╬ಠิ益ಠิ)")
+        # index = 4
+        # first_batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(index))
+        # DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
+
+        # Exporter.Previewer.colorpicker_has_applied()
+        # Exporter.get_custom_range()
+        # DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets("Egypt_01", "WOW")
+        return {'FINISHED'}
 
 
 # ------------------------------- Panels ----------------------------------------------
@@ -1448,11 +1603,9 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        row = layout.row()
-        row.prop(mytool, "inputDNA")
-        row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
 
-        row = layout.separator()
+
+        # row = layout.separator()
         # row = layout.separator(factor=0.0)
         row = layout.row()
         row.prop(mytool, "maxNFTs")
@@ -1496,7 +1649,7 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
 
 
 class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
-    bl_label = "All Slots"
+    bl_label = "Slots"
     bl_idname = "WCUSTOM_PT_ParentSlots"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -1506,18 +1659,40 @@ class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+
+
+class WCUSTOM_PT_AllSlots(bpy.types.Panel):
+    bl_label = "All Slots"
+    bl_idname = "WCUSTOM_PT_AllSlots"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ParentSlots'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        row = layout.row()
+        row.prop(mytool, "inputDNA")
+        row.operator(randomizePreview.bl_idname, text=randomizePreview.bl_label)
+
         box = layout.box()
         row = box.row()
         row.scale_x = 1.3
         row.label(text='Any Slot', icon='OUTLINER_COLLECTION')
         row.prop(mytool, "inputGeneral", text='')
         row.scale_x = 1
+        row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
+        row.operator(randomizeAllSets.bl_idname, text=randomizeAllSets.bl_label)
 
-        row = layout.row()
-        row.separator(factor=1.5)
-        row = layout.row()
-        row.operator(clearSlots.bl_idname, text=clearSlots.bl_label, emboss=False)
+        # row = layout.row()
+        # row.label(text='')
+        row.scale_x = 0.5
+        row.prop(mytool, "currentGeneratorStyle", text='')
+        row.operator(clearGeneratorStyle.bl_idname, text=clearGeneratorStyle.bl_label)
+
 
 
 class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
@@ -1538,21 +1713,41 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(config.Slots[name][0][:2])
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 0.5
+                row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
                 row.label(text='')
-
+                row.label(text='')
 
 class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_label = "Arms Slots"
@@ -1575,22 +1770,45 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(config.Slots[name][0][:2])
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 0.5
+                # print(len(bpy.data.collections[config.Slots[name][0]].children))
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
                 row.label(text='')
-
-
+                row.label(text='')
 
 class WCUSTOM_PT_LegSlots(bpy.types.Panel):
     bl_label = "Leg Slots"
@@ -1613,19 +1831,43 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(config.Slots[name][0][:2])
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name     
+                row.label(text='')
                 row.label(text='')
 
 class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
@@ -1648,24 +1890,51 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+
+        row = layout.row()
+        row.label(text="")
+        row.scale_x = 0.3
+        row.label(text="RANDOMIZE")
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(config.Slots[name][0][:2])
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name  
                 row.label(text='')
-                # row.operator(randomizeColor.bl_idname, text='',emboss=False).collection_name = name
-
+                row.label(text='')
 
 class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
     bl_label = "Other Slots"
@@ -1682,23 +1951,78 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
         mytool = scene.my_tool
         for name in self.slots:
             row = layout.row()
-            row.label(text=Slots[name][1], icon=self.slots[name])
+            row.label(text=config.Slots[name][1], icon=self.slots[name])
             label = ''
-            row.scale_x = 0.5
+            row.scale_x = 1.5
             if bpy.context.scene.my_tool[name] is not None:
-                label = bpy.context.scene.my_tool[name].name.split('_')[3]
+                inputDNA = bpy.context.scene.my_tool.inputDNA
+                dna_index = int(config.Slots[name][0][:2])
+                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                color_key = dna_splitstrand[3] or 'X'
+                texture_index = dna_splitstrand[2]
+                variant = bpy.context.scene.my_tool[name]
+                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
-                row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
+                if len(variant.objects) > 1:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeTexture.bl_idname, text=randomizeTexture.bl_label,emboss=False).collection_name = name
+                if color_key == 'Empty':
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label,emboss=False).collection_name = name
+                else:
+                    row.operator(randomizeColor.bl_idname, text=randomizeColor.bl_label).collection_name = name
             else:
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
+                row.scale_x = 0.5
+                if len(bpy.data.collections[config.Slots[name][0]].children) > 1:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label).collection_name = name
+                else:
+                    row.operator(randomizeMesh.bl_idname, text=randomizeMesh.bl_label,emboss=False).collection_name = name
+                row.label(text='')
                 row.label(text='')
 
 
 #-----------------------------------------------------------------------
+class WCUSTOM_PT_DeleteRange(bpy.types.Panel):
+    bl_label = "Delete NFTs"
+    bl_idname = "WCUSTOM_PT_DeleteRange"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_ELoadFromFile'
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        box = layout.box()
+
+        row = box.row()
+        row.scale_y = 0.6
+        box2 = row.box()
+        box2.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
+        box2 = row.box()
+        box2.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
+
+        row = box.row()
+        row.scale_x = 0.5
+        row.prop(mytool, "deleteStart")
+        row.prop(mytool, "deleteEnd")
+        row.scale_x = 1
+        box2 = row.box()
+        box2.scale_y = 0.5
+        box2.operator(deleteRangeNFT.bl_idname, text=deleteRangeNFT.bl_label,emboss=False)
 
 
 class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
@@ -1738,18 +2062,14 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
             for char in config.Characters:
                 row.label(text="{}: {}".format(char, single_dict[char]))
 
-
-        row = layout.row()
+        box = layout.box()
+        row = box.row()
         row.prop(mytool, "loadNFTIndex")
         row.operator(loadNFT.bl_idname, text=loadNFT.bl_label)
         
-        row = layout.row()
+        row = box.row()
         row.operator(loadPrevNFT.bl_idname, text=loadPrevNFT.bl_label)
         row.operator(loadNextNFT.bl_idname, text=loadNextNFT.bl_label)
-
-        row = layout.row()
-        row.operator(deleteNFT.bl_idname, text=deleteNFT.bl_label, emboss=False)
-        row.operator(deleteAllNFTs.bl_idname, text=deleteAllNFTs.bl_label, emboss=False)
         return
 
 
@@ -1782,11 +2102,13 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
             # row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
             row.label(text="Please create or load directory")
 
-        row = layout.row()
+        box = layout.box()
+
+        row = box.row()
         row.prop(mytool, "BatchSliderIndex")
 
         row.operator(loadBatch.bl_idname, text=loadBatch.bl_label)
-        row = layout.row()
+        row = box.row()
         row.operator(saveBatch.bl_idname, text=saveBatch.bl_label)
         row.operator(saveNewBatch.bl_idname, text=saveNewBatch.bl_label)
         row = layout.row()
@@ -1829,7 +2151,7 @@ class WCUSTOM_PT_ARootDirectory(bpy.types.Panel):
         row = layout.row()
         row.label(text=output_path)
 
-        row = layout.row()
+        row = layout.box()
         row.operator(loadDirectory.bl_idname, text=loadDirectory.bl_label)
 
 
@@ -1898,12 +2220,13 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             layout.separator()
 
             batch_count = len(os.listdir(batches_path)) - 1
-            row = layout.row()
+            box = layout.box()
+            row = box.row()
             row.label(text="Total Batches: {}".format(batch_count))            
-            row = layout.row()
+            row = box.row()
             row.prop(mytool, "BatchRenderIndex")
 
-            row = layout.row()
+            row = box.row()
             if os.path.exists(batch_path):
                 batch_count = len(next(os.walk(batch_path))[1])
                 row.label(text="Number in batch: {}".format(batch_count))
@@ -1913,6 +2236,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.prop(mytool, "renderFullBatch",toggle=-1)
             layout.separator()
 
+            box = layout.box()
             if not bpy.context.scene.my_tool.renderFullBatch:
                 row = layout.row()
                 size = bpy.context.scene.my_tool.renderSectionSize
@@ -1925,10 +2249,15 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     range_start = mytool.renderSectionIndex
                     range_end = min(mytool.renderSectionSize, batch_count)
 
-                row = layout.row()
+                row = box.row()
                 row.prop(mytool, "rangeBool")
 
-                if range_start > batch_count or range_start > range_end:
+                row.prop(mytool, "customRenderRangeBool", toggle=1)
+                row.scale_x=2
+
+                if mytool.customRenderRangeBool:
+                    row.label(text="Render total: ¯\_(ツ)_/¯")
+                elif range_start > batch_count or range_start > range_end:
                     row.label(text="Render range: Out of range")
                 else:
                     if mytool.rangeBool:
@@ -1936,39 +2265,52 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                     else:
                         row.label(text="Render total: {}".format(range_end - range_start + 1))
 
-                row = layout.row()
-                if mytool.rangeBool:
+                row = box.row()
+                if mytool.customRenderRangeBool:
+                    row.prop(mytool, "customRenderRange")
+                elif mytool.rangeBool:
                     row.prop(mytool, "renderSectionIndex")
                     row.prop(mytool, "renderSectionSize")
                 else:
                     row.prop(mytool, "renderSectionIndex", text="Range Start")
                     row.prop(mytool, "renderSectionSize", text="Range End")
 
-            row = layout.row()
-            row.prop(mytool, "imageBool")
-            row.prop(mytool, "animationBool")
-            row.prop(mytool, "modelBool")
-            if mytool.imageBool:
-                row = layout.row()
-                row.label(text="Image Type:")
-                row.prop(mytool, "imageEnum", expand=True)
-                row = layout.row()
+            layout.separator(factor=0)
+            box = layout.box()
 
-                if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
-                    row.label(text="")
-                    row.label(text="")
-                    row.prop(mytool, "PNGTransparency",toggle=1)
-                    row = layout.row()
-            if mytool.modelBool:
-                row = layout.row()
-                row.label(text="Model Type:")
-                row.prop(mytool, "modelEnum", expand=True)
-                row = layout.row()
+            row = box.row()
+            row.prop(mytool, "imageBool", toggle=1)
+            row.prop(mytool, "animationBool", toggle=1)
+            row.prop(mytool, "modelBool", toggle=1)
+
+            row = box.row()
+            row = box.row()
+            row.prop(mytool, "exportDimension")
+            row = box.row()
+            row.prop(mytool, "imageFrame")
+            row.prop(mytool, "frameLength")
+            # if mytool.imageBool:
+            #     row = layout.row()
+            #     row.label(text="Image Type:")
+            #     row.prop(mytool, "imageEnum", expand=True)
+            #     row = layout.row()
+
+            #     if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
+            #         row.label(text="")
+            #         row.label(text="")
+            #         row.prop(mytool, "PNGTransparency",toggle=1)
+            #         row = layout.row()
+            # if mytool.modelBool:
+            #     row = layout.row()
+            #     row.label(text="Model Type:")
+            #     row.prop(mytool, "modelEnum", expand=True)
+            #     row = layout.row()
 
             layout.separator()
             box = layout.box()
-            box.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label)
-            box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
+            box2 = box.box()
+            box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper())
+            # box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 
 
@@ -2066,15 +2408,16 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.prop(mytool, 'shouldForceDownres')
 
         row.scale_x = 1
-
-        
-
         layout.separator(factor=1.5)
         box = layout.box()
         box.label(text="Calculator:")
         row = box.row()
         row.operator(countUpAllRarities.bl_idname, text=countUpAllRarities.bl_label)
         
+        layout.separator(factor=1.5)
+
+        row = layout.row()
+        row.operator(testButton.bl_idname, text=testButton.bl_label)
 
         # box = layout.box()
         # row = box.row()
@@ -2231,6 +2574,30 @@ class WCUSTOM_PT_TintPreviewUI(bpy.types.Panel):
         # row.operator(colourCopyUp.bl_idname, text=colourCopyUp.bl_label, icon=colourCopyUp.icon)
         row.operator(colourCopyDown.bl_idname, text=colourCopyDown.bl_label, icon=colourCopyDown.icon)
 
+
+class WCUSTOM_PT_RenameColors(bpy.types.Panel):
+    bl_label ="Rename Sets"
+    bl_idname = "WCUSTOM_PT_RenameColors"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ARTIST'
+    bl_parent_id = 'WCUSTOM_PT_ArtistUI'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "renameSetFrom", text='')
+        row.scale_x = 0.1
+        row.label(text="to")
+        row.scale_x = 1
+        row.prop(mytool, "renameSetTo", text='')
+
+        row = layout.row()
+        row.operator(renameSet.bl_idname, text=renameSet.bl_label)
+
 # # Documentation Panel:
 # class BMNFTS_PT_Documentation(bpy.types.Panel):
 #     bl_label = "Documentation"
@@ -2256,10 +2623,11 @@ classes = (
     WCUSTOM_PT_ARootDirectory,
     WCUSTOM_PT_EditBatch,
     WCUSTOM_PT_ELoadFromFile,
-    WCUSTOM_PT_PreviewNFTs,
     WCUSTOM_PT_ModelSettings,
+    WCUSTOM_PT_PreviewNFTs,
     # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
+    WCUSTOM_PT_AllSlots,
     WCUSTOM_PT_HeadSlots,
     WCUSTOM_PT_TorsoSlots,
     WCUSTOM_PT_ArmSlots,
@@ -2272,8 +2640,10 @@ classes = (
     WCUSTOM_PT_CreateMetadata,
     WCUSTOM_PT_RefactorExports,
     WCUSTOM_PT_ArtistUI,
+    WCUSTOM_PT_RenameColors,
     WCUSTOM_PT_TintPreviewUI,
     WCUSTOM_PT_TintUI,
+    WCUSTOM_PT_DeleteRange,
     # BMNFTS_PT_Documentation,
 
 
@@ -2330,12 +2700,17 @@ classes = (
     deleteColorSet,
     updateBatch,
     saveStyleRarity,
-
+    clearGeneratorStyle,
+    randomizeAllSets,
     downresTextures,
     renameAllOriginalTextures,
     countUpAllRarities,
-
-    forceLoadDNAFromUI
+    randomizeTexture,
+    randomizeMesh,
+    deleteRangeNFT,
+    forceLoadDNAFromUI,
+    renameSet,
+    testButton
 
 )
 

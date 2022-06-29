@@ -411,7 +411,7 @@ def reset_rarity_Record(NFTRecord_save_path):
    DataDictionary["DNAList"] = OriginalDataDictionary["DNAList"]
    hierarchy = NFTHirachy.createHirachy()
 
-   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-UpperHeadNull"]
+   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-UpperHeadNull", "00-FeetNull"]
 
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):

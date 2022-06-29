@@ -18,7 +18,8 @@ from . import config
 
 # A list for each caterogry of clothing that states what slots it will fil
 ItemUsedBodySlot = {
-"ShirtCropSleeveless" : ["01-UpperTorso"],
+"ShirtCropSleeveless" : ["01-UpperTorso", "18-Backpack"],
+"ShirtCropSleevelessBack" : ["01-UpperTorso"],
 "ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck"],
 "ShirtCrop" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm"],
 "ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "18-Backpack"],
@@ -52,10 +53,12 @@ ItemUsedBodySlot = {
 "FeetLong" : ["10-Calf", "11-Ankle", "12-Feet"],
 "FeetMid" : ["11-Ankle", "12-Feet"],
 "FeetShort" : ["12-Feet"],
+"FeetShortNone" : ["12-Feet"],
 "Calf" : ["10-Calf"],
+"CalfLong" : ["10-Calf", "11-Ankle"],
 "Neck" : ["13-Neck"],
-"HeadUpper" : ["17-UpperHead"],
-"HeadShort" : ["17-UpperHead"], # IS THIS RIGHT?
+"HeadShort" : ["17-UpperHead"],
+"HeadShortNone" : ["17-UpperHead"],
 "HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
 "HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-Backpack", "16-Earings"],
 "HeadMid" : ["15-MiddleHead"],
@@ -69,10 +72,13 @@ ItemUsedBodySlot = {
 "BackpackHigh" : ["18-Backpack"],
 "Expression" : ["20-Expression"],
 "ExpressionLower" : ["14-LowerHead", "20-Expression"],
+"ExpressionLowerNone" : ["14-LowerHead", "20-Expression"],
 "ExpressionUpper" : ["15-MiddleHead", "20-Expression"],
 "ExpressionFull" : ["14-LowerHead", "15-MiddleHead", "20-Expression"],
 "Background" : ["19-Background"]
 }
+
+
 
 #Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
 # cols = {
@@ -151,7 +157,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         character = PickCharacter()
-        ColorGen.SetUpCharacterStyle()
+        style = ColorGen.SetUpCharacterStyle()
+        bpy.context.scene.my_tool.currentGeneratorStyle = style
 
         # letterstyles = 'abcdefghijkl'
         # styleChoice = random.choice(letterstyles)
@@ -198,40 +205,41 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
 
-                char_variants = bpy.data.collections.get(varientChoosen).children
-                if char_variants:
-                    for char_coll in char_variants:
-                        char_name = char_coll.name.split('_')[-1]
-                        if char_name == character:
-                            chidlrenObjs = char_coll.objects
+                if typeIndex == 0 and varientIndex == 0:
+                    SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0-0"
                 else:
-                    chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
-                    #for obj in chidlrenObjs:
+                    char_variants = bpy.data.collections.get(varientChoosen).children
+                    if char_variants:
+                        for char_coll in char_variants:
+                            char_name = char_coll.name.split('_')[-1]
+                            if char_name == character:
+                                chidlrenObjs = char_coll.objects
+                    else:
+                        chidlrenObjs = bpy.data.collections.get(varientChoosen).objects # CHECK THIS
+                        #for obj in chidlrenObjs:
 
-                # else:
-                    # print("Armature '{}' does not exist atm".format(armature_name)) # CHECK THIS
-            
+                    ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["item_type"][3:]
+                    #loop through all slots that selected item will take up
+                    if ItemClothingGenre in ItemUsedBodySlot:
+                        UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
+                    else: 
+                        UsedUpSlotArray = []
 
-                ItemClothingGenre = hierarchy[attribute][typeChoosen][varientChoosen]["item_type"][3:]
-                #loop through all slots that selected item will take up
-                if ItemClothingGenre in ItemUsedBodySlot:
-                    UsedUpSlotArray = ItemUsedBodySlot.get(ItemClothingGenre)
-                else: 
-                    UsedUpSlotArray = []
+                    if UsedUpSlotArray:
+                        for i in ItemUsedBodySlot.get(ItemClothingGenre):
+                            SlotUpdateValue = {i : True}
+                            attributeUsedDict.update(SlotUpdateValue)
 
-                if UsedUpSlotArray:
-                    for i in ItemUsedBodySlot.get(ItemClothingGenre):
-                        SlotUpdateValue = {i : True}
-                        attributeUsedDict.update(SlotUpdateValue)
 
-            ColorGen.PickOutfitColors(attribute)
-            SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex)])
+            if not (typeIndex == 0 and varientIndex == 0):
+                if typeChoosen[3:] in config.EmptyTypes:
+                    color_key = 'Empty'
+                else:
+                    color_key, color_choice = ColorGen.PickOutfitColors(attribute)
+                SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
 
-            # SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex) + "-" + str(ColorGen.styleChoice) + "-" + str(ColorID[0]) + "-" + str(ColorID[1]) + "-" + str(ColorID[2])
-            #SingleDNA[list(hierarchy.keys()).index(attribute)] = str(typeIndex) + "-" + str(varientIndex)
             VarientDict = {}
             current_entry = {}
-            # current_entry = hierarchy[attribute][typeChoosen][varientChoosen]
             variant_name = varientChoosen.split('_')[-1]
             if variant_name in ["Null", 'Nulll']:
                 VarientDict = 'Null'
@@ -241,7 +249,6 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 current_entry["item_variant"] = variant_name
                 current_entry["item_texture"] = textureChoosen
                 current_entry["item_index"] = hierarchy[attribute][typeChoosen][varientChoosen]["item_index"]
-                current_entry["texture_index"] = textureIndex
                 current_entry["type_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["type_rarity"]
                 current_entry["variant_rarity"] = hierarchy[attribute][typeChoosen][varientChoosen]["variant_rarity"]
                 if hierarchy[attribute][typeChoosen][varientChoosen]["textureSets"]:
@@ -249,14 +256,13 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 else:
                     texture_rarity = 0
                 current_entry["texture_rarity"] = texture_rarity
-                current_entry["color_style"] = ColorGen.styleKey
-                current_entry["color_key"] = ColorGen.colorkey
+                current_entry["color_key"] = color_key
                 VarientDict[varientChoosen] = current_entry
             ItemsUsed[attribute] = VarientDict
             
                 
         SingleDNA.insert(0, character)
-        SingleDNA.insert(1, ColorGen.styleKey) # TODO add color style to dict too
+        # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
             print("ADDING DNA TO SET")
@@ -274,9 +280,119 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         if m.users == 0 and m.name != 'MasterV01':
             bpy.data.materials.remove(m)
 
+    print(DNASet)
+
     return list(DNASet), NFTDict
     
 
+
+# ------------------------------------------------------
+
+
+def GetRandomSingleTexture(att_name, variant_coll):
+    index = bpy.context.scene.my_tool.CurrentBatchIndex
+    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+
+    DataDictionary = json.load(open(NFTRecord_save_path))
+    hierarchy = DataDictionary["hierarchy"]
+
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    att_index = list(hierarchy.keys()).index(att_name)
+    inputDNA = bpy.context.scene.my_tool.inputDNA
+    dna_split = inputDNA.split(',')
+    old_dna_strand = dna_split[att_index + 1]
+    old_texture_index = old_dna_strand.split('-')[2]
+
+    variant = variant_coll.name
+    for type in hierarchy[att_name].keys():
+        if variant in hierarchy[att_name][type].keys():
+            item_info = hierarchy[att_name][type][variant]
+            texture_info = item_info["textureSets"]
+            for tex in texture_info.keys():
+                rarity = texture_info[tex]
+                if rarity > 0.0:
+                    rarity_List_Of_i.append(float(rarity))
+                    number_List_Of_i.append(tex)
+            break
+
+    max_attempts = 10
+    if number_List_Of_i:
+        if len(number_List_Of_i) == 1:
+            print("There's only one texture set")
+            textureChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+        else:
+            for i in range(max_attempts):
+                textureChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+                index = str(list(texture_info.keys()).index(textureChosen[0]))
+                if index != old_texture_index:
+                    break
+        return textureChosen[0], list(texture_info.keys()).index(textureChosen[0])
+    elif texture_info:
+        return list(texture_info.keys())[0], 0
+    else: # set has none
+        return None, 0
+
+
+
+def GetRandomSingleMesh(att_name):
+    pointer_name = "input" + att_name[3:]
+    last_variant = bpy.context.scene.my_tool[pointer_name].name if bpy.context.scene.my_tool[pointer_name] else ''
+    index = bpy.context.scene.my_tool.CurrentBatchIndex
+    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+
+    DataDictionary = json.load(open(NFTRecord_save_path))
+    hierarchy = DataDictionary["hierarchy"]
+    type_number_List_Of_i = []
+    type_rarity_List_Of_i = []
+
+    for type in hierarchy[att_name].keys():
+        if hierarchy[att_name][type].keys():
+            first_variant = list(hierarchy[att_name][type].keys())[0]
+            type_rarity = hierarchy[att_name][type][first_variant]["type_rarity"]
+            if type_rarity and not type.endswith('Null'):
+                type_number_List_Of_i.append(type)
+                type_rarity_List_Of_i.append(int(type_rarity))
+
+    if type_number_List_Of_i:
+        typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)
+        type = typeChosen[0]
+        type_index = list(hierarchy[att_name].keys()).index(type)
+    else:
+        # null_type = list(hierarchy[att_name].keys())[0]
+        # null_variant = list(hierarchy[att_name][null_type].keys())[0]
+        # print(null_variant)
+        return "0-0-0"
+
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    for variant in hierarchy[att_name][type]:
+        rarity = hierarchy[att_name][type][variant]["variant_rarity"]
+        if rarity:
+            rarity_List_Of_i.append(float(rarity))
+            number_List_Of_i.append(variant)
+
+    max_attempts = 10
+    if number_List_Of_i:
+        for i in range(max_attempts):
+            variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+            if variantChosen[0] != last_variant:
+                break
+        variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen[0])
+    else:
+        return "0-0-0"
+        variant_index = 0
+        variantChosen = [list(hierarchy[att_name][type].keys())[variant_index]]
+
+    texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen[0]])
+    dna_strand = '-'.join([str(type_index), str(variant_index), str(texture_index)])
+    return dna_strand
+
+# ------------------------------------------------------
 
 
 
@@ -337,8 +453,8 @@ def PickWeightedTextureVarient(VariantInfo):
 
     if len(number_List_Of_i) > 0:
         textureChoosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
-        print(textureChoosen[0])
-        print(list(VariantInfo['textureSets'].keys()).index(textureChoosen[0]))
+        # print(textureChoosen[0])
+        # print(list(VariantInfo['textureSets'].keys()).index(textureChoosen[0]))
         return textureChoosen[0], list(VariantInfo['textureSets'].keys()).index(textureChoosen[0])
     else:
         if len(VariantInfo["textureSets"].keys()) > 0:
@@ -362,11 +478,13 @@ def PickCharacter():
 
 # ----------------------------------------------------------------------
 
+count = 0
 
 def count_all_rarities(batch_record_path, index):
+    global count
     print("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-    json_name = 'RarityCounter_Batch_{:03d}.json'.format(index)
-    DataDictionary = json.load(open(batch_record_path))
+    json_name = os.path.join(batch_record_path, '_RarityCounter_{:03d}.json'.format(index))
+    DataDictionary = json.load(open(os.path.join(batch_record_path, "_NFTRecord_{:03d}.json".format(index))))
     hierarchy = DataDictionary["hierarchy"]
 
     time_start = time.time()
@@ -384,7 +502,8 @@ def count_all_rarities(batch_record_path, index):
                 rarity_dict[attribute][type][variant]['absolute_rarity'] = 0.0
                 rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[variant], bpy.data.collections[type])[0]
 
-    filled_slots = set()
+    count = 0
+    filled_slots = '0' * len(hierarchy.keys())
     rarity_dict = add_rarity_recurse(rarity_dict, 1, hierarchy, filled_slots, attribute='01-UpperTorso')
 
     logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -397,12 +516,13 @@ def count_all_rarities(batch_record_path, index):
         outfile.write(ledger + '\n')
     
     print(f"{config.bcolors.OK}Time taken to calculate rarity: {time.time() - time_start} seconds{config.bcolors.RESET}")
-
+    print("Total number of possible combinations? {}".format(count))
     return
 
 
-def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', variant=''):
-    if attribute and attribute in filled_slots:
+def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', branch_count=1):
+    global count
+    if attribute and filled_slots[int(attribute[:2]) - 1] == '1':
         null_type = bpy.data.collections[attribute].children[0]
         null_variant = null_type.children[0]
         rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + current_probability
@@ -411,60 +531,62 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         next_index = list(hierarchy.keys()).index(attribute) + 1
         if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
-            rarity_dict = add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute=next_att)
+            rarity_dict = add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
+        else:
+            count += branch_count
         return rarity_dict
 
     if not type: # this is a attribute
         percentage = 1.0
-    elif not variant: # this is a type
+    else: # this is a type
         parent_coll = bpy.data.collections[attribute]
         current_coll = bpy.data.collections[type]
-        percentage, weight_total = get_weighted_rarity(current_coll, parent_coll)
-    else: # this is a variant
-        parent_coll = bpy.data.collections[type]
-        current_coll = bpy.data.collections[variant]
         percentage, weight_total = get_weighted_rarity(current_coll, parent_coll)
 
     new_probability = current_probability * percentage
 
     if new_probability == 0.0: # if 0 then it shouldn't need to go down branch?
         return rarity_dict
-
-    if variant:
-        rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability
-    elif type:
+    
+    if type:
         rarity_dict[attribute][type]["absolute_rarity"] = rarity_dict[attribute][type]["absolute_rarity"] + new_probability
+        for variant in rarity_dict[attribute][type].keys():
+            if variant != "absolute_rarity" and variant != "relative_rarity":
+                type_coll = bpy.data.collections[type]
+                variant_coll = bpy.data.collections[variant]
+                variant_percentage, weight_total = get_weighted_rarity(variant_coll, type_coll)
+                rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability * variant_percentage
+        var_count = 0
+        for v in bpy.data.collections[type].children:
+            if v.get('rarity') and v.get('rarity') > 0:
+                var_count += 1
+        branch_count = branch_count * var_count
+
     else:
         rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + new_probability
 
-
-    if not type: # this is a attribute
+    if not type: # this is an attribute
         att_coll = bpy.data.collections[attribute]
         for coll in att_coll.children:
-            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=coll.name)
-    elif not variant: # this is a type
-        type_coll = bpy.data.collections[type]
-        for coll in type_coll.children:
-            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=type, variant=coll.name)
-    else: # this is a variant
-        if 'Null' not in type:
+            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=coll.name, branch_count=branch_count)
+    else: # this is a type
+        if 'Null' not in type and type[3:] in ItemUsedBodySlot:
             new_slots = ItemUsedBodySlot[type[3:]]
         else:
             new_slots = []
 
-        # if attribute in new_slots: # CHECK THIS
-        #     new_slots.remove(attribute)
-        new_filled_slots = set(filled_slots)
-        # for slot in filled_slots:
-        #     # new_filled_slots[slot] = filled_slots[slot]
-        #     new_filled_slots.add(slot)
-        for slot in new_slots:
-            new_filled_slots.add(slot)
+        if new_slots:
+            for slot in new_slots:
+                index = int(slot[:2]) - 1
+                if filled_slots[index] == '0':
+                    filled_slots = filled_slots[:index] + '1' + filled_slots[index+1:]
 
         next_index = (list(hierarchy.keys()).index(attribute)) + 1
         if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
-            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, new_filled_slots, attribute=next_att)
+            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
+        else:
+            count += branch_count
     return rarity_dict
 
 

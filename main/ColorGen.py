@@ -180,25 +180,36 @@ def RGBtoHex(vals, rgbtype=1):
 
 def SetUpCharacterStyle():
     global availableColorStyleKeys, styleKey
-    globalStyleInfo = OpenGlobalStyleList()
 
     number_List_Of_i = []
     rarity_List_Of_i = []
+    globalStyleInfo = OpenGlobalStyleList()
 
-    for style in globalStyleInfo.keys():
-        rarity = globalStyleInfo[style]["StyleRarity"]
-        if rarity > 0:
-            number_List_Of_i.append(style)
-            rarity_List_Of_i.append(float(rarity))
+    batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    try:
+        batch_style = json.load(open(style_path))
+        for style in batch_style.keys():
+            rarity = batch_style[style]
+            if rarity > 0:
+                number_List_Of_i.append(style)
+                rarity_List_Of_i.append(float(rarity))
+    except:
+        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.ERROR}")
+
+        for style in globalStyleInfo.keys():
+            rarity = globalStyleInfo[style]["StyleRarity"]
+            if rarity > 0:
+                number_List_Of_i.append(style)
+                rarity_List_Of_i.append(float(rarity))
 
     if len(number_List_Of_i) > 0:
         colorChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
-    # styleIndex = random.randrange(0, len( list(globalStyleInfo.keys()) ) )
-    # styleKey = list(globalStyleInfo.keys())[styleIndex]
-    # print("STYLE: " + styleKey )
+
     styleKey = colorChosen[0]
     availableColorStyleKeys =  globalStyleInfo[styleKey]["ColorSets"]
     return styleKey
+
 
 def CheckAndFormatPath(path, pathTojoin = ""):
     if pathTojoin != "" :
@@ -249,8 +260,10 @@ def NextStyle(direction):
         key = keys_list[ 0 ]
     bpy.context.scene.my_tool.colorStyleName = key
     StyleColorList = GlobalStyleList[key]["ColorSets"]
-    bpy.context.scene.my_tool.colorStyleRarity = GlobalStyleList[key]["StyleRarity"]
+    # bpy.context.scene.my_tool.colorStyleRarity = GlobalStyleList[key]["StyleRarity"]
+    bpy.context.scene.my_tool.colorStyleRarity = get_style_rarity(key)
     bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[0]
+    
 
 
 def NextStyleColor(direction):
@@ -307,6 +320,7 @@ def NextGlobalColorSet(direction):
         key = keys_list[ 0 ]
     bpy.context.scene.my_tool.colorSetName = key
     UpdateColorWheels()
+    return key
 
 
 def UpdateColorWheels():
@@ -455,6 +469,13 @@ def WriteToGlobalStyleList(GlobalStyleList):
       print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
 
 
+def OpenBatchColorRarity(batch_index):
+    path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    GlobalColorList = json.load(open(path))
+    return GlobalColorList
+
+
+
 def ColorHasbeenUpdated(ColorTint):
     inputColorListSceneObject = bpy.context.scene.my_tool.inputColorListSceneObject
     Rtint = bpy.context.scene.my_tool.RTint
@@ -462,6 +483,9 @@ def ColorHasbeenUpdated(ColorTint):
     Btint = bpy.context.scene.my_tool.BTint
     Atint = bpy.context.scene.my_tool.AlphaTint
     Wtint = bpy.context.scene.my_tool.WhiteTint
+    collection_name = inputColorListSceneObject.users_collection[0].name
+    collection_name = collection_name.rpartition('_')[0]
+    print(collection_name)
     if inputColorListSceneObject is not None:
         for m in inputColorListSceneObject.material_slots:
             material = m.material
@@ -483,27 +507,39 @@ def ColorHasbeenUpdated(ColorTint):
 
 
 def UpdateStyleRarity(Style=''):
-    rarity = bpy.context.scene.my_tool.colorStyleRarity
     if not Style:
         Style = bpy.context.scene.my_tool.colorStyleName
+    batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    rarity = bpy.context.scene.my_tool.colorStyleRarity
+    try:
+        batch_style = json.load(open(style_path))
+    except:
+        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.ERROR}")
+        return
 
-    GlobalStyle = OpenGlobalStyleList()
-    if Style in GlobalStyle.keys():
-        GlobalStyle[Style]["StyleRarity"] = rarity
+    batch_style[Style] = rarity
 
-    WriteToGlobalStyleList(GlobalStyle)
+    try:
+        ledger = json.dumps(batch_style, indent=1, ensure_ascii=True)
+        with open(style_path, 'w') as outfile:
+            outfile.write(ledger + '\n')
+    except:
+        print(f"{config.bcolors.ERROR}Batch Style JSON could not be saved at {style_path}{config.bcolors.ERROR}")
     return
 
 
 def get_style_rarity(style=''):
-    if not style:
-        style = bpy.context.scene.my_tool.colorStyleName
-    GlobalStyle = OpenGlobalStyleList()
-    if style in GlobalStyle.keys():
-        return GlobalStyle[style]["StyleRarity"]
-    else:
-        print(f"{config.bcolors.ERROR}This style ({style}) is not valid{config.bcolors.ERROR}")
-        return
+    batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
+    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    try:
+        batch_style = json.load(open(style_path))
+        if style in batch_style:
+            return batch_style[style]
+    except:
+        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.ERROR}")
+    return 0
+
 
 
 # -------------------------------------------------------
@@ -539,4 +575,52 @@ def temp_styles_reformat():
     #     GlobalStyles[style] = new_dict
 
     # WriteToGlobalStyleList(GlobalStyles)
+    return
+
+
+#-----------------------------------------------------------
+
+
+def create_batch_color(batch_path, batch_num, contains_all):
+    default_style = "Random"
+    default_weight = 50
+    json_path = os.path.join(batch_path, "_Styles_{:03d}.json".format(batch_num))
+
+    style_dict = {}
+    if contains_all:
+        GlobalStyles = OpenGlobalStyleList()
+        for style in GlobalStyles.keys():
+            rarity = GlobalStyles[style]["StyleRarity"]
+            style_dict[style] = rarity
+    else:
+        style_dict[default_style] = default_weight
+
+    ledger = json.dumps(style_dict, indent=1, ensure_ascii=True)
+    with open(json_path, 'w') as outfile:
+        outfile.write(ledger + '\n')
+    return
+
+
+#-----------------------------------------------------------
+
+
+def rename_color_sets(old_name, new_name):
+    GlobalColorSetList = OpenGlobalColorList()
+    GlobalStyles = OpenGlobalStyleList()
+
+    old_value = GlobalColorSetList.pop(old_name, None)
+    if old_value:
+        old_value["CommonName"] = new_name
+        GlobalColorSetList[new_name] = old_value
+    else:
+        print("This key does not exist")
+        return
+
+    for style in GlobalStyles.keys():
+        colorset = GlobalStyles[style]["ColorSets"]
+        new_colorset = [i if i != old_name else new_name for i in colorset]
+        GlobalStyles[style]["ColorSets"] = new_colorset
+
+    WriteToGlobalColorList(GlobalColorSetList)
+    WriteToGlobalStyleList(GlobalStyles)
     return

@@ -167,7 +167,6 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict):
     attributes = []
     DNAString = DNA.split(",")
     character = DNAString.pop(0)
-    style = DNAString.pop(0)
 
     attributes.append({"trait_type": "Character", "value": character})
 
@@ -181,13 +180,20 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict):
                 variant = itemDictionary["item_variant"]
                 texture = itemDictionary["item_texture"].rpartition('_')[2]
 
-                split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split())
+                # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
+                split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
+                # full_variant_name = [split_variant_name]
 
-                full_variant_name = "{} {} {}".format(split_variant_name, color_key, texture)
+                full_variant_name = [variant]
+                if color_key != 'Empty':
+                    full_variant_name.append(color_key)
+                if len(bpy.data.collections[itemKey].objects) > 1:
+                    full_variant_name.append(texture)
+
+                full_variant_name = ' '.join(full_variant_name)
                 full_variant_name = full_variant_name[0].upper() + full_variant_name[1:]
 
                 type_name = type[3:]
-                print(type_name)
                 keyword = None
                 for key in list(KeywordAttributeDict.keys()):
                     if type_name.startswith(key):
