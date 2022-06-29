@@ -214,8 +214,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground"))
     inputExpression: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression"))
-    inputParticles: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputParticles"))
+    inputEnvironment: bpy.props.PointerProperty(name="Environment Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEnvironment"))
     inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.general_pointer_updated())
 
@@ -241,7 +241,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastParticles: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEnvironment: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.colourindex_has_been_updated("colourStyleIndex", "lastStyleIndex"))
@@ -1946,7 +1946,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
     bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
     slots = {"inputBackground": ("NODE_TEXTURE"),
-            "inputParticles": ("STICKY_UVS_DISABLE")}
+            "inputEnvironment": ("STICKY_UVS_DISABLE")}
     
     def draw(self, context):
         layout = self.layout

@@ -15,18 +15,6 @@ enableGeneration = False
 colorList = []
 
 
-class bcolors:
-   '''
-   The colour of console messages.
-   '''
-   OK = '\033[92m'  # GREEN
-   WARNING = '\033[93m'  # YELLOW
-   ERROR = '\033[91m'  # RED
-   RESET = '\033[0m'  # RESET COLOR
-
-
-
-
 def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection hiearchy based on index to hide/show DNA
    bpy.ops.object.select_all(action='DESELECT')
    
@@ -380,7 +368,7 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
                   for n in mat.node_tree.nodes:
                      if n.type == 'TEX_IMAGE':
                         if n.image is not None:
-                           texture_info = get_new_texture_name(n, suffix, texture_mesh, slot_pathing)
+                           texture_info = get_new_texture_name(n, suffix, texture_mesh, slot_pathing, childMatSlot.name)
                            if texture_info:
                               new_texture, new_texture_path, _type = texture_info
                               if os.path.exists(new_texture_path):
@@ -443,7 +431,7 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
    return
 
 
-def get_new_texture_name(node, suffix, texture_mesh, slot_pathing):
+def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name):
    types = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
    for _type in types:
       filepath, partition, filename = node.image.filepath.rpartition('\\')
@@ -461,14 +449,35 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing):
             variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])
             texture_folder_path = os.path.join(variant_folder_path, "Textures", texture_set)
             
+            if len(next(os.walk(texture_folder_path))[1]) > 0: # if there's multiple sets
+               if '.' in material_name:
+                  material_name = material_name.split('.')[0]
+               texture_folder_path = os.path.join(texture_folder_path, material_name)
+
             new_texture_end = _type + suffix + '.' + file_type
-            new_texture = [t for t in os.listdir(texture_folder_path) if t.endswith(new_texture_end)]
+            # new_texture = [t for t in os.listdir(texture_folder_path) if t.endswith(new_texture_end)]
+
+            original_texture_end = _type + '.' + file_type
+            original_texture = None
+
+            new_path = filepath + partition
             for t in os.listdir(texture_folder_path):
                if t.endswith(new_texture_end):
                   new_texture = t
-                  new_path = filepath + partition
                   new_texture_path = new_path + new_texture
                   return new_texture, new_texture_path, _type
+
+               elif t.endswith(original_texture_end): # returns 4k if proper size texture doesn't exist
+                  texture_split = t.split('_')
+                  original_texture_path = new_path + t
+                  original_texture = t, original_texture_path, _type
+
+            if original_texture:
+               texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
+               print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
+               print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+               return original_texture
+
    return None
 
 
@@ -503,7 +512,6 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
 
          type_list = list(type_coll.children)
          variant_index = type_list.index(var_coll)
-         # texture_index = 0 # TODO HOW TO GET TEXTURE INDEX NOW
 
          if type_coll.name[3:] in config.EmptyTypes:
             dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']

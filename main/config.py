@@ -27,7 +27,7 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
     "inputBackpack": ("18-Backpack", "Backpack"),
     "inputBackground": ("19-Background", "Background"),
     "inputExpression": ("20-Expression", "Expression"),
-    "inputParticles": ("21-Particles", "Particles")}
+    "inputEnvironment": ("21-Environment", "Environment")}
 
 
 class bcolors:
