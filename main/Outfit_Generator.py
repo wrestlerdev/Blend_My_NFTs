@@ -570,7 +570,7 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         for coll in att_coll.children:
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=coll.name, branch_count=branch_count)
     else: # this is a type
-        if 'Null' not in type:
+        if 'Null' not in type and type[3:] in ItemUsedBodySlot:
             new_slots = ItemUsedBodySlot[type[3:]]
         else:
             new_slots = []
