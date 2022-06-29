@@ -403,8 +403,8 @@ def CreateSlotsFolderHierarchy(save_path):
                                             #     bpy.ops.object.join() # OBJECTJOIN
                                             if len(characterCollectionDict[c].objects) > 0:
                                                 objectToCalc = characterCollectionDict[c].objects[0]
-                                                area = find_mesh_area(objectToCalc)
-
+                                                #area = find_mesh_area(objectToCalc)
+                                                area = 0.0
 
                                                 characterCollectionDict[c]["Volume"] = (area * 2) / 1000
 
@@ -617,6 +617,15 @@ def LinkImagesToNodes(matcopy, texture_path):
                 matcopy.node_tree.nodes["OpacityNode"].image = newImage 
                 matcopy.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
+
+            if "I" == mapType:
+                print("I is choosen")
+                file = file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["IntensityNode"].image = newImage 
+                matcopy.node_tree.nodes["IntensityNode"].image.colorspace_settings.name = 'Linear'
+                matcopy.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
             # if node.label == "RTint":
             #     node.outputs["Color"].default_value = parent["color_primary"]
 
@@ -687,12 +696,12 @@ def find_mesh_area(obj):
     # area = x * y * z
     #print("x: ", x, " y: ", y, " z: ", z, " Volume: ",  area)
 
-    bm = bmesh_copy_from_object(obj, apply_modifiers=True)
-    area = bmesh_calc_area(bm)
+    #bm = bmesh_copy_from_object(obj, apply_modifiers=True)
+    #area = bmesh_calc_area(bm)
     #area = bmesh_calc_vol(bm)
-    bm.free()
+    #bm.free()
 
-    return area
+    #return area
     # if unit.system == 'NONE':
     #     area_fmt = clean_float(area, 8)
     # else:

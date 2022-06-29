@@ -55,7 +55,7 @@ KeywordAttributeDict = {
                          (["Feet"], "Shoes"),
                          (["Head", "Face"], "Head"),
                          (["Earing", "Backpack", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
-                         (["Plane", "Background"], "Background"),
+                         (["Plane", "Background", "Particles"], "Environment"),
                          (["Expression"], "Character")]
     for new_key in keys
 }
