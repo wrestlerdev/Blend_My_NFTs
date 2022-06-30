@@ -55,6 +55,7 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
     normal_list = ['_N.', 'Normal', 'normal']
     emissive_list = ['_E.', ' Emmissive', 'Emissive', 'emissive', 'emmissive']
     opacity_list = ['_O.', ' Opacity', 'opacity']
+    intensity_list = ['_I.', 'Intensity', 'intensity']
     if os.path.isdir(folder_path): # to avoid .db file issue?
         texture_images = [fn for fn in os.listdir(folder_path) if any(fn.endswith(ext) for ext in config.image_extensions)] # find all images
         not_texture_images = [fn for fn in os.listdir(folder_path) if not any(fn.endswith(ext) for ext in config.image_extensions)]
@@ -84,6 +85,8 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
                 new_name = 'T_' + variant_name + variant_suffix + texture_set + emissive_list[0] + file_type
             elif any(o in texture for o in opacity_list):
                 new_name = 'T_' + variant_name + variant_suffix + texture_set + opacity_list[0] + file_type
+            elif any(i in texture for i in intensity_list):
+                new_name = 'T_' + variant_name + variant_suffix + texture_set + intensity_list[0] + file_type
             else:
                 print(f"{config.bcolors.ERROR}This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system woops{config.bcolors.RESET}")
             print(new_name)
@@ -122,7 +125,7 @@ def create_downres_textures(input_path, dims, should_overwrite):
 
 
 def downres_all_textures_in_folder(path, dims, should_overwrite):
-    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
+    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O'] # don't put '_I' in here since it shouldn'be be downres'ed
 
     if os.path.isdir(path):
         texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]

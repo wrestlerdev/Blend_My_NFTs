@@ -70,7 +70,7 @@ KeywordKeys = [
     "Bottoms",
     "Shoes",
     "Accessories",
-    "Background"
+    "Environment"
     ]
 
 KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))} 
@@ -183,15 +183,16 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict):
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
                 split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
                 # full_variant_name = [split_variant_name]
+                variant = variant[0].upper() + variant[1:]
 
                 full_variant_name = [variant]
                 if color_key != 'Empty':
-                    full_variant_name.append(color_key)
+                    full_variant_name.insert(0, color_key)
                 if len(bpy.data.collections[itemKey].objects) > 1:
                     full_variant_name.append(texture)
 
                 full_variant_name = ' '.join(full_variant_name)
-                full_variant_name = full_variant_name[0].upper() + full_variant_name[1:]
+                # full_variant_name = full_variant_name[0].upper() + full_variant_name[1:]
 
                 type_name = type[3:]
                 keyword = None
