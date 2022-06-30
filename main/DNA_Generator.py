@@ -439,7 +439,9 @@ def reset_rarity_Record(NFTRecord_save_path):
    return DataDictionary
 
 
-def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path): # saves rarity when reinitializes
+def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path, Backup_save_path): # saves rarity when reinitializes
+   backup_hierarchy = json.load(open(Backup_save_path))['hierarchy']
+
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
@@ -467,6 +469,13 @@ def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path): # saves 
                for texture in hierarchy[slot][type][variant]["textureSets"].keys():
                   if texture in original_hierarchy[slot][type][variant]["textureSets"].keys():
                      hierarchy[slot][type][variant]["textureSets"][texture] = original_hierarchy[slot][type][variant]["textureSets"][texture]
+
+            elif slot in backup_hierarchy and type in backup_hierarchy[slot] and variant in backup_hierarchy[slot][type]:
+               hierarchy[slot][type][variant]["variant_rarity"]   = backup_hierarchy[slot][type][variant]["variant_rarity"]
+               hierarchy[slot][type][variant]["type_rarity"]      = backup_hierarchy[slot][type][variant]["type_rarity"]
+               for texture in hierarchy[slot][type][variant]["textureSets"].keys():
+                  if texture in backup_hierarchy[slot][type][variant]["textureSets"].keys():
+                     hierarchy[slot][type][variant]["textureSets"][texture] = backup_hierarchy[slot][type][variant]["textureSets"][texture]
 
    DataDictionary["hierarchy"] = hierarchy
 
