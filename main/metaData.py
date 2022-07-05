@@ -56,13 +56,14 @@ KeywordAttributeDict = {
                          (["Head", "Face"], "Head"),
                          (["Earing", "Backpack", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
                          (["Plane", "Background", "Particles"], "Environment"),
-                         (["Expression"], "Character")]
+                         (["Expression"], "Expression")]
     for new_key in keys
 }
 
 KeywordKeys = [
     "Null",
     "Character",
+    "Expression",
     # "Color Style",
     "Head",
     "Outfit",
