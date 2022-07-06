@@ -141,8 +141,8 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path): # 
 
 
 def update_batch_items(batch_num, record_path):
-    default_type_rarity = 0 # for new items
-    default_var_rarity = 0
+    default_type_rarity = 1000 # for new items
+    default_var_rarity = 1000
 
     record = json.load(open(record_path))
     hierarchy = record['hierarchy']

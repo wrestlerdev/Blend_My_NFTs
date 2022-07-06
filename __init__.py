@@ -789,7 +789,7 @@ class saveNewBatch(bpy.types.Operator):
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
 
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-        index = len(os.listdir(batch_json_save_path))
+        index = len(next(os.walk(batch_json_save_path))[1]) + 1
         
         LoadNFT.update_current_batch(index, batch_json_save_path)
 
@@ -2109,7 +2109,7 @@ class WCUSTOM_PT_EditBatch(bpy.types.Panel):
         row = layout.box().row()
         if os.path.exists(bpy.context.scene.my_tool.batch_json_save_path):
             batch_path = bpy.context.scene.my_tool.batch_json_save_path
-            row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(os.listdir(batch_path)) - 1))
+            row.label(text="Current Batch: {} / {}".format(bpy.context.scene.my_tool.CurrentBatchIndex, len(next(os.walk(batch_path))[1])))
         else:
             # row.label(text="Current Batch: {}".format(bpy.context.scene.my_tool.CurrentBatchIndex))
             row.label(text="Please create or load directory")

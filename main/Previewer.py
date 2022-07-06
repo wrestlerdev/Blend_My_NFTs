@@ -361,7 +361,9 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
          # print("Child Name: " + child.name  + " || Child Mat" + childMatSlot.name)
          for textureMatSlot in texture_mesh.material_slots:
             # print("Texture Mat: " + textureMatSlot.name)
-            if textureMatSlot.material.name in childMatSlot.material.name or len(texture_mesh.material_slots) == 1 :
+            childMatName = childMatSlot.material.name.partition('.')[0] # sometimes materials ending in .003 etc don't match up
+            textureMatName = textureMatSlot.material.name.partition('.')[0]
+            if textureMatName in childMatName or len(texture_mesh.material_slots) == 1 :
                # print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
                mat = textureMatSlot.material
                if mat.use_nodes:
