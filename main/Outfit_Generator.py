@@ -497,11 +497,11 @@ def count_all_rarities(batch_record_path, index):
         for type in hierarchy[attribute].keys():
             rarity_dict[attribute][type] = {}
             rarity_dict[attribute][type]['absolute_rarity'] = 0.0
-            rarity_dict[attribute][type]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[type], bpy.data.collections[attribute])[0]
+            rarity_dict[attribute][type]['relative_rarity'] = get_weighted_rarity(type, attribute)[0]
             for variant in hierarchy[attribute][type].keys():
                 rarity_dict[attribute][type][variant] = {}
                 rarity_dict[attribute][type][variant]['absolute_rarity'] = 0.0
-                rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[variant], bpy.data.collections[type])[0]
+                rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(variant, type)[0]
 
     count = 0
     filled_slots = '0' * len(hierarchy.keys())
@@ -521,7 +521,7 @@ def count_all_rarities(batch_record_path, index):
     return
 
 
-max_att = 21 # not inclusive
+max_att = 21 # inclusive?
 
 def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', branch_count=1):
     global count
@@ -543,9 +543,7 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
     if not type: # this is a attribute
         percentage = 1.0
     else: # this is a type
-        parent_coll = bpy.data.collections[attribute]
-        current_coll = bpy.data.collections[type]
-        percentage, weight_total = get_weighted_rarity(current_coll, parent_coll)
+        percentage = get_weighted_rarity(type, attribute)[0]
 
     new_probability = current_probability * percentage
 
@@ -554,16 +552,14 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
     
     if type:
         rarity_dict[attribute][type]["absolute_rarity"] = rarity_dict[attribute][type]["absolute_rarity"] + new_probability
+        var_count = 0
+        var_weight_total = 0
         for variant in rarity_dict[attribute][type].keys():
             if variant != "absolute_rarity" and variant != "relative_rarity":
-                type_coll = bpy.data.collections[type]
-                variant_coll = bpy.data.collections[variant]
-                variant_percentage, weight_total = get_weighted_rarity(variant_coll, type_coll)
+                variant_percentage, var_weight_total = get_weighted_rarity(variant, type, var_weight_total)
                 rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability * variant_percentage
-        var_count = 0
-        for v in bpy.data.collections[type].children:
-            if v.get('rarity') and v.get('rarity') > 0:
-                var_count += 1
+                if variant_percentage:
+                    var_count += 1
         branch_count = branch_count * var_count
 
     else:
@@ -596,28 +592,30 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
 
 
 
-def get_weighted_rarity(current_coll, parent_coll):
-    total = 0
-    for coll in parent_coll.children:
-        if coll.get('rarity') != None:
-            total += coll.get('rarity')
+def get_weighted_rarity(current_name, parent_name, total = 0):
+    
+    if not total:
+        for coll in bpy.data.collections[parent_name].children:
+            if coll.get('rarity') != None:
+                total += coll.get('rarity')
 
     if total:
+        current_coll = bpy.data.collections[current_name]
         if current_coll.get('rarity') != None:
             percentage = current_coll.get('rarity') / total
             return percentage, total
         else:
-            return 0.0, 0
+            return 0.0, total
 
     else: # CHECK GREEN NULL
         # print(current_coll.name)
-        if len(parent_coll.children) == 1:
-            return 1.0, 0
+        if len(bpy.data.collections[parent_name].children) == 1:
+            return 1.0, total
         else: # CHECK THIS
             if 'Null' in current_coll.name:
-                return 1.0, 0
+                return 1.0, total
             else:
-                return 0.0, 0
+                return 0.0, total
 
 
 

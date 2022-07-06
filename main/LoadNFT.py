@@ -101,7 +101,8 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path): # 
                                 variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
                                 update_rarity_color(variant, int(float(variant_rarity)))
                                 scene_var_coll["rarity"] = int(float(variant_rarity))
-                                scene_var_coll["absolute_rarity"] = (rarities[slot][type][variant]["absolute_rarity"]) * 100
+                                if variant in rarities[slot][type]:
+                                    scene_var_coll["absolute_rarity"] = (rarities[slot][type][variant]["absolute_rarity"]) * 100
 
                                 texture_objs = scene_var_coll.objects
                                 for texture_obj in texture_objs:
