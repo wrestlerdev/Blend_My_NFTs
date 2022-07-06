@@ -521,6 +521,8 @@ def count_all_rarities(batch_record_path, index):
     return
 
 
+max_att = 21 # not inclusive
+
 def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', branch_count=1):
     global count
     if attribute and filled_slots[int(attribute[:2]) - 1] == '1':
@@ -530,7 +532,8 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         rarity_dict[attribute][null_type.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name]["absolute_rarity"] + current_probability 
         rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] + current_probability
         next_index = list(hierarchy.keys()).index(attribute) + 1
-        if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
+        # if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
             rarity_dict = add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
         else:
@@ -583,7 +586,8 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
                     filled_slots = filled_slots[:index] + '1' + filled_slots[index+1:]
 
         next_index = (list(hierarchy.keys()).index(attribute)) + 1
-        if next_index != len(hierarchy.keys()):
+        # if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
             next_att = list(hierarchy.keys())[next_index]
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
         else:
