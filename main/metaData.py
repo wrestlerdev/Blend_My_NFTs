@@ -150,9 +150,9 @@ KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))}
 
 
 
-def returnERC721MetaDataCustom(name, DNA, NFTDict):
+def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))      
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(int(batch_num)), "_NFTRecord_{:03d}.json".format(int(batch_num)))      
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
 

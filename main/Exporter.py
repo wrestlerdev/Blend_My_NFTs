@@ -621,7 +621,7 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # dele
 # -----------------------------------------------------------------
 
 def save_metadata_file(path, nft_name, batch_num, nft_num, DNA, NFTDict):
-    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA, NFTDict)
+    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA, NFTDict, batch_num)
     metaDataObj = json.dumps(metadata, indent=1, ensure_ascii=True)
     with open(os.path.join(path, "ERC721_{}_{}.json".format(batch_num, nft_num)), "w") as outfile:
             outfile.write(metaDataObj)
