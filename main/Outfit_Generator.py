@@ -263,6 +263,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             
                 
         SingleDNA.insert(0, character)
+        SingleDNA.insert(1, style)
         # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
@@ -304,7 +305,7 @@ def GetRandomSingleTexture(att_name, variant_coll):
     att_index = list(hierarchy.keys()).index(att_name)
     inputDNA = bpy.context.scene.my_tool.inputDNA
     dna_split = inputDNA.split(',')
-    old_dna_strand = dna_split[att_index + 1]
+    old_dna_strand = dna_split[att_index + 2] # .pop(0)
     old_texture_index = old_dna_strand.split('-')[2]
 
     variant = variant_coll.name

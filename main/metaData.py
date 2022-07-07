@@ -54,7 +54,8 @@ KeywordAttributeDict = {
                          (["Outfit"], "Outfit"),
                          (["Feet"], "Shoes"),
                          (["Head", "Face"], "Head"),
-                         (["Earing", "Backpack", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
+                         (["Earing","Calf", "Neck", "Forearm", "Hands"], "Accessories"),
+                         (["Backpack"], "Backpack"),
                          (["Plane", "Background", "Particles"], "Environment"),
                          (["Expression"], "Expression")]
     for new_key in keys
@@ -63,6 +64,7 @@ KeywordAttributeDict = {
 KeywordKeys = [
     "Null",
     "Character",
+    "Theme",
     "Expression",
     # "Color Style",
     "Head",
@@ -71,6 +73,7 @@ KeywordKeys = [
     "Bottoms",
     "Shoes",
     "Accessories",
+    "Backpack",
     "Environment"
     ]
 
@@ -168,8 +171,11 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
     attributes = []
     DNAString = DNA.split(",")
     character = DNAString.pop(0)
+    style = DNAString.pop(0)
 
     attributes.append({"trait_type": "Character", "value": character})
+    # if style != 'Random':
+    attributes.append({"trait_type": "Theme", "value": style})
 
     for key in keys:
         for itemKey in NFTDict[key]:
@@ -187,8 +193,8 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 variant = variant[0].upper() + variant[1:]
 
                 full_variant_name = [variant]
-                if color_key != 'Empty':
-                    full_variant_name.insert(0, color_key)
+                # if color_key != 'Empty':
+                #     full_variant_name.insert(0, color_key)
                 if len(bpy.data.collections[itemKey].objects) > 1:
                     full_variant_name.append(texture)
 

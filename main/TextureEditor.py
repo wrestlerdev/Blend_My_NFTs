@@ -53,8 +53,8 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
     diffuse_list = ['_D.', 'Diffuse', 'BakedBaseColor', 'LightGreyScale', 'diffuse','BaseColor']
     metallic_list = ['_M.', 'Metallic', 'Metalic', 'metallic']
     normal_list = ['_N.', 'Normal', 'normal']
-    emissive_list = ['_E.', ' Emmissive', 'Emissive', 'emissive', 'emmissive']
-    opacity_list = ['_O.', ' Opacity', 'opacity']
+    emissive_list = ['_E.', 'Emmissive', 'Emissive', 'emissive', 'emmissive']
+    opacity_list = ['_O.', 'Opacity', 'opacity',]
     intensity_list = ['_I.', 'Intensity', 'intensity']
     if os.path.isdir(folder_path): # to avoid .db file issue?
         texture_images = [fn for fn in os.listdir(folder_path) if any(fn.endswith(ext) for ext in config.image_extensions)] # find all images

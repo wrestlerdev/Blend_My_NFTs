@@ -1,3 +1,4 @@
+from hashlib import new
 import bpy
 import os
 import time
@@ -297,9 +298,10 @@ def AddColorSetToStyle():
 def SaveNewColorStyle():
     GlobalStyleList = OpenGlobalStyleList()
     if bpy.context.scene.my_tool.colorStyleName not in GlobalStyleList:
-        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = {}
-        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["StyleRarity"] = bpy.context.scene.my_tool.colorStyleRarity
-        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["ColorSets"] = []
+        new_style = {}
+        new_style["StyleRarity"] = bpy.context.scene.my_tool.colorStyleRarity
+        new_style["ColorSets"] = []
+        GlobalStyleList[bpy.context.scene.my_tool.colorStyleName] = new_style
     WriteToGlobalStyleList(GlobalStyleList)
     AddColorSetToStyle()
 

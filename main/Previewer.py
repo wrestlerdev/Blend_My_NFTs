@@ -45,6 +45,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    keys = list(NFTDict.keys())
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
+   style = DNAString.pop(0)
    reset_shape_keys(character)
    show_character(character, Select)
 
@@ -257,6 +258,7 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
    if True:
       DNAString = DNA.split(',')
       character = DNAString.pop(0)
+      style = DNAString.pop(0)
       show_character(character)
       ohierarchy = get_hierarchy_ordered()
 
@@ -504,9 +506,10 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
    type_index = 0
    variant_index = 0
 
-   lastDNA = bpy.context.scene.my_tool.lastDNA # input or last?
-   DNAString = lastDNA.split(",")
-   character = DNAString.pop(0)
+   # lastDNA = bpy.context.scene.my_tool.lastDNA # input or last?
+   # DNAString = lastDNA.split(",")
+   # character = DNAString.pop(0)
+   # style = DNAString.pop(0)
 
    for type_coll in slot_coll.children: # get type,variant,texture index by going through collection hierarchy
       if variant_name in type_coll.children.keys():
@@ -655,8 +658,8 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    dna_string = NFTDict["DNAList"]
    hierarchy = get_hierarchy_ordered()
    coll_index = list(hierarchy.keys()).index(coll_name)
-   DNA = dna_string.split(',') 
-   old_strand = DNA[coll_index + 1]
+   DNA = dna_string.split(',') # .pop(0)
+   old_strand = DNA[coll_index + 2]
 
    if dna_strand: # append old colour to new dna_string
       new_dnastrand = dna_strand
@@ -674,7 +677,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
       else:
          new_colorkey = dna_strand.rpartition('-')[2]
    else: # randomize colour here? # should it check for 0-0-0?
-      new_split = DNA[coll_index + 1].split('-')
+      new_split = DNA[coll_index + 2].split('-')
       max_attempts = 10
       old_colorkey = old_strand.split('-')[-1]
       for i in range(max_attempts):
@@ -686,7 +689,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
       new_dnastrand = '-'.join(new_split)
 
    if new_dnastrand == '0-0-0':
-      DNA[coll_index + 1] = str(new_dnastrand)
+      DNA[coll_index + 2] = str(new_dnastrand)
       dna_string = ','.join(DNA)
       CharacterItems[coll_name] = "Null"
       return dna_string, CharacterItems
@@ -705,7 +708,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    new_dnastrand = '-'.join([type_index, var_index, tex_index, new_colorkey])
 
    var_coll = type_coll.children[int(var_index)]
-   DNA[coll_index + 1] = str(new_dnastrand)
+   DNA[coll_index + 2] = str(new_dnastrand)
    dna_string = ','.join(DNA)
 
    record_item = batch_record["hierarchy"][coll_name][type_coll.name][var_coll.name]
@@ -736,13 +739,18 @@ def randomize_color_style(new_style=''):
    DNASplit = dna_string.split(',') 
 
    if not new_style:
-      new_style = ColorGen.SetUpCharacterStyle()
+      last_style = bpy.context.scene.my_tool.currentGeneratorStyle
+      max_count = 10
+      for i in range(max_count):
+         new_style = ColorGen.SetUpCharacterStyle()
+         if new_style != last_style:
+            break
       bpy.context.scene.my_tool.currentGeneratorStyle = new_style
 
    for coll_name in list(NFTDict["CharacterItems"].keys()):
       if CharacterItems[coll_name] != 'Null':
          index = list(NFTDict["CharacterItems"].keys()).index(coll_name)
-         dna_strand = DNASplit[index + 1]
+         dna_strand = DNASplit[index + 2]
 
          type_index, var_index, tex_index, color_key = dna_strand.split('-')
          type_coll = bpy.data.collections[coll_name].children[int(type_index)]
@@ -758,7 +766,8 @@ def randomize_color_style(new_style=''):
          new_dnastrand = dna_strand.split('-')
          new_dnastrand[-1] = new_key
          new_dnastring = '-'.join(new_dnastrand)
-         DNASplit[index + 1] = new_dnastring
+         DNASplit[index + 2] = new_dnastring
+
          dna_string = ','.join(DNASplit)
 
          variant_dict = {}
@@ -783,6 +792,7 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
+   style = DNAString.pop(0)
    show_character(character)
    
    ohierarchy = get_hierarchy_ordered()

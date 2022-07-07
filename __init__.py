@@ -1730,7 +1730,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1787,7 +1787,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1848,7 +1848,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1914,7 +1914,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1969,7 +1969,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -2231,7 +2231,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.label(text="Only render once all NFTs have been generated and finalized.")
             layout.separator()
 
-            batch_count = len(os.listdir(batches_path)) - 1
+            batch_count = len(next(os.walk(batches_path))[1])
             box = layout.box()
             row = box.row()
             row.label(text="Total Batches: {}".format(batch_count))            
