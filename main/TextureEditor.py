@@ -47,7 +47,7 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
     #og_texture_suffixes = ['_64', '_128', '_256', '_512', '_1k', '_2k']
     og_texture_suffixes = list(config.texture_suffixes.values()) 
     og_texture_suffixes.remove('')
-    print(og_texture_suffixes)
+
     roughness_list = ['_R.', 'R_', 'Roughness', 'roughness']
     id_list = ['_ID.', 'ColorID']
     diffuse_list = ['_D.', 'Diffuse', 'BakedBaseColor', 'LightGreyScale', 'diffuse','BaseColor']
@@ -93,7 +93,12 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
             if new_name != texture:
                 old_texture_path = os.path.join(folder_path, texture)
                 new_texture_path = os.path.join(folder_path, new_name)
-                os.rename(old_texture_path, new_texture_path)
+                try:
+                    os.rename(old_texture_path, new_texture_path)
+                    print(f"{config.bcolors.OK}{texture} will be renamed to {new_name}{config.bcolors.OK}")
+                except Exception as e:
+                    print(f"{config.bcolors.ERROR}{texture} could not be renamed to {new_name}{config.bcolors.ERROR}")
+                    print(f"{config.bcolors.ERROR}{e}{config.bcolors.ERROR}")
     return
 
 
