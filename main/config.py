@@ -19,15 +19,16 @@ Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
     "inputCalf": ("10-Calf", "Calf"),
     "inputAnkle": ("11-Ankle", "Ankle"),
     "inputFeet": ("12-Feet", "Feet"),
-    "inputNeck": ("13-Neck", "Neck"),
-    "inputLowerHead": ("14-LowerHead", "Lower Head"),
-    "inputMiddleHead": ("15-MiddleHead", "Mid Head"),
-    "inputEarings": ("16-Earings", "Earrings"),
-    "inputUpperHead": ("17-UpperHead", "Upper Head"),
-    "inputBackpack": ("18-Backpack", "Backpack"),
-    "inputBackground": ("19-Background", "Background"),
+    "inputHairLong": ("13-HairLong", "Hair Long"),
+    "inputNeck": ("14-Neck", "Neck"),
+    "inputHairShort": ("15-HairShort", "Hair Short"),
+    "inputMiddleHead": ("16-MiddleHead", "Mid Head"),
+    "inputLowerHead": ("17-LowerHead", "Lower Head"),
+    "inputEarrings": ("18-Earrings", "Earrings"),
+    "inputBackpack": ("19-Backpack", "Backpack"),
     "inputExpression": ("20-Expression", "Expression"),
-    "inputEnvironment": ("21-Environment", "Environment")}
+    "inputEnvironment": ("21-Environment", "Environment"),
+    "inputBackground": ("22-Background", "Background")}
 
 
 class bcolors:

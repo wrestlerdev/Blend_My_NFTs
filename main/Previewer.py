@@ -205,9 +205,9 @@ def RaycastPackpack(backpackType, character, NFTDict):
 
 
          if backpackType == "BackpackHigh":
-            backpack = list(NFTDict["13-Neck"].keys())[0]
+            backpack = list(NFTDict["14-Neck"].keys())[0]
          else:
-            backpack = list(NFTDict["18-Backpack"].keys())[0]
+            backpack = list(NFTDict["19-Backpack"].keys())[0]
          backpack = backpack + "_" + character
          for obj in bpy.data.collections[backpack].objects:
             if len(obj.constraints) < 1:
@@ -635,7 +635,7 @@ def get_null_variant_collection(att_coll):
       return att_coll.children[0].children[0]
 
    head_info = ["Head", "HeadShortNone"]
-   head_atts = ["13-Neck", "14-LowerHead", "15-MiddleHead", "16-Earings", "17-UpperHead"]
+   head_atts = ["14-Neck", "17-LowerHead", "16-MiddleHead", "18-Earrings", "17-UpperHead"]
    feet_info = ["Feet", "FeetShortNone"]
    feet_atts = ["10-Calf", "11-Ankle", "12-Feet"]
 

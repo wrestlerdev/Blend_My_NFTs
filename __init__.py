@@ -204,8 +204,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead"))
     inputMiddleHead: bpy.props.PointerProperty(name="Middle Head Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead"))
-    inputEarings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarings"))
+    inputEarrings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarrings"))
     inputUpperHead: bpy.props.PointerProperty(name="Upper Head Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead"))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
@@ -236,7 +236,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastNeck: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastEarings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -1894,7 +1894,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     "inputUpperHead": ("MESH_CONE"),
     "inputMiddleHead": ("HIDE_OFF"),
     "inputLowerHead": ("USER"),
-    "inputEarings": ("PMARKER_ACT"),
+    "inputEarrings": ("PMARKER_ACT"),
     "inputNeck": ("NODE_INSERT_OFF")}
     
     def draw(self, context):
