@@ -141,11 +141,11 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
    # objects = bpy.data.collections[torsoObj].objects
 
    if shoetype == "FeetLong":
-      shoes = list(NFTDict["10-Calf"].keys())[0]
+      shoes = list(NFTDict["08-Calf"].keys())[0]
    elif shoetype == "FeetMid":
-      shoes = list(NFTDict["11-Ankle"].keys())[0]
+      shoes = list(NFTDict["09-Ankle"].keys())[0]
    else:
-      shoes = list(NFTDict["12-Feet"].keys())[0]
+      shoes = list(NFTDict["10-Feet"].keys())[0]
 
    shoesObj = shoes + "_" + character
    objects = bpy.data.collections[shoesObj].objects
@@ -205,9 +205,9 @@ def RaycastPackpack(backpackType, character, NFTDict):
 
 
          if backpackType == "BackpackHigh":
-            backpack = list(NFTDict["14-Neck"].keys())[0]
+            backpack = list(NFTDict["12-Neck"].keys())[0]
          else:
-            backpack = list(NFTDict["19-Backpack"].keys())[0]
+            backpack = list(NFTDict["17-Backpack"].keys())[0]
          backpack = backpack + "_" + character
          for obj in bpy.data.collections[backpack].objects:
             if len(obj.constraints) < 1:
@@ -476,12 +476,34 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
                   original_texture_path = new_path + t
                   original_texture = t, original_texture_path, _type
 
+
             if original_texture:
                texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
                print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
                print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
                return original_texture
 
+
+
+            if texture_set != 'A':
+               original_texture_folder_path = os.path.join(variant_folder_path, "Textures", 'A')
+               for t in os.listdir(original_texture_folder_path):
+                  if t.endswith(new_texture_end):
+                     new_texture = t
+                     new_texture_path = new_path + new_texture
+                     return new_texture, new_texture_path, _type
+
+                  elif t.endswith(original_texture_end): # returns 4k if proper size texture doesn't exist
+                     texture_split = t.split('_')
+                     original_texture_path = new_path + t
+                     original_texture = t, original_texture_path, _type
+
+            if original_texture:
+               texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
+               print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
+               print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+               return original_texture
+                  
    return None
 
 
@@ -635,9 +657,9 @@ def get_null_variant_collection(att_coll):
       return att_coll.children[0].children[0]
 
    head_info = ["Head", "HeadShortNone"]
-   head_atts = ["14-Neck", "17-LowerHead", "16-MiddleHead", "18-Earrings", "17-UpperHead"]
+   head_atts = ["12-Neck", "15-LowerHead", "14-MiddleHead", "16-Earrings", "17-UpperHead"]
    feet_info = ["Feet", "FeetShortNone"]
-   feet_atts = ["10-Calf", "11-Ankle", "12-Feet"]
+   feet_atts = ["08-Calf", "09-Ankle", "10-Feet"]
 
    if att_coll.name in head_atts: # should this account for the hoodie :(, can't differentiate between head and hair types atm
       return check_collections(head_info, head_atts)

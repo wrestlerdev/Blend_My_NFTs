@@ -178,14 +178,14 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso"))
     inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso"))
-    inputLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLForeArm"))
-    inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist"))
-    inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm"))
-    inputRWrist: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRWrist"))
+    inputForeArms: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputForeArms"))
+    # inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
+    #                                             update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist"))
+    # inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
+    #                                             update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm"))
+    inputWrists: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputWrists"))
     inputPelvisThick: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick"))
     inputPelvisThin: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
@@ -206,8 +206,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead"))
     inputEarrings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarrings"))
-    inputUpperHead: bpy.props.PointerProperty(name="Upper Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperHead"))
+    inputHairShort: bpy.props.PointerProperty(name="Hair Short Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairShort"))
+    inputHairLong: bpy.props.PointerProperty(name="Hair Long Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairLong"))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack"))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
@@ -223,10 +225,12 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastLForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastLWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastRWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastForeArms: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHairShort: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHairLong: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    # lastLWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    # lastRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastWrists: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastPelvisThick: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastPelvisThin: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastHands: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
@@ -301,7 +305,6 @@ def update_combinations(dummy1, dummy2):
     # redraw_panel()
 
 #bpy.app.handlers.depsgraph_update_post.append(update_combinations)
-
 
 
 
@@ -1581,6 +1584,10 @@ class testButton(bpy.types.Operator):
         # Exporter.Previewer.colorpicker_has_applied()
         # Exporter.get_custom_range()
         # DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets("Egypt_01", "WOW")
+        bpy.context.scene.my_tool.inputHairShort = None
+        bpy.context.scene.my_tool.inputHairLong = None
+        bpy.context.scene.my_tool.inputForeArms = None
+        bpy.context.scene.my_tool.inputWrists = None
         return {'FINISHED'}
 
 
@@ -1769,10 +1776,10 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputRForeArm": ("LOOP_FORWARDS"),
-    "inputLForeArm": ("LOOP_BACK"),
-    "inputRWrist": ("FORWARD"),
-    "inputLWrist": ("BACK"),
+    # "inputRForeArm": ("LOOP_FORWARDS"),
+    "inputForeArms": ("LOOP_BACK"),
+    "inputWrists": ("FORWARD"),
+    # "inputLWrist": ("BACK"),
     "inputHands": ("VIEW_PAN"),}
     
     def draw(self, context):
@@ -1891,7 +1898,9 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
 
     slots = {
     "inputExpression": ("GHOST_ENABLED"),
-    "inputUpperHead": ("MESH_CONE"),
+    # "inputUpperHead": ("MESH_CONE"),
+    "inputHairLong": ("MESH_CONE"),
+    "inputHairShort": ("MARKER"),
     "inputMiddleHead": ("HIDE_OFF"),
     "inputLowerHead": ("USER"),
     "inputEarrings": ("PMARKER_ACT"),
