@@ -20,20 +20,20 @@ from . import config
 ItemUsedBodySlot = {
 "ShirtCropSleeveless" : ["01-UpperTorso"],
 "ShirtCropSleevelessBack" : ["01-UpperTorso", "19-Backpack"],
-"ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck", "11-HairLong"],
+"ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck", "11-HairLong", "16-EarringsLong"],
 "ShirtCrop" : ["01-UpperTorso", "03-ForeArms"],
-"ShirtCropNeck" : ["01-UppreTorso", "03-ForeArms", "13-Neck", "11-HairLong"],
+"ShirtCropNeck" : ["01-UppreTorso", "03-ForeArms", "13-Neck", "11-HairLong", "16-EarringsLong"],
 "ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
-"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "11-HairLong"],
-"ShirtMidSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "11-HairLong", "19-Backpack"],
+"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "11-HairLong", "16-EarringsLong"],
+"ShirtMidSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "11-HairLong", "19-Backpack", "16-EarringsLong"],
 "ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms"],
-"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "13-Neck", "11-HairLong"],
+"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "13-Neck", "11-HairLong", "16-EarringsLong"],
 "ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick"],
-"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","13-Neck", "11-HairLong"],
-"ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","13-Neck", "11-HairLong", "19-Backpack"],
+"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","13-Neck", "11-HairLong", "16-EarringsLong"],
+"ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","13-Neck", "11-HairLong", "19-Backpack", "16-EarringsLong"],
 "ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms"],
-"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","13-Neck", "11-HairLong"],
-"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","13-Neck", "11-HairLong", "12-HairShort", "17-Earrings"],
+"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","13-Neck", "11-HairLong", "16-EarringsLong"],
+"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","13-Neck", "11-HairLong", "12-HairShort", "17-Earrings", "16-EarringsLong"],
 
 "PantsShort" : ["07-PelvisThin"],
 "PantsShortThick" : ["06-PelvisThick", "07-PelvisThin"],
@@ -45,12 +45,12 @@ ItemUsedBodySlot = {
 "PantsLongThick" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle"],
 "PantsLongHigh" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle", "02-MiddleTorso"],
 
-"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "08-Calf", "09-Ankle"],
-"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "08-Calf", "09-Ankle"],
-"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "08-Calf"],
-"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "08-Calf"],
-"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck"],
-"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck"],
+"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "08-Calf", "09-Ankle","16-EarringsLong"],
+"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "08-Calf", "09-Ankle", "16-EarringsLong"],
+"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "08-Calf", "16-EarringsLong"],
+"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "08-Calf", "16-EarringsLong"],
+"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "16-EarringsLong"],
+"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "16-EarringsLong"],
 
 "Forearm" : ["03-ForeArms"],
 "HandsShort" : ["05-Hands", "04-Wrists"],
@@ -65,20 +65,20 @@ ItemUsedBodySlot = {
 "Calf" : ["08-Calf"],
 "CalfLong" : ["08-Calf", "09-Ankle"],
 
-"Neck" : ["13-Neck"],
+"Neck" : ["13-Neck", "16-EarringsLong"],
 "HairShort" : ["12-HairShort"], #
 "HairShortFront" : ["12-HairShort", "14-MiddleHead"], #
-"HairMid" : ["11-HairLong", "13-Neck", "12-HairShort", "17-Earrings"], #
-"HairLong" : ["11-HairLong", "13-Neck", "12-HairShort", "17-Earrings", "19-Backpack"], #
+"HairMid" : ["11-HairLong", "13-Neck", "12-HairShort", "17-Earrings", "16-EarringsLong"], #
+"HairLong" : ["11-HairLong", "13-Neck", "12-HairShort", "17-Earrings", "19-Backpack", "16-EarringsLong"], #
 
-"HeadFull" : ["11-HairLong", "13-Neck", "12-HairShort", "14-MiddleHead", "15-LowerHead", "17-Earrings"], #
+"HeadFull" : ["11-HairLong", "13-Neck", "12-HairShort", "14-MiddleHead", "15-LowerHead", "17-Earrings", "16-EarringsLong"], #
 
 "FaceMid" : ["14-MiddleHead"],
 "FaceMidNeutral" : ["14-MiddleHead", "18-Expression"],
 "FaceLower" : ["15-LowerHead"],
 "FaceFull" : ["14-MiddleHead", "15-LowerHead"], #
-"EarringShort" : ["17-Earrings"], 
-"EarringLong" : ["17-Earrings", "13-Neck"],
+"EarringsShort" : ["17-Earrings"], 
+"EarringsLong" : ["17-Earrings", "16-EarringsLong"],
 
 "Backpack" : ["19-Backpack"],
 "BackpackHigh" : ["13-Neck", "19-Backpack"],
