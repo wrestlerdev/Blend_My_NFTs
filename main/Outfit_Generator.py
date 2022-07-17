@@ -18,20 +18,22 @@ from . import config
 
 # A list for each caterogry of clothing that states what slots it will fil
 ItemUsedBodySlot = {
-"ShirtCropSleevelessBack" : ["01-UpperTorso", "17-Backpack"],
 "ShirtCropSleeveless" : ["01-UpperTorso"],
-"ShirtCropSleevelessNeck" : ["01-UpperTorso", "12-Neck", "11-HairLong"],
+"ShirtCropSleevelessBack" : ["01-UpperTorso", "19-Backpack"],
+"ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck", "11-HairLong"],
 "ShirtCrop" : ["01-UpperTorso", "03-ForeArms"],
-"ShirtCropNeck" : ["01-UpperTorso", "03-ForeArms", "12-Neck", "11-HairLong"],
+"ShirtCropNeck" : ["01-UppreTorso", "03-ForeArms", "13-Neck", "11-HairLong"],
 "ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
-"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "12-Neck", "11-HairLong"],
+"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "11-HairLong"],
+"ShirtMidSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck", "11-HairLong", "19-Backpack"],
 "ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms"],
-"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "12-Neck", "11-HairLong"],
+"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "13-Neck", "11-HairLong"],
 "ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick"],
-"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","12-Neck", "11-HairLong"],
+"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","13-Neck", "11-HairLong"],
+"ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","13-Neck", "11-HairLong", "19-Backpack"],
 "ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms"],
-"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","12-Neck", "11-HairLong"],
-"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","12-Neck", "11-HairLong", "13-HairShort", "16-Earrings"],
+"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","13-Neck", "11-HairLong"],
+"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","13-Neck", "11-HairLong", "12-HairShort", "17-Earrings"],
 
 "PantsShort" : ["07-PelvisThin"],
 "PantsShortThick" : ["06-PelvisThick", "07-PelvisThin"],
@@ -43,18 +45,18 @@ ItemUsedBodySlot = {
 "PantsLongThick" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle"],
 "PantsLongHigh" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle", "02-MiddleTorso"],
 
-"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "12-Neck", "08-Calf", "09-Ankle"],
-"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "12-Neck", "08-Calf", "09-Ankle"],
-"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "12-Neck", "08-Calf"],
-"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "12-Neck", "08-Calf"],
-"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "12-Neck"],
-"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "12-Neck"],
+"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "08-Calf", "09-Ankle"],
+"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "08-Calf", "09-Ankle"],
+"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck", "08-Calf"],
+"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck", "08-Calf"],
+"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "13-Neck"],
+"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "13-Neck"],
 
 "Forearm" : ["03-ForeArms"],
-"HandsShort" : ["05-Hands"],
-"GlovesShort" : ["05-Hands"],
-"HandsLong" : ["03-ForeArms", "05-Hands"],
-"GlovesLong" : ["03-ForeArms", "05-Hands"],
+"HandsShort" : ["05-Hands", "04-Wrists"],
+"GlovesShort" : ["05-Hands", "04-Wrists"],
+"HandsLong" : ["03-ForeArms", "05-Hands", "04-Wrists"],
+"GlovesLong" : ["03-ForeArms", "05-Hands", "04-Wrists"],
 
 "FeetLong" : ["08-Calf", "09-Ankle", "10-Feet"],
 "FeetMid" : ["09-Ankle", "10-Feet"],
@@ -63,22 +65,23 @@ ItemUsedBodySlot = {
 "Calf" : ["08-Calf"],
 "CalfLong" : ["08-Calf", "09-Ankle"],
 
-"Neck" : ["12-Neck"],
-"HairShort" : ["13-HairShort"], #
-"HairShortNone" : ["13-HairShort"], #
-"HairMid" : ["11-HairLong", "12-Neck", "13-HairShort", "16-Earrings"], #
-"HairLong" : ["11-HairLong", "12-Neck", "13-HairShort", "16-Earrings", "17-Backpack"], #
-"HairMidFront" : ["13-HairShort", "14-MiddleHead"], #
+"Neck" : ["13-Neck"],
+"HairShort" : ["12-HairShort"], #
+"HairShortFront" : ["12-HairShort", "14-MiddleHead"], #
+"HairMid" : ["11-HairLong", "13-Neck", "12-HairShort", "17-Earrings"], #
+"HairLong" : ["11-HairLong", "13-Neck", "12-HairShort", "17-Earrings", "19-Backpack"], #
+
+"HeadFull" : ["11-HairLong", "13-Neck", "12-HairShort", "14-MiddleHead", "15-LowerHead", "17-Earrings"], #
+
 "FaceMid" : ["14-MiddleHead"],
 "FaceMidNeutral" : ["14-MiddleHead", "18-Expression"],
 "FaceLower" : ["15-LowerHead"],
 "FaceFull" : ["14-MiddleHead", "15-LowerHead"], #
-"HeadFull" : ["11-HairLong", "12-Neck", "13-HairShort", "14-MiddleHead", "15-LowerHead", "16-Earrings"], #
-"EarringShort" : ["16-Earrings"], 
-"EarringLong" : ["16-Earrings", "12-Neck"],
+"EarringShort" : ["17-Earrings"], 
+"EarringLong" : ["17-Earrings", "13-Neck"],
 
-"Backpack" : ["17-Backpack"],
-"BackpackHigh" : ["12-Neck", "17-Backpack"],
+"Backpack" : ["19-Backpack"],
+"BackpackHigh" : ["13-Neck", "19-Backpack"],
 
 "Expression" : ["18-Expression"],
 "ExpressionLower" : ["15-LowerHead", "18-Expression"],
@@ -86,7 +89,7 @@ ItemUsedBodySlot = {
 "ExpressionUpper" : ["14-MiddleHead", "18-Expression"],
 "ExpressionFull" : ["15-LowerHead", "14-MiddleHead", "18-Expression"],
 
-"Background" : ["20-Background"]
+"Background" : ["22-Background"]
 }
 
 
@@ -532,7 +535,7 @@ def count_all_rarities(batch_record_path, index):
     return
 
 
-max_att = 20 # inclusive?
+max_att = 19 # inclusive?
 
 def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', branch_count=1):
     global count
@@ -543,8 +546,8 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         rarity_dict[attribute][null_type.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name]["absolute_rarity"] + current_probability 
         rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] + current_probability
         next_index = list(hierarchy.keys()).index(attribute) + 1
-        # if next_index != max_att:
-        if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
+        # if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
             rarity_dict = add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
         else:
@@ -593,8 +596,8 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
                     filled_slots = filled_slots[:index] + '1' + filled_slots[index+1:]
 
         next_index = (list(hierarchy.keys()).index(attribute)) + 1
-        if next_index != len(hierarchy.keys()):
-        # if next_index != max_att:
+        # if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
             next_att = list(hierarchy.keys())[next_index]
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
         else:
