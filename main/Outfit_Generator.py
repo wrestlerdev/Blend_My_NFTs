@@ -199,7 +199,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         #     obj["metallic"] = random.random()
         #     obj.hide_viewport = False
         
-
+        hair_coll_name = ''
         for attribute in attributeskeys:
             if(attributeUsedDict.get(attribute)):
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0-0"
@@ -215,9 +215,15 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 textureIndex = 0
             else:
                 position = attributevalues.index(hierarchy[attribute])
-                typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
-                varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
+                if attribute[3:].startswith("Head"): # for hair accessories
+                    hair_collection = bpy.data.collections[hair_coll_name + '_' + character]
+                    typeChoosen, typeIndex, varientChoosen, varientIndex = PickWeightedAccessoryTypeAndVariant(hierarchy[attribute], hair_collection)
+                else:
+                    typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
+                    varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
+                if attribute[3:].startswith('Hair') and not varientChoosen.endswith("Null"):
+                    hair_coll_name = varientChoosen
 
                 if typeIndex == 0 and varientIndex == 0:
                     SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0-0"
@@ -409,6 +415,35 @@ def GetRandomSingleMesh(att_name):
 
 # ------------------------------------------------------
 
+
+def PickWeightedAccessoryTypeAndVariant(AttributeTypes, hair_coll=''):
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    null_var_rarity = bpy.data.collections["HeadAccessories_HeadAccessoriesNull_000_Null"]['rarity']
+    number_List_Of_i.append("00-HeadAccessoriesNull_HeadAccessories_HeadAccessoriesNull_000_Null")
+    rarity_List_Of_i.append(null_var_rarity)
+
+    for type in AttributeTypes:
+        if AttributeTypes[type].keys():
+            for variant in AttributeTypes[type].keys():
+                variant_name = variant.rpartition('_')[2]
+
+                for obj in hair_coll.objects:
+                    if obj.type == 'MESH':
+                        if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+                            for shape_key in obj.data.shape_keys.key_blocks:
+                                if shape_key.name.lower() == variant_name.lower():
+                                    number_List_Of_i.append(type + '_' + variant)
+                                    rarity = bpy.data.collections[variant]['rarity'] # this doesn't take type into consideration atm
+                                    rarity_List_Of_i.append(rarity)
+
+    chosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+    typeChosen, dash, variantChosen = chosen[0].partition('_')
+    typeIndex = list(AttributeTypes.keys()).index(typeChosen)
+    variantIndex = list(AttributeTypes[typeChosen].keys()).index(variantChosen)
+
+    return typeChosen, typeIndex, variantChosen, variantIndex
 
 
 def PickWeightedAttributeType(AttributeTypes):
