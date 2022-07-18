@@ -49,6 +49,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    reset_shape_keys(character)
    show_character(character, Select)
 
+   hair_coll = ''
    for key in keys:
       for itemKey in NFTDict[key]:
          if(NFTDict[key] != "Null"):
@@ -123,7 +124,14 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                print("Feetoroni")
                print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
-               
+
+            elif attr.name[3:].startswith('Hair') and varient:
+               hair_coll = bpy.data.collections[varient.name + '_' + character]
+               reset_hair_shape_key(hair_coll)
+            elif attr.name[3:].startswith('Head'):
+               char_var_coll = bpy.data.collections[varient.name + '_' + character]
+               set_hair_accessory_shape_keys(char_var_coll, hair_coll)
+
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -348,6 +356,33 @@ def reset_shape_keys(character):
             for shape_key in obj.data.shape_keys.key_blocks:
                if shape_key.name != 'Basis':
                   shape_key.value = 0
+   return
+
+def reset_hair_shape_key(coll):
+   for obj in coll.objects:
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+            for shape_key in obj.data.shape_keys.key_blocks:
+               if shape_key.name != 'Basis':
+                  shape_key.value = 0
+   return
+
+def set_hair_accessory_shape_keys(variant_coll, hair_coll):
+   variant_name = variant_coll.name.split('_')[3]
+   for obj in hair_coll.objects: # set blend shape on hair
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+               for shape_key in obj.data.shape_keys.key_blocks:
+                  if shape_key.name.lower() == variant_name.lower():
+                     shape_key.value = 1
+   
+   hair_name = hair_coll.name.split('_')[3]
+   for obj in variant_coll.objects: # set blend shape on accessory
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+               for shape_key in obj.data.shape_keys.key_blocks:
+                  if shape_key.name.lower() == hair_name.lower():
+                     shape_key.value = 1
    return
 
 
