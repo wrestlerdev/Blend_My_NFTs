@@ -212,8 +212,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairShort"))
     inputHairLong: bpy.props.PointerProperty(name="Hair Long Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairLong"))
-    inputHeadAccessories: bpy.props.PointerProperty(name="Accessories Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHeadAccessories"))
+    inputAccessories: bpy.props.PointerProperty(name="Accessories Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAccessories"))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack"))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
@@ -251,7 +251,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastEnvironment: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastHeadAccessories: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastAccessories: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.colourindex_has_been_updated("colourStyleIndex", "lastStyleIndex"))
@@ -1590,10 +1590,10 @@ class testButton(bpy.types.Operator):
         # Exporter.Previewer.colorpicker_has_applied()
         # Exporter.get_custom_range()
         # DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets("Egypt_01", "WOW")
-        bpy.context.scene.my_tool.inputHairShort = None
-        bpy.context.scene.my_tool.inputHairLong = None
-        bpy.context.scene.my_tool.inputForeArms = None
-        bpy.context.scene.my_tool.inputWrists = None
+        # bpy.context.scene.my_tool.inputHairShort = None
+        # bpy.context.scene.my_tool.inputHairLong = None
+        # bpy.context.scene.my_tool.inputForeArms = None
+        bpy.context.scene.my_tool.inputAccessories = None
         return {'FINISHED'}
 
 
@@ -1905,7 +1905,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     slots = {
     "inputExpression": ("GHOST_ENABLED"),
     # "inputUpperHead": ("MESH_CONE"),
-    "inputHeadAccessories": ("SOLO_ON"),
+    "inputAccessories": ("SOLO_ON"),
     "inputHairLong": ("PARTICLEMODE"),
     "inputHairShort": ("PARTICLEMODE"),
     "inputMiddleHead": ("HIDE_OFF"),
