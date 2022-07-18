@@ -206,10 +206,14 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead"))
     inputEarrings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarrings"))
+    inputEarringsLong: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarringsLong"))
     inputHairShort: bpy.props.PointerProperty(name="Hair Short Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairShort"))
     inputHairLong: bpy.props.PointerProperty(name="Hair Long Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairLong"))
+    inputHeadAccessories: bpy.props.PointerProperty(name="Accessories Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHeadAccessories"))
     inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack"))
     inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
@@ -241,11 +245,13 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEarringsLong: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastEnvironment: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHeadAccessories: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.colourindex_has_been_updated("colourStyleIndex", "lastStyleIndex"))
@@ -1899,11 +1905,13 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     slots = {
     "inputExpression": ("GHOST_ENABLED"),
     # "inputUpperHead": ("MESH_CONE"),
-    "inputHairLong": ("MESH_CONE"),
-    "inputHairShort": ("MARKER"),
+    "inputHeadAccessories": ("SOLO_ON"),
+    "inputHairLong": ("PARTICLEMODE"),
+    "inputHairShort": ("PARTICLEMODE"),
     "inputMiddleHead": ("HIDE_OFF"),
     "inputLowerHead": ("USER"),
-    "inputEarrings": ("PMARKER_ACT"),
+    "inputEarringsLong": ("PMARKER_ACT"),
+    "inputEarrings": ("PMARKER_SEL"),
     "inputNeck": ("NODE_INSERT_OFF")}
     
     def draw(self, context):
