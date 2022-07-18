@@ -562,7 +562,6 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
    new_dna_strand = ''
    type_index = 0
    variant_index = 0
-
    # lastDNA = bpy.context.scene.my_tool.lastDNA # input or last?
    # DNAString = lastDNA.split(",")
    # character = DNAString.pop(0)
@@ -603,7 +602,8 @@ def general_pointer_updated():
       for types in att_coll.children:
          if types.name.endswith(type_name):
             for vars in types.children:
-               if vars.name.endswith(var_name):
+               split_variant_name = vars.name.rpartition('_')[2]
+               if split_variant_name == var_name:
                   pointers_have_updated(input_name, vars.name)
                   break
       bpy.context.scene.my_tool.inputGeneral = None
