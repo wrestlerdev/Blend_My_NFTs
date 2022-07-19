@@ -1,7 +1,6 @@
 # Purpose:
 # This file generates the Outfit DNA based on a rule set
 
-from textwrap import fill
 import bpy
 import os
 import json
@@ -19,7 +18,7 @@ from . import config
 # A list for each caterogry of clothing that states what slots it will fil
 ItemUsedBodySlot = {
 "ShirtCropSleeveless" : ["01-UpperTorso"],
-"ShirtCropSleevelessBack" : ["01-UpperTorso", "20-Backpack"],
+"ShirtCropSleevelessBack" : ["01-UpperTorso", "20-Backpack", "14-Neck"],
 "ShirtCropSleevelessNeck" : ["01-UpperTorso", "14-Neck", "11-HairLong", "17-EarringsLong"],
 "ShirtCrop" : ["01-UpperTorso", "03-ForeArms"],
 "ShirtCropNeck" : ["01-UppreTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong"],
@@ -384,7 +383,7 @@ def GetRandomSingleMesh(att_name):
         typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)
         type = typeChosen[0]
         type_index = list(hierarchy[att_name].keys()).index(type)
-    else:
+    elif not pointer_name == 'inputAccessories':
         # null_type = list(hierarchy[att_name].keys())[0]
         # null_variant = list(hierarchy[att_name][null_type].keys())[0]
         # print(null_variant)
@@ -392,28 +391,49 @@ def GetRandomSingleMesh(att_name):
 
     number_List_Of_i = []
     rarity_List_Of_i = []
-
-    for variant in hierarchy[att_name][type]:
-        rarity = hierarchy[att_name][type][variant]["variant_rarity"]
-        if rarity:
-            rarity_List_Of_i.append(float(rarity))
-            number_List_Of_i.append(variant)
-
     max_attempts = 10
-    if number_List_Of_i:
-        for i in range(max_attempts):
-            variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
-            if variantChosen[0] != last_variant:
-                break
-        variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen[0])
-    else:
-        return "0-0-0"
-        variant_index = 0
-        variantChosen = [list(hierarchy[att_name][type].keys())[variant_index]]
 
-    texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen[0]])
+    if pointer_name == 'inputAccessories':
+        for type in hierarchy[att_name].keys():
+            if hierarchy[att_name][type].keys() and not type.endswith('Null'):
+                for variant in hierarchy[att_name][type]:
+                    rarity = hierarchy[att_name][type][variant]["variant_rarity"]
+                    print(variant)
+                    if rarity:
+                        rarity_List_Of_i.append(float(rarity))
+                        number_List_Of_i.append(type + '_' + variant)
+
+        if number_List_Of_i:
+            for i in range(max_attempts):
+                chosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+                typeChosen, dash, variantChosen = chosen[0].partition('_')
+                if variantChosen != last_variant:
+                    break
+            type_index = list(hierarchy[att_name].keys()).index(typeChosen)
+            variant_index = list(hierarchy[att_name][typeChosen].keys()).index(variantChosen)
+        else:
+            return "0-0-0"
+
+    else:
+        for variant in hierarchy[att_name][type]:
+            rarity = hierarchy[att_name][type][variant]["variant_rarity"]
+            if rarity:
+                rarity_List_Of_i.append(float(rarity))
+                number_List_Of_i.append(variant)
+
+        if number_List_Of_i:
+            for i in range(max_attempts):
+                variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)[0]
+                if variantChosen != last_variant:
+                    break
+            variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen)
+        else:
+            return "0-0-0"
+
+    texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen])
     dna_strand = '-'.join([str(type_index), str(variant_index), str(texture_index)])
     return dna_strand
+
 
 # ------------------------------------------------------
 
