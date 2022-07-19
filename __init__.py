@@ -1551,11 +1551,23 @@ class countUpAllRarities(bpy.types.Operator):
     def execute(self, context):
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
         batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
-        NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(1))
-        Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{:03d}.json".format(1))
+        NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(index))
+        Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{:03d}.json".format(index))
 
         DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, index)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
+        return {'FINISHED'}
+
+
+class countUpAllItems(bpy.types.Operator):
+    bl_idname = 'items.count'
+    bl_label = 'Count All Used Items'
+    bl_description = 'Count All Used Items in Batches'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,'TotalItemCounter.json')
+        SaveNFTsToRecord.count_all_items_in_batch(bpy.context.scene.my_tool.batch_json_save_path, [1,10], save_path)
         return {'FINISHED'}
 
 
@@ -1594,9 +1606,8 @@ class testButton(bpy.types.Operator):
         # Exporter.get_custom_range()
         # DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets("Egypt_01", "WOW")
         # bpy.context.scene.my_tool.inputHairShort = None
-        # bpy.context.scene.my_tool.inputHairLong = None
-        # bpy.context.scene.my_tool.inputForeArms = None
-        bpy.context.scene.my_tool.inputAccessories = None
+        # save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,'TotalItemCounter.json')
+        # SaveNFTsToRecord.count_all_items_in_batch(bpy.context.scene.my_tool.batch_json_save_path, [1,10], save_path)
         return {'FINISHED'}
 
 
@@ -2445,6 +2456,8 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         box.label(text="Calculator:")
         row = box.row()
         row.operator(countUpAllRarities.bl_idname, text=countUpAllRarities.bl_label)
+        row = box.row()
+        row.operator(countUpAllItems.bl_idname, text=countUpAllItems.bl_label)
         
         layout.separator(factor=1.5)
 
@@ -2746,6 +2759,7 @@ classes = (
     deleteRangeNFT,
     forceLoadDNAFromUI,
     renameSet,
+    countUpAllItems,
     testButton
 
 )

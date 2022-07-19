@@ -104,10 +104,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                               resolution = suffix
                               print("Varient: ", varient.name, "  || Sacle Factor:  ", scaleFac, "  ||  Apdative Res: ", apdativeRes,"  ||  Resolution: ", resolution)
                               break
-                           
-                        
-                     # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
-                     print("setting texture", resolution)
+                                                   
+                     # print("setting texture", resolution)
                      set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
 
             if type.name[3:].startswith('Expression'):
