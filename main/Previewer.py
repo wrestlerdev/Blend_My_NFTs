@@ -498,7 +498,6 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
 
             original_texture_end = _type + '.' + file_type
             original_texture = None
-
             new_path = filepath + partition
             for t in os.listdir(texture_folder_path):
                if t.endswith(new_texture_end):
@@ -517,7 +516,6 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
                print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
                print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
                return original_texture
-
 
 
             if texture_set != 'A':
@@ -692,7 +690,7 @@ def get_null_variant_collection(att_coll):
       return att_coll.children[0].children[0]
 
    head_info = ["Head", "HeadShortNone"]
-   head_atts = ["14-Neck", "16-LowerHead", "15-MiddleHead", "18-Earrings", "17-UpperHead"]
+   head_atts = ["14-Neck", "16-LowerHead", "15-MiddleHead", "18-Earrings"]
    feet_info = ["Feet", "FeetShortNone"]
    feet_atts = ["08-Calf", "09-Ankle", "10-Feet"]
 

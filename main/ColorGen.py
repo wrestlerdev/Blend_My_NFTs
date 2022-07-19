@@ -234,10 +234,7 @@ def PickOutfitColors(attribute, style_key=''):
     globalColorInfo = OpenGlobalColorList()
 
     #This needs to be thought about, will leave for now but hair styles might become wack
-    if(attribute == "17-UpperHead"):
-        colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
-    else:
-        colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
+    colorkeyindex = random.randrange(0, len(availableColorStyleKeys))
         
     colorkey = availableColorStyleKeys[colorkeyindex]
     colorChoice = globalColorInfo[colorkey]

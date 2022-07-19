@@ -246,7 +246,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastEarringsLong: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    # lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
     lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
