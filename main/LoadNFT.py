@@ -60,9 +60,10 @@ def init_batch(batch_data_path): # delete all batch data then create first batch
 
 
 
-def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path): # update rarity value for in scene collections
-    RarityDictionary = json.load(open(Rarity_save_path)) # sets any collection not in hierarchy as rarity = 0
-    rarities = RarityDictionary["Rarities"]
+def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''): # update rarity value for in scene collections
+    if Rarity_save_path:
+        RarityDictionary = json.load(open(Rarity_save_path)) # sets any collection not in hierarchy as rarity = 0
+        rarities = RarityDictionary["Rarities"]
 
     DataDictionary = json.load(open(NFTRecord_save_path)) # sets any collection not in hierarchy as rarity = 0
     hierarchy = DataDictionary["hierarchy"]
@@ -88,7 +89,10 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path): # 
                         if type in types:
                             scene_type_coll["rarity"] =  int(float(type_rarity))
                             update_rarity_color(type, type_rarity)
-                            scene_type_coll["absolute_rarity"] = (rarities[slot][type]["absolute_rarity"]) * 100 
+                            if Rarity_save_path:
+                                scene_type_coll["absolute_rarity"] = (rarities[slot][type]["absolute_rarity"]) * 100 
+                            elif scene_type_coll.get("absolute_rarity") is not None:
+                                del(scene_type_coll["absolute_rarity"])
                         else:
                             scene_type_coll["rarity"] =  0
                             update_rarity_color(type, 0)
@@ -101,8 +105,10 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path): # 
                                 variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
                                 update_rarity_color(variant, int(float(variant_rarity)))
                                 scene_var_coll["rarity"] = int(float(variant_rarity))
-                                if variant in rarities[slot][type]:
+                                if Rarity_save_path and variant in rarities[slot][type]:
                                     scene_var_coll["absolute_rarity"] = (rarities[slot][type][variant]["absolute_rarity"]) * 100
+                                elif scene_var_coll.get("absolute_rarity") is not None:
+                                    del(scene_var_coll["absolute_rarity"])
 
                                 texture_objs = scene_var_coll.objects
                                 for texture_obj in texture_objs:
@@ -125,6 +131,7 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path): # 
                             del(current_var_coll["rarity"])
                         if scene_type_coll.get("rarity") is not None:
                             del(scene_type_coll["rarity"])
+
                         
                         update_rarity_color(h_variant, 0)
                         update_rarity_color(type, 0)
