@@ -453,8 +453,12 @@ def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path, Backup_sa
 
    exists_in_original = True
    for slot in list(hierarchy.keys()):
-      if slot in original_hierarchy:
-         exists_in_original = True
+      print(slot)
+      if original_hierarchy != None:
+         if slot in original_hierarchy:
+            exists_in_original = True
+         else:
+            exists_in_original = False
       else:
          exists_in_original = False
       for type in list(hierarchy[slot].keys()):
