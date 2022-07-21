@@ -44,7 +44,7 @@ def createHirachy():
          _varients = bpy.data.collections[_attributeTypes[i].name].children
          
          for j in range(len(_varients)):
-
+            print(_varients[j].name)
             if not _varients[j].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
                Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i], attribute)
 
@@ -111,6 +111,8 @@ def attributeData(attributeVariantColl, attributeTypeColl, attribute):
       return textures
       
    name = getName(attributeVariant)
+   print(name)
+   print("Helooo")
    orderRarity = getOrder_rarity(attributeVariant)
 
    if len(orderRarity) == 0:
@@ -121,6 +123,7 @@ def attributeData(attributeVariantColl, attributeTypeColl, attribute):
       item_attribute = attribute
       item_type = attributeTypeColl.name
       number = name[2]
+      
       item_variant = name[3]
       textureSets = get_textureSets(attributeVariantColl)
 
