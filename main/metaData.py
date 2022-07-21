@@ -17,12 +17,12 @@ KeywordAttributeDict = {
                          (["Pant"], "Bottoms"),
                          (["Outfit"], "Outfit"),
                          (["Feet"], "Shoes"),
-                         (["Head"], "Hearwear"),
+                         (["Head"], "Headwear"),
+                         (["Gloves", "Forearm"], "Armwear"),
                          (["Face"], "Facewear"),
                          (["Hair"], "Hairstyle"),
-                         (["Gloves"], "Gloves"),
-                         (["Earring", "Calf", "Neck", "Forearm", "Hands"], "Accessories"),
-                         (["Backpack"], "Backpack"),
+                         (["Earring", "Calf", "Neck", "Hands"], "Accessories"),
+                         (["Backpack"], "Backwear"),
                          (["Plane", "Background", "Particles"], "Environment"),
                          (["Expression"], "Expression")]
     for new_key in keys
@@ -40,9 +40,9 @@ KeywordKeys = [
     "Hairstyle",
     "Facewear",
     "Headwear",
-    "Gloves",
+    "Armwear",
     "Accessories",
-    "Backpack",
+    "Backwear",
     "Environment"
     ]
 
@@ -157,11 +157,11 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 texture = itemDictionary["item_texture"].rpartition('_')[2]
 
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
-                split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
                 # full_variant_name = [split_variant_name]
                 variant = variant[0].upper() + variant[1:]
+                split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
 
-                full_variant_name = [variant]
+                full_variant_name = [split_variant_name]
                 # if color_key != 'Empty':
                 #     full_variant_name.insert(0, color_key)
                 if len(bpy.data.collections[itemKey].objects) > 1:

@@ -21,6 +21,7 @@ import os
 import importlib
 from .main import config
 import json
+import re
 
 # Import files from main directory:
 
@@ -1608,6 +1609,8 @@ class testButton(bpy.types.Operator):
         # bpy.context.scene.my_tool.inputHairShort = None
         # save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,'TotalItemCounter.json')
         # SaveNFTsToRecord.count_all_items_in_batch(bpy.context.scene.my_tool.batch_json_save_path, [1,10], save_path)
+        text = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>","HowDoD-DashesWork").split())
+        print(text)
         return {'FINISHED'}
 
 
