@@ -498,7 +498,7 @@ def reimport_character_objects(character, rig_blendfile_path):
             rigMesh = obj
             rigMesh.select_set( state = True, view_layer = bpy.context.view_layer )
             bpy.context.view_layer.objects.active = rigMesh
-            set_up_elemental_materials(obj)
+            set_up_character_elemental_materials(obj)
             
 
                 
@@ -521,7 +521,7 @@ def reimport_character_objects(character, rig_blendfile_path):
     #     bpy.ops.object.join()
     return
 
-def set_up_elemental_materials(obj):
+def set_up_character_elemental_materials(obj):
     if obj.type == "MESH":
         # print(obj.name)
         for mat in obj.material_slots:
@@ -536,36 +536,28 @@ def set_up_elemental_materials(obj):
             og_BDSF = mat.material.node_tree.nodes["Principled BSDF"]
             og_bdsf_loc = og_BDSF.location
             
-            value_node = nodes.new("ShaderNodeValue")
-            value_node.location = (og_bdsf_loc[0] + 400, og_bdsf_loc[1])
-            value_node.name = "ElementalMix"
+            node_type = "SkinElementMixer"
+            if "ball" in obj.name.lower() or "highlight" in obj.name.lower():
+                node_type = "FullBodyElementMixer"
+            else:
+                print(obj.name.lower())
 
-            mix_node = nodes.new("ShaderNodeMixShader")
-            mix_node.location = (og_bdsf_loc[0] + 600, og_bdsf_loc[1])
-            mix_node.name = "ElementalMixShader"
-
-            mat.material.node_tree.links.new(mix_node.inputs[0], value_node.outputs[0])
-            mat.material.node_tree.links.new(mix_node.inputs[1], og_BDSF.outputs[0])
-
-            elements = ["Gold", "Bismuth"]
-            for e in range(len(elements)):
-                element = elements[e]
+            if not "glass" in obj.name:
                 node_group = nodes.new("ShaderNodeGroup")
-                node_group.node_tree = bpy.data.node_groups[element]
-                node_group.location = (og_bdsf_loc[0] + 400, og_bdsf_loc[1] - e * 125 - 100)
-                node_group.name = element
+                node_group.node_tree = bpy.data.node_groups[node_type]
+                node_group.location = (og_bdsf_loc[0] + 400, og_bdsf_loc[1])
+                node_group.name = node_type
                 if normal_node:
-                    print(normal_node)
-                    mat.material.node_tree.links.new(node_group.inputs[0], normal_node.outputs[0])
+                    mat.material.node_tree.links.new(node_group.inputs[1], normal_node.outputs[0])
                 else:
-                    node_group.inputs[0].default_value = (0.5, 0.5, 1, 1)
-            for e in elements:
-                pass
-            output_node = mat.material.node_tree.nodes["Material Output"]
-            output_node.location = (og_bdsf_loc[0] + 800, og_bdsf_loc[1])
+                    node_group.inputs[1].default_value = (0.5, 0.5, 1, 1)
 
-            mat.material.node_tree.links.new(mix_node.inputs[2], mat.material.node_tree.nodes[elements[0]].outputs[0])
-            mat.material.node_tree.links.new(output_node.inputs[0], mix_node.outputs[0])
+                mat.material.node_tree.links.new(node_group.inputs[0], og_BDSF.outputs[0])
+
+                output_node = mat.material.node_tree.nodes["Material Output"]
+                output_node.location = (og_bdsf_loc[0] + 800, og_bdsf_loc[1])
+
+                mat.material.node_tree.links.new(output_node.inputs[0], node_group.outputs[0])
 
 def import_character_actions(character, rig_blendfile_pathr):
     actions = []

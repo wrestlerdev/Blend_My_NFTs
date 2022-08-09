@@ -6,6 +6,8 @@ texture_suffixes = {64: '_64', 128: '_128', 256: '_256', 512: '_512', 1024: '_1k
 image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
 
 EmptyTypes = ["Expression", "ExpressionLowerNone", "HeadShortNone", "FeetShortNone", 'Background', "Particles"]
+Elements = ["Gold", "Bismuth", "Gold_02", "Gold_03"]
+
 
 Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
     "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),

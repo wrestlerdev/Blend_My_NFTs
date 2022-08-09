@@ -552,14 +552,16 @@ def PickCharacter():
 
 def PickElement():
     # All || Skin || Outfit
-    elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
+    element_rarity = 10
+    none_rarity = 100
+    # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
     options = [("All", 10), ("Skin", 20), ("Outfit", 20)]
 
-    rand_elements = []
-    weights_elements = []
-    for e in elements:
-        rand_elements.append(e[0])
-        weights_elements.append(e[1])
+    rand_elements = ["None"]
+    weights_elements = [none_rarity]
+    for e in config.Elements:
+        rand_elements.append(e)
+        weights_elements.append(element_rarity)
     chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
     if chosen == "None":
         return "None-None"
