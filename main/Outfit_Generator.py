@@ -172,6 +172,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         character = PickCharacter()
+        element = PickElement()
         style = ColorGen.SetUpCharacterStyle()
         bpy.context.scene.my_tool.currentGeneratorStyle = style
 
@@ -283,7 +284,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             
                 
         SingleDNA.insert(0, character)
-        SingleDNA.insert(1, style)
+        SingleDNA.insert(1, element)
+        SingleDNA.insert(2, style)
         # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
@@ -548,6 +550,28 @@ def PickCharacter():
     return char
 
 
+def PickElement():
+    # All || Skin || Outfit
+    elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
+    options = [("All", 10), ("Skin", 20), ("Outfit", 20)]
+
+    rand_elements = []
+    weights_elements = []
+    for e in elements:
+        rand_elements.append(e[0])
+        weights_elements.append(e[1])
+    chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
+    if chosen == "None":
+        return "None-None"
+
+    rand_options = []
+    weights_options = []
+    for o in options:
+        rand_options.append(o[0])
+        weights_options.append(o[1])
+    chosen_option = random.choices(rand_options, weights=weights_options, k=1)[0]
+    
+    return chosen_option + '-' + chosen
 # ----------------------------------------------------------------------
 
 count = 0

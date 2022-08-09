@@ -25,7 +25,7 @@ import re
 
 # Import files from main directory:
 
-importList = ['TextureEditor', 'Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
+importList = ['TextureEditor', 'Scene_Setup', 'Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
 
 if bpy in locals():
         importlib.reload(LoadNFT)
@@ -36,6 +36,7 @@ if bpy in locals():
         importlib.reload(get_combinations)
         importlib.reload(SaveNFTsToRecord)
         importlib.reload(UIList)
+        importlib.reload(Scene_Setup)
         importlib.reload(TextureEditor)
 else:
     from .main import \
@@ -46,7 +47,8 @@ else:
         Batch_Refactorer, \
         SaveNFTsToRecord, \
         get_combinations, \
-        TextureEditor
+        TextureEditor, \
+        Scene_Setup
 
     from .ui_Lists import UIList
     
@@ -978,11 +980,11 @@ class createSlotFolders(bpy.types.Operator):
 
 
     def execute(self, context):
-        SaveNFTsToRecord.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
+        Scene_Setup.CreateSlotsFolderHierarchy(bpy.context.scene.my_tool.root_dir)
         return {'FINISHED'}
 
 
-class createCharacterCollections(bpy.types.Operator):
+class createCharacterCollections(bpy.types.Operator): # OLD
     bl_idname = 'create.charcolls'
     bl_label = 'Organize Character Collections'
     bl_description = 'This will look through all folders for textures and create model copies for each. Are you sure...Punk?'
@@ -995,7 +997,7 @@ class createCharacterCollections(bpy.types.Operator):
     def execute(self, context):
         folder_dir = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT")
         record_path = os.path.join(folder_dir, "OUTPUT", "Batch_{:03d}".format(1), "_NFTRecord_{:03d}.json".format(1))
-        SaveNFTsToRecord.SearchForMeshesAndCreateCharacterDuplicates(record_path)
+        Scene_Setup.SearchForMeshesAndCreateCharacterDuplicates(record_path)
         return {'FINISHED'}
        
 
@@ -1510,7 +1512,7 @@ class reimportCharacters(bpy.types.Operator):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
         charinfo_path = os.path.join(input_path, 'CHARACTERS')
 
-        TextureEditor.reimport_all_character_objects(charinfo_path)
+        Scene_Setup.reimport_all_character_objects(charinfo_path)
         return {'FINISHED'}
 
 
@@ -1526,7 +1528,7 @@ class reimportLight(bpy.types.Operator):
         for dir in os.listdir(charinfo_path):
             if dir.endswith('.blend') and 'light' in dir:
                 light_path = os.path.join(charinfo_path, dir)
-                TextureEditor.reimport_lights(light_path)
+                Scene_Setup.reimport_lights(light_path)
                 break
 
         return {'FINISHED'}
@@ -1599,18 +1601,12 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        # index = 4
-        # first_batch_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(index))
-        # DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, index, True)
 
-        # Exporter.Previewer.colorpicker_has_applied()
-        # Exporter.get_custom_range()
-        # DNA_Generator.Outfit_Generator.ColorGen.rename_color_sets("Egypt_01", "WOW")
-        # bpy.context.scene.my_tool.inputHairShort = None
-        # save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,'TotalItemCounter.json')
-        # SaveNFTsToRecord.count_all_items_in_batch(bpy.context.scene.my_tool.batch_json_save_path, [1,10], save_path)
-        text = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>","HowDoD-DashesWork").split())
-        print(text)
+        material = bpy.data.materials.get("MasterV01")
+        material.node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+
+        # material.node_tree.nodes["Bismuth"].outputs["BSDF"].default_value = material.node_tree.nodes["ElementalMixShader"].inputs["Shader"]
+        material.node_tree.links.new(material.node_tree.nodes["ElementalMixShader"].inputs[2], material.node_tree.nodes["Gold"].outputs[0])
         return {'FINISHED'}
 
 
@@ -1760,7 +1756,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1817,7 +1813,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1878,7 +1874,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -1948,7 +1944,7 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
@@ -2003,7 +1999,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
             if bpy.context.scene.my_tool[name] is not None:
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
-                dna_splitstrand = inputDNA.split(',')[dna_index + 1].split('-')
+                dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
