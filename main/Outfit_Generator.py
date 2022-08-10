@@ -27,6 +27,7 @@ ItemUsedBodySlot = {
 "ShirtMidSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
 "ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms"],
 "ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong"],
+"ShirtMidNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong", "20-Backpack"],
 "ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick"],
 "ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "17-EarringsLong"],
 "ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
@@ -553,9 +554,9 @@ def PickCharacter():
 def PickElement():
     # All || Skin || Outfit
     element_rarity = 10
-    none_rarity = 100
+    none_rarity = 30
     # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
-    options = [("All", 10), ("Skin", 20), ("Outfit", 20)]
+    options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
 
     rand_elements = ["None"]
     weights_elements = [none_rarity]

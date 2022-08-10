@@ -50,6 +50,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    reset_shape_keys(character)
    show_character(character, Select)
 
+   set_material_element(element)
+
    hair_coll = ''
    for key in keys:
       for itemKey in NFTDict[key]:
@@ -142,12 +144,38 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 
-def set_material_element(meshes):
+def set_material_element(element):
+   mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer"]
+   element_style, element_type = element.split('-')
+   if element_style == 'None':
+      for mixer in mixers:
+         node_tree = bpy.data.node_groups[mixer]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+   elif element_style == 'All':
+      for mixer in mixers:
+         node_tree = bpy.data.node_groups[mixer]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+   elif element_style == 'Skin':
+         node_tree = bpy.data.node_groups["OutfitElementMixer"]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+         node_tree = bpy.data.node_groups["SkinElementMixer"]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+         node_tree = bpy.data.node_groups["FullBodyElementMixer"]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+   elif element_style == 'Outfit':
+         node_tree = bpy.data.node_groups["OutfitElementMixer"]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+         node_tree = bpy.data.node_groups["SkinElementMixer"]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+         node_tree = bpy.data.node_groups["FullBodyElementMixer"]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
 
+   if element_type != 'None':
+      node_tree = bpy.data.node_groups["ElementPicker"]
+      element_node = node_tree.nodes[element_type]
+      output_node = node_tree.nodes["Group Output"]
 
-
-
-
+      node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
    return
 
 

@@ -26,7 +26,7 @@ def CreateSlotsFolderHierarchy(save_path):
     bpy.ops.outliner.orphans_purge()
 
     slots_path = CheckAndFormatPath(save_path, "INPUT/SLOTS")
-    print(slots_path)
+    # print(slots_path)
     if(slots_path != ""):
         for slot in os.listdir(slots_path):
             type_path = CheckAndFormatPath(slots_path, slot)
@@ -80,7 +80,7 @@ def CreateSlotsFolderHierarchy(save_path):
                         for varient in os.listdir(varient_path):             
                             item_path = CheckAndFormatPath(varient_path, varient)
                             if item_path != "":
-                                print(varient)
+                                # print(varient)
                                 varient_coll = bpy.data.collections.new(varient)
                                 varient_coll.hide_viewport = True
                                 varient_coll.hide_render = True
@@ -117,19 +117,19 @@ def CreateSlotsFolderHierarchy(save_path):
                                         for item in tempHolder.children:
                                             if item.name == "Item":
                                                 for char in item.children:
-                                                    print(char.name)
+                                                    # print(char.name)
                                                     for obj in char.objects:
-                                                        print(obj.name)
+                                                        # print(obj.name)
                                                         for c in config.Characters:
                                                             if char.name.partition(".")[0] == c:
-                                                                print(c)
+                                                                # print(c)
                                                                 characterCollectionDict[c].objects.link(obj)
                                                                 obj.hide_viewport = True
                                                                 obj.hide_render =  True
                                                                 if obj.modifiers:
                                                                     for mod in obj.modifiers:
                                                                         if mod.type == 'SUBSURF':
-                                                                            print(obj.name)
+                                                                            # print(obj.name)
                                                                             mod.show_viewport = False
                                                                             mod.show_render = True
                                                                             mod.levels = mod.render_levels
@@ -169,7 +169,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                     tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()
                                                     tex_object.name = varient + "_" + texture_set
                                                     varient_coll.objects.link(tex_object)
-                                                    SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict) 
+                                                    SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict, type) 
                                                     #Remove base children objects used as a way to easily copy to texture varients
                                                     # for char in config.Characters:                                     
                                                     #     for childObj in characterCollectionDict[char].objects: 
@@ -191,7 +191,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                             bpy.ops.outliner.orphans_purge() 
 
                                         else:
-                                            print("No Textures" + varient)
+                                            # print("No Textures" + varient)
                                             for child_col in tempHolder.children:
                                                 for child_obj in child_col.objects:
                                                     child_col.objects.unlink(child_obj)
@@ -225,15 +225,15 @@ def CreateSlotsFolderHierarchy(save_path):
     bpy.ops.file.make_paths_absolute()
     return
 
-def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol): 
+def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, type): 
     materialSets = next(os.walk(texture_path))[1] 
     #is there more than one material group
     if len(materialSets) > 0:
         mats = set()
-        for char in config.Characters:                                     
+        for char in config.Characters:
             for childObj in characterCol[char].objects: 
                 for i in range(0, len(childObj.material_slots)):
-                    if childObj.material_slots[i]:                                                                  
+                    if childObj.material_slots[i]:
                         if childObj.material_slots[i].material not in mats:
                             mats.add(childObj.material_slots[i].material)
         matfolderlink = {}
@@ -265,6 +265,12 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
             # matcopy.name = m
             LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
             i += 1
+
+            if "Hair" in type:
+                for n in tempcopy.node_tree.nodes:
+                    if n.type == "GROUP" and n.node_tree == bpy.data.node_groups["OutfitElementMixer"]:
+                        n.node_tree = bpy.data.node_groups["SkinElementMixer"]
+            
     else:
         material_slots = obj.material_slots
         for m in material_slots:
@@ -273,7 +279,12 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol):
             matcopy = material.copy()
             m.material = matcopy
             LinkImagesToNodes(matcopy, texture_path)
-    
+
+            if "Hair" in type:
+                print(type)
+                for n in matcopy.node_tree.nodes:
+                    if n.type == "GROUP" and n.node_tree == bpy.data.node_groups["OutfitElementMixer"]:
+                        n.node_tree = bpy.data.node_groups["SkinElementMixer"]
     
     # for i in reversed(range(0, len(obj.material_slots))):
     #     if obj.material_slots[i].link != 'OBJECT':
@@ -292,10 +303,8 @@ def GetMatrialDomain(texture_path, matfolderlink = ""):
 
     if resultD == [] and resultE != []:
         material = bpy.data.materials['MasterUnlitV01']
-        print(resultD)
     elif resultO != []:
         material = bpy.data.materials['MasterTransparentV01']
-        print(resultO)
     else:
         material = bpy.data.materials['MasterV01']
 
@@ -306,9 +315,9 @@ def LinkImagesToNodes(matcopy, texture_path):
         
         for tex in os.listdir(texture_path):      
             mapType = tex.rpartition("_")[2]
-            print(mapType)
+            # print(mapType)
             mapType = mapType.partition(".")[0]
-            print('TEXTURE IS: ' + mapType)
+            # print('TEXTURE IS: ' + mapType)
             if "D" == mapType:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
@@ -363,7 +372,7 @@ def LinkImagesToNodes(matcopy, texture_path):
                 matcopy.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
 
             if "I" == mapType:
-                print("I is choosen")
+                # print("I is choosen")
                 file = file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
@@ -499,13 +508,11 @@ def reimport_character_objects(character, rig_blendfile_path):
             rigMesh.select_set( state = True, view_layer = bpy.context.view_layer )
             bpy.context.view_layer.objects.active = rigMesh
             set_up_character_elemental_materials(obj)
-            
-
                 
     if len(bpy.context.selected_objects) > 1:
         bpy.context.view_layer.objects.active = bpy.data.objects[character + "_Body"]            
         # bpy.ops.object.join() # OBJECTJOIN
-        print("JOINING")
+        # print("JOINING")
     
     # for col in bpy.data.collections[character].children:
     #     for obj in col.objects:
@@ -539,8 +546,6 @@ def set_up_character_elemental_materials(obj):
             node_type = "SkinElementMixer"
             if "ball" in obj.name.lower() or "highlight" in obj.name.lower():
                 node_type = "FullBodyElementMixer"
-            else:
-                print(obj.name.lower())
 
             if not "glass" in obj.name:
                 node_group = nodes.new("ShaderNodeGroup")
@@ -558,6 +563,7 @@ def set_up_character_elemental_materials(obj):
                 output_node.location = (og_bdsf_loc[0] + 800, og_bdsf_loc[1])
 
                 mat.material.node_tree.links.new(output_node.inputs[0], node_group.outputs[0])
+
 
 def import_character_actions(character, rig_blendfile_pathr):
     actions = []
