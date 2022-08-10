@@ -73,7 +73,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                         subtype="DIR_PATH"
     )
 
-    enableRarity: bpy.props.BoolProperty(name="Enable Rarity")
+    # enableRarity: bpy.props.BoolProperty(name="Enable Rarity")
 
     imageBool: bpy.props.BoolProperty(name="Image")
     imageEnum: bpy.props.EnumProperty(
@@ -124,6 +124,30 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     # Custom properties
+
+    elementStyle: bpy.props.EnumProperty(
+            name='Elemental Type',
+            description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
+            items=[
+                ('All', 'All', 'All'),
+                ('Skin', 'Skin', 'Skin'),
+                ('Outfit', 'Outfit', 'Outfit')
+            ],
+            default='All'
+        )
+
+    element: bpy.props.EnumProperty(
+            name='Elemental Type',
+            description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
+            items=[
+                ('None', 'None', 'None'),
+                ('Gold', 'Gold', 'Gold'),
+                ('Gold_02', 'Gold_02', 'Gold_02'),
+                ('Gold_03', 'Gold_03', 'Gold_03'),
+                ('Bismuth', 'Bismuth', 'Bismuth'),
+                ('Bismuth_02', 'Bismuth_02', 'Bismuth_02')
+            ],
+        )
 
     renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
@@ -1602,11 +1626,7 @@ class testButton(bpy.types.Operator):
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
 
-        material = bpy.data.materials.get("MasterV01")
-        material.node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-
-        # material.node_tree.nodes["Bismuth"].outputs["BSDF"].default_value = material.node_tree.nodes["ElementalMixShader"].inputs["Shader"]
-        material.node_tree.links.new(material.node_tree.nodes["ElementalMixShader"].inputs[2], material.node_tree.nodes["Gold"].outputs[0])
+        Exporter.Previewer.elements_updated()
         return {'FINISHED'}
 
 
@@ -1685,6 +1705,10 @@ class WCUSTOM_PT_ModelSettings(bpy.types.Panel):
 
 
 
+
+
+
+
 class WCUSTOM_PT_ParentSlots(bpy.types.Panel):
     bl_label = "Slots"
     bl_idname = "WCUSTOM_PT_ParentSlots"
@@ -1720,6 +1744,14 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
         row.label(text='Any Slot', icon='OUTLINER_COLLECTION')
         row.prop(mytool, "inputGeneral", text='')
         row.scale_x = 1
+
+        row = layout.row()
+        row.prop(mytool, "element", expand=False, text='')
+        if bpy.context.scene.my_tool.element != 'None':
+            row.prop(mytool, "elementStyle", expand=True)
+        else:
+            row.prop(mytool, "elementStyle", expand=True, emboss=False)
+
         row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
         row.operator(randomizeAllSets.bl_idname, text=randomizeAllSets.bl_label)

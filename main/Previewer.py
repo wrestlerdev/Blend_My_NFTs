@@ -156,19 +156,19 @@ def set_material_element(element):
          node_tree = bpy.data.node_groups[mixer]
          node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
    elif element_style == 'Skin':
-         node_tree = bpy.data.node_groups["OutfitElementMixer"]
-         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-         node_tree = bpy.data.node_groups["SkinElementMixer"]
-         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
-         node_tree = bpy.data.node_groups["FullBodyElementMixer"]
-         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["OutfitElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["SkinElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+      node_tree = bpy.data.node_groups["FullBodyElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
    elif element_style == 'Outfit':
-         node_tree = bpy.data.node_groups["OutfitElementMixer"]
-         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
-         node_tree = bpy.data.node_groups["SkinElementMixer"]
-         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-         node_tree = bpy.data.node_groups["FullBodyElementMixer"]
-         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["OutfitElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+      node_tree = bpy.data.node_groups["SkinElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["FullBodyElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
 
    if element_type != 'None':
       node_tree = bpy.data.node_groups["ElementPicker"]
@@ -621,6 +621,29 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
       else:
          type_index += 1
    return new_dna_strand # return dna strand or empty string if not valid
+
+
+def elements_updated():
+   NFTDict = LoadTempDNADict()
+   DNA = NFTDict["DNAList"]
+
+   DNASplit = DNA.split(',')
+   element = DNASplit[1] # .pop
+   last_ele_style, last_ele = element.split('-')
+
+   if bpy.context.scene.my_tool.element == last_ele and \
+               (bpy.context.scene.my_tool.elementStyle == last_ele_style or last_ele == 'None'):
+      return
+
+   if bpy.context.scene.my_tool.element == 'None':
+      new_element = 'None-None'
+   else:
+      new_element = bpy.context.scene.my_tool.elementStyle + '-' + bpy.context.scene.my_tool.element
+   DNASplit[1] = new_element
+   new_DNA = ','.join(DNASplit)
+
+   show_nft_from_dna(new_DNA, NFTDict["CharacterItems"])
+   return
 
 
 def general_pointer_updated():

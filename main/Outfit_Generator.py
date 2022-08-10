@@ -438,6 +438,21 @@ def GetRandomSingleMesh(att_name):
     return dna_strand
 
 
+def GetRandomElement():
+
+
+
+
+
+    return
+
+def GetRandomElementalStyle():
+
+
+
+    return
+
+
 # ------------------------------------------------------
 
 
