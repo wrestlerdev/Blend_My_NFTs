@@ -568,26 +568,30 @@ def PickCharacter():
 
 def PickElement():
     # All || Skin || Outfit
-    element_rarity = 10
-    none_rarity = 30
-    # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
-    options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
+    if not bpy.context.scene.my_tool.isElementLocked:
+        element_rarity = 10
+        none_rarity = 30
+        # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
+        options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
 
-    rand_elements = ["None"]
-    weights_elements = [none_rarity]
-    for e in config.Elements:
-        rand_elements.append(e)
-        weights_elements.append(element_rarity)
-    chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
-    if chosen == "None":
-        return "None-None"
+        rand_elements = ["None"]
+        weights_elements = [none_rarity]
+        for e in config.Elements:
+            rand_elements.append(e)
+            weights_elements.append(element_rarity)
+        chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
+        if chosen == "None":
+            return "None-None"
 
-    rand_options = []
-    weights_options = []
-    for o in options:
-        rand_options.append(o[0])
-        weights_options.append(o[1])
-    chosen_option = random.choices(rand_options, weights=weights_options, k=1)[0]
+        rand_options = []
+        weights_options = []
+        for o in options:
+            rand_options.append(o[0])
+            weights_options.append(o[1])
+        chosen_option = random.choices(rand_options, weights=weights_options, k=1)[0]
+    else:
+        chosen_option = bpy.context.scene.my_tool.elementStyle
+        chosen = bpy.context.scene.my_tool.element
     
     return chosen_option + '-' + chosen
 # ----------------------------------------------------------------------

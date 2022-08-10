@@ -151,6 +151,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             update=lambda s,c: Exporter.Previewer.elements_updated()
         )
 
+    isElementLocked: bpy.props.BoolProperty(name='Lock Element', default=False)
+
     renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
     shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
@@ -1753,6 +1755,8 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
             row.prop(mytool, "elementStyle", expand=True)
         else:
             row.prop(mytool, "elementStyle", expand=True, emboss=False)
+
+        row.prop(mytool, "isElementLocked", toggle=1, expand=True)
 
         row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
