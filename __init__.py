@@ -133,7 +133,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('Skin', 'Skin', 'Skin'),
                 ('Outfit', 'Outfit', 'Outfit')
             ],
-            default='All'
+            default='All',
+            update=lambda s,c: Exporter.Previewer.elements_updated()
         )
 
     element: bpy.props.EnumProperty(
@@ -147,6 +148,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('Bismuth', 'Bismuth', 'Bismuth'),
                 ('Bismuth_02', 'Bismuth_02', 'Bismuth_02')
             ],
+            update=lambda s,c: Exporter.Previewer.elements_updated()
         )
 
     renameSetFrom: bpy.props.StringProperty(name='Rename Set From')

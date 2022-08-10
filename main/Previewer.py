@@ -932,6 +932,15 @@ def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
       else:
          bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
          bpy.context.scene.my_tool[input_coll_name] = None
+
+   ele_style, ele = element.split('-')
+
+   if ele != bpy.context.scene.my_tool.element:
+      bpy.context.scene.my_tool.element = ele
+
+   if ele_style != bpy.context.scene.my_tool.elementStyle and ele != 'None':
+      bpy.context.scene.my_tool.elementStyle = ele_style
+
    return
 
 
