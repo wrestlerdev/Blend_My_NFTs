@@ -91,7 +91,9 @@ ItemUsedBodySlot = {
 "ExpressionUpper" : ["15-MiddleHead", "19-Expression"],
 "ExpressionFull" : ["16-LowerHead", "15-MiddleHead", "19-Expression"],
 
-"Background" : ["22-Background"]
+"Background" : ["22-Background"],
+
+"TattooMiddleTorso": ["02-MiddleTorso"]
 }
 
 
@@ -438,20 +440,6 @@ def GetRandomSingleMesh(att_name):
     return dna_strand
 
 
-def GetRandomElement():
-
-
-
-
-
-    return
-
-def GetRandomElementalStyle():
-
-
-
-    return
-
 
 # ------------------------------------------------------
 
@@ -592,6 +580,8 @@ def PickElement():
     else:
         chosen_option = bpy.context.scene.my_tool.elementStyle
         chosen = bpy.context.scene.my_tool.element
+        if chosen == 'None':
+            return "None-None"
     
     return chosen_option + '-' + chosen
 # ----------------------------------------------------------------------

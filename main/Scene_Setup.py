@@ -472,25 +472,31 @@ def find_mesh_area(obj):
 def reimport_all_character_objects(folder_path):
     delete_all_actions()
     for dir in os.listdir(folder_path):
-        if dir.endswith('.blend') and 'Rig' in dir:
+        if dir.endswith('.blend') and 'Rigs_master_tattoo' in dir:
             rig_blendfile_path = os.path.join(folder_path, dir)
     for char in config.Characters:
+        bpy.ops.outliner.orphans_purge()
         reimport_character_objects(char, rig_blendfile_path)
         
+    if bpy.data.node_groups.get("TattooNef.001") != None:
+        # bpy.data.node_groups["TattooNef.001"] = "TattooNef"
+        pass
     bpy.ops.file.make_paths_absolute()
     return
 
 
 def reimport_character_objects(character, rig_blendfile_path):
     clear_old_character_objects(character)
-
     bpy.data.collections[character].hide_viewport = False
     bpy.data.collections[character].hide_render = False
     bpy.ops.outliner.orphans_purge()
+    bpy.ops.outliner.orphans_purge()
+    bpy.ops.outliner.orphans_purge() # i think doing this 3 times gets rid of the orphan node groups too
 
     layer_collection = bpy.context.view_layer.layer_collection.children["Script_Ignore"].children[character]
     bpy.context.view_layer.active_layer_collection = layer_collection
     
+
     filename = character + '_Rig'
     file_path   = os.path.join(rig_blendfile_path, "Collection", filename)
     directory = os.path.join(rig_blendfile_path, "Collection")
@@ -511,6 +517,9 @@ def reimport_character_objects(character, rig_blendfile_path):
                 
     if len(bpy.context.selected_objects) > 1:
         bpy.context.view_layer.objects.active = bpy.data.objects[character + "_Body"]            
+
+
+
         # bpy.ops.object.join() # OBJECTJOIN
         # print("JOINING")
     
@@ -563,6 +572,7 @@ def set_up_character_elemental_materials(obj):
                 output_node.location = (og_bdsf_loc[0] + 800, og_bdsf_loc[1])
 
                 mat.material.node_tree.links.new(output_node.inputs[0], node_group.outputs[0])
+
 
 
 def import_character_actions(character, rig_blendfile_pathr):

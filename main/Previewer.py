@@ -126,12 +126,18 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
 
+            elif type.name[3:].startswith('Tattoo'):
+               pass
+               tatt_node_group_name = 'Tattoo' + character
+               # bpy.data.node_groups[tatt_node_group_name].node_tree.nodes["TattooImage01"] = #TODO
+
             elif attr.name[3:].startswith('Hair') and varient:
                hair_coll = bpy.data.collections[varient.name + '_' + character]
                reset_hair_shape_key(hair_coll)
             elif attr.name[3:].startswith('Accessories'):
                char_var_coll = bpy.data.collections[varient.name + '_' + character]
                set_hair_accessory_shape_keys(char_var_coll, hair_coll)
+
 
 
    newTempDict = {}

@@ -1630,7 +1630,15 @@ class testButton(bpy.types.Operator):
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
 
-        Exporter.Previewer.elements_updated()
+        # Exporter.Previewer.elements_updated()
+        # for mat in bpy.data.node_groups:
+        #     print (20*"-")
+        #     print(repr(mat))
+        #     print("Users:", mat.users)         
+        #     for users in search(mat):
+        #         print(users)  
+
+            
         return {'FINISHED'}
 
 
