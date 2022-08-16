@@ -51,6 +51,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    show_character(character, Select)
 
    set_material_element(element)
+   add_texture_to_tattoos(character, texture1='clear', texture2='clear')
 
    hair_coll = ''
    for key in keys:
@@ -127,9 +128,21 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                SnapFeetToFloor(type.name[3:], character, NFTDict)
 
             elif type.name[3:].startswith('Tattoo'):
-               pass
                tatt_node_group_name = 'Tattoo' + character
-               # bpy.data.node_groups[tatt_node_group_name].node_tree.nodes["TattooImage01"] = #TODO
+               image_node = bpy.data.node_groups[tatt_node_group_name].nodes["TattooImage01"]
+               texture_set = itemDictionary["item_texture"].rpartition('_')[2]
+
+               tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
+               if image_node.image:
+                  add_texture_to_tattoos(character, texture2=tattoo_texture)
+               else:
+                  add_texture_to_tattoos(character, texture1=tattoo_texture)
+
+               turn_on_tattoo(character, texture_set, color_key)
+
+
+
+
 
             elif attr.name[3:].startswith('Hair') and varient:
                hair_coll = bpy.data.collections[varient.name + '_' + character]
@@ -951,7 +964,59 @@ def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
 
 
 
-#  ----------------------------------------------------------------------------------
+#  -------------------------------------- TATTOOS --------------------------------------------
+
+def get_texture_for_tattoo(att, type, variant, element):
+   slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
+   variant_folder_path = os.path.join(slots_folder_path, att, type, variant)
+   texture_folder_path = os.path.join(variant_folder_path, "Textures", element)
+
+   for dir in os.listdir(texture_folder_path):
+      if "_T." in dir:
+         texture_path = os.path.join(texture_folder_path, dir)
+         return texture_path
+
+
+def add_texture_to_tattoos(character, texture1='', texture2=''):
+   skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+
+   if texture1 == 'clear':
+      skin_node_tree.nodes["TattooImage01"].image = None
+   elif texture1:
+      newImage = bpy.data.images.load(texture1, check_existing=False)
+      skin_node_tree.nodes["TattooImage01"].image = newImage
+
+   if texture2 == 'clear':
+      skin_node_tree.nodes["TattooImage02"].image = None
+   elif texture2:
+      newImage = bpy.data.images.load(texture2, check_existing=False)
+      skin_node_tree.nodes["TattooImage02"].image = newImage
+
+
+def turn_on_tattoo(character, element, color=''):
+   skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+   nodes_types = ["Diffuse", "Metallic", "Roughness", "Normal", "Emission"]
+
+   if element == 'A':
+      for type in nodes_types:
+         skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 0
+         GlobalColorList = OpenGlobalColorList()
+         colorChoice = GlobalColorList[color]
+         skin_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
+         skin_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
+   else:
+      for type in nodes_types:
+         skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 1
+
+         element_node_tree = bpy.data.node_groups["TattooElementPicker"]
+         element_node = element_node_tree.nodes[element + "Tattoo"]
+         output_node = element_node_tree.nodes["Group Output"]
+
+         for type in nodes_types:
+            element_node_tree.links.new(output_node.inputs[type], element_node.outputs[type])
+
+
+#--------------------------------------------------------------------------------------
 
 
 def set_armature_for_meshes(character, meshes):

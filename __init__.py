@@ -1630,14 +1630,10 @@ class testButton(bpy.types.Operator):
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
 
-        # Exporter.Previewer.elements_updated()
-        # for mat in bpy.data.node_groups:
-        #     print (20*"-")
-        #     print(repr(mat))
-        #     print("Users:", mat.users)         
-        #     for users in search(mat):
-        #         print(users)  
-
+        char = "Kae"
+        # Exporter.Previewer.turn_on_tattoo(char, "Bismuth")
+        bpy.data.node_groups["TattooKae"].nodes["TattooColor"].outputs['Color'].default_value = (0.1,0,0,1)
+        # Exporter.Previewer.add_texture_to_tattoos(char, texture1='clear')
             
         return {'FINISHED'}
 

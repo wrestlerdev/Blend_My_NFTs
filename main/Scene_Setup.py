@@ -476,7 +476,13 @@ def reimport_all_character_objects(folder_path):
             rig_blendfile_path = os.path.join(folder_path, dir)
     for char in config.Characters:
         bpy.ops.outliner.orphans_purge()
+        bpy.ops.outliner.orphans_purge()
+        bpy.ops.outliner.orphans_purge()
+        bpy.ops.outliner.orphans_purge()
+        bpy.ops.outliner.orphans_purge()
         reimport_character_objects(char, rig_blendfile_path)
+        set_up_character_tattoo_materials(char)
+        
         
     if bpy.data.node_groups.get("TattooNef.001") != None:
         # bpy.data.node_groups["TattooNef.001"] = "TattooNef"
@@ -536,6 +542,21 @@ def reimport_character_objects(character, rig_blendfile_path):
     # if len(bpy.context.selected_objects) > 1:                    
     #     bpy.ops.object.join()
     return
+
+
+def set_up_character_tattoo_materials(character):
+    elementtexture_node = bpy.data.node_groups["ElementTextures" + character]
+
+    node_group = elementtexture_node.nodes.new("ShaderNodeGroup")
+    node_group.node_tree = bpy.data.node_groups["TattooElementPicker"]
+    node_group.location = (100,100)
+
+    output_node = elementtexture_node.nodes["Group Output"]
+    for type in ["Diffuse", "Roughness", "Metallic", "Normal", "Emission"]:
+        elementtexture_node.links.new(output_node.inputs[type], node_group.outputs[type])
+
+    return
+
 
 def set_up_character_elemental_materials(obj):
     if obj.type == "MESH":

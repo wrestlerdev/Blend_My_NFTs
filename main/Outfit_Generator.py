@@ -330,9 +330,8 @@ def GetRandomSingleTexture(att_name, variant_coll):
     att_index = list(hierarchy.keys()).index(att_name)
     inputDNA = bpy.context.scene.my_tool.inputDNA
     dna_split = inputDNA.split(',')
-    old_dna_strand = dna_split[att_index + 2] # .pop(0)
+    old_dna_strand = dna_split[att_index + 3] # .pop(0)
     old_texture_index = old_dna_strand.split('-')[2]
-
     variant = variant_coll.name
     for type in hierarchy[att_name].keys():
         if variant in hierarchy[att_name][type].keys():
