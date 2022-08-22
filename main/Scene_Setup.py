@@ -230,6 +230,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, type):
     #is there more than one material group
     if len(materialSets) > 0:
         mats = set()
+        #go through all materials on characters and put their name in front
         for char in config.Characters:
             for childObj in characterCol[char].objects: 
                 for i in range(0, len(childObj.material_slots)):
@@ -481,7 +482,7 @@ def reimport_all_character_objects(folder_path):
         bpy.ops.outliner.orphans_purge()
         bpy.ops.outliner.orphans_purge()
         reimport_character_objects(char, rig_blendfile_path)
-        set_up_character_tattoo_materials(char)
+        set_up_character_skinTattoo_materials(folder_path, char)
         
         
     if bpy.data.node_groups.get("TattooNef.001") != None:
@@ -544,16 +545,33 @@ def reimport_character_objects(character, rig_blendfile_path):
     return
 
 
-def set_up_character_tattoo_materials(character):
-    elementtexture_node = bpy.data.node_groups["ElementTextures" + character]
+def set_up_character_skinTattoo_materials(folderpath, character):
+    matcopy =  bpy.data.materials['CharacterSkin_Master'].copy()
+    matcopy.name = "CharacterSkin_Master" + "_" + character
+    texture_path = os.path.join(folderpath, character + "_master", character + "Texture")
+    for type in ["Color", "Roughness", "Normal"]:
+        for tex in os.listdir(texture_path):
+            if "_Body_" + type in tex:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes[type].image = newImage
+                if type == "Normal":
+                    matcopy.node_tree.nodes[type].image.colorspace_settings.name = 'Linear'
+    #Find the body mesh and set index 01 to be skin master
+    bpy.data.objects[character + "_Body"].material_slots[0].material = matcopy
+    print(character)
 
-    node_group = elementtexture_node.nodes.new("ShaderNodeGroup")
-    node_group.node_tree = bpy.data.node_groups["TattooElementPicker"]
-    node_group.location = (100,100)
 
-    output_node = elementtexture_node.nodes["Group Output"]
-    for type in ["Diffuse", "Roughness", "Metallic", "Normal", "Emission"]:
-        elementtexture_node.links.new(output_node.inputs[type], node_group.outputs[type])
+    # elementtexture_node = bpy.data.node_groups["ElementTextures" + character]
+
+    # node_group = elementtexture_node.nodes.new("ShaderNodeGroup")
+    # node_group.node_tree = bpy.data.node_groups["TattooElementPicker"]
+    # node_group.location = (100,100)
+
+    # output_node = elementtexture_node.nodes["Group Output"]
+    # for type in ["Diffuse", "Roughness", "Metallic", "Normal", "Emission"]:
+    #     elementtexture_node.links.new(output_node.inputs[type], node_group.outputs[type])
 
     return
 

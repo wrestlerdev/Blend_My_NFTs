@@ -978,7 +978,8 @@ def get_texture_for_tattoo(att, type, variant, element):
 
 
 def add_texture_to_tattoos(character, texture1='', texture2=''):
-   skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+   #skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+   skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
 
    if texture1 == 'clear':
       skin_node_tree.nodes["TattooImage01"].image = None
