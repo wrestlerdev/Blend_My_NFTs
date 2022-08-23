@@ -283,9 +283,9 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, type):
 
             if "Hair" in type:
                 print(type)
-                for n in matcopy.node_tree.nodes:
-                    if n.type == "GROUP" and n.node_tree == bpy.data.node_groups["OutfitElementMixer"]:
-                        n.node_tree = bpy.data.node_groups["SkinElementMixer"]
+                #for n in matcopy.node_tree.nodes:
+                    # if n.type == "GROUP" and n.node_tree == bpy.data.node_groups["OutfitElementMixer"]:
+                    #     n.node_tree = bpy.data.node_groups["SkinElementMixer"]
     
     # for i in reversed(range(0, len(obj.material_slots))):
     #     if obj.material_slots[i].link != 'OBJECT':

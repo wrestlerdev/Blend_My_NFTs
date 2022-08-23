@@ -129,15 +129,15 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
             elif type.name[3:].startswith('Tattoo'):
                tatt_node_group_name = 'Tattoo' + character
-               image_node = bpy.data.node_groups[tatt_node_group_name].nodes["TattooImage01"]
+               #image_node = bpy.data.node_groups[tatt_node_group_name].nodes["TattooImage01"]
                texture_set = itemDictionary["item_texture"].rpartition('_')[2]
 
                tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
-               if image_node.image:
-                  add_texture_to_tattoos(character, texture2=tattoo_texture)
-               else:
-                  add_texture_to_tattoos(character, texture1=tattoo_texture)
-
+               # if image_node.image:
+               #    add_texture_to_tattoos(character, texture2=tattoo_texture)
+               # else:
+               #    add_texture_to_tattoos(character, texture1=tattoo_texture)
+               add_texture_to_tattoos(character, texture1=tattoo_texture)
                turn_on_tattoo(character, texture_set, color_key)
 
 
@@ -995,26 +995,43 @@ def add_texture_to_tattoos(character, texture1='', texture2=''):
 
 
 def turn_on_tattoo(character, element, color=''):
-   skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+   skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
    nodes_types = ["Diffuse", "Metallic", "Roughness", "Normal", "Emission"]
 
-   if element == 'A':
-      for type in nodes_types:
-         skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 0
-         GlobalColorList = OpenGlobalColorList()
-         colorChoice = GlobalColorList[color]
-         skin_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
-         skin_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
-   else:
-      for type in nodes_types:
-         skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 1
+   #link element mix to weather outfit elmental is on
+   tattoo_node_tree = bpy.data.node_groups["Tattoo_Master"]
+   elementalTattooMixer = tattoo_node_tree.nodes["ElementalTattoo"]
 
-         element_node_tree = bpy.data.node_groups["TattooElementPicker"]
-         element_node = element_node_tree.nodes[element + "Tattoo"]
-         output_node = element_node_tree.nodes["Group Output"]
+   if bpy.context.scene.my_tool.element == "None":
+      elementalTattooMixer.outputs["Value"].default_value = 0
+      elementalTattooMixer.outputs["Value"].default_value = bpy.data.node_groups["OutfitElementMixer"].nodes["ElementalMix"].outputs["Value"].default_value
+      GlobalColorList = OpenGlobalColorList()
+      colorChoice = GlobalColorList[color]
+      tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
+      tattoo_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
+   elif bpy.context.scene.my_tool.elementStyle == "All":
+      elementalTattooMixer.outputs["Value"].default_value = 0
+      tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = [0.0,0.0,0.0, 1.0]
+   elif bpy.context.scene.my_tool.elementStyle == "Outfit":
+      elementalTattooMixer.outputs["Value"].default_value = 1
+   
+   # if element == 'A':
+   #    for type in nodes_types:
+   #       skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 0
+   #       GlobalColorList = OpenGlobalColorList()
+   #       colorChoice = GlobalColorList[color]
+   #       skin_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
+   #       skin_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
+   # else:
+   #    for type in nodes_types:
+   #       skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 1
 
-         for type in nodes_types:
-            element_node_tree.links.new(output_node.inputs[type], element_node.outputs[type])
+   #       element_node_tree = bpy.data.node_groups["TattooElementPicker"]
+   #       element_node = element_node_tree.nodes[element + "Tattoo"]
+   #       output_node = element_node_tree.nodes["Group Output"]
+
+   #       for type in nodes_types:
+   #          element_node_tree.links.new(output_node.inputs[type], element_node.outputs[type])
 
 
 #--------------------------------------------------------------------------------------
