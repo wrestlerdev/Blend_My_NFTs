@@ -544,6 +544,7 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
             slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
             variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])
             texture_folder_path = os.path.join(variant_folder_path, "Textures", texture_set)
+            print(texture_folder_path)
             
             if len(next(os.walk(texture_folder_path))[1]) > 0: # if there's multiple sets
                if '.' in material_name:

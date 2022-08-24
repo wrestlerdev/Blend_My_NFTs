@@ -12,6 +12,7 @@ from datetime import datetime
 from . import config
 from . import Previewer
 importlib.reload(Previewer)
+import collections
 
 from . import metaData
 importlib.reload(metaData)
@@ -803,7 +804,86 @@ def get_custom_range():
                 ranges.append([range, range])
     return ranges
 
+#-----------------------------------------------------------------------
+#render out each item indivudually 
+def render_all_items_as_single():
+   hierarchy = get_hierarchy_ordered()
+   singleCollections = hide_all_and_populate(hierarchy)
+   render_single_item(hierarchy)
 
+   
+def render_single_item(hierarchy):
+    for attribute in hierarchy: # hide all
+        bpy.data.collections[attribute].hide_viewport = False
+        bpy.data.collections[attribute].hide_render = False
+        for type in hierarchy[attribute]:
+            bpy.data.collections[type].hide_viewport = False
+            bpy.data.collections[type].hide_render = False
+            for variant in hierarchy[attribute][type]:
+                bpy.data.collections[variant].hide_viewport = False
+                bpy.data.collections[variant].hide_render = False
+
+                char_var = variant + '_' + "Kae"
+                if bpy.data.collections.get(char_var) is not None and "Null" not in variant:
+                    bpy.data.collections.get(char_var).hide_viewport = False
+                    bpy.data.collections.get(char_var).hide_render = False
+
+                    #RENDER
+                    print(char_var)
+                    # Render image through viewport
+                    sce = bpy.context.scene.name
+                    bpy.data.scenes[sce].render.filepath = "D:/Users/OEM/Documents/ExportSingle/" + variant + ".jpg"
+                    bpy.ops.render.opengl(write_still=True)
+
+                    bpy.data.collections.get(char_var).hide_viewport = True
+                    bpy.data.collections.get(char_var).hide_render = True
+
+
+                bpy.data.collections[variant].hide_viewport = True
+                bpy.data.collections[variant].hide_render = True              
+            bpy.data.collections[type].hide_viewport = True
+            bpy.data.collections[type].hide_render = True
+        bpy.data.collections[attribute].hide_viewport = True
+        bpy.data.collections[attribute].hide_render = True
+        
+
+
+def hide_all_and_populate(hierarchy):
+    signelCollections = []
+    for attribute in hierarchy: # hide all
+        bpy.data.collections[attribute].hide_viewport = True
+        bpy.data.collections[attribute].hide_render = True
+        for type in hierarchy[attribute]:
+            bpy.data.collections[type].hide_viewport = True
+            bpy.data.collections[type].hide_render = True
+            for variant in hierarchy[attribute][type]:
+                bpy.data.collections[variant].hide_viewport = True
+                bpy.data.collections[variant].hide_render = True
+                for char in config.Characters:
+                    char_var = variant + '_' + char
+                    if bpy.data.collections.get(char_var) is not None:
+                        bpy.data.collections.get(char_var).hide_viewport = True
+                        bpy.data.collections.get(char_var).hide_render = True
+                        if(char == "Kae" and "Null" not in variant):
+                            signelCollections.append(char_var)
+                        for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                            obj.hide_viewport = False
+                            obj.hide_render = False
+                            # if obj.field != None:
+                            #     obj.field.apply_to_location = False
+                            #     obj.field.apply_to_rotation = False
+    return signelCollections
+
+def get_hierarchy_ordered(index=0):
+   if not index:
+         index = bpy.context.scene.my_tool.CurrentBatchIndex
+   batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+   if os.path.exists(NFTRecord_save_path):
+      DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
+      hierarchy = DataDictionary["hierarchy"]
+      return hierarchy
+   return None
 
 if __name__ == '__main__':
     render_and_save_NFTs()

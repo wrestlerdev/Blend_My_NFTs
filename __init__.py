@@ -1632,8 +1632,9 @@ class testButton(bpy.types.Operator):
 
         char = "Kae"
         # Exporter.Previewer.turn_on_tattoo(char, "Bismuth")
-        bpy.data.node_groups["TattooKae"].nodes["TattooColor"].outputs['Color'].default_value = (0.1,0,0,1)
+        #bpy.data.node_groups["TattooKae"].nodes["TattooColor"].outputs['Color'].default_value = (0.1,0,0,1)
         # Exporter.Previewer.add_texture_to_tattoos(char, texture1='clear')
+        Exporter.render_all_items_as_single()
             
         return {'FINISHED'}
 
