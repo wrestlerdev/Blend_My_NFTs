@@ -634,6 +634,8 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
 
          if type_coll.name[3:] in config.EmptyTypes:
             dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']
+         elif type_coll.name[3:].startswith('Tattoo'):
+            dna_string = [str(type_index), str(variant_index), str(texture_index), 'Black']
          elif color_key:
             dna_string = [str(type_index), str(variant_index), str(texture_index), color_key]
          else:
@@ -839,6 +841,8 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    type_coll = bpy.data.collections[coll_name].children[int(type_index)]
    if type_coll.name[3:] in config.EmptyTypes:
       new_colorkey = 'Empty'
+   elif type_coll.name[3:].startswith("Tattoo"):
+      new_colorkey = 'Black'
    else:
       if new_colorkey == 'Empty':
          style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
@@ -896,6 +900,8 @@ def randomize_color_style(new_style=''):
 
          if type_coll.name[3:] in config.EmptyTypes:
             new_key = 'Empty'
+         elif type_coll.name[3:].startswith("Tattoo"):
+            new_key = 'Black'
          else:
             new_key, color_choice = ColorGen.PickOutfitColors(coll_name, new_style)
          new_item = CharacterItems[coll_name][var_coll.name]

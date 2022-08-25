@@ -265,6 +265,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             if not (typeIndex == 0 and varientIndex == 0):
                 if typeChoosen[3:] in config.EmptyTypes:
                     color_key = 'Empty'
+                elif typeChoosen[3:].startswith("Tattoo"):
+                    color_key = 'Black'
                 else:
                     color_key, color_choice = ColorGen.PickOutfitColors(attribute)
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
