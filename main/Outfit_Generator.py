@@ -93,7 +93,13 @@ ItemUsedBodySlot = {
 
 "Background" : ["22-Background"],
 
-"TattooMiddleTorso": ["02-MiddleTorso"]
+"TattooMiddleTorso": ["02-MiddleTorso"],
+"TattooForearm": ["03-ForeArms"],
+"TattooCalf": ["08-Calf"],
+"TattooFeet": ["10-Feet"],
+"TattooNeck": ["14-Neck"],
+"TattooAnkle": ["09-Ankle"]
+
 }
 
 
