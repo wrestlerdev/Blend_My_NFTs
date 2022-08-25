@@ -15,18 +15,6 @@ enableGeneration = False
 colorList = []
 
 
-class bcolors:
-   '''
-   The colour of console messages.
-   '''
-   OK = '\033[92m'  # GREEN
-   WARNING = '\033[93m'  # YELLOW
-   ERROR = '\033[91m'  # RED
-   RESET = '\033[0m'  # RESET COLOR
-
-
-
-
 def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection hiearchy based on index to hide/show DNA
    bpy.ops.object.select_all(action='DESELECT')
    
@@ -48,16 +36,26 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
                         obj.hide_viewport = True
                         obj.hide_render = True
-                        if obj.type == 'MESH':
-                           pass
+                        if obj.field != None:
+                           obj.field.apply_to_location = False
+                           obj.field.apply_to_rotation = False
+
 
    
    keys = list(NFTDict.keys())
    DNAString = DNA.split(",")
    character = DNAString.pop(0)
+   element = DNAString.pop(0)
+   style = DNAString.pop(0)
    reset_shape_keys(character)
    show_character(character, Select)
 
+   set_material_element(element)
+   image_nodes = ["MiddleTorso" , "ForeArms", "Calf", "Feet", "Neck"]
+   for image_node in image_nodes:
+      add_texture_to_tattoos(character, image_node, texture1='clear')
+
+   hair_coll = ''
    for key in keys:
       for itemKey in NFTDict[key]:
          if(NFTDict[key] != "Null"):
@@ -86,6 +84,10 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      for obj in meshes: # Should we re hide the object meshes?
                         obj.hide_viewport = False
                         obj.hide_render = False
+                        if obj.field != None:
+                           obj.field.apply_to_location = True
+                           obj.field.apply_to_rotation = True
+
                         if Select:
                            obj.select_set(True)
                      scaleFac = child["Volume"]
@@ -106,12 +108,10 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                         for suffix in list(config.texture_suffixes):
                            if apdativeRes < suffix * 1.5 or resolution == suffix:
                               resolution = suffix
-                              print("Varient: ", varient.name, "  || Sacle Factor:  ", scaleFac, "  ||  Apdative Res: ", apdativeRes,"  ||  Resolution: ", resolution)
+                              print("Varient: ", varient.name, "  || Scale Factor:  ", scaleFac, "  ||  Apdative Res: ", apdativeRes,"  ||  Resolution: ", resolution)
                               break
-                           
-                        
-                     # set_texture_on_mesh(variant, meshes, texture_mesh, color_key, resolution)
-                     print("setting texture", resolution)
+                                                   
+                     # print("setting texture", resolution)
                      set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
 
             if type.name[3:].startswith('Expression'):
@@ -128,7 +128,32 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                print("Feetoroni")
                print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
-               
+
+            elif type.name[3:].startswith('Tattoo'):
+               tatt_node_group_name = 'Tattoo' + character
+               #image_node = bpy.data.node_groups[tatt_node_group_name].nodes["TattooImage01"]
+               texture_set = itemDictionary["item_texture"].rpartition('_')[2]
+
+               tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
+               # if image_node.image:
+               #    add_texture_to_tattoos(character, texture2=tattoo_texture)
+               # else:
+               #    add_texture_to_tattoos(character, texture1=tattoo_texture)
+               add_texture_to_tattoos(character, attr.name, tattoo_texture)
+               turn_on_tattoo(character, element, color_key)
+
+
+
+
+
+            elif attr.name[3:].startswith('Hair') and varient:
+               hair_coll = bpy.data.collections[varient.name + '_' + character]
+               reset_hair_shape_key(hair_coll)
+            elif attr.name[3:].startswith('Accessories'):
+               char_var_coll = bpy.data.collections[varient.name + '_' + character]
+               set_hair_accessory_shape_keys(char_var_coll, hair_coll)
+
+
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -139,6 +164,42 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    fill_pointers_from_dna(DNA)
 
 
+
+def set_material_element(element):
+   mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer"]
+   element_style, element_type = element.split('-')
+   if element_style == 'None':
+      for mixer in mixers:
+         node_tree = bpy.data.node_groups[mixer]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+   elif element_style == 'All':
+      for mixer in mixers:
+         node_tree = bpy.data.node_groups[mixer]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+   elif element_style == 'Skin':
+      node_tree = bpy.data.node_groups["OutfitElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["SkinElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+      node_tree = bpy.data.node_groups["FullBodyElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+   elif element_style == 'Outfit':
+      node_tree = bpy.data.node_groups["OutfitElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+      node_tree = bpy.data.node_groups["SkinElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["FullBodyElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+
+   if element_type != 'None':
+      node_tree = bpy.data.node_groups["ElementPicker"]
+      element_node = node_tree.nodes[element_type]
+      output_node = node_tree.nodes["Group Output"]
+
+      node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
+   return
+
+
 # -----------------------------------------------------
 def SnapFeetToFloor(shoetype, character, NFTDict):
    # torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
@@ -146,11 +207,11 @@ def SnapFeetToFloor(shoetype, character, NFTDict):
    # objects = bpy.data.collections[torsoObj].objects
 
    if shoetype == "FeetLong":
-      shoes = list(NFTDict["10-Calf"].keys())[0]
+      shoes = list(NFTDict["08-Calf"].keys())[0]
    elif shoetype == "FeetMid":
-      shoes = list(NFTDict["11-Ankle"].keys())[0]
+      shoes = list(NFTDict["09-Ankle"].keys())[0]
    else:
-      shoes = list(NFTDict["12-Feet"].keys())[0]
+      shoes = list(NFTDict["10-Feet"].keys())[0]
 
    shoesObj = shoes + "_" + character
    objects = bpy.data.collections[shoesObj].objects
@@ -210,9 +271,9 @@ def RaycastPackpack(backpackType, character, NFTDict):
 
 
          if backpackType == "BackpackHigh":
-            backpack = list(NFTDict["13-Neck"].keys())[0]
+            backpack = list(NFTDict["14-Neck"].keys())[0]
          else:
-            backpack = list(NFTDict["18-Backpack"].keys())[0]
+            backpack = list(NFTDict["20-Backpack"].keys())[0]
          backpack = backpack + "_" + character
          for obj in bpy.data.collections[backpack].objects:
             if len(obj.constraints) < 1:
@@ -263,6 +324,8 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
    if True:
       DNAString = DNA.split(',')
       character = DNAString.pop(0)
+      element = DNAString.pop(0)
+      style = DNAString.pop(0)
       show_character(character)
       ohierarchy = get_hierarchy_ordered()
 
@@ -354,6 +417,33 @@ def reset_shape_keys(character):
                   shape_key.value = 0
    return
 
+def reset_hair_shape_key(coll):
+   for obj in coll.objects:
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+            for shape_key in obj.data.shape_keys.key_blocks:
+               if shape_key.name != 'Basis':
+                  shape_key.value = 0
+   return
+
+def set_hair_accessory_shape_keys(variant_coll, hair_coll):
+   variant_name = variant_coll.name.split('_')[3]
+   for obj in hair_coll.objects: # set blend shape on hair
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+               for shape_key in obj.data.shape_keys.key_blocks:
+                  if shape_key.name.lower() == variant_name.lower():
+                     shape_key.value = 1
+   
+   hair_name = hair_coll.name.split('_')[3]
+   for obj in variant_coll.objects: # set blend shape on accessory
+      if obj.type == 'MESH':
+         if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+               for shape_key in obj.data.shape_keys.key_blocks:
+                  if shape_key.name.lower() == hair_name.lower():
+                     shape_key.value = 1
+   return
+
 
 def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, slot_pathing):
    suffix = config.texture_suffixes[resolution]
@@ -367,14 +457,16 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
          # print("Child Name: " + child.name  + " || Child Mat" + childMatSlot.name)
          for textureMatSlot in texture_mesh.material_slots:
             # print("Texture Mat: " + textureMatSlot.name)
-            if textureMatSlot.material.name in childMatSlot.material.name or len(texture_mesh.material_slots) == 1 :
+            childMatName = childMatSlot.material.name.partition('.')[0] # sometimes materials ending in .003 etc don't match up
+            textureMatName = textureMatSlot.material.name.partition('.')[0]
+            if textureMatName in childMatName or len(texture_mesh.material_slots) == 1 :
                # print("Child Name: " + childMatSlot.material.name + " || Texture Name: " + textureMatSlot.material.name)
                mat = textureMatSlot.material
                if mat.use_nodes:
                   for n in mat.node_tree.nodes:
                      if n.type == 'TEX_IMAGE':
                         if n.image is not None:
-                           texture_info = get_new_texture_name(n, suffix, texture_mesh, slot_pathing)
+                           texture_info = get_new_texture_name(n, suffix, texture_mesh, slot_pathing, childMatSlot.name)
                            if texture_info:
                               new_texture, new_texture_path, _type = texture_info
                               if os.path.exists(new_texture_path):
@@ -437,7 +529,7 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
    return
 
 
-def get_new_texture_name(node, suffix, texture_mesh, slot_pathing):
+def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name):
    types = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
    for _type in types:
       filepath, partition, filename = node.image.filepath.rpartition('\\')
@@ -454,15 +546,57 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing):
             slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
             variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])
             texture_folder_path = os.path.join(variant_folder_path, "Textures", texture_set)
+            print(texture_folder_path)
             
+            if len(next(os.walk(texture_folder_path))[1]) > 0: # if there's multiple sets
+               if '.' in material_name:
+                  material_name = material_name.split('.')[0]
+               texture_folder_path = os.path.join(texture_folder_path, material_name)
+
             new_texture_end = _type + suffix + '.' + file_type
-            new_texture = [t for t in os.listdir(texture_folder_path) if t.endswith(new_texture_end)]
+            # new_texture = [t for t in os.listdir(texture_folder_path) if t.endswith(new_texture_end)]
+
+            original_texture_end = _type + '.' + file_type
+            original_texture = None
+            new_path = filepath + partition
             for t in os.listdir(texture_folder_path):
                if t.endswith(new_texture_end):
                   new_texture = t
-                  new_path = filepath + partition
                   new_texture_path = new_path + new_texture
                   return new_texture, new_texture_path, _type
+
+               elif t.endswith(original_texture_end): # returns 4k if proper size texture doesn't exist
+                  texture_split = t.split('_')
+                  original_texture_path = new_path + t
+                  original_texture = t, original_texture_path, _type
+
+
+            if original_texture:
+               texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
+               print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
+               print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+               return original_texture
+
+
+            if texture_set != 'A':
+               original_texture_folder_path = os.path.join(variant_folder_path, "Textures", 'A')
+               for t in os.listdir(original_texture_folder_path):
+                  if t.endswith(new_texture_end):
+                     new_texture = t
+                     new_texture_path = new_path + new_texture
+                     return new_texture, new_texture_path, _type
+
+                  elif t.endswith(original_texture_end): # returns 4k if proper size texture doesn't exist
+                     texture_split = t.split('_')
+                     original_texture_path = new_path + t
+                     original_texture = t, original_texture_path, _type
+
+            if original_texture:
+               texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
+               print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
+               print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+               return original_texture
+                  
    return None
 
 
@@ -486,10 +620,10 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
    new_dna_strand = ''
    type_index = 0
    variant_index = 0
-
-   lastDNA = bpy.context.scene.my_tool.lastDNA # input or last?
-   DNAString = lastDNA.split(",")
-   character = DNAString.pop(0)
+   # lastDNA = bpy.context.scene.my_tool.lastDNA # input or last?
+   # DNAString = lastDNA.split(",")
+   # character = DNAString.pop(0)
+   # style = DNAString.pop(0)
 
    for type_coll in slot_coll.children: # get type,variant,texture index by going through collection hierarchy
       if variant_name in type_coll.children.keys():
@@ -497,7 +631,6 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
 
          type_list = list(type_coll.children)
          variant_index = type_list.index(var_coll)
-         # texture_index = 0 # TODO HOW TO GET TEXTURE INDEX NOW
 
          if type_coll.name[3:] in config.EmptyTypes:
             dna_string = [str(type_index), str(variant_index), str(texture_index), 'Empty']
@@ -510,6 +643,29 @@ def set_from_collection(slot_coll, variant_name, color_key='', texture_index=0):
       else:
          type_index += 1
    return new_dna_strand # return dna strand or empty string if not valid
+
+
+def elements_updated():
+   NFTDict = LoadTempDNADict()
+   DNA = NFTDict["DNAList"]
+
+   DNASplit = DNA.split(',')
+   element = DNASplit[1] # .pop
+   last_ele_style, last_ele = element.split('-')
+
+   if bpy.context.scene.my_tool.element == last_ele and \
+               (bpy.context.scene.my_tool.elementStyle == last_ele_style or last_ele == 'None'):
+      return
+
+   if bpy.context.scene.my_tool.element == 'None':
+      new_element = 'None-None'
+   else:
+      new_element = bpy.context.scene.my_tool.elementStyle + '-' + bpy.context.scene.my_tool.element
+   DNASplit[1] = new_element
+   new_DNA = ','.join(DNASplit)
+
+   show_nft_from_dna(new_DNA, NFTDict["CharacterItems"])
+   return
 
 
 def general_pointer_updated():
@@ -527,7 +683,8 @@ def general_pointer_updated():
       for types in att_coll.children:
          if types.name.endswith(type_name):
             for vars in types.children:
-               if vars.name.endswith(var_name):
+               split_variant_name = vars.name.rpartition('_')[2]
+               if split_variant_name == var_name:
                   pointers_have_updated(input_name, vars.name)
                   break
       bpy.context.scene.my_tool.inputGeneral = None
@@ -616,9 +773,9 @@ def get_null_variant_collection(att_coll):
       return att_coll.children[0].children[0]
 
    head_info = ["Head", "HeadShortNone"]
-   head_atts = ["13-Neck", "14-LowerHead", "15-MiddleHead", "16-Earings", "17-UpperHead"]
+   head_atts = ["14-Neck", "16-LowerHead", "15-MiddleHead", "18-Earrings"]
    feet_info = ["Feet", "FeetShortNone"]
-   feet_atts = ["10-Calf", "11-Ankle", "12-Feet"]
+   feet_atts = ["08-Calf", "09-Ankle", "10-Feet"]
 
    if att_coll.name in head_atts: # should this account for the hoodie :(, can't differentiate between head and hair types atm
       return check_collections(head_info, head_atts)
@@ -639,8 +796,8 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    dna_string = NFTDict["DNAList"]
    hierarchy = get_hierarchy_ordered()
    coll_index = list(hierarchy.keys()).index(coll_name)
-   DNA = dna_string.split(',') 
-   old_strand = DNA[coll_index + 1]
+   DNA = dna_string.split(',') # .pop(0)
+   old_strand = DNA[coll_index + 3]
 
    if dna_strand: # append old colour to new dna_string
       new_dnastrand = dna_strand
@@ -658,7 +815,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
       else:
          new_colorkey = dna_strand.rpartition('-')[2]
    else: # randomize colour here? # should it check for 0-0-0?
-      new_split = DNA[coll_index + 1].split('-')
+      new_split = DNA[coll_index + 3].split('-') # .pop
       max_attempts = 10
       old_colorkey = old_strand.split('-')[-1]
       for i in range(max_attempts):
@@ -670,7 +827,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
       new_dnastrand = '-'.join(new_split)
 
    if new_dnastrand == '0-0-0':
-      DNA[coll_index + 1] = str(new_dnastrand)
+      DNA[coll_index + 3] = str(new_dnastrand) # .pop
       dna_string = ','.join(DNA)
       CharacterItems[coll_name] = "Null"
       return dna_string, CharacterItems
@@ -689,7 +846,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    new_dnastrand = '-'.join([type_index, var_index, tex_index, new_colorkey])
 
    var_coll = type_coll.children[int(var_index)]
-   DNA[coll_index + 1] = str(new_dnastrand)
+   DNA[coll_index + 3] = str(new_dnastrand) # .pop
    dna_string = ','.join(DNA)
 
    record_item = batch_record["hierarchy"][coll_name][type_coll.name][var_coll.name]
@@ -699,7 +856,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    new_item = {}
    new_item["item_attribute"] = coll_name
    new_item["item_type"] = type_coll.name
-   new_item["item_variant"] = var_coll.name
+   new_item["item_variant"] = var_coll.name.split('_')[3]
    new_item["item_texture"] = new_tex
    new_item["type_rarity"] = type_coll['rarity']
    new_item["variant_rarity"] = var_coll['rarity']
@@ -720,13 +877,18 @@ def randomize_color_style(new_style=''):
    DNASplit = dna_string.split(',') 
 
    if not new_style:
-      new_style = ColorGen.SetUpCharacterStyle()
+      last_style = bpy.context.scene.my_tool.currentGeneratorStyle
+      max_count = 10
+      for i in range(max_count):
+         new_style = ColorGen.SetUpCharacterStyle()
+         if new_style != last_style:
+            break
       bpy.context.scene.my_tool.currentGeneratorStyle = new_style
 
    for coll_name in list(NFTDict["CharacterItems"].keys()):
       if CharacterItems[coll_name] != 'Null':
          index = list(NFTDict["CharacterItems"].keys()).index(coll_name)
-         dna_strand = DNASplit[index + 1]
+         dna_strand = DNASplit[index + 3] # .pop
 
          type_index, var_index, tex_index, color_key = dna_strand.split('-')
          type_coll = bpy.data.collections[coll_name].children[int(type_index)]
@@ -742,7 +904,8 @@ def randomize_color_style(new_style=''):
          new_dnastrand = dna_strand.split('-')
          new_dnastrand[-1] = new_key
          new_dnastring = '-'.join(new_dnastrand)
-         DNASplit[index + 1] = new_dnastring
+         DNASplit[index + 3] = new_dnastring # .pop
+
          dna_string = ','.join(DNASplit)
 
          variant_dict = {}
@@ -767,6 +930,8 @@ def dnastring_has_updated(DNA, lastDNA): # called from inputdna update, check if
 def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
    DNAString = DNA.split(',')
    character = DNAString.pop(0)
+   element = DNAString.pop(0)
+   style = DNAString.pop(0)
    show_character(character)
    
    ohierarchy = get_hierarchy_ordered()
@@ -789,11 +954,91 @@ def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
       else:
          bpy.context.scene.my_tool[last_coll_name] = bpy.data.collections[variant]
          bpy.context.scene.my_tool[input_coll_name] = None
+
+   ele_style, ele = element.split('-')
+
+   if ele != bpy.context.scene.my_tool.element:
+      bpy.context.scene.my_tool.element = ele
+
+   if ele_style != bpy.context.scene.my_tool.elementStyle and ele != 'None':
+      bpy.context.scene.my_tool.elementStyle = ele_style
+
    return
 
 
 
-#  ----------------------------------------------------------------------------------
+#  -------------------------------------- TATTOOS --------------------------------------------
+
+def get_texture_for_tattoo(att, type, variant, element):
+   slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
+   variant_folder_path = os.path.join(slots_folder_path, att, type, variant)
+   texture_folder_path = os.path.join(variant_folder_path, "Textures", element)
+
+   for dir in os.listdir(texture_folder_path):
+      if "_T." in dir:
+         texture_path = os.path.join(texture_folder_path, dir)
+         return texture_path
+
+
+def add_texture_to_tattoos(character, attr, texture1):
+   #skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+   image_node_name = attr.split('-')[-1]
+   print("ATTRIBUTE IS: " + attr)
+   skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
+
+   if texture1 == 'clear':
+      skin_node_tree.nodes[image_node_name].image = None
+   elif texture1:
+      newImage = bpy.data.images.load(texture1, check_existing=False)
+      skin_node_tree.nodes[image_node_name].image = newImage
+
+
+
+def turn_on_tattoo(character, element, color=''):
+   #skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
+   element_style, element_type = element.split('-')
+
+   #link element mix to weather outfit elmental is on
+   tattoo_node_tree = bpy.data.node_groups["Tattoo_Master"]
+   elementalTattooMixer = tattoo_node_tree.nodes["ElementalTattoo"]
+   print("element is: " + element)
+   print("tool is: " + bpy.context.scene.my_tool.element)
+   if element_type == "None":
+      elementalTattooMixer.outputs["Value"].default_value = 0
+      elementalTattooMixer.outputs["Value"].default_value = bpy.data.node_groups["OutfitElementMixer"].nodes["ElementalMix"].outputs["Value"].default_value
+      GlobalColorList = OpenGlobalColorList()
+      colorChoice = GlobalColorList[color]
+
+      #Change this to select black
+      #tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
+      tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = [0.0,0.0,0.0, 1.0]
+      tattoo_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
+   elif element_style == "All":
+      elementalTattooMixer.outputs["Value"].default_value = 3
+      tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = [0.0,0.0,0.0, 1.0]
+   elif element_style == "Outfit":
+      elementalTattooMixer.outputs["Value"].default_value = 1
+   
+   # if element == 'A':
+   #    for type in nodes_types:
+   #       skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 0
+   #       GlobalColorList = OpenGlobalColorList()
+   #       colorChoice = GlobalColorList[color]
+   #       skin_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
+   #       skin_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
+   # else:
+   #    for type in nodes_types:
+   #       skin_node_tree.nodes["Texture" + type + "Value"].outputs["Value"].default_value = 1
+
+   #       element_node_tree = bpy.data.node_groups["TattooElementPicker"]
+   #       element_node = element_node_tree.nodes[element + "Tattoo"]
+   #       output_node = element_node_tree.nodes["Group Output"]
+
+   #       for type in nodes_types:
+   #          element_node_tree.links.new(output_node.inputs[type], element_node.outputs[type])
+
+
+#--------------------------------------------------------------------------------------
 
 
 def set_armature_for_meshes(character, meshes):

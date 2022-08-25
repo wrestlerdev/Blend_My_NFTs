@@ -411,7 +411,7 @@ def reset_rarity_Record(NFTRecord_save_path):
    DataDictionary["DNAList"] = OriginalDataDictionary["DNAList"]
    hierarchy = NFTHirachy.createHirachy()
 
-   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-UpperHeadNull", "00-FeetNull"]
+   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-FeetNull", "00-HairShortNull"]
 
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):
@@ -439,7 +439,10 @@ def reset_rarity_Record(NFTRecord_save_path):
    return DataDictionary
 
 
-def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path): # saves rarity when reinitializes
+def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path, Backup_save_path): # saves rarity when reinitializes
+   if os.path.exists(Backup_save_path):
+      backup_hierarchy = json.load(open(Backup_save_path))['hierarchy']
+
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = 0
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
@@ -450,8 +453,12 @@ def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path): # saves 
 
    exists_in_original = True
    for slot in list(hierarchy.keys()):
-      if slot in original_hierarchy:
-         exists_in_original = True
+      print(slot)
+      if original_hierarchy != None:
+         if slot in original_hierarchy:
+            exists_in_original = True
+         else:
+            exists_in_original = False
       else:
          exists_in_original = False
       for type in list(hierarchy[slot].keys()):
@@ -467,6 +474,13 @@ def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path): # saves 
                for texture in hierarchy[slot][type][variant]["textureSets"].keys():
                   if texture in original_hierarchy[slot][type][variant]["textureSets"].keys():
                      hierarchy[slot][type][variant]["textureSets"][texture] = original_hierarchy[slot][type][variant]["textureSets"][texture]
+
+            elif os.path.exists(Backup_save_path) and slot in backup_hierarchy and type in backup_hierarchy[slot] and variant in backup_hierarchy[slot][type]:
+               hierarchy[slot][type][variant]["variant_rarity"]   = backup_hierarchy[slot][type][variant]["variant_rarity"]
+               hierarchy[slot][type][variant]["type_rarity"]      = backup_hierarchy[slot][type][variant]["type_rarity"]
+               for texture in hierarchy[slot][type][variant]["textureSets"].keys():
+                  if texture in backup_hierarchy[slot][type][variant]["textureSets"].keys():
+                     hierarchy[slot][type][variant]["textureSets"][texture] = backup_hierarchy[slot][type][variant]["textureSets"][texture]
 
    DataDictionary["hierarchy"] = hierarchy
 

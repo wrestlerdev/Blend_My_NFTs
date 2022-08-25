@@ -12,6 +12,7 @@ from datetime import datetime
 from . import config
 from . import Previewer
 importlib.reload(Previewer)
+import collections
 
 from . import metaData
 importlib.reload(metaData)
@@ -253,8 +254,8 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     modelBool = bpy.context.scene.my_tool.modelBool
 
     if not imageBool and not animationBool and not modelBool:
-        print("Please select a render output type")
-        return False
+        print("Please select a render output type - Only creating blender saves")
+        #return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
     frames = int(bpy.context.scene.my_tool.frameLength * 24)
@@ -621,7 +622,7 @@ def recurse_delete_data(batch_path, record_batch_root, local_batch_root): # dele
 # -----------------------------------------------------------------
 
 def save_metadata_file(path, nft_name, batch_num, nft_num, DNA, NFTDict):
-    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA, NFTDict)
+    metadata = metaData.returnERC721MetaDataCustom(nft_name, DNA, NFTDict, batch_num)
     metaDataObj = json.dumps(metadata, indent=1, ensure_ascii=True)
     with open(os.path.join(path, "ERC721_{}_{}.json".format(batch_num, nft_num)), "w") as outfile:
             outfile.write(metaDataObj)
@@ -739,6 +740,8 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
             else:
                 metadata_path = os.path.join(old_path)
                 change_nftname_in_metadata(metadata_path, new_file_name)
+                new_file_path = os.path.join(folder_path, "ERC721_" + new_file_name)
+                os.rename(old_path, new_file_path)
         elif suffix in ["blend", 'blend1']:
             pass
         else:
@@ -801,7 +804,114 @@ def get_custom_range():
                 ranges.append([range, range])
     return ranges
 
+#-----------------------------------------------------------------------
+#render out each item indivudually 
+def render_all_items_as_single():
+   hierarchy = get_hierarchy_ordered()
+   singleCollections = hide_all_and_populate(hierarchy)
+   render_single_item(hierarchy)
 
+   
+def render_single_item(hierarchy):
+    #bpy.context.scene.camera = bpy.data.objects["SingleRenderCam"]
+    bpy.data.objects.get("Platform_Kae").hide_viewport = True
+    bpy.data.objects.get("Platform_Kae").hide_render = True
+
+    bpy.data.objects.get("SinglesPlaneBG").hide_viewport = False
+    bpy.data.objects.get("SinglesPlaneBG").hide_render = False
+
+    for attribute in hierarchy: # hide all
+        bpy.data.collections[attribute].hide_viewport = False
+        bpy.data.collections[attribute].hide_render = False
+        for type in hierarchy[attribute]:
+            bpy.data.collections[type].hide_viewport = False
+            bpy.data.collections[type].hide_render = False
+            for variant in hierarchy[attribute][type]:
+                bpy.data.collections[variant].hide_viewport = False
+                bpy.data.collections[variant].hide_render = False
+
+                char_var = variant + '_' + "Kae"
+                if bpy.data.collections.get(char_var) is not None and "Null" not in variant:
+                    bpy.data.collections.get(char_var).hide_viewport = False
+                    bpy.data.collections.get(char_var).hide_render = False
+                    for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                            obj.hide_viewport = False
+                            obj.hide_render = False
+                    mesh_objects  =bpy.data.collections.get(char_var).objects
+                    set_armature_for_meshes("Kae", mesh_objects)
+
+                    #RENDER
+                    print(char_var)
+                    # Render image through viewport
+                    sce = bpy.context.scene.name
+                    bpy.data.scenes[sce].render.filepath = "D:/Users/OEM/Documents/ExportSingle/" + variant + ".jpg"
+                    bpy.ops.render.opengl(write_still=True)
+
+                    bpy.data.collections.get(char_var).hide_viewport = True
+                    bpy.data.collections.get(char_var).hide_render = True
+
+
+                bpy.data.collections[variant].hide_viewport = True
+                bpy.data.collections[variant].hide_render = True              
+            bpy.data.collections[type].hide_viewport = True
+            bpy.data.collections[type].hide_render = True
+        bpy.data.collections[attribute].hide_viewport = True
+        bpy.data.collections[attribute].hide_render = True
+
+        #bpy.context.scene.camera = bpy.data.objects["CameraStill"]
+        bpy.data.objects.get("Platform_Kae").hide_viewport = False
+        bpy.data.objects.get("Platform_Kae").hide_render = False
+
+        bpy.data.objects.get("SinglesPlaneBG").hide_viewport = True
+        bpy.data.objects.get("SinglesPlaneBG").hide_render = True
+        return
+
+def set_armature_for_meshes(character, meshes):
+    armature_name = "armature_" + str(character).lower()
+    if bpy.data.objects.get(armature_name) is not None:
+        for mesh in meshes:
+            if mesh.modifiers:
+                for mod in mesh.modifiers:
+                    if mod.type == 'ARMATURE':
+                        mod.object = bpy.data.objects[armature_name]
+
+
+def hide_all_and_populate(hierarchy):
+    signelCollections = []
+    for attribute in hierarchy: # hide all
+        bpy.data.collections[attribute].hide_viewport = True
+        bpy.data.collections[attribute].hide_render = True
+        for type in hierarchy[attribute]:
+            bpy.data.collections[type].hide_viewport = True
+            bpy.data.collections[type].hide_render = True
+            for variant in hierarchy[attribute][type]:
+                bpy.data.collections[variant].hide_viewport = True
+                bpy.data.collections[variant].hide_render = True
+                for char in config.Characters:
+                    char_var = variant + '_' + char
+                    if bpy.data.collections.get(char_var) is not None:
+                        bpy.data.collections.get(char_var).hide_viewport = True
+                        bpy.data.collections.get(char_var).hide_render = True
+                        if(char == "Kae" and "Null" not in variant):
+                            signelCollections.append(char_var)
+                        for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                            obj.hide_viewport = False
+                            obj.hide_render = False
+                            # if obj.field != None:
+                            #     obj.field.apply_to_location = False
+                            #     obj.field.apply_to_rotation = False
+    return signelCollections
+
+def get_hierarchy_ordered(index=0):
+   if not index:
+         index = bpy.context.scene.my_tool.CurrentBatchIndex
+   batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+   if os.path.exists(NFTRecord_save_path):
+      DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
+      hierarchy = DataDictionary["hierarchy"]
+      return hierarchy
+   return None
 
 if __name__ == '__main__':
     render_and_save_NFTs()

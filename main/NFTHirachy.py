@@ -44,7 +44,7 @@ def createHirachy():
          _varients = bpy.data.collections[_attributeTypes[i].name].children
          
          for j in range(len(_varients)):
-
+            print(_varients[j].name)
             if not _varients[j].name.rpartition('_')[2] in config.Characters: # check if char variation mesh
                Varients[_varients[j].name] = attributeData(_varients[j], _attributeTypes[i], attribute)
 
@@ -91,30 +91,6 @@ def attributeData(attributeVariantColl, attributeTypeColl, attribute):
       else:
          a[2] = attributeVariantColl['rarity'] = 50
 
-      # if(attributeTextureColl.get('rarity') is not None):
-      #    a[3] = attributeTextureColl.get('rarity')
-      # else:
-      #    a[3] = attributeTextureColl['rarity'] = 50
-
-      # if(attributeVariantColl.get('Style') is not None):
-      #    a[3] = attributeVariantColl.get('Style')
-      # else:
-      #    a[3] = attributeVariantColl['Style'] = "Temp_Style"
-
-      # if(attributeVariantColl.get('color_primary') is not None):
-      #    a[4] = attributeVariantColl.get('color_primary')
-      # else:
-      #    a[4] = attributeVariantColl['color_primary'] = "0"
-
-      # if(attributeVariantColl.get('color_secondary') is not None):
-      #    a[5] = attributeVariantColl.get('color_secondary')
-      # else:
-      #    a[5] = attributeVariantColl['color_secondary'] = "0"
-
-      # if(attributeVariantColl.get('color_tertiary') is not None):
-      #    a[6] = attributeVariantColl.get('color_tertiary')
-      # else:
-      #    a[6] = attributeVariantColl['color_tertiary'] = "0"
 
       # x = re.sub(r'[a-zA-Z]', "", i)
       # a = x.split("_")
@@ -135,6 +111,8 @@ def attributeData(attributeVariantColl, attributeTypeColl, attribute):
       return textures
       
    name = getName(attributeVariant)
+   print(name)
+   print("Helooo")
    orderRarity = getOrder_rarity(attributeVariant)
 
    if len(orderRarity) == 0:
@@ -145,6 +123,7 @@ def attributeData(attributeVariantColl, attributeTypeColl, attribute):
       item_attribute = attribute
       item_type = attributeTypeColl.name
       number = name[2]
+      
       item_variant = name[3]
       textureSets = get_textureSets(attributeVariantColl)
 

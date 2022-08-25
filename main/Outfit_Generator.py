@@ -1,7 +1,6 @@
 # Purpose:
 # This file generates the Outfit DNA based on a rule set
 
-from textwrap import fill
 import bpy
 import os
 import json
@@ -18,65 +17,83 @@ from . import config
 
 # A list for each caterogry of clothing that states what slots it will fil
 ItemUsedBodySlot = {
-"ShirtCropSleeveless" : ["01-UpperTorso", "18-Backpack"],
-"ShirtCropSleevelessBack" : ["01-UpperTorso"],
-"ShirtCropSleevelessNeck" : ["01-UpperTorso", "13-Neck"],
-"ShirtCrop" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm"],
-"ShirtCropNeck" : ["01-UpperTorso", "03-LForeArm", "05-RForeArm", "13-Neck",  "18-Backpack"],
+"ShirtCropSleeveless" : ["01-UpperTorso"],
+"ShirtCropSleevelessBack" : ["01-UpperTorso", "20-Backpack", "14-Neck"],
+"ShirtCropSleevelessNeck" : ["01-UpperTorso", "14-Neck", "11-HairLong", "17-EarringsLong"],
+"ShirtCrop" : ["01-UpperTorso", "03-ForeArms"],
+"ShirtCropNeck" : ["01-UppreTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong"],
 "ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
-"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "13-Neck"],
-"ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm"],
-"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-LForeArm", "05-RForeArm", "13-Neck", "18-Backpack"],
-"ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick"],
-"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick","13-Neck"],
-"ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm"],
-"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "18-Backpack"],
-"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "03-LForeArm", "05-RForeArm","13-Neck", "17-UpperHead"],
-"PantsShort" : ["09-PelvisThin"],
-"PantsShortThick" : ["08-PelvisThick", "09-PelvisThin"],
-"PantsShortHigh" : ["08-PelvisThick", "09-PelvisThin", "02-MiddleTorso"],
-"PantsMid" : ["09-PelvisThin", "10-Calf"],
-"PantsMidThick" : ["08-PelvisThick", "09-PelvisThin", "10-Calf"],
-"PantsMidHigh" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "02-MiddleTorso"],
-"PantsLong" : ["09-PelvisThin", "10-Calf", "11-Ankle"],
-"PantsLongThick" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle"],
-"PantsLongHigh" : ["08-PelvisThick", "09-PelvisThin", "10-Calf", "11-Ankle", "02-MiddleTorso"],
-"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-Backpack", "10-Calf", "11-Ankle"],
-"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-Backpack", "10-Calf", "11-Ankle"],
-"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-Backpack", "10-Calf"],
-"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-Backpack", "10-Calf"],
-"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "03-LForeArm", "05-RForeArm", "13-Neck", "18-Backpack"],
-"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "08-PelvisThick", "09-PelvisThin", "13-Neck", "18-Backpack"],
-"Forearm" : ["03-LForeArm", "05-RForeArm"],
-"HandsShort" : ["07-Hands"],
-"HandsLong" : ["05-RForeArm", "03-LForeArm", "07-Hands"],
-"FeetLong" : ["10-Calf", "11-Ankle", "12-Feet"],
-"FeetMid" : ["11-Ankle", "12-Feet"],
-"FeetShort" : ["12-Feet"],
-"FeetShortNone" : ["12-Feet"],
-"Calf" : ["10-Calf"],
-"CalfLong" : ["10-Calf", "11-Ankle"],
-"Neck" : ["13-Neck"],
-"HeadShort" : ["17-UpperHead"],
-"HeadShortNone" : ["17-UpperHead"],
-"HeadUpperMid" : ["17-UpperHead", "13-Neck", "16-Earings"],
-"HeadUpperLong" : ["17-UpperHead", "13-Neck", "18-Backpack", "16-Earings"],
-"HeadMid" : ["15-MiddleHead"],
-"HeadMidNeutral" : ["15-MiddleHead", "20-Expression"],
-"HeadMidFull" : ["15-MiddleHead", "17-UpperHead"],
-"HeadLower" : ["14-LowerHead"],
-"FaceFull" : ["15-MiddleHead", "14-LowerHead"],
-"HeadFull" : ["15-MiddleHead", "14-LowerHead", "13-Neck", "17-UpperHead", "16-Earings"],
-"EaringShort" : ["16-Earings"], 
-"EaringLong" : ["16-Earings", "13-Neck"], 
-"Backpack" : ["18-Backpack"],
-"BackpackHigh" : ["18-Backpack"],
-"Expression" : ["20-Expression"],
-"ExpressionLower" : ["14-LowerHead", "20-Expression"],
-"ExpressionLowerNone" : ["14-LowerHead", "20-Expression"],
-"ExpressionUpper" : ["15-MiddleHead", "20-Expression"],
-"ExpressionFull" : ["14-LowerHead", "15-MiddleHead", "20-Expression"],
-"Background" : ["19-Background"]
+"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "14-Neck", "11-HairLong", "17-EarringsLong"],
+"ShirtMidSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
+"ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms"],
+"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong"],
+"ShirtMidNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong", "20-Backpack"],
+"ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick"],
+"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "17-EarringsLong"],
+"ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
+"ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms"],
+"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "17-EarringsLong"],
+"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "12-HairShort", "18-Earrings", "17-EarringsLong"],
+
+"PantsShort" : ["07-PelvisThin"],
+"PantsShortThick" : ["06-PelvisThick", "07-PelvisThin"],
+"PantsShortHigh" : ["06-PelvisThick", "07-PelvisThin", "02-MiddleTorso"],
+"PantsMid" : ["07-PelvisThin", "08-Calf"],
+"PantsMidThick" : ["06-PelvisThick", "07-PelvisThin", "08-Calf"],
+"PantsMidHigh" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "02-MiddleTorso"],
+"PantsLong" : ["07-PelvisThin", "08-Calf", "09-Ankle"],
+"PantsLongThick" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle"],
+"PantsLongHigh" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle", "02-MiddleTorso"],
+
+"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "14-Neck", "08-Calf", "09-Ankle","17-EarringsLong"],
+"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "14-Neck", "08-Calf", "09-Ankle", "17-EarringsLong"],
+"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "14-Neck", "08-Calf", "17-EarringsLong"],
+"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "14-Neck", "08-Calf", "17-EarringsLong"],
+"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "14-Neck", "17-EarringsLong"],
+"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "14-Neck", "17-EarringsLong"],
+
+"Forearm" : ["03-ForeArms"],
+"HandsShort" : ["05-Hands", "04-Wrists"],
+"GlovesShort" : ["05-Hands", "04-Wrists"],
+"HandsLong" : ["03-ForeArms", "05-Hands", "04-Wrists"],
+"GlovesLong" : ["03-ForeArms", "05-Hands", "04-Wrists"],
+
+"FeetLong" : ["08-Calf", "09-Ankle", "10-Feet"],
+"FeetMid" : ["09-Ankle", "10-Feet"],
+"FeetShort" : ["10-Feet"],
+"FeetShortNone" : ["10-Feet"],
+"Calf" : ["08-Calf"],
+"CalfLong" : ["08-Calf", "09-Ankle"],
+
+"Neck" : ["14-Neck", "17-EarringsLong"],
+"HairShort" : ["12-HairShort"],
+"HairShortFront" : ["12-HairShort", "15-MiddleHead"],
+"HairMid" : ["11-HairLong", "14-Neck", "12-HairShort", "18-Earrings", "17-EarringsLong"],
+"HairLong" : ["11-HairLong", "14-Neck", "12-HairShort", "18-Earrings", "20-Backpack", "17-EarringsLong"],
+
+"HeadFull" : ["11-HairLong", "14-Neck", "12-HairShort", "15-MiddleHead", "16-LowerHead", "18-Earrings", "17-EarringsLong"],
+"HeadExtraEar" : ["17-EarringsLong", "18-Earrings"],
+"HeadExtra" : [],
+
+"FaceMid" : ["15-MiddleHead"],
+"FaceMidNeutral" : ["15-MiddleHead", "19-Expression"],
+"FaceLower" : ["16-LowerHead"],
+"FaceFull" : ["15-MiddleHead", "16-LowerHead"],
+"EarringsShort" : ["18-Earrings"], 
+"EarringsLong" : ["18-Earrings", "17-EarringsLong"],
+
+"Backpack" : ["20-Backpack"],
+"BackpackHigh" : ["14-Neck", "20-Backpack"],
+
+"Expression" : ["19-Expression"],
+"ExpressionLower" : ["16-LowerHead", "19-Expression"],
+"ExpressionLowerNone" : ["16-LowerHead", "19-Expression"],
+"ExpressionUpper" : ["15-MiddleHead", "19-Expression"],
+"ExpressionFull" : ["16-LowerHead", "15-MiddleHead", "19-Expression"],
+
+"Background" : ["22-Background"],
+
+"TattooMiddleTorso": ["02-MiddleTorso"]
 }
 
 
@@ -158,6 +175,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         attributeUsedDict = dict.fromkeys(attributeskeys, False)
 
         character = PickCharacter()
+        element = PickElement()
         style = ColorGen.SetUpCharacterStyle()
         bpy.context.scene.my_tool.currentGeneratorStyle = style
 
@@ -186,7 +204,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         #     obj["metallic"] = random.random()
         #     obj.hide_viewport = False
         
-
+        hair_coll_name = ''
         for attribute in attributeskeys:
             if(attributeUsedDict.get(attribute)):
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0-0"
@@ -202,9 +220,15 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 textureIndex = 0
             else:
                 position = attributevalues.index(hierarchy[attribute])
-                typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
-                varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
+                if attribute[3:].startswith("Accessories"): # for hair accessories
+                    hair_collection = bpy.data.collections[hair_coll_name + '_' + character]
+                    typeChoosen, typeIndex, varientChoosen, varientIndex = PickWeightedAccessoryTypeAndVariant(hierarchy[attribute], hair_collection)
+                else:
+                    typeChoosen, typeIndex = PickWeightedAttributeType(hierarchy[attribute])
+                    varientChoosen, varientIndex = PickWeightedTypeVarient(hierarchy[attribute][typeChoosen])
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
+                if attribute[3:].startswith('Hair') and not varientChoosen.endswith("Null"):
+                    hair_coll_name = varientChoosen
 
                 if typeIndex == 0 and varientIndex == 0:
                     SingleDNA[list(hierarchy.keys()).index(attribute)] = "0-0-0"
@@ -263,6 +287,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             
                 
         SingleDNA.insert(0, character)
+        SingleDNA.insert(1, element)
+        SingleDNA.insert(2, style)
         # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
@@ -304,9 +330,8 @@ def GetRandomSingleTexture(att_name, variant_coll):
     att_index = list(hierarchy.keys()).index(att_name)
     inputDNA = bpy.context.scene.my_tool.inputDNA
     dna_split = inputDNA.split(',')
-    old_dna_strand = dna_split[att_index + 1]
+    old_dna_strand = dna_split[att_index + 3] # .pop(0)
     old_texture_index = old_dna_strand.split('-')[2]
-
     variant = variant_coll.name
     for type in hierarchy[att_name].keys():
         if variant in hierarchy[att_name][type].keys():
@@ -362,7 +387,7 @@ def GetRandomSingleMesh(att_name):
         typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)
         type = typeChosen[0]
         type_index = list(hierarchy[att_name].keys()).index(type)
-    else:
+    elif not pointer_name == 'inputAccessories':
         # null_type = list(hierarchy[att_name].keys())[0]
         # null_variant = list(hierarchy[att_name][null_type].keys())[0]
         # print(null_variant)
@@ -370,31 +395,82 @@ def GetRandomSingleMesh(att_name):
 
     number_List_Of_i = []
     rarity_List_Of_i = []
-
-    for variant in hierarchy[att_name][type]:
-        rarity = hierarchy[att_name][type][variant]["variant_rarity"]
-        if rarity:
-            rarity_List_Of_i.append(float(rarity))
-            number_List_Of_i.append(variant)
-
     max_attempts = 10
-    if number_List_Of_i:
-        for i in range(max_attempts):
-            variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
-            if variantChosen[0] != last_variant:
-                break
-        variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen[0])
-    else:
-        return "0-0-0"
-        variant_index = 0
-        variantChosen = [list(hierarchy[att_name][type].keys())[variant_index]]
 
-    texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen[0]])
+    if pointer_name == 'inputAccessories':
+        for type in hierarchy[att_name].keys():
+            if hierarchy[att_name][type].keys() and not type.endswith('Null'):
+                for variant in hierarchy[att_name][type]:
+                    rarity = hierarchy[att_name][type][variant]["variant_rarity"]
+                    print(variant)
+                    if rarity:
+                        rarity_List_Of_i.append(float(rarity))
+                        number_List_Of_i.append(type + '_' + variant)
+
+        if number_List_Of_i:
+            for i in range(max_attempts):
+                chosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+                typeChosen, dash, variantChosen = chosen[0].partition('_')
+                if variantChosen != last_variant:
+                    break
+            type_index = list(hierarchy[att_name].keys()).index(typeChosen)
+            variant_index = list(hierarchy[att_name][typeChosen].keys()).index(variantChosen)
+        else:
+            return "0-0-0"
+
+    else:
+        for variant in hierarchy[att_name][type]:
+            rarity = hierarchy[att_name][type][variant]["variant_rarity"]
+            if rarity:
+                rarity_List_Of_i.append(float(rarity))
+                number_List_Of_i.append(variant)
+
+        if number_List_Of_i:
+            for i in range(max_attempts):
+                variantChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)[0]
+                if variantChosen != last_variant:
+                    break
+            variant_index = list(hierarchy[att_name][type].keys()).index(variantChosen)
+        else:
+            return "0-0-0"
+
+    texture, texture_index = GetRandomSingleTexture(att_name, bpy.data.collections[variantChosen])
     dna_strand = '-'.join([str(type_index), str(variant_index), str(texture_index)])
     return dna_strand
 
+
+
 # ------------------------------------------------------
 
+
+def PickWeightedAccessoryTypeAndVariant(AttributeTypes, hair_coll=''):
+    number_List_Of_i = []
+    rarity_List_Of_i = []
+
+    null_var_rarity = bpy.data.collections["Accessories_AccessoriesNull_000_Null"]['rarity']
+    number_List_Of_i.append("00-AccessoriesNull_Accessories_AccessoriesNull_000_Null")
+    rarity_List_Of_i.append(null_var_rarity)
+
+    for type in AttributeTypes:
+        if AttributeTypes[type].keys():
+            for variant in AttributeTypes[type].keys():
+                variant_name = variant.rpartition('_')[2]
+
+                for obj in hair_coll.objects:
+                    if obj.type == 'MESH':
+                        if hasattr(obj.data, "shape_keys") and obj.data.shape_keys != None:
+                            for shape_key in obj.data.shape_keys.key_blocks:
+                                if shape_key.name.lower() == variant_name.lower():
+                                    number_List_Of_i.append(type + '_' + variant)
+                                    rarity = bpy.data.collections[variant]['rarity'] # this doesn't take type into consideration atm
+                                    rarity_List_Of_i.append(rarity)
+
+    chosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
+    typeChosen, dash, variantChosen = chosen[0].partition('_')
+    typeIndex = list(AttributeTypes.keys()).index(typeChosen)
+    variantIndex = list(AttributeTypes[typeChosen].keys()).index(variantChosen)
+
+    return typeChosen, typeIndex, variantChosen, variantIndex
 
 
 def PickWeightedAttributeType(AttributeTypes):
@@ -477,6 +553,36 @@ def PickCharacter():
     return char
 
 
+def PickElement():
+    # All || Skin || Outfit
+    if not bpy.context.scene.my_tool.isElementLocked:
+        element_rarity = 10
+        none_rarity = 30
+        # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
+        options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
+
+        rand_elements = ["None"]
+        weights_elements = [none_rarity]
+        for e in config.Elements:
+            rand_elements.append(e)
+            weights_elements.append(element_rarity)
+        chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
+        if chosen == "None":
+            return "None-None"
+
+        rand_options = []
+        weights_options = []
+        for o in options:
+            rand_options.append(o[0])
+            weights_options.append(o[1])
+        chosen_option = random.choices(rand_options, weights=weights_options, k=1)[0]
+    else:
+        chosen_option = bpy.context.scene.my_tool.elementStyle
+        chosen = bpy.context.scene.my_tool.element
+        if chosen == 'None':
+            return "None-None"
+    
+    return chosen_option + '-' + chosen
 # ----------------------------------------------------------------------
 
 count = 0
@@ -497,11 +603,11 @@ def count_all_rarities(batch_record_path, index):
         for type in hierarchy[attribute].keys():
             rarity_dict[attribute][type] = {}
             rarity_dict[attribute][type]['absolute_rarity'] = 0.0
-            rarity_dict[attribute][type]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[type], bpy.data.collections[attribute])[0]
+            rarity_dict[attribute][type]['relative_rarity'] = get_weighted_rarity(type, attribute)[0]
             for variant in hierarchy[attribute][type].keys():
                 rarity_dict[attribute][type][variant] = {}
                 rarity_dict[attribute][type][variant]['absolute_rarity'] = 0.0
-                rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(bpy.data.collections[variant], bpy.data.collections[type])[0]
+                rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(variant, type)[0]
 
     count = 0
     filled_slots = '0' * len(hierarchy.keys())
@@ -521,6 +627,8 @@ def count_all_rarities(batch_record_path, index):
     return
 
 
+max_att = 20 # inclusive?
+
 def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', branch_count=1):
     global count
     if attribute and filled_slots[int(attribute[:2]) - 1] == '1':
@@ -530,7 +638,8 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
         rarity_dict[attribute][null_type.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name]["absolute_rarity"] + current_probability 
         rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] + current_probability
         next_index = list(hierarchy.keys()).index(attribute) + 1
-        if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
+        # if next_index != len(hierarchy.keys()):
             next_att = list(hierarchy.keys())[next_index]
             rarity_dict = add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
         else:
@@ -540,9 +649,7 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
     if not type: # this is a attribute
         percentage = 1.0
     else: # this is a type
-        parent_coll = bpy.data.collections[attribute]
-        current_coll = bpy.data.collections[type]
-        percentage, weight_total = get_weighted_rarity(current_coll, parent_coll)
+        percentage = get_weighted_rarity(type, attribute)[0]
 
     new_probability = current_probability * percentage
 
@@ -551,16 +658,14 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
     
     if type:
         rarity_dict[attribute][type]["absolute_rarity"] = rarity_dict[attribute][type]["absolute_rarity"] + new_probability
+        var_count = 0
+        var_weight_total = 0
         for variant in rarity_dict[attribute][type].keys():
             if variant != "absolute_rarity" and variant != "relative_rarity":
-                type_coll = bpy.data.collections[type]
-                variant_coll = bpy.data.collections[variant]
-                variant_percentage, weight_total = get_weighted_rarity(variant_coll, type_coll)
+                variant_percentage, var_weight_total = get_weighted_rarity(variant, type, var_weight_total)
                 rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability * variant_percentage
-        var_count = 0
-        for v in bpy.data.collections[type].children:
-            if v.get('rarity') and v.get('rarity') > 0:
-                var_count += 1
+                if variant_percentage:
+                    var_count += 1
         branch_count = branch_count * var_count
 
     else:
@@ -583,7 +688,8 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
                     filled_slots = filled_slots[:index] + '1' + filled_slots[index+1:]
 
         next_index = (list(hierarchy.keys()).index(attribute)) + 1
-        if next_index != len(hierarchy.keys()):
+        # if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
             next_att = list(hierarchy.keys())[next_index]
             rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
         else:
@@ -592,28 +698,30 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
 
 
 
-def get_weighted_rarity(current_coll, parent_coll):
-    total = 0
-    for coll in parent_coll.children:
-        if coll.get('rarity') != None:
-            total += coll.get('rarity')
+def get_weighted_rarity(current_name, parent_name, total = 0):
+    # print(current_name)
+    if not total:
+        for coll in bpy.data.collections[parent_name].children:
+            if coll.get('rarity') != None:
+                total += coll.get('rarity')
 
     if total:
+        current_coll = bpy.data.collections[current_name]
         if current_coll.get('rarity') != None:
             percentage = current_coll.get('rarity') / total
             return percentage, total
         else:
-            return 0.0, 0
+            return 0.0, total
 
     else: # CHECK GREEN NULL
         # print(current_coll.name)
-        if len(parent_coll.children) == 1:
-            return 1.0, 0
+        if len(bpy.data.collections[parent_name].children) == 1:
+            return 1.0, total
         else: # CHECK THIS
             if 'Null' in current_coll.name:
-                return 1.0, 0
+                return 1.0, total
             else:
-                return 0.0, 0
+                return 0.0, total
 
 
 
