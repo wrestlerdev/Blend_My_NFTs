@@ -130,7 +130,7 @@ def create_downres_textures(input_path, dims, should_overwrite):
 
 
 def downres_all_textures_in_folder(path, dims, should_overwrite):
-    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O'] # don't put '_I' in here since it shouldn'be be downres'ed
+    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O', '_T'] # don't put '_I' in here since it shouldn'be be downres'ed
 
     if os.path.isdir(path):
         texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]
@@ -173,3 +173,11 @@ def downres_single_texture(path, image_name, dims, should_overwrite):
 
 # ------------------------------------------------------------------------------
 
+
+def downres_element_textures(elements_folder_path, dims, should_overwrite):
+
+    for ele_dir in os.listdir(elements_folder_path):
+        elements = os.path.join(elements_folder_path, ele_dir)
+        downres_all_textures_in_folder(elements, dims, should_overwrite)
+
+    return

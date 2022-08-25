@@ -1527,6 +1527,21 @@ class renameAllOriginalTextures(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class downresElementTextures(bpy.types.Operator):
+    bl_idname = 'downres.elementtextures'
+    bl_label = 'Down-res Element Textures'
+    bl_description = "This can't be undoooooooooone"
+    bl_options = {'REGISTER', 'UNDO'}
+
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        elements_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'ELEMENTS')
+        TextureEditor.downres_element_textures(elements_folder_path, [1024, 2048], False)
+        return {'FINISHED'}
+
 # -------------------------------------------------------------------------------
 
 
@@ -1629,13 +1644,10 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-
-        char = "Kae"
+        # TextureEditor.downres_element_textures([1024,2048], False)
         # Exporter.Previewer.turn_on_tattoo(char, "Bismuth")
         #bpy.data.node_groups["TattooKae"].nodes["TattooColor"].outputs['Color'].default_value = (0.1,0,0,1)
         # Exporter.Previewer.add_texture_to_tattoos(char, texture1='clear')
-        Exporter.render_all_items_as_single()
-            
         return {'FINISHED'}
 
 
@@ -2492,6 +2504,12 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.scale_x = 0.4
         row.prop(mytool, 'shouldForceDownres')
 
+        box.separator(factor=1.5)
+        row = box.row()
+        row.operator(downresElementTextures.bl_idname, text=downresElementTextures.bl_label)
+
+
+
         row.scale_x = 1
         layout.separator(factor=1.5)
         box = layout.box()
@@ -2802,6 +2820,7 @@ classes = (
     forceLoadDNAFromUI,
     renameSet,
     countUpAllItems,
+    downresElementTextures,
     testButton
 
 )
