@@ -51,7 +51,9 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    show_character(character, Select)
 
    set_material_element(element)
-   add_texture_to_tattoos(character, texture1='clear', texture2='clear')
+   image_nodes = ["MiddleTorso" , "ForeArms", "Calf", "Feet", "Neck"]
+   for image_node in image_nodes:
+      add_texture_to_tattoos(character, image_node, texture1='clear')
 
    hair_coll = ''
    for key in keys:
@@ -137,8 +139,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                #    add_texture_to_tattoos(character, texture2=tattoo_texture)
                # else:
                #    add_texture_to_tattoos(character, texture1=tattoo_texture)
-               add_texture_to_tattoos(character, texture1=tattoo_texture)
-               turn_on_tattoo(character, texture_set, color_key)
+               add_texture_to_tattoos(character, attr.name, tattoo_texture)
+               turn_on_tattoo(character, element, color_key)
 
 
 
@@ -978,42 +980,43 @@ def get_texture_for_tattoo(att, type, variant, element):
          return texture_path
 
 
-def add_texture_to_tattoos(character, texture1='', texture2=''):
+def add_texture_to_tattoos(character, attr, texture1):
    #skin_node_tree = bpy.data.node_groups["Tattoo" + character]
+   image_node_name = attr.split('-')[-1]
+   print("ATTRIBUTE IS: " + attr)
    skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
 
    if texture1 == 'clear':
-      skin_node_tree.nodes["TattooImage01"].image = None
+      skin_node_tree.nodes[image_node_name].image = None
    elif texture1:
       newImage = bpy.data.images.load(texture1, check_existing=False)
-      skin_node_tree.nodes["TattooImage01"].image = newImage
+      skin_node_tree.nodes[image_node_name].image = newImage
 
-   if texture2 == 'clear':
-      skin_node_tree.nodes["TattooImage02"].image = None
-   elif texture2:
-      newImage = bpy.data.images.load(texture2, check_existing=False)
-      skin_node_tree.nodes["TattooImage02"].image = newImage
 
 
 def turn_on_tattoo(character, element, color=''):
-   skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
-   nodes_types = ["Diffuse", "Metallic", "Roughness", "Normal", "Emission"]
+   #skin_node_tree = bpy.data.materials['CharacterSkin_Master' + "_" + character].node_tree
+   element_style, element_type = element.split('-')
 
    #link element mix to weather outfit elmental is on
    tattoo_node_tree = bpy.data.node_groups["Tattoo_Master"]
    elementalTattooMixer = tattoo_node_tree.nodes["ElementalTattoo"]
-
-   if bpy.context.scene.my_tool.element == "None":
+   print("element is: " + element)
+   print("tool is: " + bpy.context.scene.my_tool.element)
+   if element_type == "None":
       elementalTattooMixer.outputs["Value"].default_value = 0
       elementalTattooMixer.outputs["Value"].default_value = bpy.data.node_groups["OutfitElementMixer"].nodes["ElementalMix"].outputs["Value"].default_value
       GlobalColorList = OpenGlobalColorList()
       colorChoice = GlobalColorList[color]
-      tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
-      tattoo_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
-   elif bpy.context.scene.my_tool.elementStyle == "All":
-      elementalTattooMixer.outputs["Value"].default_value = 0
+
+      #Change this to select black
+      #tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = colorChoice["R"]
       tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = [0.0,0.0,0.0, 1.0]
-   elif bpy.context.scene.my_tool.elementStyle == "Outfit":
+      tattoo_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
+   elif element_style == "All":
+      elementalTattooMixer.outputs["Value"].default_value = 3
+      tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = [0.0,0.0,0.0, 1.0]
+   elif element_style == "Outfit":
       elementalTattooMixer.outputs["Value"].default_value = 1
    
    # if element == 'A':

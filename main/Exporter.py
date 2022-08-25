@@ -254,8 +254,8 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     modelBool = bpy.context.scene.my_tool.modelBool
 
     if not imageBool and not animationBool and not modelBool:
-        print("Please select a render output type")
-        return False
+        print("Please select a render output type - Only creating blender saves")
+        #return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
     frames = int(bpy.context.scene.my_tool.frameLength * 24)
@@ -813,6 +813,13 @@ def render_all_items_as_single():
 
    
 def render_single_item(hierarchy):
+    #bpy.context.scene.camera = bpy.data.objects["SingleRenderCam"]
+    bpy.data.objects.get("Platform_Kae").hide_viewport = True
+    bpy.data.objects.get("Platform_Kae").hide_render = True
+
+    bpy.data.objects.get("SinglesPlaneBG").hide_viewport = False
+    bpy.data.objects.get("SinglesPlaneBG").hide_render = False
+
     for attribute in hierarchy: # hide all
         bpy.data.collections[attribute].hide_viewport = False
         bpy.data.collections[attribute].hide_render = False
@@ -827,6 +834,11 @@ def render_single_item(hierarchy):
                 if bpy.data.collections.get(char_var) is not None and "Null" not in variant:
                     bpy.data.collections.get(char_var).hide_viewport = False
                     bpy.data.collections.get(char_var).hide_render = False
+                    for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
+                            obj.hide_viewport = False
+                            obj.hide_render = False
+                    mesh_objects  =bpy.data.collections.get(char_var).objects
+                    set_armature_for_meshes("Kae", mesh_objects)
 
                     #RENDER
                     print(char_var)
@@ -845,7 +857,23 @@ def render_single_item(hierarchy):
             bpy.data.collections[type].hide_render = True
         bpy.data.collections[attribute].hide_viewport = True
         bpy.data.collections[attribute].hide_render = True
-        
+
+        #bpy.context.scene.camera = bpy.data.objects["CameraStill"]
+        bpy.data.objects.get("Platform_Kae").hide_viewport = False
+        bpy.data.objects.get("Platform_Kae").hide_render = False
+
+        bpy.data.objects.get("SinglesPlaneBG").hide_viewport = True
+        bpy.data.objects.get("SinglesPlaneBG").hide_render = True
+        return
+
+def set_armature_for_meshes(character, meshes):
+    armature_name = "armature_" + str(character).lower()
+    if bpy.data.objects.get(armature_name) is not None:
+        for mesh in meshes:
+            if mesh.modifiers:
+                for mod in mesh.modifiers:
+                    if mod.type == 'ARMATURE':
+                        mod.object = bpy.data.objects[armature_name]
 
 
 def hide_all_and_populate(hierarchy):
