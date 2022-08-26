@@ -32,6 +32,7 @@ KeywordKeys = [
     "Null",
     "Character",
     "Theme",
+    "Element",
     "Expression",
     "Outfit",
     "Tops",

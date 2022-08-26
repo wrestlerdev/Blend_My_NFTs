@@ -813,7 +813,10 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
          new_dnasplit = dna_strand.split('-')
          if len(old_strand.split('-')) < 4:
             style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
-            new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style)
+            if style != 'Elemental':
+               new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style)
+            else:
+               new_colorkey = 'Element'
          else:
             new_colorkey = old_strand.rpartition('-')[2]
 
