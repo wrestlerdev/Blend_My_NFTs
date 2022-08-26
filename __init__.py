@@ -428,8 +428,9 @@ class randomizeAllColor(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
-        Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        if bpy.context.scene.my_tool.element == 'None':
+            dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
+            Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
 class randomizeAllSets(bpy.types.Operator):
@@ -439,9 +440,10 @@ class randomizeAllSets(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
-        dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
-        Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        if bpy.context.scene.my_tool.element == 'None':
+            style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
+            dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
+            Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
 
@@ -458,7 +460,7 @@ class randomizeColor(bpy.types.Operator):
             input_slot = self.collection_name
             slot_coll = config.Slots[input_slot][0]
             type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
-            if type not in config.EmptyTypes:
+            if type not in config.EmptyTypes and bpy.context.scene.my_tool.element == 'None':
                 Exporter.Previewer.update_colour_random(slot_coll)
         return {'FINISHED'}
 
@@ -1489,7 +1491,8 @@ class clearGeneratorStyle(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        context.scene.my_tool.currentGeneratorStyle = ''
+        if context.scene.my_tool.currentGeneratorStyle != 'Elemental':
+            context.scene.my_tool.currentGeneratorStyle = ''
         return {'FINISHED'}
 
 # --------------------------------- Textures ---------------------------------------------

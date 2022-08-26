@@ -449,8 +449,6 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
    suffix = config.texture_suffixes[resolution]
    # if suffix == '':
    #    print("this should be 4k okay")
-   GlobalColorList = OpenGlobalColorList()
-   colorChoice = GlobalColorList[color_key]
    for child in meshes:
       for childMatSlot in child.material_slots:
          # print("!--------------------------------!")
@@ -512,7 +510,9 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
                                     mat.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
                            # else:
                               # print("Texture image within this node is not named properly (e.g. missing _N)")
-                     elif n.type == 'RGB':
+                     elif n.type == 'RGB' and color_key != 'Element':
+                        GlobalColorList = OpenGlobalColorList()
+                        colorChoice = GlobalColorList[color_key]
                         if (n.label == "RTint"):
                            n.outputs["Color"].default_value = colorChoice["R"]
                         if (n.label == "GTint"):
@@ -666,7 +666,12 @@ def elements_updated():
    DNASplit[1] = new_element
    new_DNA = ','.join(DNASplit)
 
-   show_nft_from_dna(new_DNA, NFTDict["CharacterItems"])
+   print(element)
+   if new_element != 'None-None':
+      dna_string, CharacterItems = randomize_color_style(element=new_element, dna_string=new_DNA)
+   else:
+      dna_string, CharacterItems = randomize_color_style(dna_string=new_DNA)
+   show_nft_from_dna(dna_string, CharacterItems)
    return
 
 
@@ -825,6 +830,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
          new_colorkey, color_choice = ColorGen.PickOutfitColors(coll_name, style)
          if new_colorkey != old_colorkey:
             break
+
       new_split[-1] = new_colorkey
       new_dnastrand = '-'.join(new_split)
 
@@ -874,13 +880,18 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
 
 
 
-def randomize_color_style(new_style=''):
+def randomize_color_style(new_style='', element='', dna_string=''):
    NFTDict = LoadTempDNADict()
    CharacterItems = NFTDict["CharacterItems"]
-   dna_string = NFTDict["DNAList"]
+   if not dna_string:
+      dna_string = NFTDict["DNAList"]
    DNASplit = dna_string.split(',') 
 
-   if not new_style:
+   if element:
+      new_style = 'Elemental'
+      bpy.context.scene.my_tool.currentGeneratorStyle = new_style
+
+   elif not new_style:
       last_style = bpy.context.scene.my_tool.currentGeneratorStyle
       max_count = 10
       for i in range(max_count):
@@ -889,6 +900,7 @@ def randomize_color_style(new_style=''):
             break
       bpy.context.scene.my_tool.currentGeneratorStyle = new_style
 
+   DNASplit[2] = new_style # .pop(0)
    for coll_name in list(NFTDict["CharacterItems"].keys()):
       if CharacterItems[coll_name] != 'Null':
          index = list(NFTDict["CharacterItems"].keys()).index(coll_name)
@@ -902,6 +914,8 @@ def randomize_color_style(new_style=''):
             new_key = 'Empty'
          elif type_coll.name[3:].startswith("Tattoo"):
             new_key = 'Black'
+         elif element:
+            new_key = 'Element'
          else:
             new_key, color_choice = ColorGen.PickOutfitColors(coll_name, new_style)
          new_item = CharacterItems[coll_name][var_coll.name]

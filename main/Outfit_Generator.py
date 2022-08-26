@@ -182,7 +182,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
         character = PickCharacter()
         element = PickElement()
-        style = ColorGen.SetUpCharacterStyle()
+        if element == 'None-None':
+            style = ColorGen.SetUpCharacterStyle()
+        else:
+            style = 'Elemental'
         bpy.context.scene.my_tool.currentGeneratorStyle = style
 
         # letterstyles = 'abcdefghijkl'
@@ -267,6 +270,8 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                     color_key = 'Empty'
                 elif typeChoosen[3:].startswith("Tattoo"):
                     color_key = 'Black'
+                elif element != 'None-None':
+                    color_key = 'Element'
                 else:
                     color_key, color_choice = ColorGen.PickOutfitColors(attribute)
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
@@ -297,6 +302,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         SingleDNA.insert(0, character)
         SingleDNA.insert(1, element)
         SingleDNA.insert(2, style)
+
         # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
@@ -567,7 +573,8 @@ def PickElement():
         element_rarity = 10
         none_rarity = 30
         # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
-        options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
+        # options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
+        options = [("All", 20), ("Outfit", 20)]
 
         rand_elements = ["None"]
         weights_elements = [none_rarity]

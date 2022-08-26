@@ -267,10 +267,10 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, type):
             LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
             i += 1
 
-            if "Hair" in type:
-                for n in tempcopy.node_tree.nodes:
-                    if n.type == "GROUP" and n.node_tree == bpy.data.node_groups["OutfitElementMixer"]:
-                        n.node_tree = bpy.data.node_groups["SkinElementMixer"]
+            # if "Hair" in type:
+            #     for n in tempcopy.node_tree.nodes:
+            #         if n.type == "GROUP" and n.node_tree == bpy.data.node_groups["OutfitElementMixer"]:
+            #             n.node_tree = bpy.data.node_groups["SkinElementMixer"]
             
     else:
         material_slots = obj.material_slots
