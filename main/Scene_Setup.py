@@ -549,7 +549,7 @@ def set_up_character_skinTattoo_materials(folderpath, character):
     matcopy =  bpy.data.materials['CharacterSkin_Master'].copy()
     matcopy.name = "CharacterSkin_Master" + "_" + character
     texture_path = os.path.join(folderpath, character + "_master", character + "Texture")
-    for type in ["Color", "Roughness", "Normal"]:
+    for type in ["Color", "Roughness", "Normal", "Tattoos"]:
         for tex in os.listdir(texture_path):
             if "_Body_" + type in tex:
                 file = os.path.join(texture_path, tex)
