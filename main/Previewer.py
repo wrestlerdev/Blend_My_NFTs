@@ -669,6 +669,8 @@ def elements_updated():
    print(element)
    if new_element != 'None-None':
       dna_string, CharacterItems = randomize_color_style(element=new_element, dna_string=new_DNA)
+      # if new_element.startswith("All"):
+      #    dna_string, CharacterItems = remove_tattoos(dna_string, CharacterItems)
    else:
       dna_string, CharacterItems = randomize_color_style(dna_string=new_DNA)
    show_nft_from_dna(dna_string, CharacterItems)
@@ -1060,6 +1062,28 @@ def turn_on_tattoo(character, element, color=''):
    #       for type in nodes_types:
    #          element_node_tree.links.new(output_node.inputs[type], element_node.outputs[type])
 
+
+# def remove_tattoos(dna_string, CharacterItems):
+#    DNASplit = dna_string.split(',') 
+
+#    for coll_name in list(CharacterItems.keys()):
+#       if CharacterItems[coll_name] != 'Null':
+#          index = list(CharacterItems.keys()).index(coll_name)
+#          dna_strand = DNASplit[index + 3] # .pop
+
+#          type_index, var_index, tex_index, color_key = dna_strand.split('-')
+#          type_coll = bpy.data.collections[coll_name].children[int(type_index)]
+
+#          if type_coll.name[3:].startswith("Tattoo"):
+#             if "Feet" in type_coll.name:
+#                pass # barefeet isn't 0-0-0
+#             else:
+#                new_dnastring = '0-0-0'
+#                DNASplit[index + 3] = new_dnastring # .pop
+#                CharacterItems[coll_name] = 'Null'
+      
+#    dna_string = ','.join(DNASplit)
+#    return dna_string, CharacterItems
 
 #--------------------------------------------------------------------------------------
 
