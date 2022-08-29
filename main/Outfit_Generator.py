@@ -567,41 +567,45 @@ def PickCharacter():
 
 
 def PickElement():
-    # All || Skin || Outfit
-    if not bpy.context.scene.my_tool.isElementLocked:
-        elements_probability = bpy.context.scene.my_tool.elementalProbability
-        none_rarity = 100 - elements_probability
-        element_rarity = elements_probability / len(config.Elements)
-        # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
-        # options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
-        options = [("All", 20), ("Outfit", 20)]
+    if not bpy.context.scene.my_tool.isElementStyleLocked:
+        regular_prob = bpy.context.scene.my_tool.NonElementalProbability
+        full_prob = bpy.context.scene.my_tool.FullElementalProbability
+        outfit_prob = bpy.context.scene.my_tool.OutfitElementalProbability
 
         rand_elements = []
         weights_elements = []
-        if none_rarity > 0:
-            rand_elements.append("None")
-            weights_elements.append(none_rarity)
-        if elements_probability > 0:
-            for e in config.Elements:
-                rand_elements.append(e)
-                weights_elements.append(element_rarity)
-        chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
-        if chosen == "None":
-            return "None-None"
 
+        if regular_prob:
+            rand_elements.append("None")
+            weights_elements.append(regular_prob)
+        if full_prob:
+            rand_elements.append("All")
+            weights_elements.append(full_prob)
+        if full_prob:
+            rand_elements.append("Outfit")
+            weights_elements.append(outfit_prob)
+
+        if not rand_elements:
+            rand_elements.append("None")
+            weights_elements.append(100)
+        chosen_style = random.choices(rand_elements, weights=weights_elements, k=1)[0]
+    else:
+        chosen_style = bpy.context.scene.my_tool.elementStyle
+
+    if chosen_style == 'None':
+        return 'None-None'
+    
+    if not bpy.context.scene.my_tool.isElementLocked:
         rand_options = []
         weights_options = []
-        for o in options:
-            rand_options.append(o[0])
-            weights_options.append(o[1])
-        chosen_option = random.choices(rand_options, weights=weights_options, k=1)[0]
+        for e in config.Elements:
+            rand_options.append(e)
+            weights_options.append(1)
+        chosen_element = random.choices(rand_options, weights=weights_options, k=1)[0]
     else:
-        chosen_option = bpy.context.scene.my_tool.elementStyle
-        chosen = bpy.context.scene.my_tool.element
-        if chosen == 'None':
-            return "None-None"
-    
-    return chosen_option + '-' + chosen
+        chosen_element = bpy.context.scene.my_tool.element
+
+    return chosen_style + '-' + chosen_element
 # ----------------------------------------------------------------------
 
 count = 0

@@ -655,11 +655,11 @@ def elements_updated():
    element = DNASplit[1] # .pop
    last_ele_style, last_ele = element.split('-')
 
-   if bpy.context.scene.my_tool.element == last_ele and \
-               (bpy.context.scene.my_tool.elementStyle == last_ele_style or last_ele == 'None'):
+   if (bpy.context.scene.my_tool.element == last_ele  or last_ele_style == 'None') and \
+               bpy.context.scene.my_tool.elementStyle == last_ele_style:
       return
 
-   if bpy.context.scene.my_tool.element == 'None':
+   if bpy.context.scene.my_tool.elementStyle == 'None':
       new_element = 'None-None'
    else:
       new_element = bpy.context.scene.my_tool.elementStyle + '-' + bpy.context.scene.my_tool.element
@@ -982,10 +982,10 @@ def fill_pointers_from_dna(DNA): # fill all pointer properties with variants
 
    ele_style, ele = element.split('-')
 
-   if ele != bpy.context.scene.my_tool.element:
+   if ele != bpy.context.scene.my_tool.element and ele_style != 'None':
       bpy.context.scene.my_tool.element = ele
 
-   if ele_style != bpy.context.scene.my_tool.elementStyle and ele != 'None':
+   if ele_style != bpy.context.scene.my_tool.elementStyle:
       bpy.context.scene.my_tool.elementStyle = ele_style
 
    return

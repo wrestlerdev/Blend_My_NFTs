@@ -114,10 +114,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         ]
     )
 
-    # cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
-    # solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
-    # erc721MetaData: bpy.props.BoolProperty(name="ERC721")
-
     # API Panel properties:
     apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
 
@@ -129,8 +125,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             name='Elemental Type',
             description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
             items=[
+                ('None', 'None', 'None'),
                 ('All', 'All', 'All'),
-                ('Skin', 'Skin', 'Skin'),
+                # ('Skin', 'Skin', 'Skin'),
                 ('Outfit', 'Outfit', 'Outfit')
             ],
             default='All',
@@ -141,7 +138,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             name='Elemental Type',
             description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
             items=[
-                ('None', 'None', 'None'),
                 ('Gold', 'Gold', 'Gold'),
                 ('Gold_02', 'Gold_02', 'Gold_02'),
                 ('Gold_03', 'Gold_03', 'Gold_03'),
@@ -152,7 +148,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         )
 
     isElementLocked: bpy.props.BoolProperty(name='Lock Element', default=False)
-    elementalProbability: bpy.props.IntProperty(name='ElementChance', default=0, max=100, min=0)
+    isElementStyleLocked: bpy.props.BoolProperty(name='Lock Style', default=False)
+    NonElementalProbability: bpy.props.IntProperty(name='Regular', default=50, max=100, min=0)
+    FullElementalProbability: bpy.props.IntProperty(name='All', default=0, max=100, min=0)
+    OutfitElementalProbability: bpy.props.IntProperty(name='Outfit', default=0, max=100, min=0)
 
     renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
@@ -1779,9 +1778,19 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
         else:
             row.prop(mytool, "elementStyle", expand=True, emboss=False)
 
-        row.prop(mytool, "isElementLocked", toggle=1, expand=True)
+        row.scale_x = 0.75
+        row.prop(mytool, "isElementLocked", toggle=1, expand=True, icon='LOCKED', text='Element')
+        row.prop(mytool, "isElementStyleLocked", toggle=1, expand=True, icon='LOCKED', text='Style')
         row.scale_x = 0.5
-        row.prop(mytool, "elementalProbability", text='')
+        row = layout.row()
+        row.label(text='')
+        row.separator(factor=0)
+        row.prop(mytool, "NonElementalProbability", text='', emboss=False)
+        row.prop(mytool, "FullElementalProbability", text='', emboss=False)
+        row.prop(mytool, "OutfitElementalProbability", text='', emboss=False)
+        row.separator(factor=0)
+        row.scale_x = 1.6
+        row.label(text='')
 
         row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
