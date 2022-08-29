@@ -817,8 +817,8 @@ def render_single_item(hierarchy):
     bpy.data.objects.get("Platform_Kae").hide_viewport = True
     bpy.data.objects.get("Platform_Kae").hide_render = True
 
-    bpy.data.objects.get("SinglesPlaneBG").hide_viewport = False
-    bpy.data.objects.get("SinglesPlaneBG").hide_render = False
+    #bpy.data.objects.get("SinglesPlaneBG").hide_viewport = False
+    #bpy.data.objects.get("SinglesPlaneBG").hide_render = False
 
     for attribute in hierarchy: # hide all
         bpy.data.collections[attribute].hide_viewport = False
@@ -837,8 +837,10 @@ def render_single_item(hierarchy):
                     for obj in bpy.data.collections.get(char_var).objects: # Should we re hide the object meshes?
                             obj.hide_viewport = False
                             obj.hide_render = False
-                    mesh_objects  =bpy.data.collections.get(char_var).objects
+                    mesh_objects  = bpy.data.collections.get(char_var).objects
                     set_armature_for_meshes("Kae", mesh_objects)
+                    print(bpy.data.collections.get(variant).objects[0].name)
+                    Previewer.set_texture_on_mesh(variant, mesh_objects, bpy.data.collections.get(variant).objects[0], "AlTanoor_02", 1024,[attribute, type, variant])
 
                     #RENDER
                     print(char_var)
