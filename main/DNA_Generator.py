@@ -365,6 +365,7 @@ def send_To_Record_JSON(NFTRecord_save_path):
    DataDictionary["numNFTsGenerated"] = 0
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
    DataDictionary["numCharacters"] = numCharacters
+   DataDictionary["ElementalProbability"] = 0
 
    DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []
@@ -388,6 +389,7 @@ def save_new_rarity_Record(NFTRecord_save_path): # saves new rarity to existing 
    DataDictionary["numNFTsGenerated"] = OriginalDataDictionary["numNFTsGenerated"]
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
    DataDictionary["numCharacters"] =  OriginalDataDictionary["numCharacters"]
+   DataDictionary["ElementalProbability"] = bpy.context.scene.my_tool.elementalProbability
 
    DataDictionary["hierarchy"] = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] =  OriginalDataDictionary["DNAList"]
@@ -408,7 +410,9 @@ def reset_rarity_Record(NFTRecord_save_path):
    DataDictionary = {}
    DataDictionary["numNFTsGenerated"] = OriginalDataDictionary["numNFTsGenerated"]
    DataDictionary["numCharacters"] = OriginalDataDictionary["numCharacters"]
+   DataDictionary["ElementalProbability"] = 0
    DataDictionary["DNAList"] = OriginalDataDictionary["DNAList"]
+
    hierarchy = NFTHirachy.createHirachy()
 
    zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-FeetNull", "00-HairShortNull"]
@@ -447,6 +451,7 @@ def save_rarity_To_New_Record(original_hierarchy, NFTRecord_save_path, Backup_sa
    DataDictionary["numNFTsGenerated"] = 0
    numCharacters = {k:v for (k,v) in zip(config.Characters, [0] * len(config.Characters))}
    DataDictionary["numCharacters"] = numCharacters
+   DataDictionary["ElementalProbability"] = 0
 
    hierarchy = NFTHirachy.createHirachy()
    DataDictionary["DNAList"] = []

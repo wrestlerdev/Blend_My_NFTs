@@ -122,16 +122,13 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                             else:
                                 update_rarity_color(variant, 0)
                                 scene_var_coll["rarity"] = 0
-                            
 
-
-                    else: # BETA_1.0 || has no textures so is not a valid collection
+                    else:
                         current_var_coll = bpy.data.collections[h_variant]
                         if current_var_coll.get("rarity") is not None:
                             del(current_var_coll["rarity"])
                         if scene_type_coll.get("rarity") is not None:
                             del(scene_type_coll["rarity"])
-
                         
                         update_rarity_color(h_variant, 0)
                         update_rarity_color(type, 0)
@@ -139,10 +136,11 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                     if scene_type_coll.get("rarity") is not None:
                         del(scene_type_coll["rarity"])
                     update_rarity_color(type, 0)
-
             else:
                 print(type)
                 update_rarity_color(type, 0)
+    
+    bpy.context.scene.my_tool.elementalProbability = DataDictionary["ElementalProbability"] if "ElementalProbability" in DataDictionary.keys() else 0
     return
 
 
@@ -236,8 +234,10 @@ def update_rarity_color(coll_name, rarity):
         bpy.data.collections[coll_name].color_tag = col["green"]
     elif rarity > 20:
         bpy.data.collections[coll_name].color_tag = col["orange"]
-    elif rarity > 0:
+    elif rarity > 5:
         bpy.data.collections[coll_name].color_tag = col["yellow"]
+    elif rarity > 0:
+        bpy.data.collections[coll_name].color_tag = col["purple"]
     else:
         bpy.data.collections[coll_name].color_tag = col["red"]
     return

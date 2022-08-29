@@ -569,17 +569,22 @@ def PickCharacter():
 def PickElement():
     # All || Skin || Outfit
     if not bpy.context.scene.my_tool.isElementLocked:
-        element_rarity = 10
-        none_rarity = 30
+        elements_probability = bpy.context.scene.my_tool.elementalProbability
+        none_rarity = 100 - elements_probability
+        element_rarity = elements_probability / len(config.Elements)
         # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
         # options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
         options = [("All", 20), ("Outfit", 20)]
 
-        rand_elements = ["None"]
-        weights_elements = [none_rarity]
-        for e in config.Elements:
-            rand_elements.append(e)
-            weights_elements.append(element_rarity)
+        rand_elements = []
+        weights_elements = []
+        if none_rarity > 0:
+            rand_elements.append("None")
+            weights_elements.append(none_rarity)
+        if elements_probability > 0:
+            for e in config.Elements:
+                rand_elements.append(e)
+                weights_elements.append(element_rarity)
         chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
         if chosen == "None":
             return "None-None"

@@ -152,6 +152,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         )
 
     isElementLocked: bpy.props.BoolProperty(name='Lock Element', default=False)
+    elementalProbability: bpy.props.IntProperty(name='ElementChance', default=0, max=100, min=0)
 
     renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
@@ -810,8 +811,9 @@ class saveBatch(bpy.types.Operator):
             DNA_Generator.send_To_Record_JSON(record_backup_save_path)
 
         nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
-        # DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
 
+        # DNA_Generator.Outfit_Generator.count_all_rarities(batch_save_path, index)
+        # LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
@@ -1509,7 +1511,8 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [2048, 1024, 512, 256, 128, 64]
+        # resolutions = [2048, 1024, 512, 256, 128, 64]
+        resolutions = [2048, 1024, 512, 64]
         should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
         TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}
@@ -1777,6 +1780,8 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
             row.prop(mytool, "elementStyle", expand=True, emboss=False)
 
         row.prop(mytool, "isElementLocked", toggle=1, expand=True)
+        row.scale_x = 0.5
+        row.prop(mytool, "elementalProbability", text='')
 
         row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
