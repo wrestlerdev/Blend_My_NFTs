@@ -428,7 +428,7 @@ class randomizeAllColor(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        if bpy.context.scene.my_tool.element == 'None':
+        if bpy.context.scene.my_tool.elementStyle == 'None':
             dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
             Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
@@ -440,7 +440,7 @@ class randomizeAllSets(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        if bpy.context.scene.my_tool.element == 'None':
+        if bpy.context.scene.my_tool.elementStyle == 'None':
             style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
             dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
             Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
@@ -460,7 +460,7 @@ class randomizeColor(bpy.types.Operator):
             input_slot = self.collection_name
             slot_coll = config.Slots[input_slot][0]
             type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
-            if type not in config.EmptyTypes and bpy.context.scene.my_tool.element == 'None':
+            if type not in config.EmptyTypes and bpy.context.scene.my_tool.elementStyle == 'None':
                 Exporter.Previewer.update_colour_random(slot_coll)
         return {'FINISHED'}
 

@@ -140,7 +140,9 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                 print(type)
                 update_rarity_color(type, 0)
     
-    bpy.context.scene.my_tool.elementalProbability = DataDictionary["ElementalProbability"] if "ElementalProbability" in DataDictionary.keys() else 0
+    bpy.context.scene.my_tool.NonElementalProbability = DataDictionary["RegularWeight"] if "RegularWeight" in DataDictionary.keys() else 0
+    bpy.context.scene.my_tool.FullElementalProbability = DataDictionary["ElementalWeight"] if "ElementalWeight" in DataDictionary.keys() else 0
+    bpy.context.scene.my_tool.OutfitElementalProbability = DataDictionary["ElementalOutfitWeight"] if "ElementalOutfitWeight" in DataDictionary.keys() else 0
     return
 
 

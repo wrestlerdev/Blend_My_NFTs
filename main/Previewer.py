@@ -577,25 +577,26 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
                print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
                return original_texture
 
+         print("######################")
 
-            if texture_set != 'A':
-               original_texture_folder_path = os.path.join(variant_folder_path, "Textures", 'A')
-               for t in os.listdir(original_texture_folder_path):
-                  if t.endswith(new_texture_end):
-                     new_texture = t
-                     new_texture_path = new_path + new_texture
-                     return new_texture, new_texture_path, _type
+         if texture_set != 'A':
+            original_texture_folder_path = os.path.join(variant_folder_path, "Textures", 'A')
+            for t in os.listdir(original_texture_folder_path):
+               if t.endswith(new_texture_end):
+                  new_texture = t
+                  new_texture_path = new_path + new_texture
+                  return new_texture, new_texture_path, _type
 
-                  elif t.endswith(original_texture_end): # returns 4k if proper size texture doesn't exist
-                     texture_split = t.split('_')
-                     original_texture_path = new_path + t
-                     original_texture = t, original_texture_path, _type
+               elif t.endswith(original_texture_end): # returns 4k if proper size texture doesn't exist
+                  texture_split = t.split('_')
+                  original_texture_path = new_path + t
+                  original_texture = t, original_texture_path, _type
 
-            if original_texture:
-               texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
-               print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
-               print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
-               return original_texture
+         if original_texture:
+            texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
+            print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
+            print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+            return original_texture
                   
    return None
 
