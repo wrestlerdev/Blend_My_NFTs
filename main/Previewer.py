@@ -2,6 +2,7 @@
 # This file generates NFT DNA based on a .blend file scene structure and exports NFTRecord.json.
 
 import collections
+from xml.dom.minidom import Element
 import bpy
 import os
 import json
@@ -166,6 +167,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 def set_material_element(element):
+   
+
    mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer"]
    element_style, element_type = element.split('-')
    if element_style == 'None':
@@ -193,10 +196,17 @@ def set_material_element(element):
 
    if element_type != 'None':
       node_tree = bpy.data.node_groups["ElementPicker"]
-      element_node = node_tree.nodes[element_type]
-      output_node = node_tree.nodes["Group Output"]
+      #element_node = node_tree.nodes[element_type]
+      #output_node = node_tree.nodes["Group Output"]
+      
+      #node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
+      elementIndex = config.Elements.index(element_type)
+      for i in range(0, len(config.Elements)):
+         if i == elementIndex:
+            node_tree.nodes["Index_" + str(i)].outputs["Value"].default_value = 1
+         else:
+            node_tree.nodes["Index_" + str(i)].outputs["Value"].default_value = 0
 
-      node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
    return
 
 
