@@ -8,6 +8,7 @@ image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
 EmptyTypes = ["Expression", "ExpressionLowerNone", "HeadShortNone", "FeetShortNone", 'Background', "Particles"]
 Elements = ["Bismuth","Bismuth_02","Gold", "Gold_02", "Gold_03"]
 
+LoggingEnabled = True
 
 Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
     "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),
