@@ -162,7 +162,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    SaveTempDNADict(newTempDict)
    bpy.context.scene.my_tool.lastDNA = DNA
    bpy.context.scene.my_tool.inputDNA = DNA
-   fill_pointers_from_dna(DNA)
+   if not Select:
+      fill_pointers_from_dna(DNA)
 
 
 
@@ -196,16 +197,17 @@ def set_material_element(element):
 
    if element_type != 'None':
       node_tree = bpy.data.node_groups["ElementPicker"]
-      #element_node = node_tree.nodes[element_type]
-      #output_node = node_tree.nodes["Group Output"]
+      element_node = node_tree.nodes[element_type]
+      output_node = node_tree.nodes["Group Output"]
       
-      #node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
-      elementIndex = config.Elements.index(element_type)
-      for i in range(0, len(config.Elements)):
-         if i == elementIndex:
-            node_tree.nodes["Index_" + str(i)].outputs["Value"].default_value = 1
-         else:
-            node_tree.nodes["Index_" + str(i)].outputs["Value"].default_value = 0
+      node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
+
+      # elementIndex = config.Elements.index(element_type)
+      # for i in range(0, len(config.Elements)):
+      #    if i == elementIndex:
+      #       node_tree.nodes["Index_" + str(i)].outputs["Value"].default_value = 1
+      #    else:
+      #       node_tree.nodes["Index_" + str(i)].outputs["Value"].default_value = 0
 
    return
 
