@@ -114,10 +114,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         ]
     )
 
-    # cardanoMetaDataBool: bpy.props.BoolProperty(name="Cardano Cip")
-    # solanaMetaDataBool: bpy.props.BoolProperty(name="Solana Metaplex")
-    # erc721MetaData: bpy.props.BoolProperty(name="ERC721")
-
     # API Panel properties:
     apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
 
@@ -129,8 +125,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             name='Elemental Type',
             description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
             items=[
+                ('None', 'None', 'None'),
                 ('All', 'All', 'All'),
-                ('Skin', 'Skin', 'Skin'),
+                # ('Skin', 'Skin', 'Skin'),
                 ('Outfit', 'Outfit', 'Outfit')
             ],
             default='All',
@@ -141,7 +138,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             name='Elemental Type',
             description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
             items=[
-                ('None', 'None', 'None'),
                 ('Gold', 'Gold', 'Gold'),
                 ('Gold_02', 'Gold_02', 'Gold_02'),
                 ('Gold_03', 'Gold_03', 'Gold_03'),
@@ -152,6 +148,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         )
 
     isElementLocked: bpy.props.BoolProperty(name='Lock Element', default=False)
+    isElementStyleLocked: bpy.props.BoolProperty(name='Lock Style', default=False)
+    NonElementalProbability: bpy.props.IntProperty(name='Regular', default=50, max=100, min=0)
+    FullElementalProbability: bpy.props.IntProperty(name='All', default=0, max=100, min=0)
+    OutfitElementalProbability: bpy.props.IntProperty(name='Outfit', default=0, max=100, min=0)
 
     renameSetFrom: bpy.props.StringProperty(name='Rename Set From')
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
@@ -428,8 +428,9 @@ class randomizeAllColor(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
-        Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        if bpy.context.scene.my_tool.elementStyle == 'None':
+            dna_string, CharacterItems = Exporter.Previewer.randomize_color_style()
+            Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
 class randomizeAllSets(bpy.types.Operator):
@@ -439,9 +440,10 @@ class randomizeAllSets(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
-        dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
-        Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
+        if bpy.context.scene.my_tool.elementStyle == 'None':
+            style = bpy.context.scene.my_tool.currentGeneratorStyle or "Random"
+            dna_string, CharacterItems = Exporter.Previewer.randomize_color_style(style)
+            Exporter.Previewer.show_nft_from_dna(dna_string, CharacterItems)
         return {'FINISHED'}
 
 
@@ -458,7 +460,7 @@ class randomizeColor(bpy.types.Operator):
             input_slot = self.collection_name
             slot_coll = config.Slots[input_slot][0]
             type = bpy.context.scene.my_tool[input_slot].name.split('_')[1]
-            if type not in config.EmptyTypes:
+            if type not in config.EmptyTypes and bpy.context.scene.my_tool.elementStyle == 'None':
                 Exporter.Previewer.update_colour_random(slot_coll)
         return {'FINISHED'}
 
@@ -808,8 +810,9 @@ class saveBatch(bpy.types.Operator):
             DNA_Generator.send_To_Record_JSON(record_backup_save_path)
 
         nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(index))
-        # DNA_Generator.Outfit_Generator.count_all_rarities(nftrecord_path, index)
 
+        # DNA_Generator.Outfit_Generator.count_all_rarities(batch_save_path, index)
+        # LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
 
@@ -1489,7 +1492,8 @@ class clearGeneratorStyle(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        context.scene.my_tool.currentGeneratorStyle = ''
+        if context.scene.my_tool.currentGeneratorStyle != 'Elemental':
+            context.scene.my_tool.currentGeneratorStyle = ''
         return {'FINISHED'}
 
 # --------------------------------- Textures ---------------------------------------------
@@ -1506,7 +1510,8 @@ class downresTextures(bpy.types.Operator):
 
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        resolutions = [2048, 1024, 512, 256, 128, 64]
+        # resolutions = [2048, 1024, 512, 256, 128, 64]
+        resolutions = [2048, 1024, 512, 64]
         should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
         TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}
@@ -1526,6 +1531,21 @@ class renameAllOriginalTextures(bpy.types.Operator):
         TextureEditor.rename_all_original_textures(input_path)
         return {'FINISHED'}
 
+
+class downresElementTextures(bpy.types.Operator):
+    bl_idname = 'downres.elementtextures'
+    bl_label = 'Down-res Element Textures'
+    bl_description = "This can't be undoooooooooone"
+    bl_options = {'REGISTER', 'UNDO'}
+
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        elements_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'ELEMENTS')
+        TextureEditor.downres_element_textures(elements_folder_path, [1024, 2048], False)
+        return {'FINISHED'}
 
 # -------------------------------------------------------------------------------
 
@@ -1629,13 +1649,10 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-
-        char = "Kae"
+        # TextureEditor.downres_element_textures([1024,2048], False)
         # Exporter.Previewer.turn_on_tattoo(char, "Bismuth")
         #bpy.data.node_groups["TattooKae"].nodes["TattooColor"].outputs['Color'].default_value = (0.1,0,0,1)
         # Exporter.Previewer.add_texture_to_tattoos(char, texture1='clear')
-        Exporter.render_all_items_as_single()
-            
         return {'FINISHED'}
 
 
@@ -1761,7 +1778,19 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
         else:
             row.prop(mytool, "elementStyle", expand=True, emboss=False)
 
-        row.prop(mytool, "isElementLocked", toggle=1, expand=True)
+        row.scale_x = 0.75
+        row.prop(mytool, "isElementLocked", toggle=1, expand=True, icon='LOCKED', text='Element')
+        row.prop(mytool, "isElementStyleLocked", toggle=1, expand=True, icon='LOCKED', text='Style')
+        row.scale_x = 0.5
+        row = layout.row()
+        row.label(text='')
+        row.separator(factor=0)
+        row.prop(mytool, "NonElementalProbability", text='', emboss=False)
+        row.prop(mytool, "FullElementalProbability", text='', emboss=False)
+        row.prop(mytool, "OutfitElementalProbability", text='', emboss=False)
+        row.separator(factor=0)
+        row.scale_x = 1.6
+        row.label(text='')
 
         row = layout.row()
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
@@ -2492,6 +2521,12 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.scale_x = 0.4
         row.prop(mytool, 'shouldForceDownres')
 
+        box.separator(factor=1.5)
+        row = box.row()
+        row.operator(downresElementTextures.bl_idname, text=downresElementTextures.bl_label)
+
+
+
         row.scale_x = 1
         layout.separator(factor=1.5)
         box = layout.box()
@@ -2802,6 +2837,7 @@ classes = (
     forceLoadDNAFromUI,
     renameSet,
     countUpAllItems,
+    downresElementTextures,
     testButton
 
 )

@@ -93,7 +93,12 @@ ItemUsedBodySlot = {
 
 "Background" : ["22-Background"],
 
-"TattooMiddleTorso": ["02-MiddleTorso"]
+"TattooMiddleTorso": ["02-MiddleTorso"],
+"TattooForearm": ["03-ForeArms"],
+"TattooCalf": ["08-Calf"],
+"TattooFeet": ["10-Feet"],
+"TattooNeck": ["14-Neck"]
+
 }
 
 
@@ -176,7 +181,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
         character = PickCharacter()
         element = PickElement()
-        style = ColorGen.SetUpCharacterStyle()
+        if element == 'None-None':
+            style = ColorGen.SetUpCharacterStyle()
+        else:
+            style = 'Elemental'
         bpy.context.scene.my_tool.currentGeneratorStyle = style
 
         # letterstyles = 'abcdefghijkl'
@@ -259,6 +267,10 @@ def RandomizeFullCharacter(maxNFTs, save_path):
             if not (typeIndex == 0 and varientIndex == 0):
                 if typeChoosen[3:] in config.EmptyTypes:
                     color_key = 'Empty'
+                elif typeChoosen[3:].startswith("Tattoo"):
+                    color_key = 'Black'
+                elif element != 'None-None':
+                    color_key = 'Element'
                 else:
                     color_key, color_choice = ColorGen.PickOutfitColors(attribute)
                 SingleDNA[list(hierarchy.keys()).index(attribute)] = "-".join([str(typeIndex), str(varientIndex), str(textureIndex), str(color_key)])
@@ -289,6 +301,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
         SingleDNA.insert(0, character)
         SingleDNA.insert(1, element)
         SingleDNA.insert(2, style)
+
         # SingleDNA.insert(1, ColorGen.styleKey)
         formattedDNA = ','.join(SingleDNA)
         if formattedDNA not in DNASet and formattedDNA not in exsistingDNASet:
@@ -554,35 +567,45 @@ def PickCharacter():
 
 
 def PickElement():
-    # All || Skin || Outfit
+    if not bpy.context.scene.my_tool.isElementStyleLocked:
+        regular_prob = bpy.context.scene.my_tool.NonElementalProbability
+        full_prob = bpy.context.scene.my_tool.FullElementalProbability
+        outfit_prob = bpy.context.scene.my_tool.OutfitElementalProbability
+
+        rand_elements = []
+        weights_elements = []
+
+        if regular_prob:
+            rand_elements.append("None")
+            weights_elements.append(regular_prob)
+        if full_prob:
+            rand_elements.append("All")
+            weights_elements.append(full_prob)
+        if full_prob:
+            rand_elements.append("Outfit")
+            weights_elements.append(outfit_prob)
+
+        if not rand_elements:
+            rand_elements.append("None")
+            weights_elements.append(100)
+        chosen_style = random.choices(rand_elements, weights=weights_elements, k=1)[0]
+    else:
+        chosen_style = bpy.context.scene.my_tool.elementStyle
+
+    if chosen_style == 'None':
+        return 'None-None'
+    
     if not bpy.context.scene.my_tool.isElementLocked:
-        element_rarity = 10
-        none_rarity = 30
-        # elements = [("None", 100), ("Gold", 10), ("Bismuth", 10)]
-        options = [("All", 20), ("Skin", 20), ("Outfit", 20)]
-
-        rand_elements = ["None"]
-        weights_elements = [none_rarity]
-        for e in config.Elements:
-            rand_elements.append(e)
-            weights_elements.append(element_rarity)
-        chosen = random.choices(rand_elements, weights=weights_elements, k=1)[0]
-        if chosen == "None":
-            return "None-None"
-
         rand_options = []
         weights_options = []
-        for o in options:
-            rand_options.append(o[0])
-            weights_options.append(o[1])
-        chosen_option = random.choices(rand_options, weights=weights_options, k=1)[0]
+        for e in config.Elements:
+            rand_options.append(e)
+            weights_options.append(1)
+        chosen_element = random.choices(rand_options, weights=weights_options, k=1)[0]
     else:
-        chosen_option = bpy.context.scene.my_tool.elementStyle
-        chosen = bpy.context.scene.my_tool.element
-        if chosen == 'None':
-            return "None-None"
-    
-    return chosen_option + '-' + chosen
+        chosen_element = bpy.context.scene.my_tool.element
+
+    return chosen_style + '-' + chosen_element
 # ----------------------------------------------------------------------
 
 count = 0
