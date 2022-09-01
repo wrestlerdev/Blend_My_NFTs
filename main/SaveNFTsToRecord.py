@@ -1,7 +1,3 @@
-# Purpose:
-# This file sorts the NFT DNA from NFTRecord.json and exports it to a given number of Batch#.json files set by nftsPerBatch
-# in config.py.
-
 import bpy
 import os
 import json
@@ -10,15 +6,12 @@ import bmesh
 from . import config
 
 
-def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_record_save_path):
+def SaveNFTs(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_record_save_path): 
     single_record_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
-
     DataDictionary = json.load(open(single_record_path))
     single_i = int(DataDictionary["numNFTsGenerated"])
-    
     MasterDictionary = json.load(open(master_record_save_path))
     totalDNAList = MasterDictionary["DNAList"]
-
     character_count = [0] * len(config.Characters)
 
     uniqueDNASetToAdd = []
@@ -27,7 +20,6 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
             singleNFT = {}
             singleNFT["CharacterItems"] = NFTDict[nft]
             singleNFT["DNAList"] = nft
-
             singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
             if not os.path.exists(os.path.join(single_batch_save_path, "NFT_{:04d}".format(single_i + 1))):
                 os.mkdir(os.path.join(single_batch_save_path, "NFT_{:04d}".format(single_i + 1)))
@@ -39,19 +31,18 @@ def SaveNFT(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_re
             char_index = config.Characters.index(character)
             character_count[char_index] += 1
 
-
     if uniqueDNASetToAdd:
         UpdateNFTRecord(uniqueDNASetToAdd, character_count, DataDictionary, single_record_path, master_record_save_path)
-        print("{} NFTs have been saved (ノಠ vಠ)ノ彡( {}o)". format(len(uniqueDNASetToAdd), "o°"*len(uniqueDNASetToAdd)))
+        config.custom_print(("{} NFTs have been saved (ノಠ vಠ)ノ彡( {}o)".format(len(uniqueDNASetToAdd), "o°"*len(uniqueDNASetToAdd))), col=config.bcolors.OK)
         return True
     else:
-        print("ERROR: This NFT(s) already exists")
+        config.custom_print("ERROR: This NFT(s) already exists", col=config.bcolors.ERROR)
         return False
 
 
-def UpdateNFTRecord(DNASetToAdd, CharacterCount, DataDictionary, single_record_path, master_record_save_path):
-    print("This should updated record.json with new nft DNA and number")
-
+def UpdateNFTRecord(DNASetToAdd, CharacterCount, DataDictionary, single_record_path, master_record_save_path): 
+    # This should update record.json with new nft DNA and number
+    # Also updates nft/character counts
     updatedMasterDictionary = {}
     MasterDictionary = json.load(open(master_record_save_path))
     updatedMasterDictionary["numNFTsGenerated"] = int(MasterDictionary["numNFTsGenerated"]) + len(DNASetToAdd)
@@ -59,8 +50,6 @@ def UpdateNFTRecord(DNASetToAdd, CharacterCount, DataDictionary, single_record_p
 
     numMasterCharDict = {}
     numSingleCharDict = {}
-
-    # updatedMasterDictionary["numCharacters"] = newNumMasterCharDict
 
     currentNFTNumber = DataDictionary["numNFTsGenerated"]
     currentDNASet = DataDictionary["DNAList"]
@@ -93,21 +82,21 @@ def UpdateNFTRecord(DNASetToAdd, CharacterCount, DataDictionary, single_record_p
       ledger = json.dumps(updatedDataDictionary, indent=1, ensure_ascii=True)
       with open(single_record_path, 'w') as outfile:
         outfile.write(ledger + '\n')
-        print("Success update {}". format(single_record_path))
+        config.custom_print("Success update {}".format(single_record_path), col=config.bcolors.OK)
     except:
-        print("Failed to update {}". format(single_record_path))
+        config.custom_print("Failed to update {}".format(single_record_path), col=config.bcolors.ERROR)
 
     try:
       ledger = json.dumps(updatedMasterDictionary, indent=1, ensure_ascii=True)
       with open(master_record_save_path, 'w') as outfile:
         outfile.write(ledger + '\n')
-        print("Success update {}". format(master_record_save_path))
+        config.custom_print("Success update {}".format(master_record_save_path), col=config.bcolors.OK)
     except:
-        print("Failed to update {}". format(master_record_save_path))
+        config.custom_print("Failed to update {}".format(master_record_save_path), col=config.bcolors.ERROR)
 
 
 
-def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, master_record_save_path):
+def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, master_record_save_path): # save over existing nft
     single_record_save_path = os.path.join(batch_save_path, "_NFTRecord_{:03d}.json".format(batch_index))
     DataDictionary = json.load(open(single_record_save_path))
     MasterDictionary = json.load(open(master_record_save_path))
@@ -130,7 +119,6 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     newMasterCharDict = MasterDictionary["numCharacters"]
 
     DNAList = DataDictionary["DNAList"]
-
     oldDNA = DNAList[nft_index - 1]
     old_char = oldDNA.partition(',')[0]
     new_char = DNAToAdd.partition(',')[0]
@@ -149,15 +137,13 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     oldDNAIndex = totalDNAList.index(oldDNA)
     totalDNAList[oldDNAIndex] = DNAToAdd
     updatedMasterDictionary["DNAList"] = totalDNAList
-
     try:
       ledger = json.dumps(updatedDictionary, indent=1, ensure_ascii=True)
       with open(single_record_save_path, 'w') as outfile:
         outfile.write(ledger + '\n')
-        print("Success update {}".format(single_record_save_path))
+        config.custom_print("Success update {}".format(single_record_save_path), col=config.bcolors.OK)
     except:
-        print("Failed to update {}".format(single_record_save_path))
-
+        config.custom_print("Failed to update {}".format(single_record_save_path), col=config.bcolors.ERROR)
     singleNFT = {}
     singleNFT["DNAList"] = DNAToAdd
     singleNFT["CharacterItems"] = NFTDict[DNAToAdd]
@@ -168,24 +154,23 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     updatedMasterObject = json.dumps(updatedMasterDictionary, indent=1, ensure_ascii=True)
     with open(master_record_save_path, "w") as outfile:
         outfile.write(updatedMasterObject)
-
     return True
+
+
+#------------------------------------------------------------
 
 
 def DeleteNFTsinRange(start, end, TotalDNA, save_path, batch_index, master_record_save_path):
     if start > end or start > len(TotalDNA):
-        print(f"{config.bcolors.ERROR}This is not a valid range. Nothing was deleted{config.bcolors.RESET}")
+        config.custom_print("This is not a valid range. Nothing was deleted", col=config.bcolors.WARNING)
         return
-
     if end > len(TotalDNA):
         end = len(TotalDNA)
-        print(f"{config.bcolors.WARNING}This is out of range. New range deleted is {start} ~ {end}{config.bcolors.RESET}")
-
+        config.custom_print("This is out of range. New range deleted is {} ~ {}".format(start, end), col=config.bcolors.WARNING)
     for index in range(end, start - 1, -1):
         DNA = TotalDNA[index - 1]
         DeleteNFT(DNA, save_path, batch_index, master_record_save_path)
-
-    print(f"{config.bcolors.OK}NFTs from {start} ~ {end} (total {end - start + 1}) deleted{config.bcolors.RESET}")
+    config.custom_print("NFTs from {} ~ {} (total {}) deleted".format(start, end, str(end - start + 1)), col=config.bcolors.OK)
     return
 
 
@@ -217,16 +202,15 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
     updatedDictionary["numCharacters"] = newSingleCharDict
 
     DNAList = DataDictionary["DNAList"]
-    if DNAToDelete in DNAList:
+    if DNAToDelete in DNAList: # goes through each dna, deletes, updates indices, then goes to next dna
         DNA_index = DNAList.index(DNAToDelete) + 1
         DNAList.remove(DNAToDelete)
         updatedDictionary["DNAList"] = DNAList
-
         try:
             ledger = json.dumps(updatedDictionary, indent=1, ensure_ascii=True)
             with open(NFTRecord_save_path, 'w') as outfile:
                 outfile.write(ledger + '\n')
-                print("Success update {}".format(NFTRecord_save_path))
+                config.custom_print("Success update {}".format(NFTRecord_save_path))
             UpdateSingleNFTFileIndex(DNA_index, save_path, batch_index)
 
             totalDNAList = MasterDictionary["DNAList"]
@@ -236,16 +220,15 @@ def DeleteNFT(DNAToDelete, save_path, batch_index, master_record_save_path):
             ledger = json.dumps(updatedMasterDictionary, indent=1, ensure_ascii=True)
             with open(master_record_save_path, 'w') as outfile:
                 outfile.write(ledger + '\n')
-                print("Success update {}".format(master_record_save_path))
+                config.custom_print("Success update {}".format(master_record_save_path))
         except:
-            print("Failed to update {}".format(master_record_save_path))
-
+            config.custom_print("Failed to update {}".format(master_record_save_path))
     else:
-        print("smth went wrong :^(")
+        config.custom_print("smth went wrong :^(")
     return DNA_index
 
 
-def UpdateSingleNFTFileIndex(DNA_index, save_path, batch_index): 
+def UpdateSingleNFTFileIndex(DNA_index, save_path, batch_index): # updates index of nft files after deletion
     total_nfts = len(next(os.walk(save_path))[1])
     nft_save_path = os.path.join(save_path, "NFT_{:04d}".format(DNA_index))
     shutil.rmtree(nft_save_path)
@@ -255,30 +238,14 @@ def UpdateSingleNFTFileIndex(DNA_index, save_path, batch_index):
         new_folder_path = os.path.join(save_path, "NFT_{:04d}".format(i-1))
 
         os.mkdir(new_folder_path)
-        
         os.rename(old_nft_save_path, new_nft_save_path)
-
         shutil.rmtree(os.path.join(save_path, "NFT_{:04d}".format(i)))
     return
 
 
-# def delete_hierarchy(parent_col):
-#     # Go over all the objects in the hierarchy like @zeffi suggested:
-#     def get_child_names(obj):
-#         for child in obj.children:
-#             if child.name != "Script_Ignore":
-#                 if child.children:
-#                     get_child_names(child)
-#                 for obj in child.objects:
-#                     bpy.data.objects.remove(obj, do_unlink=True)       
-#                 bpy.data.collections.remove(child)
-#     get_child_names(parent_col)
-
-
-
-def count_all_items_in_batch(batches_path, batch_nums, save_path):
+def count_all_items_in_batch(batches_path, batch_nums, save_path): # goes through all nfts in batches and counts up number of times a variant is used
     counter = {}
-    has_init = False
+    has_init = False # has all items been added to json and set to 0
     characters = 0
     for index in range(batch_nums[1], batch_nums[0]-1, -1):
         batch_path = os.path.join(batches_path, "Batch_{:03d}".format(index))
@@ -304,34 +271,26 @@ def count_all_items_in_batch(batches_path, batch_nums, save_path):
                     single_nft_json = json.load(open(json_path))
                     char_items = single_nft_json["CharacterItems"]
                     characters += 1
+
                     for slot in char_items.keys():
                         item_info = char_items[slot]
                         if item_info != "Null":
                             item = item_info[list(item_info)[0]]["item_texture"]
-
                             if item:
                                 variant_name = item.split('_')[3] + ' ' + item.split('_')[4]
                                 counter[variant_name]["count"] = counter[variant_name]["count"] + 1
                             else:
-                                print(f"{config.bcolors.ERROR}THIS ITEM ({list(item_info)[0]}) IS MISSING TEXTURE SETS{config.bcolors.RESET}")
+                                config.custom_print("THIS ITEM ({}) IS MISSING TEXTURE SETS".format(list(item_info)[0]), col=config.bcolors.ERROR)
 
-            
-    counter_sorted = {k: v for k, v in sorted(counter.items(), key=lambda item: -item[1]["count"])}
-
+    counter_sorted = {k: v for k, v in sorted(counter.items(), key=lambda item: -item[1]["count"])} # sort all items based on count
     counter_info = {}
     counter_info["Total Characters"] = characters
     counter_info["Items"] = counter_sorted
-
     counter_obj = json.dumps(counter_info, indent=1, ensure_ascii=True)
     with open(save_path, "w") as outfile:
         outfile.write(counter_obj)
-
     return
 
 
-def SaveBlenderFile():
-    print("This should save blender file")
-    #bpy.ops.wm.save_as_mainfile(filepath=batch_json_save_path+".blend")
-
 if __name__ == '__main__':
-    SaveNFT()
+    SaveNFTs()

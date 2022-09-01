@@ -28,7 +28,7 @@ KeywordAttributeDict = {
     for new_key in keys
 }
 
-KeywordKeys = [
+KeywordKeys = [ # this is the order attributes will be listed in the metadata
     "Null",
     "Character",
     "Theme",
@@ -46,87 +46,12 @@ KeywordKeys = [
     "Backwear",
     "Environment"
     ]
-
 KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))} 
 
 
 
-
-
-# def returnCardanoMetaData(name, NFT_DNA, NFT_Variants):
-#     metaDataDictCardano = {"721": {
-#         "<policy_id>": {
-#             name: {
-#                 "name": name,
-#                 "image": "",
-#                 "mediaType": "",
-#                 "description": "",
-
-#             }
-#         },
-#         "version": "1.0"
-#     }}
-
-#     for i in NFT_Variants:
-#         metaDataDictCardano["721"]["<policy_id>"][name][i] = NFT_Variants[i]
-
-#     return metaDataDictCardano
-
-# def returnSolanaMetaData(name, NFT_DNA, NFT_Variants):
-#     metaDataDictSolana = {"name": name, "symbol": "", "description": "", "seller_fee_basis_points": None,
-#                           "image": "", "animation_url": "", "external_url": ""}
-
-#     attributes = []
-
-#     for i in NFT_Variants:
-#         dictionary = {
-#             "trait_type": i,
-#             "value": NFT_Variants[i]
-#         }
-
-#         attributes.append(dictionary)
-
-#     metaDataDictSolana["attributes"] = attributes
-#     metaDataDictSolana["collection"] = {
-#         "name": "",
-#         "family": ""
-#     }
-
-#     metaDataDictSolana["properties"] = {
-#         "files": [{"uri": "", "type": ""}],
-#         "category": "",
-#         "creators": [{"address": "", "share": None}]
-#     }
-#     return metaDataDictSolana
-
-# def returnErc721MetaData(name, NFT_DNA, NFT_Variants):
-#     metaDataDictErc721 = {
-#         "name": name,
-#         "description": "",
-#         "image": "",
-#         "attributes": None,
-#     }
-
-#     attributes = []
-
-#     for i in NFT_Variants:
-#         dictionary = {
-#             "trait_type": i,
-#             "value": NFT_Variants[i]
-#         }
-
-#         attributes.append(dictionary)
-
-#     metaDataDictErc721["attributes"] = attributes
-
-#     return metaDataDictErc721
-
-
-
 def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
-
     keys = list(NFTDict.keys())
-
     metaDataDictErc721 = {
         "name": name,
         "description": "This is a test meta data file",
@@ -144,16 +69,13 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
 
     if style != 'Elemental':
         attributes.append({"trait_type": "Theme", "value": style})
-
     else:
         ele_style, ele_type = element.split('-')
         if ele_style == 'All':
             attributes.append({"trait_type": "Theme", "value": "Elemental"})
         elif ele_style == 'Outfit':
             attributes.append({"trait_type": "Theme", "value": "Elemental Outfit"})
-
         attributes.append({"trait_type": "Element", "value": ele_type})
-
 
     for key in keys:
         for itemKey in NFTDict[key]:
@@ -167,25 +89,19 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
 
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
                 # full_variant_name = [split_variant_name]
-                variant = variant[0].upper() + variant[1:]
+                variant = variant[0].upper() + variant[1:] # capitilize variant
                 split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
-
                 full_variant_name = [split_variant_name]
-                # if color_key != 'Empty':
-                #     full_variant_name.insert(0, color_key)
-                if len(bpy.data.collections[itemKey].objects) > 1:
+                if len(bpy.data.collections[itemKey].objects) > 1: # if mutliple texture variants, then add texture set to name
                     full_variant_name.append(texture)
 
                 full_variant_name = ' '.join(full_variant_name)
-                # full_variant_name = full_variant_name[0].upper() + full_variant_name[1:]
-
                 type_name = type[3:]
                 keyword = None
                 for key in list(KeywordAttributeDict.keys()):
                     if type_name.startswith(key):
                         keyword = KeywordAttributeDict[key]
                         break
-                    
                 if keyword:
                     if not variant.endswith("Null"):
                         dict = {"trait_type": keyword, "value": full_variant_name}
@@ -193,9 +109,7 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
 
     attributes = sorted(attributes, key = lambda i:KeywordAttributeOrder[i["trait_type"]])
     metaDataDictErc721["attributes"] = attributes
-
     return metaDataDictErc721
-
 
 
 if __name__ == '__main__':

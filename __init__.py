@@ -511,7 +511,7 @@ class createBatch(bpy.types.Operator):
         master_record_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
         nft_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
         DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(bpy.context.scene.my_tool.maxNFTs, nft_save_path)
-        if not SaveNFTsToRecord.SaveNFT(DNASet, NFTDict, nft_save_path, index, master_record_save_path):
+        if not SaveNFTsToRecord.SaveNFTs(DNASet, NFTDict, nft_save_path, index, master_record_save_path):
             self.report({"ERROR"}, "These NFTs already exist")
 
         numGenerated = LoadNFT.get_total_DNA()
@@ -608,7 +608,7 @@ class saveNewNFT(bpy.types.Operator):
 
         master_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
         nft_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index))
-        if not SaveNFTsToRecord.SaveNFT(DNASet, NFTDicts, nft_save_path, index, master_save_path):
+        if not SaveNFTsToRecord.SaveNFTs(DNASet, NFTDicts, nft_save_path, index, master_save_path):
             self.report({"ERROR"}, "This NFT already exists")
 
         bpy.context.scene.my_tool.loadNFTIndex = LoadNFT.get_total_DNA()
