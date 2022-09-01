@@ -1592,7 +1592,7 @@ class countUpAllItems(bpy.types.Operator):
 
     def execute(self, context):
         save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,'TotalItemCounter.json')
-        SaveNFTsToRecord.count_all_items_in_batch(bpy.context.scene.my_tool.batch_json_save_path, [1,10], save_path)
+        Rarity_Wrangler.count_all_items_in_batch(bpy.context.scene.my_tool.batch_json_save_path, [1,10], save_path)
         return {'FINISHED'}
 
 

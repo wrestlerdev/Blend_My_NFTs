@@ -49,7 +49,6 @@ KeywordKeys = [ # this is the order attributes will be listed in the metadata
 KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))} 
 
 
-
 def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
     keys = list(NFTDict.keys())
     metaDataDictErc721 = {

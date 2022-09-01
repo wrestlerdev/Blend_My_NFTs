@@ -153,6 +153,54 @@ def get_weighted_rarity(current_name, parent_name, total = 0):
                 return 0.0, total
 
 
+def count_all_items_in_batch(batches_path, batch_nums, save_path): # goes through all nfts in batches and counts up number of times a variant is used
+    counter = {}
+    has_init = False # has all items been added to json and set to 0
+    characters = 0
+    for index in range(batch_nums[1], batch_nums[0]-1, -1):
+        batch_path = os.path.join(batches_path, "Batch_{:03d}".format(index))
+        if os.path.exists(batch_path):
+            if not has_init:
+                record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(index))
+                record = json.load(open(record_path))
+                hierarchy = record["hierarchy"]
+                for slot in hierarchy.keys():
+                    for type in hierarchy[slot].keys():
+                        for var in hierarchy[slot][type].keys():
+                            for tex in hierarchy[slot][type][var]["textureSets"]:
+                                var_name = tex.split('_')[3] + ' ' + tex.split('_')[4]
+                                counter[var_name] = {}
+                                counter[var_name]["count"] = 0
+                                counter[var_name]["full_name"] = tex
+                has_init = True
+
+            for dir in os.listdir(batch_path):
+                folder_dir = os.path.join(batch_path, dir)
+                if os.path.isdir(folder_dir):
+                    json_path = os.path.join(folder_dir, "Batch_{:03d}_{}.json".format(index, dir))
+                    single_nft_json = json.load(open(json_path))
+                    char_items = single_nft_json["CharacterItems"]
+                    characters += 1
+
+                    for slot in char_items.keys():
+                        item_info = char_items[slot]
+                        if item_info != "Null":
+                            item = item_info[list(item_info)[0]]["item_texture"]
+                            if item:
+                                variant_name = item.split('_')[3] + ' ' + item.split('_')[4]
+                                counter[variant_name]["count"] = counter[variant_name]["count"] + 1
+                            else:
+                                config.custom_print("THIS ITEM ({}) IS MISSING TEXTURE SETS".format(list(item_info)[0]), col=config.bcolors.ERROR)
+
+    counter_sorted = {k: v for k, v in sorted(counter.items(), key=lambda item: -item[1]["count"])} # sort all items based on count
+    counter_info = {}
+    counter_info["Total Characters"] = characters
+    counter_info["Items"] = counter_sorted
+    counter_obj = json.dumps(counter_info, indent=1, ensure_ascii=True)
+    with open(save_path, "w") as outfile:
+        outfile.write(counter_obj)
+    return
+
 
 if __name__ == '__main__':
     count_all_rarities()
