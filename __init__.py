@@ -25,15 +25,12 @@ import re
 
 # Import files from main directory:
 
-importList = ['TextureEditor', 'Scene_Setup', 'Batch_Sorter', 'DNA_Generator', 'Exporter', 'Batch_Refactorer', 'get_combinations', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
+importList = ['TextureEditor', 'Scene_Setup', 'DNA_Generator', 'Exporter', 'SaveNFTsToRecord', 'UIList', 'LoadNFT']
 
 if bpy in locals():
         importlib.reload(LoadNFT)
         importlib.reload(DNA_Generator)
-        importlib.reload(Batch_Sorter)
         importlib.reload(Exporter)
-        importlib.reload(Batch_Refactorer)
-        importlib.reload(get_combinations)
         importlib.reload(SaveNFTsToRecord)
         importlib.reload(UIList)
         importlib.reload(Scene_Setup)
@@ -42,11 +39,8 @@ else:
     from .main import \
         LoadNFT, \
         DNA_Generator, \
-        Batch_Sorter, \
         Exporter, \
-        Batch_Refactorer, \
         SaveNFTsToRecord, \
-        get_combinations, \
         TextureEditor, \
         Scene_Setup
 
@@ -57,9 +51,6 @@ else:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
     # Main BMNFTS Panel properties: 
-    nftName: bpy.props.StringProperty(name="NFT Name")
-
-    collectionSize: bpy.props.IntProperty(name="NFT Collection Size", default=1, min=1)  # max=(combinations - offset)
     nftsPerBatch: bpy.props.IntProperty(name="NFTs Per Batch", default=1, min=1)  # max=(combinations - offset)
     batchToGenerate: bpy.props.IntProperty(name="Batch To Generate", default=1, min=1)  # max=(collectionSize / nftsPerBatch)
     
@@ -411,11 +402,10 @@ class randomizePreview(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        maxNFTs = bpy.context.scene.my_tool.collectionSize
         save_path = bpy.context.scene.my_tool.root_dir
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
 
-        DNA, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(maxNFTs, save_path)
+        DNA, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(1, save_path)
         SingleDNA = DNA[0]
         SingleNFTDict = NFTDict[DNA[0]]
         Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
@@ -1631,7 +1621,6 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-
         return {'FINISHED'}
 
 

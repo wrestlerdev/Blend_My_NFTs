@@ -485,10 +485,10 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
          filesplit = filename.split(_type)
          file_suffix, f, file_type = filesplit[1].rpartition('.')
          if file_suffix == suffix:
-            config.custom_print("then this should be the same texture?")
+            # config.custom_print("then this should be the same texture?")
             return None
          else:
-            config.custom_print("this is a different texture?")
+            # config.custom_print("this is a different texture?")
             texture_set = texture_mesh.name.rpartition('_')[2]
             slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
             variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])

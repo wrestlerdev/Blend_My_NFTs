@@ -11,9 +11,6 @@ import importlib
 from functools import partial
 from. import config
 
-from . import Rarity_Sorter
-importlib.reload(Rarity_Sorter)
-
 from . import Outfit_Generator
 importlib.reload(Outfit_Generator)
 
