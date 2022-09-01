@@ -196,7 +196,7 @@ def SetUpCharacterStyle():
                 number_List_Of_i.append(style)
                 rarity_List_Of_i.append(float(rarity))
     except:
-        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.ERROR}")
+        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.RESET}")
 
         for style in globalStyleInfo.keys():
             rarity = globalStyleInfo[style]["StyleRarity"]

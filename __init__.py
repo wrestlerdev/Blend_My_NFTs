@@ -202,7 +202,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     lastBatchSliderIndex: bpy.props.IntProperty(default=1)
 
     lastDNA: bpy.props.StringProperty(name="lastDNA") # for checks if dna string field is edited by user
-    inputDNA: bpy.props.StringProperty(name="DNA", update=lambda s,c: Exporter.Previewer.dnastring_has_updated(bpy.context.scene.my_tool.inputDNA,bpy.context.scene.my_tool.lastDNA))
+    inputDNA: bpy.props.StringProperty(name="DNA")
 
 
     inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
@@ -506,24 +506,6 @@ class randomizeMesh(bpy.types.Operator):
 
 
 #-----------------------------------------
-
-
-
-class clearSlots(bpy.types.Operator):
-    bl_idname = 'clear.slots'
-    bl_label = 'Clear All Slots'
-    bl_description = 'Set all slots to Null'
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
-        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        lastDNA = bpy.context.scene.my_tool.inputDNA
-        DNASplit = lastDNA.split(',')
-        character = DNASplit.pop(0)
-        DNA = Exporter.Previewer.get_null_dna(character)
-        bpy.context.scene.my_tool.inputDNA = DNA
-        return {'FINISHED'}
-
 
 
 class createBatch(bpy.types.Operator):
@@ -1649,10 +1631,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        # TextureEditor.downres_element_textures([1024,2048], False)
-        # Exporter.Previewer.turn_on_tattoo(char, "Bismuth")
-        #bpy.data.node_groups["TattooKae"].nodes["TattooColor"].outputs['Color'].default_value = (0.1,0,0,1)
-        # Exporter.Previewer.add_texture_to_tattoos(char, texture1='clear')
+
         return {'FINISHED'}
 
 
@@ -2781,7 +2760,6 @@ classes = (
     resetBatch,
     randomizeAllColor,
     randomizeColor,
-    clearSlots,
     initializeRecord,
     randomizePreview,
     saveNewNFT,
