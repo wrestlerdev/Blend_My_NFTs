@@ -12,7 +12,7 @@ def check_PIL(): # check if python imaging lib module exists
     try:
         from PIL import Image
     except:
-        print(f"{config.bcolors.ERROR}PIL needs to be installed to run this soz :<{config.bcolors.RESET}")
+        if config.LoggingEnabled: print(f"{config.bcolors.ERROR}PIL needs to be installed to run this soz :<{config.bcolors.RESET}")
         return False
     else:
         return True

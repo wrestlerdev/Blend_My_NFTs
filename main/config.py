@@ -8,7 +8,7 @@ image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
 EmptyTypes = ["Expression", "ExpressionLowerNone", "HeadShortNone", "FeetShortNone", 'Background', "Particles"]
 Elements = ["Bismuth","Bismuth_02","Gold", "Gold_02", "Gold_03"]
 
-LoggingEnabled = True
+
 
 Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),
     "inputMiddleTorso": ("02-MiddleTorso", "Mid Torso"),
@@ -42,3 +42,14 @@ class bcolors:
    WARNING = '\033[93m'  # YELLOW
    ERROR = '\033[91m'  # RED
    RESET = '\033[0m'  # RESET COLOR
+
+ShouldPrintOrigin = False
+LoggingEnabled = True
+
+def custom_print(message, parent='', col=bcolors.RESET):
+    if LoggingEnabled:
+        if ShouldPrintOrigin:
+            print(f"{col}{message}{bcolors.RESET}")
+        else:
+            print(f"{col}({parent}): {message}{bcolors.RESET}")
+    return
