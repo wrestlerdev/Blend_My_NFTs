@@ -149,8 +149,6 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
         ele_style, ele_type = element.split('-')
         if ele_style == 'All':
             attributes.append({"trait_type": "Theme", "value": "Elemental"})
-        # elif ele_style == 'Skin':
-        #     attributes.append({"trait_type": "Element", "value": "Elemental Skin"})
         elif ele_style == 'Outfit':
             attributes.append({"trait_type": "Theme", "value": "Elemental Outfit"})
 
