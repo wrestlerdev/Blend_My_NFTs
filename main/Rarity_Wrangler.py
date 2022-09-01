@@ -1,0 +1,158 @@
+# Purpose:
+# This file generates the Outfit DNA based on a rule set
+
+import bpy
+import os
+import json
+import random
+import importlib
+import time
+from datetime import datetime
+
+from . import Outfit_Generator
+importlib.reload(Outfit_Generator)
+
+from . import config
+
+count = 0
+
+def count_all_rarities(batch_record_path, index):
+    global count
+    print("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
+    json_name = os.path.join(batch_record_path, '_RarityCounter_{:03d}.json'.format(index))
+    DataDictionary = json.load(open(os.path.join(batch_record_path, "_NFTRecord_{:03d}.json".format(index))))
+    hierarchy = DataDictionary["hierarchy"]
+
+    time_start = time.time()
+
+    rarity_dict = {}
+    for attribute in hierarchy.keys():
+        rarity_dict[attribute] = {}
+        rarity_dict[attribute]['absolute_rarity'] = 0.0
+        for type in hierarchy[attribute].keys():
+            rarity_dict[attribute][type] = {}
+            rarity_dict[attribute][type]['absolute_rarity'] = 0.0
+            rarity_dict[attribute][type]['relative_rarity'] = get_weighted_rarity(type, attribute)[0]
+            for variant in hierarchy[attribute][type].keys():
+                rarity_dict[attribute][type][variant] = {}
+                rarity_dict[attribute][type][variant]['absolute_rarity'] = 0.0
+                rarity_dict[attribute][type][variant]['relative_rarity'] = get_weighted_rarity(variant, type)[0]
+
+    count = 0
+    filled_slots = '0' * len(hierarchy.keys())
+    rarity_dict = add_rarity_recurse(rarity_dict, 1, hierarchy, filled_slots, attribute='01-UpperTorso')
+
+    logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    export_dict = {}
+    export_dict["Date/Time Calculated"] = logged_time
+    export_dict["Rarities"] = rarity_dict
+
+    ledger = json.dumps(export_dict, indent=4, ensure_ascii=True)
+    with open(json_name, 'w') as outfile:
+        outfile.write(ledger + '\n')
+    
+    print(f"{config.bcolors.OK}Time taken to calculate rarity: {time.time() - time_start} seconds{config.bcolors.RESET}")
+    print("Total number of possible combinations? {}".format(count))
+    return
+
+
+max_att = 20 # inclusive?
+
+def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute='', type='', branch_count=1):
+    global count
+    if attribute and filled_slots[int(attribute[:2]) - 1] == '1':
+        null_type = bpy.data.collections[attribute].children[0]
+        null_variant = null_type.children[0]
+        rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + current_probability
+        rarity_dict[attribute][null_type.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name]["absolute_rarity"] + current_probability 
+        rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] = rarity_dict[attribute][null_type.name][null_variant.name]["absolute_rarity"] + current_probability
+        next_index = list(hierarchy.keys()).index(attribute) + 1
+        if next_index != max_att:
+        # if next_index != len(hierarchy.keys()):
+            next_att = list(hierarchy.keys())[next_index]
+            rarity_dict = add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
+        else:
+            count += branch_count
+        return rarity_dict
+
+    if not type: # this is a attribute
+        percentage = 1.0
+    else: # this is a type
+        percentage = get_weighted_rarity(type, attribute)[0]
+
+    new_probability = current_probability * percentage
+
+    if new_probability == 0.0: # if 0 then it shouldn't need to go down branch?
+        return rarity_dict
+    
+    if type:
+        rarity_dict[attribute][type]["absolute_rarity"] = rarity_dict[attribute][type]["absolute_rarity"] + new_probability
+        var_count = 0
+        var_weight_total = 0
+        for variant in rarity_dict[attribute][type].keys():
+            if variant != "absolute_rarity" and variant != "relative_rarity":
+                variant_percentage, var_weight_total = get_weighted_rarity(variant, type, var_weight_total)
+                rarity_dict[attribute][type][variant]["absolute_rarity"] = rarity_dict[attribute][type][variant]["absolute_rarity"] + new_probability * variant_percentage
+                if variant_percentage:
+                    var_count += 1
+        branch_count = branch_count * var_count
+
+    else:
+        rarity_dict[attribute]["absolute_rarity"] = rarity_dict[attribute]["absolute_rarity"] + new_probability
+
+    if not type: # this is an attribute
+        att_coll = bpy.data.collections[attribute]
+        for coll in att_coll.children:
+            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=attribute, type=coll.name, branch_count=branch_count)
+    else: # this is a type
+        if 'Null' not in type and type[3:] in Outfit_Generator.ItemUsedBodySlot:
+            new_slots = Outfit_Generator.ItemUsedBodySlot[type[3:]]
+        else:
+            new_slots = []
+
+        if new_slots:
+            for slot in new_slots:
+                index = int(slot[:2]) - 1
+                if filled_slots[index] == '0':
+                    filled_slots = filled_slots[:index] + '1' + filled_slots[index+1:]
+
+        next_index = (list(hierarchy.keys()).index(attribute)) + 1
+        # if next_index != len(hierarchy.keys()):
+        if next_index != max_att:
+            next_att = list(hierarchy.keys())[next_index]
+            rarity_dict = add_rarity_recurse(rarity_dict, new_probability, hierarchy, filled_slots, attribute=next_att, branch_count=branch_count)
+        else:
+            count += branch_count
+    return rarity_dict
+
+
+
+def get_weighted_rarity(current_name, parent_name, total = 0):
+    # print(current_name)
+    if not total:
+        for coll in bpy.data.collections[parent_name].children:
+            if coll.get('rarity') != None:
+                total += coll.get('rarity')
+
+    if total:
+        current_coll = bpy.data.collections[current_name]
+        if current_coll.get('rarity') != None:
+            percentage = current_coll.get('rarity') / total
+            return percentage, total
+        else:
+            return 0.0, total
+
+    else: # CHECK GREEN NULL
+        # print(current_coll.name)
+        if len(bpy.data.collections[parent_name].children) == 1:
+            return 1.0, total
+        else: # CHECK THIS
+            if 'Null' in current_coll.name:
+                return 1.0, total
+            else:
+                return 0.0, total
+
+
+
+if __name__ == '__main__':
+    count_all_rarities()
