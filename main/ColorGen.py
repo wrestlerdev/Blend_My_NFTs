@@ -7,44 +7,6 @@ import random
 from mathutils import Color
 from . import config
 
-#Color dict which uses a letter to definae style. 0 element is main color, all other elements are complemntary colors
-# cols = {
-#     "a" : [(0.00000, 0.04706, 0.03529), (0.64706, 0.41569, 0.21176), (0.84706, 0.81176, 0.78039), (0.84706, 0.65490, 0.58431), (0.54902,0.00784,0.00784)],
-#     "b" : [(0.62745,0.76471,0.84706), (0.13333,0.35686,0.44706), (0.19608,0.24706,0.00392), (0.84706,0.46667,0.38039), (0.74902,0.26667,0.26667)],
-#     "c" : [(0.31373,0.70588,0.74902), (0.84706,0.63922,0.01569), (0.74902,0.49020,0.01176), (0.74902,0.35686,0.01176), (0.64706,0.48235,0.33725)]
-# }
-letterstyles = 'abcdefghijklmnopqrstuvw'
-cols = {
-    "a" : [(0.0194444444444444,0.22,0.96),(0.569444444444444,0.16,0.96),(0.633333333333333,0.7,34),(0,0,0.68),(0,0,1),(0.611111111111111,0.38,0.03),(0.991666666666667,0.85,0.85),(0.111111111111111,0.13,0.99)],
-    "b" : [(0.997222222222222,0.68,82),(0.569444444444444,0.16,96),(0.633333333333333,0.7,34),(0,0,68),(0,0,100),(0.611111111111111,0.43,3),(0.0194444444444444,0.27,98),(0.111111111111111,0.13,98)],
-    "c" : [(0.0388888888888889,0.83,95),(0.402777777777778,0.81,35),(0.569444444444444,0.16,96),(0.633333333333333,0.7,34),(0,0,100),(0.611111111111111,0.43,3),(0.111111111111111,0.13,99),(0.0277777777777778,0.44,31)],
-    "d" : [(0.119444444444444,0.1,0.96),(0.633333333333333,0.7,34),(0.933333333333333,0.56,38),(0.0222222222222222,0.45,31),(0,0,100),(0.611111111111111,0.38,3),(0.136111111111111,0.81,99),(0.0388888888888889,0.83,95)],
-    "e" : [(0.130555555555556,0.69,98),(0.402777777777778,0.81,35),(0.633333333333333,0.7,34),(0,0,100),(0.611111111111111,0.38,3),(0.111111111111111,0.13,99)],
-    "f" : [(0.433333333333333,0.99,47),(0.0388888888888889,0.83,95),(0.933333333333333,0.56,38),(0,0,100),(0.611111111111111,0.38,3),(0.136111111111111,0.81,99),(0.569444444444444,0.16,96)],
-    "g" : [(0.563888888888889,0.15,93),(0.0194444444444444,0.27,0.98),(0.991666666666667,0.85,0.85),(0.0388888888888889,0.83,0.95),(0,0,100),(0.611111111111111,0.38,0.03),(0.633333333333333,0.7,34),(0.933333333333333,0.56,38)],
-    "h" : [(0.580555555555556,0.76,45),(0.0194444444444444,0.27,98),(0.991666666666667,0.85,0.85),(0.136111111111111,0.81,99),(0,0,68),(0,0,100),(0.611111111111111,0.38,3),(0.569444444444444,0.16,96),(0.933333333333333,0.56,38)],
-    "i" : [(0.0138888888888889,81,65),(0.980555555555556,62,32),(0.0833333333333333,20,65),(0.966666666666667,41,88),(0.0361111111111111,50,25),(0.111111111111111,14,8)],
-    "j" : [(0.925,0.39,45),(0.0388888888888889,0.83,95),(0,0,68),(0.433333333333333,0.99,47),(0,0,100),(0.611111111111111,0.38,3),(0.569444444444444,0.16,96),(0.633333333333333,0.7,34)],
-    "k" : [(0.025,0.28,39),(0.111111111111111,0.13,99),(0,0,100),(0.611111111111111,0.38,3),(0.0388888888888889,0.83,95)],
-    "l" : [(0.588888888888889,0.08,74),(0.0194444444444444,0.27,98),(0.991666666666667,0.85,85),(0.633333333333333,0.7,34),(0.933333333333333,0.56,38),(0,0,100),(0.611111111111111,0.38,3)],    
-    "m" : [(0.536111111111111,0.1,0.9),(0.0972222222222222,0.25,0.7),(0.0916666666666667,0.29,0.5),(0.233333333333333,0.28,0.41),(0.233333333333333,0.32,0.78),(0.666666666666667,0.49,0.61),(0.758333333333333,0.56,0.58),(0.633333333333333,0.25,0.83),(0.0972222222222222,0.78,0.77)],
-    "n" : [(0.116666666666667,0.26,0.91),(0.0305555555555556,0.81,0.83),(0.422222222222222,0.36,0.42),(0.319444444444444,0.21,0.72),(0.605555555555556,0.6,0.7),(0.666666666666667,0.2,0.83),(0.0583333333333333,0.65,0.59),(0.125,0.46,0.67),(0.138888888888889,0.87,0.92)],
-    "o" : [(0.605555555555556,0.72,0.31),(0.586111111111111,0.89,0.61),(0.433333333333333,0.38,0.45),(0.219444444444444,0.34,0.62),(0.105555555555556,0.68,0.74),(0.025,0.8,0.5),(0.0305555555555556,0.59,0.76),(0.136111111111111,0.1,0.44),(0.0888888888888889,0.71,0.33)],
-    "p" : [(0.497222222222222,0.16,0.02),(0.308333333333333,0.41,0.77),(0.527777777777778,0.15,0.94),(0.497222222222222,0.01,0.98),(0.622222222222222,0.14,0.91),(0.766666666666667,0.65,0.48),(0.669444444444444,0.61,0.43),(0.533333333333333,0.85,0.93),(0.605555555555556,0.3,0.37)],
-    "q" : [(0.497222222222222,0.16,0.02),(0.108333333333333,0.09,0.47),(0.747222222222222,0.03,0.75),(0.630555555555556,0.01,0.95),(0.211111111111111,0.03,0.87),(0.111111111111111,0.08,0.76),(0.119444444444444,0.8,0.89),(0.111111111111111,0.75,0.73),(0.0722222222222222,0.76,0.49)],
-    "r" : [(0.497222222222222,0.16,0.02),(0.755555555555556,0.6,0.38),(0.669444444444444,0.44,0.66),(0.908333333333333,0.09,0.97),(0.0333333333333333,0.76,0.52),(0.586111111111111,0.09,0.96),(0.630555555555556,0.32,0.44),(0.727777777777778,0.62,0.18),(0.105555555555556,0.12,0.99)],
-    "s" : [(0.0638888888888889,33,87),(0,0,91),(0,0,11),(0.630555555555556,41,75),(0.272222222222222,35,100),(0.397222222222222,50,50)],
-    "t" : [(0.0138888888888889,81,65),(0.980555555555556,62,32),(0.0833333333333333,20,65),(0.966666666666667,41,88),(0.0361111111111111,50,25),(0.111111111111111,14,8)],
-    "u" : [(0.738888888888889,10,88),(0.558333333333333,23,54),(0.291666666666667,12,27),(0.238888888888889,23,39),(0.111111111111111,1,82),(0.35,32,12)],
-    "v" : [(0.133333333333333,55,86),(0.075,39,64),(0.155555555555556,36,52),(0.108333333333333,66,70),(0.0722222222222222,8,84),(0.141666666666667,40,45)],
-    "w" : [(0.0333333333333333,36,33),(0.0416666666666667,68,69),(0.0861111111111111,64,27),(0.0388888888888889,6,89),(0.594444444444445,87,80),(0.0611111111111111,34,60)],
-    "x" : [(0.158333333333333,52,93),(0.0222222222222222,78,83),(0.516666666666667,20,75),(0.897222222222222,11,29),(0.0888888888888889,58,19),(0.119444444444444,3,87)]
-}
-
-haircols = [(0.66667,0.53333,0.40000), (0.87059,0.74510,0.60000), (0.14118,0.10980,0.06667), (0.30980,0.10196,0.00000), (0.60392,0.20000,0.00000) ]
-#skincols = [(0.310, 0.102, 0.000), (0.21403, 0.129142,0.019756), (0.227,0.062,0.0000), (0.841,0.431,0.195) ]
-skincols = [(0.310, 0.102, 0.000)]
-
 def MonocromaticColor(col, offset):
 
     numColors = 3 #how many colors we want our scheme to have
@@ -188,6 +150,8 @@ def SetUpCharacterStyle():
 
     batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
     style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    
+    #find rarity of styles for this batch
     try:
         batch_style = json.load(open(style_path))
         for style in batch_style.keys():
@@ -196,7 +160,7 @@ def SetUpCharacterStyle():
                 number_List_Of_i.append(style)
                 rarity_List_Of_i.append(float(rarity))
     except:
-        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.RESET}")
+        config.custom_print(f"Batch Style JSON could not be opened at {style_path}", "", config.bcolors.RESET)
 
         for style in globalStyleInfo.keys():
             rarity = globalStyleInfo[style]["StyleRarity"]
@@ -204,6 +168,7 @@ def SetUpCharacterStyle():
                 number_List_Of_i.append(style)
                 rarity_List_Of_i.append(float(rarity))
 
+    #choose style
     if len(number_List_Of_i) > 0:
         colorChosen = random.choices(number_List_Of_i, weights=rarity_List_Of_i, k=1)
 
@@ -241,7 +206,7 @@ def PickOutfitColors(attribute, style_key=''):
                 
     return colorkey, colorChoice
 
-
+#Loop through styles - called from UI
 def NextStyle(direction):
     GlobalStyleList = OpenGlobalStyleList()
     keys_list = list(GlobalStyleList)  
@@ -263,7 +228,7 @@ def NextStyle(direction):
     bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[0]
     
 
-
+#Loop through color sets - called from UI
 def NextStyleColor(direction):
     GlobalStyleList = OpenGlobalStyleList()
     if bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
@@ -276,15 +241,15 @@ def NextStyleColor(direction):
             nextIndex = 0
         bpy.context.scene.my_tool.currentColorStyleKey = StyleColorList[nextIndex]
 
-
+#add a new color set to color style
 def AddColorSetToStyle():
     GlobalStyleList = OpenGlobalStyleList()
     GlobalColorSetList = OpenGlobalColorList()
     if not bpy.context.scene.my_tool.colorStyleName in GlobalStyleList:
-        print(f"{config.bcolors.ERROR}This is not a valid Style ({bpy.context.scene.my_tool.colorStyleName}) name{config.bcolors.RESET}")
+        config.custom_print("This is not a valid Style", '', config.bcolors.ERROR )
         return
     elif not bpy.context.scene.my_tool.colorSetName in GlobalColorSetList:
-        print(f"{config.bcolors.ERROR}This is not an existing Set ({bpy.context.scene.my_tool.colorSetName}) name{config.bcolors.RESET}")
+        config.custom_print("This is not an existing Set", '', config.bcolors.ERROR )
         return
     StyleColorSetList = GlobalStyleList[bpy.context.scene.my_tool.colorStyleName]["ColorSets"]
     StyleColorSetList.append(bpy.context.scene.my_tool.colorSetName)
@@ -354,7 +319,7 @@ def AddNewGlobalColorSet():
 
 def DeleteGlobalColorSet():
     if not DoesGlobalColorSetExist():
-        print(f"{config.bcolors.ERROR}This is not a valid colour set to delete{config.bcolors.RESET}")
+        config.custom_print("This is not a valid colour set to delete", '', config.bcolors.ERROR )
         return
 
     Set = bpy.context.scene.my_tool.colorSetName
@@ -387,18 +352,18 @@ def DeleteGlobalColorStyle():
         GlobalStyleList = OpenGlobalStyleList()
         GlobalStyleList.pop(LastColorStyleName)
         WriteToGlobalStyleList(GlobalStyleList)
-        print("Color style ({}) has been deleted °˖✧◝(⁰▿⁰)◜✧˖°".format(LastColorStyleName))
+        config.custom_print("Color style ({}) has been deleted °˖✧◝(⁰▿⁰)◜✧˖°".format(LastColorStyleName), '', config.bcolors.ERROR )
     else:
-        print(f"{config.bcolors.ERROR}This ({bpy.context.scene.my_tool.colorStyleName}) isn't a valid colour style key{config.bcolors.ERROR}")
+        config.custom_print(f"This {bpy.context.scene.my_tool.colorStyleName} isn't a valid colour style key", '', config.bcolors.ERROR )
 
 
 def DeleteSetFromStyle(Style, Set):
     if not DoesStyleExist(Style):
-        print(f"{config.bcolors.ERROR}This style ({Style}) doesn't exist{config.bcolors.ERROR}")
+        config.custom_print(f"This style {Style} doesn't exist", '', config.bcolors.ERROR )
         return
 
     if not DoesGlobalColorSetExist(Set):
-        print(f"{config.bcolors.ERROR}This set ({Set}) doesn't exist{config.bcolors.ERROR}")
+        config.custom_print(f"This set {Set} doesn't exist", '', config.bcolors.ERROR )
         return
 
     GlobalStyle = OpenGlobalStyleList()
@@ -443,11 +408,11 @@ def WriteToGlobalColorList(GlobalColorList):
     root_dir = bpy.context.scene.my_tool.root_dir
     path = os.path.join(root_dir, "INPUT\GlobalColorList.json")
     try:
-      ledger = json.dumps(GlobalColorList, indent=1, ensure_ascii=True)
-      with open(path, 'w') as outfile:
-         outfile.write(ledger + '\n')
+        ledger = json.dumps(GlobalColorList, indent=1, ensure_ascii=True)
+        with open(path, 'w') as outfile:
+            outfile.write(ledger + '\n')
     except:
-      print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
+        config.custom_print("ColorStyle was not sent", '', config.bcolors.ERROR )
 
 
 def OpenGlobalStyleList():
@@ -465,7 +430,7 @@ def WriteToGlobalStyleList(GlobalStyleList):
       with open(path, 'w') as outfile:
          outfile.write(ledger + '\n')
     except:
-      print(f"{config.bcolors.ERROR}ColorStyle was not sent{config.bcolors.ERROR}")
+        config.custom_print("ColorStyle was not sent", '', config.bcolors.ERROR )
 
 
 def OpenBatchColorRarity(batch_index):
@@ -485,7 +450,6 @@ def ColorHasbeenUpdated(ColorTint):
     if inputColorListSceneObject:
         collection_name = inputColorListSceneObject.users_collection[0].name
         collection_name = collection_name.rpartition('_')[0]
-        print(collection_name)
         if inputColorListSceneObject is not None:
             for m in inputColorListSceneObject.material_slots:
                 material = m.material
@@ -515,7 +479,9 @@ def UpdateStyleRarity(Style=''):
     try:
         batch_style = json.load(open(style_path))
     except:
-        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.ERROR}")
+        config.custom_print(f"Batch Style JSON could not be opened at {style_path} ", '', config.bcolors.ERROR )
+
+        config.custom_print(f"Batch Style JSON could not be opened at {style_path}", "", config.bcolors.ERROR)
         return
 
     batch_style[Style] = rarity
@@ -525,7 +491,7 @@ def UpdateStyleRarity(Style=''):
         with open(style_path, 'w') as outfile:
             outfile.write(ledger + '\n')
     except:
-        print(f"{config.bcolors.ERROR}Batch Style JSON could not be saved at {style_path}{config.bcolors.ERROR}")
+        config.custom_print(f"Batch Style JSON could not be saved at {style_path}", "", config.bcolors.ERROR)
     return
 
 
@@ -537,7 +503,7 @@ def get_style_rarity(style=''):
         if style in batch_style:
             return batch_style[style]
     except:
-        print(f"{config.bcolors.ERROR}Batch Style JSON could not be opened at {style_path}{config.bcolors.ERROR}")
+        config.custom_print(f"Batch Style JSON could not be opened at {style_path}", "", config.bcolors.ERROR)
     return 0
 
 
@@ -562,19 +528,6 @@ def copy_colour_down():
     bpy.context.scene.my_tool.BTint = bpy.context.scene.my_tool.BTintPreview
     bpy.context.scene.my_tool.AlphaTint = bpy.context.scene.my_tool.AlphaTintPreview
     bpy.context.scene.my_tool.WhiteTint = bpy.context.scene.my_tool.WhiteTintPreview
-    return
-
-
-def temp_styles_reformat():
-    # GlobalStyles = OpenGlobalStyleList()
-
-    # for style in GlobalStyles.keys():
-    #     new_dict = {}
-    #     new_dict["StyleRarity"] = 50
-    #     new_dict["ColorSets"] = GlobalStyles[style]
-    #     GlobalStyles[style] = new_dict
-
-    # WriteToGlobalStyleList(GlobalStyles)
     return
 
 
@@ -613,7 +566,7 @@ def rename_color_sets(old_name, new_name):
         old_value["CommonName"] = new_name
         GlobalColorSetList[new_name] = old_value
     else:
-        print("This key does not exist")
+        config.custom_print(f"NO SUCH COLOR SET EXSISTS", "", config.bcolors.ERROR)
         return
 
     for style in GlobalStyles.keys():

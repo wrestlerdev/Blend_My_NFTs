@@ -35,6 +35,7 @@ if bpy in locals():
         importlib.reload(UIList)
         importlib.reload(Scene_Setup)
         importlib.reload(TextureEditor)
+        importlib.reload(Rarity_Wrangler)
 else:
     from .main import \
         LoadNFT, \
@@ -42,7 +43,8 @@ else:
         Exporter, \
         SaveNFTsToRecord, \
         TextureEditor, \
-        Scene_Setup
+        Scene_Setup, \
+        Rarity_Wrangler
 
     from .ui_Lists import UIList
     
@@ -1577,7 +1579,7 @@ class countUpAllRarities(bpy.types.Operator):
         NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(index))
         Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{:03d}.json".format(index))
 
-        DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, index)
+        #Rarity_Wrangler.count_all_rarities(batch_path, index)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         return {'FINISHED'}
 
