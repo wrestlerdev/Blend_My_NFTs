@@ -8,7 +8,7 @@ import os
 import bpy
 from . import config
 
-def check_PIL():
+def check_PIL(): # check if python imaging lib module exists
     try:
         from PIL import Image
     except:
@@ -18,7 +18,7 @@ def check_PIL():
         return True
 
 
-def rename_all_original_textures(input_path):
+def rename_all_original_textures(input_path): # renaming all 4k texture images
     if not check_PIL():
         return
     slots_path = os.path.join(input_path, 'SLOTS')
@@ -37,14 +37,13 @@ def rename_all_original_textures(input_path):
                                 multi_texture_path = os.path.join(texture_path, multi_texture_dir)
                                 number = '_' + ''.join(i for i in multi_texture_dir if i.isdigit())
                                 rename_all_textures_in_folder(multi_texture_path, var_dir, '_' + texture_dir, number)
-                                # return # GET RID OF THIS L8R
+                                # return
                         else:
                             rename_all_textures_in_folder(texture_path, var_dir, '_' + texture_dir)
-                            # return # GET RID OF THIS L8R
+                            # return
 
 
 def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix=''):
-    #og_texture_suffixes = ['_64', '_128', '_256', '_512', '_1k', '_2k']
     og_texture_suffixes = list(config.texture_suffixes.values()) 
     og_texture_suffixes.remove('')
 
@@ -52,7 +51,7 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
     id_list = ['_ID.', 'ColorID']
     diffuse_list = ['_D.', 'Diffuse', 'BakedBaseColor', 'LightGreyScale', 'diffuse','BaseColor']
     metallic_list = ['_M.', 'Metallic', 'Metalic', 'metallic']
-    normal_list = ['_N.', 'Normal', 'normal']
+    normal_list = ['_N.', 'Normal', 'normal', "nomal"]
     emissive_list = ['_E.', 'Emmissive', 'Emissive', 'emissive', 'emmissive']
     opacity_list = ['_O.', 'Opacity', 'opacity',]
     intensity_list = ['_I.', 'Intensity', 'intensity']
@@ -63,9 +62,9 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
         not_original_textures = [fn for fn in texture_images if any( (fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)]
 
         if not_original_textures:
-            print(f"{config.bcolors.WARNING}These images ({not_original_textures}) within {folder_path} will not be renamed{config.bcolors.RESET}")
+            if config.LoggingEnabled: print(f"{config.bcolors.WARNING}These images ({not_original_textures}) within {folder_path} will not be renamed{config.bcolors.RESET}")
         if not_texture_images:
-            print(f"{config.bcolors.WARNING}These files ({not_texture_images}) within {folder_path} will not be renamed{config.bcolors.RESET}")
+            if config.LoggingEnabled: print(f"{config.bcolors.WARNING}These files ({not_texture_images}) within {folder_path} will not be renamed{config.bcolors.RESET}")
 
         for texture in original_textures:
             new_name = texture
@@ -88,24 +87,23 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
             elif any(i in texture for i in intensity_list):
                 new_name = 'T_' + variant_name + variant_suffix + texture_set + intensity_list[0] + file_type
             else:
-                print(f"{config.bcolors.ERROR}This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system woops{config.bcolors.RESET}")
-            print(new_name)
+                if config.LoggingEnabled: print(f"{config.bcolors.ERROR}This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system woops{config.bcolors.RESET}")
+            if config.LoggingEnabled: print(new_name)
             if new_name != texture:
                 old_texture_path = os.path.join(folder_path, texture)
                 new_texture_path = os.path.join(folder_path, new_name)
                 try:
                     os.rename(old_texture_path, new_texture_path)
-                    print(f"{config.bcolors.OK}{texture} will be renamed to {new_name}{config.bcolors.OK}")
+                    if config.LoggingEnabled: print(f"{config.bcolors.OK}{texture} will be renamed to {new_name}{config.bcolors.RESET}")
                 except Exception as e:
-                    print(f"{config.bcolors.ERROR}{texture} could not be renamed to {new_name}{config.bcolors.ERROR}")
-                    print(f"{config.bcolors.ERROR}{e}{config.bcolors.ERROR}")
+                    if config.LoggingEnabled: print(f"{config.bcolors.ERROR}{texture} could not be renamed to {new_name}{config.bcolors.RESET}")
+                    if config.LoggingEnabled: print(f"{config.bcolors.ERROR}{e}{config.bcolors.RESET}")
     return
 
 
-def create_downres_textures(input_path, dims, should_overwrite):
+def create_downres_textures(input_path, dims, should_overwrite): # loop through all texture folders
     if not check_PIL():
         return
-
     slots_path = os.path.join(input_path, 'SLOTS')
     for slot_dir in os.listdir(slots_path):
         slots = os.path.join(slots_path, slot_dir)
@@ -121,53 +119,48 @@ def create_downres_textures(input_path, dims, should_overwrite):
                             for multi_texture_dir in os.listdir(texture_path):
                                 multi_texture_set = os.path.join(texture_path, multi_texture_dir)
                                 downres_all_textures_in_folder(multi_texture_set, dims, should_overwrite)
-                                # return # GET RID OF THIS L8R
+                                # return
                         else:
                             downres_all_textures_in_folder(texture_path, dims, should_overwrite)
-                            # return # GET RID OF THIS L8R
-
+                            # return
     return
 
 
 def downres_all_textures_in_folder(path, dims, should_overwrite):
-    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O', '_T'] # don't put '_I' in here since it shouldn'be be downres'ed
-
+    og_texture_suffixes = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O', '_T'] # don't put '_I' in here since it shouldn't be be downres'ed
     if os.path.isdir(path):
         texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]
-        
         original_textures = [fn for fn in texture_images if any((fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
-        print(original_textures)
+        if config.LoggingEnabled: print(original_textures)
         for image in original_textures:
-            print(image)
+            if config.LoggingEnabled: print(image)
             downres_single_texture(path, image, dims, should_overwrite)
     return
 
 
-def downres_single_texture(path, image_name, dims, should_overwrite):
+def downres_single_texture(path, image_name, dims, should_overwrite): # create downres textures for given dimensions
     if type(dims) != list:
         dims = [dims]
     for size in dims:
         image_path = os.path.join(path, image_name)
-
         old_name = image_name.rpartition('.')
         new_name = old_name[0] + config.texture_suffixes[size] + old_name[1] + old_name[2]
         new_path = os.path.join(path, new_name)
 
         if not should_overwrite:
             if os.path.exists(new_path):
-                # print(new_path)
                 continue
 
         with Image.open(image_path) as image:
             resized = image.resize([size, size])
             if size not in config.texture_suffixes:
-                print("This isn't a valid dimension for {} atm".format(image_name))
+                if config.LoggingEnabled: print(f"{config.bcolors.ERROR}This isn't a valid dimension for {image_name} atm{config.bcolors.RESET}")
                 return
             if new_path.endswith('tif'):
                 resized.save(new_path, optimize=True)
             else:
                 resized.save(new_path, quality=95, optimize=True)
-            print(new_path)
+            if config.LoggingEnabled: print(f"{config.bcolors.OK}Resized: {new_path}{config.bcolors.RESET}")
     return
 
 
@@ -175,9 +168,7 @@ def downres_single_texture(path, image_name, dims, should_overwrite):
 
 
 def downres_element_textures(elements_folder_path, dims, should_overwrite):
-
     for ele_dir in os.listdir(elements_folder_path):
         elements = os.path.join(elements_folder_path, ele_dir)
         downres_all_textures_in_folder(elements, dims, should_overwrite)
-
     return
