@@ -49,7 +49,7 @@ LoggingEnabled = True
 def custom_print(message, parent='', col=bcolors.RESET):
     if LoggingEnabled:
         if ShouldPrintOrigin:
-            print(f"{col}{message}{bcolors.RESET}")
-        else:
             print(f"{col}({parent}): {message}{bcolors.RESET}")
+        else:
+            print(f"{col}{message}{bcolors.RESET}")
     return
