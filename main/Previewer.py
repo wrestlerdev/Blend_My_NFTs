@@ -102,13 +102,13 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                set_shape_keys(character, variant_name)
 
             elif type.name[3:].startswith('Backpack'):
-               if config.LoggingEnabled: print("Backoroni")
-               if config.LoggingEnabled: print(type.name[3:])
+               config.custom_print("Backoroni")
+               config.custom_print(type.name[3:])
                RaycastPackpack(type.name[3:], character, NFTDict)
 
             elif type.name[3:].startswith('Feet'):
-               if config.LoggingEnabled: print("Feetoroni")
-               if config.LoggingEnabled: print(type.name[3:])
+               config.custom_print("Feetoroni")
+               config.custom_print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
 
             elif type.name[3:].startswith('Tattoo'):
@@ -202,7 +202,7 @@ def SnapFeetToFloor(shoetype, character, NFTDict): # moving character based on s
          name = "root"
          pb = obj.pose.bones.get(name) # None if no bone named name
          pb.location = (0, 0, offset)
-         if config.LoggingEnabled: print("Moving: ", rig_name, " Bone found: ", pb, " Offset adjust: ",  offset)
+         config.custom_print("Moving: " + str(rig_name) + " Bone found: " + str(pb) + " Offset adjust: " + str(offset))
 
 
 def RaycastPackpack(backpackType, character, NFTDict):
@@ -226,8 +226,8 @@ def RaycastPackpack(backpackType, character, NFTDict):
       hit, loc, norm, face = cb.ray_cast(origin, direction)
 
       if hit:
-         if config.LoggingEnabled: print("Hit at ", mw @ loc, " (local)")
-         if config.LoggingEnabled: print(dst.matrix_world.to_translation())
+         config.custom_print("Hit at " + str(mw @ loc) + " (local)")
+         config.custom_print(dst.matrix_world.to_translation())
          
          dir = (mw @ loc) - dst.matrix_world.to_translation()
          dist = dir.magnitude
@@ -249,7 +249,7 @@ def RaycastPackpack(backpackType, character, NFTDict):
                                                                (0.0, 0.0, 0.0, 1.0)))
             obj.location = Vector([0,0,0])
       else:
-         if config.LoggingEnabled: print("No HIT")
+         config.custom_print("No HIT")
 
 # --------------------------------------------------------------
 
@@ -260,9 +260,9 @@ def SaveTempDNADict(TempNFTDict):
       ledger = json.dumps(TempNFTDict, indent=1, ensure_ascii=True)
       with open(file_name, 'w') as outfile:
          outfile.write(ledger + '\n')
-         if config.LoggingEnabled: print(f"{config.bcolors.OK}Success: updated {file_name}{config.bcolors.RESET}")
+         config.custom_print("Success: updated " + str(file_name), col=config.bcolors.OK)
    except:
-      if config.LoggingEnabled: print(f"{config.bcolors.ERROR}Failed to update {file_name}{config.bcolors.RESET}")
+      config.custom_print("Failed to update " + str(file_name), col=config.bcolors.ERROR)
 
 def LoadTempDNADict():
    save_path = os.getcwd()
@@ -459,8 +459,7 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
                                     mat.node_tree.nodes["IntensityNode"].image = newImage 
                                     mat.node_tree.nodes["IntensityNode"].image.colorspace_settings.name = 'Linear'
                                     mat.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
-                           # else:
-                              # if config.LoggingEnabled: print("Texture image within this node is not named properly (e.g. missing _N)")
+
                      elif n.type == 'RGB' and color_key != 'Element':
                         GlobalColorList = OpenGlobalColorList()
                         colorChoice = GlobalColorList[color_key]
@@ -474,7 +473,6 @@ def set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, sl
                            n.outputs["Color"].default_value = colorChoice["A"]
                         if (n.label == "WhiteTint"):
                            n.outputs["Color"].default_value = colorChoice["W"]
-
                childMatSlot.material = textureMatSlot.material #Check this - update to loop through all material slots
    return
 
@@ -487,10 +485,10 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
          filesplit = filename.split(_type)
          file_suffix, f, file_type = filesplit[1].rpartition('.')
          if file_suffix == suffix:
-            # if config.LoggingEnabled: print("then this should be the same texture?")
+            config.custom_print("then this should be the same texture?")
             return None
          else:
-            # if config.LoggingEnabled: print("this is a different texture?")
+            config.custom_print("this is a different texture?")
             texture_set = texture_mesh.name.rpartition('_')[2]
             slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
             variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])
@@ -517,8 +515,8 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
                   original_texture = t, original_texture_path, _type
             if original_texture: # if correct size texture isn't found but 4k texture is found, return it
                texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
-               if config.LoggingEnabled: print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
-               if config.LoggingEnabled: print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+               config.custom_print("Texture ({}) could not be found, falling back to 4k texture.".format(texture), col=config.bcolors.ERROR)
+               config.custom_print("\tPlease down-res textures to speed up previewer :<", col=config.bcolors.WARNING)
                return original_texture
 
          if texture_set != 'A': # if texture doesn't exist in current texture set, try find it within the first ('A') texture set
@@ -534,10 +532,9 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
                   original_texture = t, original_texture_path, _type
          if original_texture:
             texture = texture_split[0] + '_' + texture_split[1] + _type + suffix
-            if config.LoggingEnabled: print(f"{config.bcolors.ERROR}Texture ({texture}) could not be found, falling back to 4k texture.{config.bcolors.ERROR}")
-            if config.LoggingEnabled: print(f"{config.bcolors.WARNING}\tPlease down-res textures to speed up previewer :<{config.bcolors.ERROR}")
+            config.custom_print("Texture ({}) could not be found, falling back to 4k texture.".format(texture), col=config.bcolors.ERROR)
+            config.custom_print("\tPlease down-res textures to speed up previewer :<", col=config.bcolors.WARNING)
             return original_texture
-
    return None
 
 #  ----------------------------------------------------------------------------------
@@ -605,7 +602,7 @@ def general_pointer_updated(): # called from UI
       try:
          att_name, type_name, i, var_name = item.split('_')
       except:
-         if config.LoggingEnabled: print(f"{config.bcolors.ERROR}Wrong type of collection{config.bcolors.RESET}")
+         config.custom_print("Wrong type of collection", col=config.bcolors.ERROR)
          bpy.context.scene.my_tool.inputGeneral = None
          return
       input_name = 'input' + att_name
@@ -632,7 +629,7 @@ def pointers_have_updated(slots_key, variant_name=''): # this is called from ini
          bpy.context.scene.my_tool[last_key] = bpy.data.collections[variant_name]
          show_nft_from_dna(dna_string, CharacterItems)
       else: # clear pointer or fill with last collection as new collection is not a valid input
-         if config.LoggingEnabled: print(f"{config.bcolors.WARNING}is not valid || clear{config.bcolors.RESET}")
+         config.custom_print("is not valid || clear", col=config.bcolors.WARNING)
          last_type = variant_name.rpartition('_')[2]
          if last_type not in ['Null', 'Nulll']:
             bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool[last_key]
@@ -646,7 +643,7 @@ def pointers_have_updated(slots_key, variant_name=''): # this is called from ini
          bpy.context.scene.my_tool[last_key] = bpy.context.scene.my_tool.get(slots_key)
          show_nft_from_dna(dna_string, CharacterItems)
       else: # clear pointer or fill with last collection as new collection is not a valid input
-         if config.LoggingEnabled: print(f"{config.bcolors.WARNING}is not valid || clear{config.bcolors.RESET}")
+         config.custom_print("is not valid || clear", col=config.bcolors.WARNING)
          last_type = bpy.context.scene.my_tool[last_key].name.rpartition('_')[2]
          if last_type not in ['Null', 'Nulll']:
             bpy.context.scene.my_tool[slots_key] = bpy.context.scene.my_tool[last_key]
@@ -922,8 +919,6 @@ def turn_on_tattoo(element, color=''):
    #link element mix to whether outfit elmental is on
    tattoo_node_tree = bpy.data.node_groups["Tattoo_Master"]
    elementalTattooMixer = tattoo_node_tree.nodes["ElementalTattoo"]
-   if config.LoggingEnabled: print("element is: " + element)
-   if config.LoggingEnabled: print("tool is: " + bpy.context.scene.my_tool.element)
    if element_type == "None":
       elementalTattooMixer.outputs["Value"].default_value = 0
       elementalTattooMixer.outputs["Value"].default_value = bpy.data.node_groups["OutfitElementMixer"].nodes["ElementalMix"].outputs["Value"].default_value

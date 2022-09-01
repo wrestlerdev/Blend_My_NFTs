@@ -21,7 +21,7 @@ def delete_hierarchy(parent_col):
 
 def CreateSlotsFolderHierarchy(save_path):
     #Clears scene and deletes all hierarchy except for ignore folder
-    if config.LoggingEnabled: print("Creating Slot Folders")
+    config.custom_print("Creating Slot Folders")
     delete_hierarchy(bpy.context.scene.collection)
     bpy.ops.outliner.orphans_purge()
 
@@ -139,7 +139,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                     tex_object.name = varient + "_" + texture_set
                                                     varient_coll.objects.link(tex_object)
                                                     if texture_set_a_path != set_path:
-                                                        if config.LoggingEnabled: print(f"{config.bcolors.OK}{varient} has alternate texture sets ({texture_set}){config.bcolors.RESET}")
+                                                        config.custom_print("{} has alternate texture sets ({})".format(varient, texture_set), col=config.bcolors.OK)
                                                         SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict, texture_a_path=texture_set_a_path) 
                                                     else:
                                                         SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict) 
@@ -244,9 +244,7 @@ def LinkImagesToNodes(matcopy, texture_path):
         # get the nodes
         for tex in os.listdir(texture_path):      
             mapType = tex.rpartition("_")[2]
-            # if config.LoggingEnabled: print(mapType)
             mapType = mapType.partition(".")[0]
-            # if config.LoggingEnabled: print('TEXTURE IS: ' + mapType)
             if "D" == mapType and not matcopy.node_tree.nodes["DiffuseNode"].image:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')

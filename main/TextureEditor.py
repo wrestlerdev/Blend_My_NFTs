@@ -12,7 +12,7 @@ def check_PIL(): # check if python imaging lib module exists
     try:
         from PIL import Image
     except:
-        if config.LoggingEnabled: print(f"{config.bcolors.ERROR}PIL needs to be installed to run this soz :<{config.bcolors.RESET}")
+        config.custom_print("PIL needs to be installed to run this soz :<", col=config.bcolors.ERROR)
         return False
     else:
         return True
@@ -62,9 +62,9 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
         not_original_textures = [fn for fn in texture_images if any( (fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)]
 
         if not_original_textures:
-            if config.LoggingEnabled: print(f"{config.bcolors.WARNING}These images ({not_original_textures}) within {folder_path} will not be renamed{config.bcolors.RESET}")
+            config.custom_print("These images ({}) within {} will not be renamed".format(not_original_textures, folder_path), col=config.bcolors.WARNING)
         if not_texture_images:
-            if config.LoggingEnabled: print(f"{config.bcolors.WARNING}These files ({not_texture_images}) within {folder_path} will not be renamed{config.bcolors.RESET}")
+            config.custom_print("These images ({}) within {} will not be renamed".format(not_texture_images, folder_path), col=config.bcolors.WARNING)
 
         for texture in original_textures:
             new_name = texture
@@ -87,17 +87,17 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
             elif any(i in texture for i in intensity_list):
                 new_name = 'T_' + variant_name + variant_suffix + texture_set + intensity_list[0] + file_type
             else:
-                if config.LoggingEnabled: print(f"{config.bcolors.ERROR}This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system woops{config.bcolors.RESET}")
-            if config.LoggingEnabled: print(new_name)
+                config.custom_print(f"This image ({config.bcolors.OK}{texture}{config.bcolors.ERROR}) within {folder_path} is not supported currently for rename system", col=config.bcolors.ERROR)
+            config.custom_print(new_name)
             if new_name != texture:
                 old_texture_path = os.path.join(folder_path, texture)
                 new_texture_path = os.path.join(folder_path, new_name)
                 try:
                     os.rename(old_texture_path, new_texture_path)
-                    if config.LoggingEnabled: print(f"{config.bcolors.OK}{texture} will be renamed to {new_name}{config.bcolors.RESET}")
+                    config.custom_print("{} will be renamed to {new_name}".format(texture, new_name), col=config.bcolors.OK)
                 except Exception as e:
-                    if config.LoggingEnabled: print(f"{config.bcolors.ERROR}{texture} could not be renamed to {new_name}{config.bcolors.RESET}")
-                    if config.LoggingEnabled: print(f"{config.bcolors.ERROR}{e}{config.bcolors.RESET}")
+                    config.custom_print("{} could not be renamed to {}".format(texture, new_name), config.bcolors.ERROR)
+                    config.custom_print(e, config.bcolors.ERROR)
     return
 
 
@@ -131,9 +131,9 @@ def downres_all_textures_in_folder(path, dims, should_overwrite):
     if os.path.isdir(path):
         texture_images = [fn for fn in os.listdir(path) if any(fn.endswith(ext) for ext in config.image_extensions)]
         original_textures = [fn for fn in texture_images if any((fn.rpartition('.')[0]).endswith(suf) for suf in og_texture_suffixes)] # original 4k textures
-        if config.LoggingEnabled: print(original_textures)
+        config.custom_print(original_textures)
         for image in original_textures:
-            if config.LoggingEnabled: print(image)
+            config.custom_print(image)
             downres_single_texture(path, image, dims, should_overwrite)
     return
 
@@ -154,13 +154,13 @@ def downres_single_texture(path, image_name, dims, should_overwrite): # create d
         with Image.open(image_path) as image:
             resized = image.resize([size, size])
             if size not in config.texture_suffixes:
-                if config.LoggingEnabled: print(f"{config.bcolors.ERROR}This isn't a valid dimension for {image_name} atm{config.bcolors.RESET}")
+                config.custom_print("This isn't a valid dimension for {} atm".format(image_name), config.bcolors.ERROR)
                 return
             if new_path.endswith('tif'):
                 resized.save(new_path, optimize=True)
             else:
                 resized.save(new_path, quality=95, optimize=True)
-            if config.LoggingEnabled: print(f"{config.bcolors.OK}Resized: {new_path}{config.bcolors.RESET}")
+            config.custom_print("Resized: ".format(new_path), config.bcolors.OK)
     return
 
 
