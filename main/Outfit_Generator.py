@@ -69,6 +69,7 @@ ItemUsedBodySlot = {
 "HairShort" : ["12-HairShort"],
 "HairShortFront" : ["12-HairShort", "15-MiddleHead"],
 "HairMid" : ["11-HairLong", "14-Neck", "12-HairShort", "18-Earrings", "17-EarringsLong"],
+"HairMidFront" : ["11-HairLong", "14-Neck", "12-HairShort", "15-MiddleHead", "18-Earrings", "17-EarringsLong"],
 "HairLong" : ["11-HairLong", "14-Neck", "12-HairShort", "18-Earrings", "20-Backpack", "17-EarringsLong"],
 
 "HeadFull" : ["11-HairLong", "14-Neck", "12-HairShort", "15-MiddleHead", "16-LowerHead", "18-Earrings", "17-EarringsLong"],

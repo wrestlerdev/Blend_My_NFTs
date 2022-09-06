@@ -131,11 +131,28 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             name='Elemental Type',
             description="Elemental Type (ﾉ◕ヮ◕)ﾉ*✲ﾟ*｡⋆",
             items=[
-                ('Gold', 'Gold', 'Gold'),
+                # ('Gold', 'Gold', 'Gold'),
+                ('Acid', 'Acid', 'Acid'),
+                ('Amalgum', 'Amalgum', 'Amalgum'),
+                ('AquaFortis', 'AquaFortis', 'AquaFortis'),
+                ('AquaRegia', 'AquaRegia', 'AquaRegia'),
+                ('Arsenic', 'Arsenic', 'Arsenic'),
                 ('Gold_02', 'Gold_02', 'Gold_02'),
-                ('Gold_03', 'Gold_03', 'Gold_03'),
+                # ('Gold_03', 'Gold_03', 'Gold_03'),
                 ('Bismuth', 'Bismuth', 'Bismuth'),
-                ('Bismuth_02', 'Bismuth_02', 'Bismuth_02')
+                ('Brimstone', 'Brimstone', 'Brimstone'),
+                # ('Bismuth_02', 'Bismuth_02', 'Bismuth_02'),
+                ('Phlogiston', 'Phlogiston', 'Phlogiston'),
+                ('Magnesium', 'Magnesium', 'Magnesium'),
+                ('Mercury', 'Mercury', 'Mercury'),
+                ('Oxygen', 'Oxygen', 'Oxygen'),
+                ('SalAmmoniac', 'SalAmmoniac', 'SalAmmoniac'),
+                ('Salt', 'Salt', 'Salt'),
+                ('Silver', 'Silver', 'Silver'),
+                ('SpiritOfWine', 'SpiritOfWine', 'SpiritOfWine'),
+                ('Sulphur', 'Sulphur', 'Sulphur'),
+                ('Tin', 'Tin', 'Tin'),
+                ('Vitriol', 'Vitriol', 'Vitriol')
             ],
             update=lambda s,c: Exporter.Previewer.elements_updated()
         )
@@ -1486,6 +1503,7 @@ class downresTextures(bpy.types.Operator):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
         # resolutions = [2048, 1024, 512, 256, 128, 64]
         resolutions = [2048, 1024, 512, 64]
+        # resolutions = [512]
         should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
         TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
         return {'FINISHED'}
@@ -1518,7 +1536,7 @@ class downresElementTextures(bpy.types.Operator):
 
     def execute(self, context):
         elements_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'ELEMENTS')
-        TextureEditor.downres_element_textures(elements_folder_path, [1024, 2048], False)
+        TextureEditor.downres_element_textures(elements_folder_path, [1024], False)
         return {'FINISHED'}
 
 # -------------------------------------------------------------------------------
@@ -1579,7 +1597,7 @@ class countUpAllRarities(bpy.types.Operator):
         NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(index))
         Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{:03d}.json".format(index))
 
-        #Rarity_Wrangler.count_all_rarities(batch_path, index)
+        #DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, index)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         return {'FINISHED'}
 
@@ -1749,8 +1767,15 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
             row.prop(mytool, "elementStyle", expand=True, emboss=False)
 
         row.scale_x = 0.75
-        row.prop(mytool, "isElementLocked", toggle=1, expand=True, icon='LOCKED', text='Element')
-        row.prop(mytool, "isElementStyleLocked", toggle=1, expand=True, icon='LOCKED', text='Style')
+        if bpy.context.scene.my_tool.isElementLocked:
+            row.prop(mytool, "isElementLocked", toggle=1, expand=True, icon='LOCKED', text=' Element')
+        else:
+            row.prop(mytool, "isElementLocked", toggle=1, expand=True, icon='UNLOCKED', text=' Element')
+        if bpy.context.scene.my_tool.isElementStyleLocked:
+            row.prop(mytool, "isElementStyleLocked", toggle=1, expand=True, icon='LOCKED', text='Style')
+        else:
+            row.prop(mytool, "isElementStyleLocked", toggle=1, expand=True, icon='UNLOCKED', text='Style')
+
         row.scale_x = 0.5
         row = layout.row()
         row.label(text='')

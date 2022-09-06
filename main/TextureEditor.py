@@ -3,6 +3,7 @@ try:
 except:
     pass
 
+from genericpath import isdir
 from . import config
 import os
 import bpy
@@ -94,10 +95,10 @@ def rename_all_textures_in_folder(folder_path, name, texture_set, variant_suffix
                 new_texture_path = os.path.join(folder_path, new_name)
                 try:
                     os.rename(old_texture_path, new_texture_path)
-                    config.custom_print("{} will be renamed to {new_name}".format(texture, new_name), col=config.bcolors.OK)
+                    config.custom_print("{} will be renamed to {}".format(texture, new_name), col=config.bcolors.OK)
                 except Exception as e:
-                    config.custom_print("{} could not be renamed to {}".format(texture, new_name), config.bcolors.ERROR)
-                    config.custom_print(e, config.bcolors.ERROR)
+                    config.custom_print("{} could not be renamed to {}".format(texture, new_name), col=config.bcolors.ERROR)
+                    config.custom_print(e, col=config.bcolors.ERROR)
     return
 
 
@@ -160,7 +161,7 @@ def downres_single_texture(path, image_name, dims, should_overwrite): # create d
                 resized.save(new_path, optimize=True)
             else:
                 resized.save(new_path, quality=95, optimize=True)
-            config.custom_print("Resized: ".format(new_path), config.bcolors.OK)
+            config.custom_print("Resized: {}".format(new_path), config.bcolors.OK)
     return
 
 
@@ -169,6 +170,12 @@ def downres_single_texture(path, image_name, dims, should_overwrite): # create d
 
 def downres_element_textures(elements_folder_path, dims, should_overwrite):
     for ele_dir in os.listdir(elements_folder_path):
+        # print(ele_dir)
         elements = os.path.join(elements_folder_path, ele_dir)
-        downres_all_textures_in_folder(elements, dims, should_overwrite)
+        if os.path.isdir(elements):
+            downres_all_textures_in_folder(elements, dims, should_overwrite)
+        else:
+            for sub_dir in os.listdir(elements):
+                element = os.path.join(elements, sub_dir)
+                downres_all_textures_in_folder(element, dims, should_overwrite)
     return

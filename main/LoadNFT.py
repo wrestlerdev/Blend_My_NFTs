@@ -1,6 +1,3 @@
-# Purpose:
-# 
-
 import bpy
 import os
 import json
@@ -8,6 +5,7 @@ import shutil
 
 from . import config
 
+# collection colours
 col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green" : "COLOR_04",
          "blue" : "COLOR_05", "purple" : "COLOR_06", "pink" : "COLOR_07", "brown" : "COLOR_08"}
 
@@ -22,7 +20,6 @@ def read_DNAList_from_file(batch_index, index): # return DNA as string
         NFT_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(batch_index), "NFT_{:04d}".format(index),
                                 "Batch_{:03d}".format(batch_index) + "_NFT_{:04d}.json".format(index))
         NFTDictionary = json.load(open(NFT_save_path))
-        # DNA = DNAList[index - 1]
         DNA = NFTDictionary["DNAList"]
         NFTDict = NFTDictionary["CharacterItems"]
         return len(DNAList), DNA, NFTDict
@@ -49,9 +46,7 @@ def get_total_DNA(): # get number of saved DNAs
 
 
 def init_batch(batch_data_path): # delete all batch data then create first batch folder
-    # delete_batch_files(batch_data_path)
     shutil.rmtree(batch_data_path)
-
     os.makedirs(batch_data_path)
     first_batch_path = os.path.join(batch_data_path, "Batch_{:03d}".format(1))
     if not os.path.exists(first_batch_path):
@@ -60,7 +55,7 @@ def init_batch(batch_data_path): # delete all batch data then create first batch
 
 
 
-def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''): # update rarity value for in scene collections
+def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''): # update rarity value for in scene collections based on hierarchy file
     if Rarity_save_path:
         RarityDictionary = json.load(open(Rarity_save_path)) # sets any collection not in hierarchy as rarity = 0
         rarities = RarityDictionary["Rarities"]
@@ -74,23 +69,21 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
         scene_type_colls = bpy.data.collections[slot].children
         for scene_type_coll in scene_type_colls:
             type = scene_type_coll.name
-            #This checks if a type has any varinets in it BETA_1.0
-            if type in  hierarchy[slot].keys() != None:
+            if type in  hierarchy[slot].keys() != None: #This checks if a type has any variants in it
                 variants = list(hierarchy[slot][type].keys())
                 if len(variants) > 0:
-                    #This checks if a varients has any texture sets in it BETA_1.0
                     for h_variant in variants: # check if any valid variants do exist
                         h_variant_exists = False # hierarchy variant
                         if len(list(hierarchy[slot][type][h_variant].keys())) > 0:
                             h_variant_exists = True
                             break
-                    if h_variant_exists: #
+                    if h_variant_exists: # get rarity from hierarchy if type exists
                         type_rarity = hierarchy[slot][type][h_variant]["type_rarity"]
                         if type in types:
                             scene_type_coll["rarity"] =  int(float(type_rarity))
                             update_rarity_color(type, type_rarity)
                             if Rarity_save_path:
-                                scene_type_coll["absolute_rarity"] = (rarities[slot][type]["absolute_rarity"]) * 100 
+                                scene_type_coll["absolute_rarity"] = (rarities[slot][type]["absolute_rarity"]) * 100
                             elif scene_type_coll.get("absolute_rarity") is not None:
                                 del(scene_type_coll["absolute_rarity"])
                         else:
@@ -101,7 +94,7 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
 
                         for scene_var_coll in scene_var_colls:
                             variant = scene_var_coll.name
-                            if variant in variants and type in types:
+                            if variant in variants and type in types: # does variant exist in heirarchy
                                 variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
                                 update_rarity_color(variant, int(float(variant_rarity)))
                                 scene_var_coll["rarity"] = int(float(variant_rarity))
@@ -118,12 +111,11 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                                     else:
                                         texture_rarity = 0
                                     texture_obj["rarity"] = texture_rarity
-
                             else:
                                 update_rarity_color(variant, 0)
                                 scene_var_coll["rarity"] = 0
 
-                    else:
+                    else: # collection doesn't exist in hierarchy, so delete value
                         current_var_coll = bpy.data.collections[h_variant]
                         if current_var_coll.get("rarity") is not None:
                             del(current_var_coll["rarity"])
@@ -132,14 +124,12 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                         
                         update_rarity_color(h_variant, 0)
                         update_rarity_color(type, 0)
-                else: # BETA_1.0
+                else:
                     if scene_type_coll.get("rarity") is not None:
                         del(scene_type_coll["rarity"])
                     update_rarity_color(type, 0)
             else:
-                print(type)
                 update_rarity_color(type, 0)
-    
     bpy.context.scene.my_tool.NonElementalProbability = DataDictionary["RegularWeight"] if "RegularWeight" in DataDictionary.keys() else 0
     bpy.context.scene.my_tool.FullElementalProbability = DataDictionary["ElementalWeight"] if "ElementalWeight" in DataDictionary.keys() else 0
     bpy.context.scene.my_tool.OutfitElementalProbability = DataDictionary["ElementalOutfitWeight"] if "ElementalOutfitWeight" in DataDictionary.keys() else 0
@@ -148,8 +138,8 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
 
 
 def update_batch_items(batch_num, record_path):
-    default_type_rarity = 1000 # for new items
-    default_var_rarity = 1000
+    default_type_rarity = 100 # for new items
+    default_var_rarity = 100
 
     record = json.load(open(record_path))
     hierarchy = record['hierarchy']
