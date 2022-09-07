@@ -394,6 +394,8 @@ def set_hair_accessory_shape_keys(variant_coll, hair_coll):
                for shape_key in obj.data.shape_keys.key_blocks:
                   if shape_key.name.lower() == hair_name.lower():
                      shape_key.value = 1
+                  else:
+                     shape_key.value = 0
    return
 
 # -----------------------------------------------------

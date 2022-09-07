@@ -33,7 +33,7 @@ ItemUsedBodySlot = {
 "ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
 "ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms"],
 "ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtMidHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "12-HairShort", "18-Earrings", "17-EarringsLong"],
+"ShirtLongHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "12-HairShort", "18-Earrings", "17-EarringsLong"],
 
 "PantsShort" : ["07-PelvisThin"],
 "PantsShortThick" : ["06-PelvisThick", "07-PelvisThin"],
