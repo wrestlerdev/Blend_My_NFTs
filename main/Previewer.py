@@ -347,7 +347,6 @@ def set_shape_keys(character, variant_name):
             for shape_key in obj.data.shape_keys.key_blocks:
                if variant_name in shape_key.name:
                   shape_key.value = 1
-                  break
    return
 
 
