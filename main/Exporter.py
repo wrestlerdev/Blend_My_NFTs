@@ -840,13 +840,13 @@ def render_single_item(hierarchy):
                     mesh_objects  = bpy.data.collections.get(char_var).objects
                     set_armature_for_meshes("Kae", mesh_objects)
                     print(bpy.data.collections.get(variant).objects[0].name)
-                    Previewer.set_texture_on_mesh(variant, mesh_objects, bpy.data.collections.get(variant).objects[0], "AlTanoor_02", 1024,[attribute, type, variant])
+                    Previewer.set_texture_on_mesh(variant, mesh_objects, bpy.data.collections.get(variant).objects[0], "Mossy", 1024,[attribute, type, variant])
 
                     #RENDER
                     print(char_var)
                     # Render image through viewport
                     sce = bpy.context.scene.name
-                    bpy.data.scenes[sce].render.filepath = "D:/Users/OEM/Documents/ExportSingle/" + variant + ".jpg"
+                    bpy.data.scenes[sce].render.filepath = "D:/Users/OEM/Documents/ExportSingle/" + variant + ".png"
                     bpy.ops.render.opengl(write_still=True)
 
                     bpy.data.collections.get(char_var).hide_viewport = True
@@ -866,7 +866,7 @@ def render_single_item(hierarchy):
 
         bpy.data.objects.get("SinglesPlaneBG").hide_viewport = True
         bpy.data.objects.get("SinglesPlaneBG").hide_render = True
-        return
+        
 
 def set_armature_for_meshes(character, meshes):
     armature_name = "armature_" + str(character).lower()

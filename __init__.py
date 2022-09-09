@@ -1641,6 +1641,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
+        Exporter.render_all_items_as_single()
         return {'FINISHED'}
 
 
