@@ -7,7 +7,7 @@ image_extensions = ['jpg','jpeg', 'bmp', 'png', 'tif']
 
 EmptyTypes = ["Expression", "ExpressionLowerNone", "HeadShortNone", "FeetShortNone", 'Background', "Particles"]
 # Elements = ["Bismuth","Bismuth_02","Gold", "Gold_02", "Gold_03", "Oxygen", "Sulphur", "SpiritOfWine", "Mercury", "Salt"]
-Elements = ["Bismuth","Gold_02", "Oxygen", "Sulphur", "SpiritOfWine", "Mercury", "Salt", "Magnesium", "AquaFortis",
+Elements = ["Cinnabar", "Bismuth","Gold_02", "Oxygen", "Sulphur", "SpiritOfWine", "Mercury", "Salt", "Magnesium", "AquaFortis",
              "Vitriol", "Brimstone", "AquaRegia", "Tin", "Silver", "Arsenic", "Phlogiston", "Amalgum", "SalAmmoniac",
              "Acid"]    
 

@@ -137,6 +137,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('AquaFortis', 'AquaFortis', 'AquaFortis'),
                 ('AquaRegia', 'AquaRegia', 'AquaRegia'),
                 ('Arsenic', 'Arsenic', 'Arsenic'),
+                ('Cinnabar', 'Cinnabar', 'Cinnabar'),
                 ('Gold_02', 'Gold_02', 'Gold_02'),
                 # ('Gold_03', 'Gold_03', 'Gold_03'),
                 ('Bismuth', 'Bismuth', 'Bismuth'),
