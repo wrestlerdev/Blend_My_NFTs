@@ -364,7 +364,7 @@ def reset_shape_keys(character):
             for shape_key in obj.data.shape_keys.key_blocks:
                if shape_key.name != 'Basis':
                   shape_key.value = 0
-   return
+   return 
 
 
 def reset_hair_shape_key(coll):
