@@ -140,6 +140,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('Arsenic', 'Arsenic', 'Arsenic'),
                 ('Cobalt', 'Cobalt', 'Cobalt'),
                 ('Copper', 'Copper', 'Copper'),
+                ('Cinnabar', 'Cinnabar', 'Cinnabar'),
                 ('Gold_02', 'Gold_02', 'Gold_02'),
                 # ('Gold_03', 'Gold_03', 'Gold_03'),
                 ('Bismuth', 'Bismuth', 'Bismuth'),
@@ -1651,6 +1652,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
+        Exporter.render_all_items_as_single()
         return {'FINISHED'}
 
 
