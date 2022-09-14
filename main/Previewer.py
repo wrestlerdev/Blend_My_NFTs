@@ -111,12 +111,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                config.custom_print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
 
-            elif type.name[3:].startswith('Tattoo'):
-               texture_set = itemDictionary["item_texture"].rpartition('_')[2]
-               tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
-               add_texture_to_tattoos(character, attr.name, tattoo_texture)
-               turn_on_tattoo(element, color_key)
-
             elif attr.name[3:].startswith('Hair') and varient:
                hair_coll = bpy.data.collections[varient.name + '_' + character]
                reset_hair_shape_key(hair_coll)
@@ -124,6 +118,12 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
             elif attr.name[3:].startswith('Accessories'):
                char_var_coll = bpy.data.collections[varient.name + '_' + character]
                set_hair_accessory_shape_keys(char_var_coll, hair_coll)
+
+            elif type.name[3:].startswith('Tattoo'):
+               texture_set = itemDictionary["item_texture"].rpartition('_')[2]
+               tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
+               add_texture_to_tattoos(character, attr.name, tattoo_texture)
+            turn_on_tattoo(element, color_key)    
 
    newTempDict = {}
    newTempDict["DNAList"] = DNA
@@ -924,7 +924,7 @@ def turn_on_tattoo(element, color=''):
       elementalTattooMixer.outputs["Value"].default_value = bpy.data.node_groups["OutfitElementMixer"].nodes["ElementalMix"].outputs["Value"].default_value
       tattoo_node_tree.nodes["EmissionMultiplier"].outputs["Value"].default_value = 1
    elif element_style == "All":
-      elementalTattooMixer.outputs["Value"].default_value = 3
+      elementalTattooMixer.outputs["Value"].default_value = 0
       tattoo_node_tree.nodes["TattooColor"].outputs["Color"].default_value = [0.0,0.0,0.0, 1.0]
    elif element_style == "Outfit":
       elementalTattooMixer.outputs["Value"].default_value = 1
