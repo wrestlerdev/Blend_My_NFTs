@@ -140,9 +140,9 @@ def CreateSlotsFolderHierarchy(save_path):
                                                     varient_coll.objects.link(tex_object)
                                                     if texture_set_a_path != set_path:
                                                         config.custom_print("{} has alternate texture sets ({})".format(varient, texture_set), col=config.bcolors.OK)
-                                                        SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict, texture_a_path=texture_set_a_path) 
+                                                        SetUpObjectMaterialsAndTextures(type, tex_object, set_path, characterCollectionDict, texture_a_path=texture_set_a_path) 
                                                     else:
-                                                        SetUpObjectMaterialsAndTextures(tex_object, set_path, characterCollectionDict) 
+                                                        SetUpObjectMaterialsAndTextures(type, tex_object, set_path, characterCollectionDict) 
 
                                                     tex_object.hide_viewport = True
                                                     tex_object.hide_render = True
@@ -165,7 +165,7 @@ def CreateSlotsFolderHierarchy(save_path):
     return
 
 
-def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, texture_a_path=''): 
+def SetUpObjectMaterialsAndTextures(type, obj, texture_path, characterCol, texture_a_path=''): 
     materialSets = next(os.walk(texture_path))[1] 
     if len(materialSets) > 0: # is there more than one material group
         mats = set()
@@ -183,14 +183,14 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, texture_a_p
         i = 0
         for m in matfolderlink.keys():         
             if i >= len(obj.material_slots):
-                material = GetMaterialDomain(texture_path, matfolderlink[m], texture_a_path=texture_a_path)
+                material = GetMaterialDomain(type, texture_path, matfolderlink[m], texture_a_path=texture_a_path)
                 tempcopy = material.copy()
                 tempcopy.name = m
                 obj.data.materials.append(None)
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m
             else:
-                material = GetMaterialDomain(texture_path, matfolderlink[m], texture_a_path=texture_a_path)
+                material = GetMaterialDomain(type, texture_path, matfolderlink[m], texture_a_path=texture_a_path)
                 tempcopy = material.copy()
                 tempcopy.name = m
                 obj.material_slots[i].material = tempcopy
@@ -204,7 +204,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, texture_a_p
     else: # only one texture set for variant
         material_slots = obj.material_slots
         for m in material_slots:
-            material = GetMaterialDomain(texture_path, texture_a_path=texture_a_path)
+            material = GetMaterialDomain(type, texture_path, texture_a_path=texture_a_path)
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
@@ -213,7 +213,7 @@ def SetUpObjectMaterialsAndTextures(obj, texture_path, characterCol, texture_a_p
                 LinkImagesToNodes(matcopy, texture_a_path)
 
 
-def GetMaterialDomain(texture_path, matfolderlink = "", texture_a_path=''):
+def GetMaterialDomain(type, texture_path, matfolderlink = "", texture_a_path=''):
     if matfolderlink:
         resultD = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_D." in s]
         resultE = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_E." in s]
@@ -223,7 +223,7 @@ def GetMaterialDomain(texture_path, matfolderlink = "", texture_a_path=''):
         resultE = [s for s in os.listdir(texture_path) if "_E." in s]
         resultO = [s for s in os.listdir(texture_path) if "_O." in s]
 
-    if texture_a_path  and os.path.isdir(texture_a_path): # check first texture set
+    if texture_a_path and os.path.isdir(texture_a_path): # check first texture set
         if not resultD:
             resultD = [s for s in os.listdir( (texture_a_path + "/" + matfolderlink) ) if "_D." in s]
         if not resultE:
@@ -234,7 +234,10 @@ def GetMaterialDomain(texture_path, matfolderlink = "", texture_a_path=''):
     if resultD == [] and resultE != []:
         material = bpy.data.materials['MasterUnlitV01']
     elif resultO != []:
-        material = bpy.data.materials['MasterTransparentV01']
+        if "Tattoo" in type:
+            material = bpy.data.materials['MasterTattooV01']
+        else:
+            material = bpy.data.materials['MasterTransparentV01']
     else:
         material = bpy.data.materials['MasterV01']
     return material   

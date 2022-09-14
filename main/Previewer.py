@@ -143,17 +143,14 @@ def set_material_element(element):
       for mixer in mixers:
          node_tree = bpy.data.node_groups[mixer]
          node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["TattooElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
    elif element_style == 'All':
       for mixer in mixers:
          node_tree = bpy.data.node_groups[mixer]
          node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
-   elif element_style == 'Skin':
-      node_tree = bpy.data.node_groups["OutfitElementMixer"]
+      node_tree = bpy.data.node_groups["TattooElementMixer"]
       node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-      node_tree = bpy.data.node_groups["SkinElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
-      node_tree = bpy.data.node_groups["FullBodyElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
    elif element_style == 'Outfit':
       node_tree = bpy.data.node_groups["OutfitElementMixer"]
       node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
@@ -161,6 +158,8 @@ def set_material_element(element):
       node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
       node_tree = bpy.data.node_groups["FullBodyElementMixer"]
       node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree = bpy.data.node_groups["TattooElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
 
    if element_type != 'None': # connect element node to material output
       node_tree = bpy.data.node_groups["ElementPicker"]

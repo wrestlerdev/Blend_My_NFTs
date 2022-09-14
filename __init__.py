@@ -141,7 +141,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('Cobalt', 'Cobalt', 'Cobalt'),
                 ('Copper', 'Copper', 'Copper'),
                 ('Cinnabar', 'Cinnabar', 'Cinnabar'),
-                ('Gold_02', 'Gold_02', 'Gold_02'),
+                ('Gold_02', 'Gold_02', 'Gold_02')   ,
                 ('Bismuth', 'Bismuth', 'Bismuth'),
                 ('Brimstone', 'Brimstone', 'Brimstone'),
                 ('Iron', 'Iron', 'Iron'),
