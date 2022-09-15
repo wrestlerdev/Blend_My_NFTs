@@ -287,6 +287,15 @@ def NextGlobalColorSet(direction):
     return key
 
 
+def LoadColorSet():
+    GlobalColorList = OpenGlobalColorList()
+    if bpy.context.scene.my_tool.colorSetName in GlobalColorList:
+        UpdateColorWheels()
+        return True
+    else:
+        return False
+
+
 def UpdateColorWheels():
     GlobalColorList = OpenGlobalColorList()
     ColorSet = GlobalColorList[bpy.context.scene.my_tool.colorSetName]

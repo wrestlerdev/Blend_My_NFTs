@@ -1374,6 +1374,20 @@ class addGlobalColorSet(bpy.types.Operator):
         Exporter.Previewer.colorpicker_has_applied()
         return {'FINISHED'}
 
+class loadGlobalColorSet(bpy.types.Operator):
+    bl_idname = 'load.globalcolorset'
+    bl_label = 'Load Color Set'
+    bl_description = 'Load Global Color Set'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        success = DNA_Generator.Outfit_Generator.ColorGen.LoadColorSet()
+        if success:
+            Exporter.Previewer.colorpicker_has_applied()
+        else:
+            self.report({"ERROR"}, "Failed: This color set does not exist")
+        return {'FINISHED'}
+
 class deleteGlobalColorSet(bpy.types.Operator):
     bl_idname = 'delete.globalcolorset'
     bl_label = 'Delete Global Color Set'
@@ -1650,7 +1664,6 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        Exporter.render_all_items_as_single()
         return {'FINISHED'}
 
 
@@ -2652,6 +2665,9 @@ class WCUSTOM_PT_TintUI(bpy.types.Panel):
 
         row = layout.row()
         row.operator(prevGlobalColorSet.bl_idname, text=prevGlobalColorSet.bl_label)
+        row.scale_x = 0.75
+        row.operator(loadGlobalColorSet.bl_idname, text=loadGlobalColorSet.bl_label)
+        row.scale_x = 1
         row.operator(nextGlobalColorSet.bl_idname, text=nextGlobalColorSet.bl_label)
         row = layout.row()
         row.operator(addGlobalColorSet.bl_idname, text=addGlobalColorSet.bl_label)
@@ -2815,6 +2831,7 @@ classes = (
     nextGlobalColorSet,
     prevGlobalColorSet,
     addGlobalColorSet,
+    loadGlobalColorSet,
     deleteGlobalColorSet,
     nextStyleColorSet,
     prevStyleColorSet,
