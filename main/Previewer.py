@@ -136,36 +136,50 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 def set_material_element(element):
-   mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer"]
+   mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer", "TattooElementMixer"]
    element_style, element_type = element.split('-')
 
    if element_style == 'None': # set up element style within nodes
       for mixer in mixers:
          node_tree = bpy.data.node_groups[mixer]
          node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+         element_node = node_tree.nodes["ElementPicker"]
+         element_node.node_tree = bpy.data.node_groups["EmptyElement"]
+         node_tree.links.new(node_tree.nodes["ElementalMixShader"].inputs[2], element_node.outputs[0])
+         node_tree.links.new(element_node.inputs[0], node_tree.nodes["Group Input"].outputs["Normal"])
+
       node_tree = bpy.data.node_groups["TattooElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+
    elif element_style == 'All':
       for mixer in mixers:
          node_tree = bpy.data.node_groups[mixer]
          node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
-      node_tree = bpy.data.node_groups["TattooElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-   elif element_style == 'Outfit':
-      node_tree = bpy.data.node_groups["OutfitElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
-      node_tree = bpy.data.node_groups["SkinElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-      node_tree = bpy.data.node_groups["FullBodyElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
-      node_tree = bpy.data.node_groups["TattooElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+         element_node = node_tree.nodes["ElementPicker"]
+         element_node.node_tree = bpy.data.node_groups[element_type]
+         node_tree.links.new(node_tree.nodes["ElementalMixShader"].inputs[2], element_node.outputs[0])
+         node_tree.links.new(element_node.inputs[0], node_tree.nodes["Group Input"].outputs["Normal"])
 
-   if element_type != 'None': # connect element node to material output
-      node_tree = bpy.data.node_groups["ElementPicker"]
-      element_node = node_tree.nodes[element_type]
-      output_node = node_tree.nodes["Group Output"]
-      node_tree.links.new(output_node.inputs[0], element_node.outputs[0])
+      node_tree = bpy.data.node_groups["TattooElementMixer"]
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+
+
+   elif element_style == 'Outfit':
+      for mixer in ["OutfitElementMixer", "TattooElementMixer"]:
+         node_tree = bpy.data.node_groups[mixer]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+         element_node = node_tree.nodes["ElementPicker"]
+         element_node.node_tree = bpy.data.node_groups[element_type]
+         node_tree.links.new(node_tree.nodes["ElementalMixShader"].inputs[2], element_node.outputs[0])
+         node_tree.links.new(element_node.inputs[0], node_tree.nodes["Group Input"].outputs["Normal"])
+
+      for mixer in ["FullBodyElementMixer", "SkinElementMixer"]:
+         node_tree = bpy.data.node_groups[mixer]
+         node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
+         element_node = node_tree.nodes["ElementPicker"]
+         element_node.node_tree = bpy.data.node_groups["EmptyElement"]
+         node_tree.links.new(node_tree.nodes["ElementalMixShader"].inputs[2], element_node.outputs[0])
+         node_tree.links.new(element_node.inputs[0], node_tree.nodes["Group Input"].outputs["Normal"])
    return
 
 # -----------------------------------------------------
