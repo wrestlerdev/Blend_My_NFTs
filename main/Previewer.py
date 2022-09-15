@@ -495,9 +495,10 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
    types = ['_E', '_ID', '_M', '_N', '_R', '_D', '_O']
    for _type in types:
       filepath, partition, filename = node.image.filepath.rpartition('\\')
-      if _type in filename:
-         filesplit = filename.split(_type)
-         file_suffix, f, file_type = filesplit[1].rpartition('.')
+      if (_type + '.') in filename or (_type + '_') in filename:
+         # filesplit = filename.split(_type)
+         filesplit = filename.rpartition(_type)
+         file_suffix, f, file_type = filesplit[2].rpartition('.')
          if file_suffix == suffix:
             # config.custom_print("then this should be the same texture?")
             return None
