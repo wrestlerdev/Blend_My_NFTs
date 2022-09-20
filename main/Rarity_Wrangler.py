@@ -168,10 +168,11 @@ def count_all_items_in_batch(batches_path, batch_nums, save_path): # goes throug
                     for type in hierarchy[slot].keys():
                         for var in hierarchy[slot][type].keys():
                             for tex in hierarchy[slot][type][var]["textureSets"]:
-                                var_name = tex.split('_')[3] + ' ' + tex.split('_')[4]
-                                counter[var_name] = {}
-                                counter[var_name]["count"] = 0
-                                counter[var_name]["full_name"] = tex
+                                if not tex.startswith("BLANK"):
+                                    var_name = tex.split('_')[3] + ' ' + tex.split('_')[4]
+                                    counter[var_name] = {}
+                                    counter[var_name]["count"] = 0
+                                    counter[var_name]["full_name"] = tex
                 has_init = True
 
             for dir in os.listdir(batch_path):

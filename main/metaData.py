@@ -18,6 +18,7 @@ KeywordAttributeDict = {
                          (["Outfit"], "Outfit"),
                          (["Feet"], "Shoes"),
                          (["Head"], "Headwear"),
+                         (["Tattoo"], "Tattoo"),
                          (["Gloves", "Forearm"], "Armwear"),
                          (["Face"], "Facewear"),
                          (["Hair"], "Hairstyle"),
@@ -33,6 +34,7 @@ KeywordKeys = [ # this is the order attributes will be listed in the metadata
     "Character",
     "Theme",
     "Element",
+    "Tattoo",
     "Expression",
     "Outfit",
     "Tops",
@@ -86,13 +88,27 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 variant = itemDictionary["item_variant"]
                 texture = itemDictionary["item_texture"].rpartition('_')[2]
 
+                if "Tattoo" in type:
+                    if "Forearm" in type:
+                        dict = {"trait_type": "Tattoo", "value": "Forearm Tattoo"}
+                    elif "Calf" in type:
+                        dict = {"trait_type": "Tattoo", "value": "Calf Tattoo"}
+                    elif "Neck" in type:
+                        dict = {"trait_type": "Tattoo", "value": "Neck Tattoo"}
+                    attributes.append(dict)
+                    dict = {"trait_type": "Tattoo", "value": "{} Tattoo".format(texture)}
+                    continue
+
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
                 # full_variant_name = [split_variant_name]
                 variant = variant[0].upper() + variant[1:] # capitilize variant
                 split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
                 full_variant_name = [split_variant_name]
-                if len(bpy.data.collections[itemKey].objects) > 1: # if mutliple texture variants, then add texture set to name
-                    full_variant_name.append(texture)
+                if len(bpy.data.collections[itemKey].objects) > 1 and texture != 'A': # if mutliple texture variants, then add texture set to name
+                    if len(texture) > 1:
+                        full_variant_name = [texture, split_variant_name]
+                    else:
+                        full_variant_name.append(texture)
 
                 full_variant_name = ' '.join(full_variant_name)
                 type_name = type[3:]

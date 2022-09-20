@@ -149,7 +149,7 @@ def set_material_element(element):
          node_tree.links.new(element_node.inputs[0], node_tree.nodes["Group Input"].outputs["Normal"])
 
       node_tree = bpy.data.node_groups["TattooElementMixer"]
-      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 1
+      node_tree.nodes["ElementalMix"].outputs["Value"].default_value = 0
 
    elif element_style == 'All':
       for mixer in mixers:
