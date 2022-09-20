@@ -90,13 +90,15 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
 
                 if "Tattoo" in type:
                     if "Forearm" in type:
-                        dict = {"trait_type": "Tattoo", "value": "Forearm Tattoo"}
+                        dict = {"trait_type": "Tattoo", "value": "On Forearm"}
                     elif "Calf" in type:
-                        dict = {"trait_type": "Tattoo", "value": "Calf Tattoo"}
+                        dict = {"trait_type": "Tattoo", "value": "On Calf"}
                     elif "Neck" in type:
-                        dict = {"trait_type": "Tattoo", "value": "Neck Tattoo"}
+                        dict = {"trait_type": "Tattoo", "value": "On Neck"}
                     attributes.append(dict)
-                    dict = {"trait_type": "Tattoo", "value": "{} Tattoo".format(texture)}
+                    tattoo_symbol = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>", texture).split())
+                    dict = {"trait_type": "Tattoo", "value": "{} Symbol".format(tattoo_symbol)}
+                    attributes.append(dict)
                     continue
 
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
