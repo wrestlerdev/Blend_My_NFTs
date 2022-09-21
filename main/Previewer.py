@@ -778,7 +778,7 @@ def update_DNA_with_strand(coll_name, dna_strand=''): # if dna_strand is given, 
    # update NFTDict based on new dna strand
    type_index, var_index, tex_index, color_key = new_dnastrand.split('-')
    batch_index = bpy.context.scene.my_tool.CurrentBatchIndex # get data from batch record json
-   nftrecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+   nftrecord_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(batch_index), "_NFTRecord_{}.json".format(batch_index))
    batch_record = json.load(open(nftrecord_save_path))
    type_coll = bpy.data.collections[coll_name].children[int(type_index)] # find collection based on indices in new dna strand
    if type_coll.name[3:] in config.EmptyTypes: # override colours in strand if needed
@@ -1012,7 +1012,7 @@ def get_hierarchy_ordered(index=0):
    if not index:
          index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
    if os.path.exists(NFTRecord_save_path):
       DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
       hierarchy = DataDictionary["hierarchy"]
@@ -1024,7 +1024,7 @@ def get_hierarchy_unordered(index=0):
    if not index:
          index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))      
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))      
    if os.path.exists(NFTRecord_save_path):
       DataDictionary = json.load(open(NFTRecord_save_path))
       hierarchy = DataDictionary["hierarchy"]

@@ -12,13 +12,13 @@ col = {"red" : 'COLOR_01', 'orange' : 'COLOR_02', 'yellow' : 'COLOR_03', "green"
 
 def read_DNAList_from_file(batch_index, index): # return DNA as string
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(batch_index), "_NFTRecord_{:03d}.json".format(batch_index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(batch_index), "_NFTRecord_{}.json".format(batch_index))
     DataDictionary = json.load(open(NFTRecord_save_path))
     DNAList = DataDictionary["DNAList"]
 
     if index <= len(DNAList):
-        NFT_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(batch_index), "NFT_{:04d}".format(index),
-                                "Batch_{:03d}".format(batch_index) + "_NFT_{:04d}.json".format(index))
+        NFT_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(batch_index), "NFT_{}".format(index),
+                                "Batch_{}".format(batch_index) + "_NFT_{}.json".format(index))
         NFTDictionary = json.load(open(NFT_save_path))
         DNA = NFTDictionary["DNAList"]
         NFTDict = NFTDictionary["CharacterItems"]
@@ -29,7 +29,7 @@ def read_DNAList_from_file(batch_index, index): # return DNA as string
 
 def get_all_DNA_from_batch(index):
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
     DataDictionary = json.load(open(NFTRecord_save_path))
     DNAList = DataDictionary["DNAList"]
     print(DataDictionary)
@@ -39,7 +39,7 @@ def get_all_DNA_from_batch(index):
 def get_total_DNA(): # get number of saved DNAs
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
     DataDictionary = json.load(open(NFTRecord_save_path))
     DNAList = DataDictionary["DNAList"]
     return len(DNAList)
@@ -48,7 +48,7 @@ def get_total_DNA(): # get number of saved DNAs
 def init_batch(batch_data_path): # delete all batch data then create first batch folder
     shutil.rmtree(batch_data_path)
     os.makedirs(batch_data_path)
-    first_batch_path = os.path.join(batch_data_path, "Batch_{:03d}".format(1))
+    first_batch_path = os.path.join(batch_data_path, "Batch_{}".format(1))
     if not os.path.exists(first_batch_path):
         os.makedirs(first_batch_path)
     return
@@ -238,7 +238,7 @@ def update_rarity_color(coll_name, rarity):
 def update_current_batch(index, batch_path): # updates current batch record path to new batch record
     bpy.context.scene.my_tool.CurrentBatchIndex = index
 
-    new_batch_path = os.path.join(batch_path, 'Batch_{:03d}'.format(index))
+    new_batch_path = os.path.join(batch_path, 'Batch_{}'.format(index))
     if not os.path.exists(new_batch_path):
         os.makedirs(new_batch_path)
         return
