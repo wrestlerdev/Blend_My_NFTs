@@ -19,8 +19,8 @@ count = 0
 def count_all_rarities(batch_record_path, index):
     global count
     print("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧")
-    json_name = os.path.join(batch_record_path, '_RarityCounter_{:03d}.json'.format(index))
-    DataDictionary = json.load(open(os.path.join(batch_record_path, "_NFTRecord_{:03d}.json".format(index))))
+    json_name = os.path.join(batch_record_path, '_RarityCounter_{}.json'.format(index))
+    DataDictionary = json.load(open(os.path.join(batch_record_path, "_NFTRecord_{}.json".format(index))))
     hierarchy = DataDictionary["hierarchy"]
 
     time_start = time.time()
@@ -158,10 +158,10 @@ def count_all_items_in_batch(batches_path, batch_nums, save_path): # goes throug
     has_init = False # has all items been added to json and set to 0
     characters = 0
     for index in range(batch_nums[1], batch_nums[0]-1, -1):
-        batch_path = os.path.join(batches_path, "Batch_{:03d}".format(index))
+        batch_path = os.path.join(batches_path, "Batch_{}".format(index))
         if os.path.exists(batch_path):
             if not has_init:
-                record_path = os.path.join(batch_path, "_NFTRecord_{:03d}.json".format(index))
+                record_path = os.path.join(batch_path, "_NFTRecord_{}.json".format(index))
                 record = json.load(open(record_path))
                 hierarchy = record["hierarchy"]
                 for slot in hierarchy.keys():
@@ -178,7 +178,7 @@ def count_all_items_in_batch(batches_path, batch_nums, save_path): # goes throug
             for dir in os.listdir(batch_path):
                 folder_dir = os.path.join(batch_path, dir)
                 if os.path.isdir(folder_dir):
-                    json_path = os.path.join(folder_dir, "Batch_{:03d}_{}.json".format(index, dir))
+                    json_path = os.path.join(folder_dir, "Batch_{}_{}.json".format(index, dir))
                     single_nft_json = json.load(open(json_path))
                     char_items = single_nft_json["CharacterItems"]
                     characters += 1
