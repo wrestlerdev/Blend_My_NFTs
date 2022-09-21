@@ -149,7 +149,7 @@ def SetUpCharacterStyle():
     globalStyleInfo = OpenGlobalStyleList()
 
     batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
-    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{}".format(batch_index), "_Styles_{}.json".format(batch_index))
     
     #find rarity of styles for this batch
     try:
@@ -443,7 +443,7 @@ def WriteToGlobalStyleList(GlobalStyleList):
 
 
 def OpenBatchColorRarity(batch_index):
-    path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{}".format(batch_index), "_Styles_{}.json".format(batch_index))
     GlobalColorList = json.load(open(path))
     return GlobalColorList
 
@@ -483,7 +483,7 @@ def UpdateStyleRarity(Style=''):
     if not Style:
         Style = bpy.context.scene.my_tool.colorStyleName
     batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
-    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{}".format(batch_index), "_Styles_{}.json".format(batch_index))
     rarity = bpy.context.scene.my_tool.colorStyleRarity
     try:
         batch_style = json.load(open(style_path))
@@ -506,7 +506,7 @@ def UpdateStyleRarity(Style=''):
 
 def get_style_rarity(style=''):
     batch_index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
-    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{:03d}".format(batch_index), "_Styles_{:03d}.json".format(batch_index))
+    style_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path,  "Batch_{}".format(batch_index), "_Styles_{}.json".format(batch_index))
     try:
         batch_style = json.load(open(style_path))
         if style in batch_style:
@@ -546,7 +546,7 @@ def copy_colour_down():
 def create_batch_color(batch_path, batch_num, contains_all):
     default_style = "Random"
     default_weight = 50
-    json_path = os.path.join(batch_path, "_Styles_{:03d}.json".format(batch_num))
+    json_path = os.path.join(batch_path, "_Styles_{}.json".format(batch_num))
 
     style_dict = {}
     if contains_all:

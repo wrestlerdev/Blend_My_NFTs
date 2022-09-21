@@ -106,7 +106,7 @@ ItemUsedBodySlot = {
 def RandomizeFullCharacter(maxNFTs, save_path):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
 
@@ -254,7 +254,7 @@ def PickCharacterElementalStyle(element):
 def GetRandomSingleTexture(att_name, variant_coll):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]
@@ -306,7 +306,7 @@ def GetRandomSingleMesh(att_name):
     last_variant = bpy.context.scene.my_tool[pointer_name].name if bpy.context.scene.my_tool[pointer_name] else ''
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+    NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
 
     DataDictionary = json.load(open(NFTRecord_save_path))
     hierarchy = DataDictionary["hierarchy"]

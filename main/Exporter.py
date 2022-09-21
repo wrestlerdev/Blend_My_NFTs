@@ -270,8 +270,8 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     render_start_time = time.time()
     for i in range(nft_range[0], nft_range[1] + 1):
         start_time = time.time()
-        file_name = "Batch_{:03d}_NFT_{:04d}".format(batch_num, i)
-        folder_name = "NFT_{:04d}".format(i)
+        file_name = "Batch_{}_NFT_{}".format(batch_num, i)
+        folder_name = "NFT_{}".format(i)
         folder_path = os.path.join(batch_path, folder_name)
         json_path = os.path.join(folder_path, file_name + '.json')
         print(json_path)
@@ -280,8 +280,8 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
         select_hierarchy(bpy.data.collections["Rendering"])
         bpy.data.objects["CameraStill"].select_set(True)
-        blend_name = "Batch_{:03d}_NFT_{:04d}.blend".format(batch_num, i)
-        blend_save  = os.path.join(batch_path, "NFT_{:04d}".format(i), blend_name)
+        blend_name = "Batch_{}_NFT_{}.blend".format(batch_num, i)
+        blend_save  = os.path.join(batch_path, "NFT_{}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
         python_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Exporter.py")
 
@@ -323,10 +323,10 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    batch_path = os.path.join(save_path, "OUTPUT", "Batch_{:03d}".format(batch_num))
+    batch_path = os.path.join(save_path, "OUTPUT", "Batch_{}".format(batch_num))
     for i in range(nft_range[0], nft_range[1] + 1):
-        file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, i)
-        json_path = os.path.join(batch_path, "NFT_{:04d}".format(i), file_name)
+        file_name = "Batch_{}_NFT_{}.json".format(batch_num, i)
+        json_path = os.path.join(batch_path, "NFT_{}".format(i), file_name)
 
         for file_format in file_formats:
             if file_format in ['PNG', 'JPEG']:
@@ -372,8 +372,8 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
 
 
 def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, color_mode, totalDNAList):
-    file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
-    json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
+    file_name = "Batch_{}_NFT_{}.json".format(batch_num, nft_num)
+    json_path = os.path.join(batch_path, "NFT_{}".format(nft_num), file_name)
     SingleDict = json.load(open(json_path))
 
     DNA = SingleDict["DNAList"]
@@ -382,7 +382,7 @@ def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, 
     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
     nft_name = file_name[:-len(".json")]
 
-    image_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
+    image_path = os.path.join(batch_path, "NFT_{}".format(nft_num), nft_name)
     Previewer.show_nft_from_dna(DNA, NFTDict)
 
     bpy.context.scene.render.filepath = image_path
@@ -398,8 +398,8 @@ def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, 
 
 
 def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDNAList):
-    file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
-    json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
+    file_name = "Batch_{}_NFT_{}.json".format(batch_num, nft_num)
+    json_path = os.path.join(batch_path, "NFT_{}".format(nft_num), file_name)
 
     SingleDict = json.load(open(json_path))
     DNA = SingleDict["DNAList"]
@@ -410,7 +410,7 @@ def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDN
     nft_name = file_name[:-len(".json")] + ".mp4"
     Previewer.show_nft_from_dna(DNA, NFTDict)
 
-    video_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
+    video_path = os.path.join(batch_path, "NFT_{}".format(nft_num), nft_name)
     bpy.context.scene.render.filepath = video_path
 
     if file_format == 'MP4':
@@ -427,8 +427,8 @@ def render_nft_single_video(batch_path, batch_num, nft_num, file_format, totalDN
 
 
 def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDNAList):
-    file_name = "Batch_{:03d}_NFT_{:04d}.json".format(batch_num, nft_num)
-    json_path = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), file_name)
+    file_name = "Batch_{}_NFT_{}.json".format(batch_num, nft_num)
+    json_path = os.path.join(batch_path, "NFT_{}".format(nft_num), file_name)
     SingleDict = json.load(open(json_path))
     dnaDictionary = SingleDict["CharacterItems"]
 
@@ -438,7 +438,7 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
     print(f"{bcolors.OK}Generating 3D Model: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
 
     nft_name = file_name[:-len(".json")]
-    modelPath = os.path.join(batch_path, "NFT_{:04d}".format(nft_num), nft_name)
+    modelPath = os.path.join(batch_path, "NFT_{}".format(nft_num), nft_name)
 
     Previewer.show_nft_from_dna(DNA, NFTDict)
 
@@ -526,7 +526,7 @@ def send_to_export_log(batch_path, batch_num, nft_name, render_time, key, render
 
  
 def return_export_log_data(batch_path, batch_num):
-    log_name = "EXPORTLOG_{:03d}.json".format(batch_num)
+    log_name = "EXPORTLOG_{}.json".format(batch_num)
     path = os.path.join(batch_path, log_name)
     if os.path.exists(path):
         log = json.load(open(path))
@@ -651,7 +651,7 @@ def save_all_metadata_files(output_path):
                             NFTDict = single_record["CharacterItems"]
                             name_prefix = str(bpy.context.scene.my_tool.renderPrefix)
                             index = total_DNA.index(DNA) + 1
-                            nft_name = name_prefix + "{:04d}".format(index)
+                            nft_name = name_prefix + "{}".format(index)
                             save_metadata_file(nft_path, nft_name, batch_index, nft_index, DNA, NFTDict)
                             count += 1
     print("{} metadata files have been created".format(count))
@@ -672,7 +672,7 @@ def refactor_all_batches(batches_path, master_record_path):
     batches = len(next(os.walk(batches_path))[1])
 
     for i in range(batches):
-        batch_path = os.path.join(batches_path, "Batch_{:03d}".format(i + 1))
+        batch_path = os.path.join(batches_path, "Batch_{}".format(i + 1))
         refactor_single_batch(batch_path, i+1, master_record_path)
     return
 
@@ -683,9 +683,9 @@ def refactor_single_batch(batch_path, batch_index, master_record_path):
     nfts = len(next(os.walk(batch_path))[1])
 
     for i in range(nfts):
-        nft_path = os.path.join(batch_path, "NFT_{:04d}".format(i + 1))
-        default_prefix = "Batch_{:03d}_NFT_{:04d}".format(batch_index, i + 1)
-        metadata_prefix = "ERC721_{:03d}_{:04d}".format(batch_index, i + 1)
+        nft_path = os.path.join(batch_path, "NFT_{}".format(i + 1))
+        default_prefix = "Batch_{}_NFT_{}".format(batch_index, i + 1)
+        metadata_prefix = "ERC721_{}_{}".format(batch_index, i + 1)
 
         for dir in os.listdir(nft_path): # checking if files have been renamed
             prefix, suffix = dir.split('.')
@@ -730,7 +730,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
             current_prefix, suffix = old_file.split('.')
 
         new_prefix = bpy.context.scene.my_tool.renderPrefix
-        new_file_name = new_prefix + "{:04d}".format(index) + '.' + suffix
+        new_file_name = new_prefix + "{}".format(index) + '.' + suffix
         old_path = os.path.join(folder_path, old_file)
         new_path = os.path.join(folder_path, new_file_name)            
         if suffix == "json":
@@ -781,7 +781,7 @@ def get_custom_range():
     render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
     export_path = bpy.context.scene.my_tool.separateExportPath
     export_path = os.path.join(export_path, "Blend_My_NFT")
-    batch_path = os.path.join(export_path, "OUTPUT", "Batch_{:03d}".format(render_batch_num))
+    batch_path = os.path.join(export_path, "OUTPUT", "Batch_{}".format(render_batch_num))
     batch_count = len(next(os.walk(batch_path))[1])
 
     ranges = []
@@ -908,7 +908,7 @@ def get_hierarchy_ordered(index=0):
    if not index:
          index = bpy.context.scene.my_tool.CurrentBatchIndex
    batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
-   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{:03d}".format(index), "_NFTRecord_{:03d}.json".format(index))
+   NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
    if os.path.exists(NFTRecord_save_path):
       DataDictionary = json.load(open(NFTRecord_save_path), object_pairs_hook=collections.OrderedDict)
       hierarchy = DataDictionary["hierarchy"]
