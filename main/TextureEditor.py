@@ -168,6 +168,26 @@ def downres_single_texture(path, image_name, dims, should_overwrite): # create d
 # ------------------------------------------------------------------------------
 
 
+def rename_texture_set_folder(old_name, new_name, input_path):
+    slots_path = os.path.join(input_path, 'SLOTS')
+    for slot_dir in os.listdir(slots_path):
+        slots = os.path.join(slots_path, slot_dir)
+        for type_dir in os.listdir(slots):
+            types = os.path.join(slots, type_dir)
+            for var_dir in os.listdir(types):
+                vars = os.path.join(types, var_dir)
+                textures = os.path.join(vars, 'Textures')
+                if os.path.exists(textures):
+                    for texture_dir in os.listdir(textures):
+                        if texture_dir == old_name:
+                            old_texture_dir = os.path.join(textures, texture_dir)
+                            new_texture_dir = os.path.join(textures, new_name)
+                            os.rename(old_texture_dir, new_texture_dir)
+    return
+
+
+#----------------------------------------------------------------------------
+
 def downres_element_textures(elements_folder_path, dims, should_overwrite):
     for ele_dir in os.listdir(elements_folder_path):
         # print(ele_dir)

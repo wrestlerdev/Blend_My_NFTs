@@ -132,7 +132,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                             index = 0
                                             for texture_set in os.listdir(texture_path):
                                                 set_path = CheckAndFormatPath(texture_path, texture_set)
-                                                texture_set_a_path = CheckAndFormatPath(texture_path, 'A')
+                                                texture_set_a_path = CheckAndFormatPath(texture_path, config.original_texture_set_name)
                                                 if(set_path != ""):
                                                     tex_object = bpy.context.scene.objects["BLANK"].copy()
                                                     tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()

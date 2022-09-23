@@ -1702,7 +1702,8 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        Exporter.render_all_items_as_single()
+        # input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        # TextureEditor.rename_texture_set_folder('A', 'Standard', input_path)
         return {'FINISHED'}
 
 

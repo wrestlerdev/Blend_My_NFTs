@@ -9,6 +9,7 @@ import bpy
 import os
 import json
 import re
+from . import config
 
 
 KeywordAttributeDict = {
@@ -106,7 +107,7 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 variant = variant[0].upper() + variant[1:] # capitilize variant
                 split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
                 full_variant_name = [split_variant_name]
-                if len(bpy.data.collections[itemKey].objects) > 1 and texture != 'A': # if mutliple texture variants, then add texture set to name
+                if len(bpy.data.collections[itemKey].objects) > 1 and texture != config.original_texture_set_name: # if mutliple texture variants, then add texture set to name
                     if len(texture) > 1:
                         full_variant_name = [texture, split_variant_name]
                     else:
