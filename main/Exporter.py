@@ -846,7 +846,8 @@ def render_single_item(hierarchy):
                     print(char_var)
                     # Render image through viewport
                     sce = bpy.context.scene.name
-                    bpy.data.scenes[sce].render.filepath = "D:/Users/OEM/Documents/ExportSingle/" + variant + ".png"
+                    # bpy.data.scenes[sce].render.filepath = "D:/Users/OEM/Documents/ExportSingle/" + variant + ".png"
+                    bpy.data.scenes[sce].render.filepath = "C:/Users/Wrestler/Desktop/ExportSingle/" + variant + ".png"
                     bpy.ops.render.opengl(write_still=True)
 
                     bpy.data.collections.get(char_var).hide_viewport = True
@@ -867,6 +868,47 @@ def render_single_item(hierarchy):
         bpy.data.objects.get("SinglesPlaneBG").hide_viewport = True
         bpy.data.objects.get("SinglesPlaneBG").hide_render = True
         
+
+#-------------------------------------------------------
+
+
+def evaluate_export_log(log_path, min_sec, max_sec):
+    failed_nfts = []
+    failed_nfts_time = []
+    large_nfts = []
+    large_nfts_time = []
+    if os.path.isfile(log_path):
+        log_dict = json.load(open(log_path))
+        for key in log_dict.keys():
+            log = log_dict[key]
+            time = float(log["time_taken"].partition(' ')[0])
+            if time < min_sec:
+                failed_nfts.append(log["nft_number"])
+                failed_nfts_time.append(log["time_taken"])
+            elif time > max_sec:
+                large_nfts.append(log["nft_number"])
+                large_nfts_time.append(log["time_taken"])
+    else:
+        config.custom_print("This is not a valid path?", '', config.bcolors.ERROR)
+        return
+
+    if failed_nfts:
+        config.custom_print("These NFTs were under the mininum render time:", '', config.bcolors.ERROR)
+        for i in range(len(failed_nfts)):
+            config.custom_print("\t{}: {}".format(failed_nfts[i], failed_nfts_time[i]), '', config.bcolors.WARNING)
+
+    if large_nfts:
+        config.custom_print("These NFTs were over the maximum render time:", '', config.bcolors.ERROR)
+        for i in range(len(large_nfts)):
+            config.custom_print("\t{}: {}".format(large_nfts[i], large_nfts_time[i]), '', config.bcolors.WARNING)
+
+    if not failed_nfts and not large_nfts:
+        config.custom_print("Everything passed :^)", '', config.bcolors.OK)
+
+    return failed_nfts, large_nfts
+
+
+#--------------------------------------------------------
 
 def set_armature_for_meshes(character, meshes):
     armature_name = "armature_" + str(character).lower()

@@ -11,6 +11,7 @@ Elements = ["Cinnabar", "Bismuth","Gold_02", "Oxygen", "Sulphur", "SpiritOfWine"
              "Vitriol", "Brimstone", "AquaRegia", "Tin", "Silver", "Arsenic", "Phlogiston", "Amalgum", "SalAmmoniac",
              "Acid", "Lead", "Iron",  "Copper", "Antimony", "Cobalt", "Manganese", "Nickel", "Phosphorus", "Platinum", "Zinc"]    
 
+original_texture_set_name = 'Standard'
 
 
 Slots = {"inputUpperTorso": ("01-UpperTorso", "Upper Torso"),

@@ -194,6 +194,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     imageFrame: bpy.props.IntProperty(name="Image Frame", default=1)
     frameLength: bpy.props.FloatProperty(name="Animation Length", default=10.0)
 
+    evalMinTime: bpy.props.FloatProperty(name='Evaluate Min Render Time', default=60)
+    evalMaxTime: bpy.props.FloatProperty(name='Evaluate Max Render Time', default=600)
+    evalFilePath: bpy.props.StringProperty(name='File Location')
+
     deleteStart: bpy.props.IntProperty(name="Start Range", default=1,min=1)
     deleteEnd: bpy.props.IntProperty(name="End Range", default=1,min=1)
 
@@ -1239,6 +1243,40 @@ class confirmRefactor(bpy.types.Operator):
         canRefactor = True
         return {'FINISHED'}
 
+
+class chooseLogPath(bpy.types.Operator):
+    bl_idname = 'choose.log'
+    bl_label = 'Choose Log Path'
+    bl_description = "Choose log to evaluate"
+    bl_options = {"REGISTER", "UNDO"}
+    filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
+    filter_glob: bpy.props.StringProperty(default ='*.json',options = {'HIDDEN'})
+
+    def execute(self, context):
+        print(self.filepath)
+        bpy.context.scene.my_tool.evalFilePath = self.filepath
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.filepath = ""
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class evaluateExportLog(bpy.types.Operator):
+    bl_idname = 'eval.logs'
+    bl_label = 'Evaluate Export Log'
+    bl_description = 'Evaluate Export Log'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        path = bpy.context.scene.my_tool.evalFilePath
+        min_sec = bpy.context.scene.my_tool.evalMinTime
+        max_sec = bpy.context.scene.my_tool.evalMaxTime
+        Exporter.evaluate_export_log(path, min_sec, max_sec)
+        return {'FINISHED'}
+
+
 #----------------------------------------------------------------
 
 class purgeData(bpy.types.Operator):
@@ -1664,6 +1702,8 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
+        # input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
+        # TextureEditor.rename_texture_set_folder('A', 'Standard', input_path)
         return {'FINISHED'}
 
 
@@ -2448,6 +2488,30 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
 
 #-------------------------------------------
 
+class WCUSTOM_PT_EvaluateLogs(bpy.types.Panel):
+    bl_label = "Evaluate Logs"
+    bl_idname = "WCUSTOM_PT_EvaluateLogs"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'EXPORTING'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        
+        row = layout.row()
+        row.prop(mytool, "evalMinTime")
+        row.prop(mytool, "evalMaxTime")
+        row = layout.row()
+        row.scale_x = 2
+        row.prop(mytool, "evalFilePath", text='')
+        row.scale_x = 1
+        row.operator(chooseLogPath.bl_idname, text=chooseLogPath.bl_label)
+        row = layout.box()
+        row.operator(evaluateExportLog.bl_idname, text=evaluateExportLog.bl_label)
+
+
 class WCUSTOM_PT_CreateMetadata(bpy.types.Panel):
     bl_label = "Export Metadata"
     bl_idname = "WCUSTOM_PT_CreateMetadata"
@@ -2791,6 +2855,7 @@ classes = (
     WCUSTOM_PT_TintPreviewUI,
     WCUSTOM_PT_TintUI,
     WCUSTOM_PT_DeleteRange,
+    WCUSTOM_PT_EvaluateLogs,
     # BMNFTS_PT_Documentation,
 
 
@@ -2859,6 +2924,8 @@ classes = (
     renameSet,
     countUpAllItems,
     downresElementTextures,
+    chooseLogPath,
+    evaluateExportLog,
     testButton
 
 )
