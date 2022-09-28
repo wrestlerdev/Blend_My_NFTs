@@ -50,9 +50,9 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
    reset_shape_keys(character)
    show_character(character, Select)
    set_material_element(element)
-   image_nodes = ["MiddleTorso" , "ForeArms", "Calf", "Feet", "Neck"] # tattoo slots
-   for image_node in image_nodes:
-      add_texture_to_tattoos(character, image_node, texture='clear')
+   # image_nodes = ["MT" , "FA", "C", "F", "N"] # tattoo slots
+   # for image_node in image_nodes:
+   #    add_texture_to_tattoos(character, image_node, texture='clear')
    hair_coll = ''
 
    for key in keys:
@@ -111,18 +111,20 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                config.custom_print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
 
-            elif attr.name[3:].startswith('Hair') and varient:
+            elif (attr.name[3:] == 'HS' or attr.name[3:] == 'HL') and varient:
                hair_coll = bpy.data.collections[varient.name + '_' + character]
                reset_hair_shape_key(hair_coll)
 
-            elif attr.name[3:].startswith('Accessories'):
+            elif attr.name[3:] == 'HA':
                char_var_coll = bpy.data.collections[varient.name + '_' + character]
+               print("wwwww")
+               print(char_var_coll)
                set_hair_accessory_shape_keys(char_var_coll, hair_coll)
 
-            elif type.name[3:].startswith('Tattoo'):
-               texture_set = itemDictionary["item_texture"].rpartition('_')[2]
-               tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
-               add_texture_to_tattoos(character, attr.name, tattoo_texture)
+            # elif type.name[3:].startswith('Tattoo'):
+            #    texture_set = itemDictionary["item_texture"].rpartition('_')[2]
+            #    tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
+            #    add_texture_to_tattoos(character, attr.name, tattoo_texture)
             turn_on_tattoo(element, color_key)    
 
    newTempDict = {}
@@ -186,11 +188,11 @@ def set_material_element(element):
 
 def SnapFeetToFloor(shoetype, character, NFTDict): # moving character based on shoe height
    if shoetype == "FeetLong":
-      shoes = list(NFTDict["08-Calf"].keys())[0]
+      shoes = list(NFTDict["08-C"].keys())[0]
    elif shoetype == "FeetMid":
-      shoes = list(NFTDict["09-Ankle"].keys())[0]
+      shoes = list(NFTDict["09-A"].keys())[0]
    else:
-      shoes = list(NFTDict["10-Feet"].keys())[0]
+      shoes = list(NFTDict["10-F"].keys())[0]
 
    shoesObj = shoes + "_" + character
    objects = bpy.data.collections[shoesObj].objects
@@ -219,7 +221,7 @@ def SnapFeetToFloor(shoetype, character, NFTDict): # moving character based on s
 
 
 def RaycastPackpack(backpackType, character, NFTDict):
-   torsoObj = list(NFTDict["01-UpperTorso"].keys())[0]
+   torsoObj = list(NFTDict["01-UT"].keys())[0]
    torsoObj = torsoObj + "_" + character
    objects = bpy.data.collections[torsoObj].objects
    if len(objects) > 0:
@@ -248,9 +250,9 @@ def RaycastPackpack(backpackType, character, NFTDict):
          null_loc.location.z -= dist
 
          if backpackType == "BackpackHigh":
-            backpack = list(NFTDict["14-Neck"].keys())[0]
+            backpack = list(NFTDict["14-N"].keys())[0]
          else:
-            backpack = list(NFTDict["20-Backpack"].keys())[0]
+            backpack = list(NFTDict["20-BP"].keys())[0]
          backpack = backpack + "_" + character
          for obj in bpy.data.collections[backpack].objects:
             if len(obj.constraints) < 1:
@@ -506,9 +508,10 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
             # config.custom_print("this is a different texture?")
             texture_set = texture_mesh.name.rpartition('_')[2]
             slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
-            variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], slot_pathing[2])
+            variant_split = slot_pathing[2].split('_')
+            variant_folder = variant_split[2] + '_' + variant_split[3]
+            variant_folder_path = os.path.join(slots_folder_path, slot_pathing[0], slot_pathing[1], variant_folder)
             texture_folder_path = os.path.join(variant_folder_path, "Textures", texture_set)
-            
             if len(next(os.walk(texture_folder_path))[1]) > 0: # if there's multiple sets
                if '.' in material_name:
                   material_name = material_name.split('.')[0]
@@ -682,7 +685,7 @@ def pointers_have_updated(slots_key, variant_name=''): # this is called from ini
 
 #  ----------------------------------------------------------------------------------
 
-def get_null_variant_collection(att_coll): # if slot has been cleared, fill with relevant empty variant e.g. BareFeet if Feet is cleared
+def get_null_variant_collection(att_coll): # if slot has been cleared, fill with relevant empty variant e.g. BareF if F is cleared
    def check_collections(info, atts):
       should_fill = True
       for i in range(len(atts)):
@@ -711,9 +714,9 @@ def get_null_variant_collection(att_coll): # if slot has been cleared, fill with
       return att_coll.children[0].children[0]
 
    head_info = ["Head", "HeadShortNone"]
-   head_atts = ["14-Neck", "16-LowerHead", "15-MiddleHead", "18-Earrings"]
-   feet_info = ["Feet", "FeetShortNone"]
-   feet_atts = ["08-Calf", "09-Ankle", "10-Feet"]
+   head_atts = ["14-N", "16-LH", "15-MH", "18-ES"]
+   feet_info = ["F", "FShortNone"]
+   feet_atts = ["08-C", "09-A", "10-F"]
 
    if att_coll.name in head_atts: # should this account for the hoodie :(, can't differentiate between head and hair types atm
       return check_collections(head_info, head_atts)
@@ -910,7 +913,9 @@ def set_texture_on_slot(coll_name, variant_name, texture_index):
 
 def get_texture_for_tattoo(att, type, variant, element):
    slots_folder_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
-   variant_folder_path = os.path.join(slots_folder_path, att, type, variant)
+   variant_split = variant.split('_')
+   variant_folder = variant_split[2] + '_' + variant_split[3]
+   variant_folder_path = os.path.join(slots_folder_path, att, type, variant_folder)
    texture_folder_path = os.path.join(variant_folder_path, "Textures", element)
    for dir in os.listdir(texture_folder_path):
       if "_T." in dir:

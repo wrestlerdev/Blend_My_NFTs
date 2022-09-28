@@ -40,7 +40,7 @@ def count_all_rarities(batch_record_path, index):
 
     count = 0
     filled_slots = '0' * len(hierarchy.keys())
-    rarity_dict = add_rarity_recurse(rarity_dict, 1, hierarchy, filled_slots, attribute='01-UpperTorso')
+    rarity_dict = add_rarity_recurse(rarity_dict, 1, hierarchy, filled_slots, attribute='01-UT')
 
     logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     export_dict = {}

@@ -23,7 +23,7 @@ KeywordAttributeDict = {
                          (["Gloves", "Forearm"], "Armwear"),
                          (["Face"], "Facewear"),
                          (["Hair"], "Hairstyle"),
-                         (["Earring", "Calf", "Neck", "Hands"], "Accessories"),
+                         (["Earring", "Calf", "Neck", "Hand"], "Accessories"),
                          (["Backpack"], "Backwear"),
                          (["Plane", "Background", "Particles"], "Environment"),
                          (["Expression"], "Expression")]
@@ -97,7 +97,7 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                     elif "Neck" in type:
                         dict = {"trait_type": "Tattoo", "value": "On Neck"}
                     attributes.append(dict)
-                    tattoo_symbol = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>", texture).split())
+                    tattoo_symbol = ' '.join(re.sub("([A-Z])(?=[A-Z][a-z])|([a-z])(?=[A-Z])","\g<1> \g<2>", texture).split())
                     dict = {"trait_type": "Tattoo", "value": "{} Symbol".format(tattoo_symbol)}
                     attributes.append(dict)
                     continue
@@ -105,7 +105,8 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
                 # full_variant_name = [split_variant_name]
                 variant = variant[0].upper() + variant[1:] # capitilize variant
-                split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
+                # split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
+                split_variant_name = ' '.join(re.sub("([A-Z])(?=[A-Z][a-z])|([a-z])(?=[A-Z])","\g<1> \g<2>",variant).split())
                 full_variant_name = [split_variant_name]
                 if len(bpy.data.collections[itemKey].objects) > 1 and texture != config.original_texture_set_name: # if mutliple texture variants, then add texture set to name
                     if len(texture) > 1:

@@ -64,8 +64,9 @@ def CreateSlotsFolderHierarchy(save_path):
                         slot_coll.children.link(type_coll)
                         for varient in os.listdir(varient_path):             
                             item_path = CheckAndFormatPath(varient_path, varient)
+                            new_var_name = "{}_{}_{}".format(slot[3:], type[3:], varient)
                             if item_path != "":
-                                varient_coll = bpy.data.collections.new(varient)
+                                varient_coll = bpy.data.collections.new(new_var_name)
                                 varient_coll.hide_viewport = True
                                 varient_coll.hide_render = True
                                 type_coll.children.link(varient_coll)
@@ -76,7 +77,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                         directory = directory.replace('\\', '/')
                                         characterCollectionDict = {}
                                         for char in config.Characters:
-                                            varient_coll_char = bpy.data.collections.new(varient + "_" + char)
+                                            varient_coll_char = bpy.data.collections.new(new_var_name + "_" + char)
                                             varient_coll.children.link(varient_coll_char)
                                             characterCollectionDict[char] = varient_coll_char
                                             varient_coll_char.hide_viewport = True
@@ -113,6 +114,7 @@ def CreateSlotsFolderHierarchy(save_path):
                                                                             mod.show_viewport = False
                                                                             mod.show_render = True
                                                                             mod.levels = mod.render_levels
+                                                                obj.name = new_var_name
 
                                         for c in config.Characters:
                                             bpy.ops.object.select_all(action='DESELECT')
@@ -136,10 +138,10 @@ def CreateSlotsFolderHierarchy(save_path):
                                                 if(set_path != ""):
                                                     tex_object = bpy.context.scene.objects["BLANK"].copy()
                                                     tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()
-                                                    tex_object.name = varient + "_" + texture_set
+                                                    tex_object.name = new_var_name + "_" + texture_set
                                                     varient_coll.objects.link(tex_object)
                                                     if texture_set_a_path != set_path:
-                                                        config.custom_print("{} has alternate texture sets ({})".format(varient, texture_set), col=config.bcolors.OK)
+                                                        config.custom_print("{} has alternate texture sets ({})".format(new_var_name, texture_set), col=config.bcolors.OK)
                                                         SetUpObjectMaterialsAndTextures(type, tex_object, set_path, characterCollectionDict, texture_a_path=texture_set_a_path) 
                                                     else:
                                                         SetUpObjectMaterialsAndTextures(type, tex_object, set_path, characterCollectionDict) 
@@ -491,6 +493,10 @@ def reimport_lights(blend_path):
     filename = 'light_setup'
     bpy.ops.wm.append(filepath=file_path, directory=directory, filename=filename)
     return
+
+
+
+#-------------------------------------------------------------------
 
 
 if __name__ == '__main__':
