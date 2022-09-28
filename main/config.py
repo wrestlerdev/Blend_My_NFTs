@@ -9,10 +9,11 @@ EmptyTypes = ["Expression", "ExpressionLowerNone", "HeadShortNone", "FeetShortNo
 # Elements = ["Bismuth","Bismuth_02","Gold", "Gold_02", "Gold_03", "Oxygen", "Sulphur", "SpiritOfWine", "Mercury", "Salt"]
 Elements = ["Cinnabar", "Bismuth","Gold_02", "Oxygen", "Sulphur", "SpiritOfWine", "Mercury", "Salt", "Magnesium", "AquaFortis",
              "Vitriol", "Brimstone", "AquaRegia", "Tin", "Silver", "Arsenic", "Phlogiston", "Amalgum", "SalAmmoniac",
-             "Acid", "Lead", "Iron",  "Copper", "Antimony", "Cobalt", "Manganese", "Nickel", "Phosphorus", "Platinum", "Zinc"]    
+             "Acid", "Lead", "Iron",  "Copper", "Antimony", "Cobalt", "Manganese", "Nickel", "Phosphorus", "Platinum", "Zinc"] 
 
-original_texture_set_name = '01-Standard'
+Textiles = ["Corn", "OceanSwirl","QuiltedShells", "MetalGate", "Salmon"]   
 
+fallback_texture_set_name = '01-Standard'
 
 Slots = {"inputUT": ("01-UT", "Upper Torso"),
     "inputMT": ("02-MT", "Mid Torso"),

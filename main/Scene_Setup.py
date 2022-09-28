@@ -134,17 +134,17 @@ def CreateSlotsFolderHierarchy(save_path):
                                             index = 0
                                             for texture_set in os.listdir(texture_path):
                                                 set_path = CheckAndFormatPath(texture_path, texture_set)
-                                                texture_set_a_path = CheckAndFormatPath(texture_path, config.original_texture_set_name)
+                                                fallback_texture_set_path = CheckAndFormatPath(texture_path, config.fallback_texture_set_name)
                                                 if(set_path != ""):
                                                     tex_object = bpy.context.scene.objects["BLANK"].copy()
                                                     tex_object.data = bpy.context.scene.objects["BLANK"].data.copy()
                                                     tex_object.name = new_var_name + "_" + texture_set
                                                     varient_coll.objects.link(tex_object)
-                                                    if texture_set_a_path != set_path:
-                                                        config.custom_print("{} has alternate texture sets ({})".format(new_var_name, texture_set), col=config.bcolors.OK)
-                                                        SetUpObjectMaterialsAndTextures(type, tex_object, set_path, characterCollectionDict, texture_a_path=texture_set_a_path) 
+                                                    if fallback_texture_set_path != set_path:
+                                                        config.custom_print("{} has alternate texture sets ({})".format(varient, texture_set), col=config.bcolors.OK)
+                                                        SetUpObjectMaterialsAndTextures(type, texture_set, tex_object, set_path, characterCollectionDict, fallback_texture_set=fallback_texture_set_path) 
                                                     else:
-                                                        SetUpObjectMaterialsAndTextures(type, tex_object, set_path, characterCollectionDict) 
+                                                        SetUpObjectMaterialsAndTextures(type, texture_set, tex_object, set_path, characterCollectionDict) 
 
                                                     tex_object.hide_viewport = True
                                                     tex_object.hide_render = True
@@ -167,7 +167,7 @@ def CreateSlotsFolderHierarchy(save_path):
     return
 
 
-def SetUpObjectMaterialsAndTextures(type, obj, texture_path, characterCol, texture_a_path=''): 
+def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, characterCol, fallback_texture_set=''): 
     materialSets = next(os.walk(texture_path))[1] 
     if len(materialSets) > 0: # is there more than one material group
         mats = set()
@@ -185,37 +185,53 @@ def SetUpObjectMaterialsAndTextures(type, obj, texture_path, characterCol, textu
         i = 0
         for m in matfolderlink.keys():         
             if i >= len(obj.material_slots):
-                material = GetMaterialDomain(type, texture_path, matfolderlink[m], texture_a_path=texture_a_path)
+                material = GetMaterialDomain(type, texture_set, texture_path, matfolderlink[m], fallback_texture_set=fallback_texture_set)
                 tempcopy = material.copy()
                 tempcopy.name = m
                 obj.data.materials.append(None)
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m
             else:
-                material = GetMaterialDomain(type, texture_path, matfolderlink[m], texture_a_path=texture_a_path)
+                material = GetMaterialDomain(type, texture_set, texture_path, matfolderlink[m], fallback_texture_set=fallback_texture_set)
                 tempcopy = material.copy()
                 tempcopy.name = m
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m     
-    
-            LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
-            if texture_a_path and os.path.isdir(texture_a_path):
-                LinkImagesToNodes(tempcopy, os.path.join(texture_a_path, matfolderlink[m]))
+
+            #if texture object is a textile we shouldnt treat it like other material
+            if(texture_set in config.Textiles):
+                LinkTextileNodes(tempcopy, texture_set, os.path.join(texture_path, matfolderlink[m]))
+            else:
+                LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
+                if fallback_texture_set and os.path.isdir(fallback_texture_set):
+                    LinkImagesToNodes(tempcopy, os.path.join(fallback_texture_set, matfolderlink[m]))
             i += 1
+
             
     else: # only one texture set for variant
         material_slots = obj.material_slots
         for m in material_slots:
-            material = GetMaterialDomain(type, texture_path, texture_a_path=texture_a_path)
+            material = GetMaterialDomain(type, texture_set, texture_path, "", fallback_texture_set=fallback_texture_set)
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
-            LinkImagesToNodes(matcopy, texture_path)
-            if texture_a_path and os.path.isdir(texture_a_path):
-                LinkImagesToNodes(matcopy, texture_a_path)
+
+            #if texture object is a textile we shouldnt treat it like other material
+            if(texture_set in config.Textiles):
+                LinkTextileNodes(matcopy, texture_set, texture_path)
+            else:
+                LinkImagesToNodes(matcopy, texture_path)
+                if fallback_texture_set and os.path.isdir(fallback_texture_set):
+                    LinkImagesToNodes(matcopy, fallback_texture_set)
 
 
-def GetMaterialDomain(type, texture_path, matfolderlink = "", texture_a_path=''):
+
+def GetMaterialDomain(type, texture_set, texture_path, matfolderlink = "", fallback_texture_set=''):
+    resultTextile = [s for s in config.Textiles if texture_set in s]
+    if resultTextile != []:
+        material = bpy.data.materials['MasterTextile']
+        return material
+
     if matfolderlink:
         resultD = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_D." in s]
         resultE = [s for s in os.listdir( (texture_path + "/" + matfolderlink) ) if "_E." in s]
@@ -225,14 +241,15 @@ def GetMaterialDomain(type, texture_path, matfolderlink = "", texture_a_path='')
         resultE = [s for s in os.listdir(texture_path) if "_E." in s]
         resultO = [s for s in os.listdir(texture_path) if "_O." in s]
 
-    if texture_a_path and os.path.isdir(texture_a_path): # check first texture set
+    if fallback_texture_set and os.path.isdir(fallback_texture_set): # check first texture set
         if not resultD:
-            resultD = [s for s in os.listdir( (texture_a_path + "/" + matfolderlink) ) if "_D." in s]
+            resultD = [s for s in os.listdir( (fallback_texture_set + "/" + matfolderlink) ) if "_D." in s]
         if not resultE:
-            resultE = [s for s in os.listdir( (texture_a_path + "/" + matfolderlink) ) if "_E." in s]
+            resultE = [s for s in os.listdir( (fallback_texture_set + "/" + matfolderlink) ) if "_E." in s]
         if not resultO:
-            resultO = [s for s in os.listdir( (texture_a_path + "/" + matfolderlink) ) if "_O." in s]
+            resultO = [s for s in os.listdir( (fallback_texture_set + "/" + matfolderlink) ) if "_O." in s]
 
+    
     if resultD == [] and resultE != []:
         material = bpy.data.materials['MasterUnlitV01']
     elif resultO != []:
@@ -244,28 +261,13 @@ def GetMaterialDomain(type, texture_path, matfolderlink = "", texture_a_path='')
         material = bpy.data.materials['MasterV01']
     return material   
 
-
-def LinkImagesToNodes(matcopy, texture_path):
-        # get the nodes
-        for tex in os.listdir(texture_path):      
-            mapType = tex.rpartition("_")[2]
-            mapType = mapType.partition(".")[0]
-            if "D" == mapType and not matcopy.node_tree.nodes["DiffuseNode"].image:
-                file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["DiffuseNode"].image = newImage
-                matcopy.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
-
-            if "N" == mapType and not matcopy.node_tree.nodes["NormalNode"].image:
-                file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["NormalNode"].image = newImage
-                matcopy.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
-                matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
-
-            if "ID" == mapType and not matcopy.node_tree.nodes["ColorIDNode"].image:
+def LinkTextileNodes(matcopy, textile_type, texture_path):
+    matcopy.node_tree.nodes["TextileNode"].node_tree = bpy.data.node_groups[textile_type]
+    for tex in os.listdir(texture_path):      
+        mapType = tex.rpartition("_")[2]
+        mapType = mapType.partition(".")[0]
+        if "ID" == mapType:
+            if not matcopy.node_tree.nodes["ColorIDNode"].image:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
@@ -273,44 +275,81 @@ def LinkImagesToNodes(matcopy, texture_path):
                 matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
                 matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
 
-            if "M" == mapType and not matcopy.node_tree.nodes["MetallicNode"].image:
-                file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["MetallicNode"].image = newImage
-                matcopy.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
-                matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
+def LinkImagesToNodes(matcopy, texture_path):
+        # get the nodes
+        for tex in os.listdir(texture_path):      
+            mapType = tex.rpartition("_")[2]
+            mapType = mapType.partition(".")[0]
+            print(texture_path)
+            if "D" == mapType:
+                if not matcopy.node_tree.nodes["DiffuseNode"].image:
+                    file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["DiffuseNode"].image = newImage
+                    matcopy.node_tree.nodes["DiffuseMix"].outputs["Value"].default_value = 1
 
-            if "R" == mapType and not matcopy.node_tree.nodes["RoughnessNode"].image:
-                file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["RoughnessNode"].image = newImage
-                matcopy.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
-                matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
+            if "N" == mapType:
+                if not matcopy.node_tree.nodes["NormalNode"].image:
+                    file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["NormalNode"].image = newImage
+                    matcopy.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
+                    matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
 
-            if "E" == mapType and not matcopy.node_tree.nodes["EmissiveNode"].image:
-                file = file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["EmissiveNode"].image = newImage 
-                matcopy.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
+            if "ID" == mapType:
+                if not matcopy.node_tree.nodes["ColorIDNode"].image:
+                    file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["ColorIDNode"].image = newImage
+                    matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                    matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
 
-            if "O" == mapType and not matcopy.node_tree.nodes["OpacityNode"].image:
-                file = file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["OpacityNode"].image = newImage 
-                matcopy.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
-                matcopy.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
+            if "M" == mapType:
+                if not matcopy.node_tree.nodes["MetallicNode"].image:
+                    file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["MetallicNode"].image = newImage
+                    matcopy.node_tree.nodes["MetallicNode"].image.colorspace_settings.name = 'Linear'
+                    matcopy.node_tree.nodes["MetallicMix"].outputs["Value"].default_value = 1
 
-            if "I" == mapType and not matcopy.node_tree.nodes["IntensityNode"].image:
-                file = file = os.path.join(texture_path, tex)
-                file = file.replace('/', '\\')
-                newImage = bpy.data.images.load(file, check_existing=False)
-                matcopy.node_tree.nodes["IntensityNode"].image = newImage 
-                matcopy.node_tree.nodes["IntensityNode"].image.colorspace_settings.name = 'Linear'
-                matcopy.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
+            if "R" == mapType:
+                if not matcopy.node_tree.nodes["RoughnessNode"].image:
+                    file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["RoughnessNode"].image = newImage
+                    matcopy.node_tree.nodes["RoughnessNode"].image.colorspace_settings.name = 'Linear'
+                    matcopy.node_tree.nodes["RoughnessMix"].outputs["Value"].default_value = 1
+
+            if "E" == mapType:
+                if not matcopy.node_tree.nodes["EmissiveNode"].image:
+                    file = file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["EmissiveNode"].image = newImage 
+                    matcopy.node_tree.nodes["EmissiveMix"].outputs["Value"].default_value = 1
+
+            if "O" == mapType:
+                if not matcopy.node_tree.nodes["OpacityNode"].image:
+                    file = file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["OpacityNode"].image = newImage 
+                    matcopy.node_tree.nodes["OpacityNode"].image.colorspace_settings.name = 'Linear'
+                    matcopy.node_tree.nodes["OpacityMix"].outputs["Value"].default_value = 1
+
+            if "I" == mapType:
+                if not matcopy.node_tree.nodes["IntensityNode"].image: 
+                    file = file = os.path.join(texture_path, tex)
+                    file = file.replace('/', '\\')
+                    newImage = bpy.data.images.load(file, check_existing=False)
+                    matcopy.node_tree.nodes["IntensityNode"].image = newImage 
+                    matcopy.node_tree.nodes["IntensityNode"].image.colorspace_settings.name = 'Linear'
+                    matcopy.node_tree.nodes["IntensityMix"].outputs["Value"].default_value = 1
 
 
 def CheckAndFormatPath(path, pathTojoin = ""):
