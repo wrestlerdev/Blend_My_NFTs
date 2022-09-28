@@ -877,11 +877,13 @@ def evaluate_export_log(log_path, min_sec, max_sec):
     failed_nfts_time = []
     large_nfts = []
     large_nfts_time = []
+    average_nfts_time = []
     if os.path.isfile(log_path):
         log_dict = json.load(open(log_path))
         for key in log_dict.keys():
             log = log_dict[key]
             time = float(log["time_taken"].partition(' ')[0])
+            average_nfts_time.append(time)
             if time < min_sec:
                 failed_nfts.append(log["nft_number"])
                 failed_nfts_time.append(log["time_taken"])
@@ -901,9 +903,15 @@ def evaluate_export_log(log_path, min_sec, max_sec):
         config.custom_print("These NFTs were over the maximum render time:", '', config.bcolors.ERROR)
         for i in range(len(large_nfts)):
             config.custom_print("\t{}: {}".format(large_nfts[i], large_nfts_time[i]), '', config.bcolors.WARNING)
-
+    total_time = 0.0
+    for single_time in average_nfts_time:
+        total_time += single_time
+    average_time = total_time / (len(average_nfts_time) - 1)
+    config.custom_print("Average render time for NFT's was: ", '', config.bcolors.OK)
+    config.custom_print(average_time)
     if not failed_nfts and not large_nfts:
         config.custom_print("Everything passed :^)", '', config.bcolors.OK)
+
 
     return failed_nfts, large_nfts
 
