@@ -17,88 +17,88 @@ from . import config
 
 # A list for each caterogry of clothing that states what slots it will fil
 ItemUsedBodySlot = {
-"ShirtCropSleeveless" : ["01-UpperTorso"],
-"ShirtCropSleevelessBack" : ["01-UpperTorso", "20-Backpack", "14-Neck"],
-"ShirtCropSleevelessNeck" : ["01-UpperTorso", "14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtCrop" : ["01-UpperTorso", "03-ForeArms"],
-"ShirtCropNeck" : ["01-UppreTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso"],
-"ShirtMidSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtMidSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
-"ShirtMid" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms"],
-"ShirtMidNeck" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtMidNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "03-ForeArms", "14-Neck", "11-HairLong", "17-EarringsLong", "20-Backpack"],
-"ShirtLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick"],
-"ShirtLongSleevelessNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtLongSleevelessNeckBack" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick","14-Neck", "11-HairLong", "20-Backpack", "17-EarringsLong"],
-"ShirtLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms"],
-"ShirtLongNeck" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "17-EarringsLong"],
-"ShirtLongHead": ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "03-ForeArms","14-Neck", "11-HairLong", "12-HairShort", "18-Earrings", "17-EarringsLong"],
+"ShirtCropTank" : ["01-UT"],
+"ShirtCropTankBack" : ["01-UT", "20-BP", "14-N"],
+"ShirtCropTankNeck" : ["01-UT", "14-N", "11-HL", "17-EL"],
+"ShirtCrop" : ["01-UT", "03-FA"],
+"ShirtCropNeck" : ["01-UppreTorso", "03-FA", "14-N", "11-HL", "17-EL"],
+"ShirtMidTank" : ["01-UT", "02-MT"],
+"ShirtMidTankNeck" : ["01-UT", "02-MT", "14-N", "11-HL", "17-EL"],
+"ShirtMidTankBack" : ["01-UT", "02-MT", "14-N", "11-HL", "20-BP", "17-EL"],
+"ShirtMid" : ["01-UT", "02-MT", "03-FA"],
+"ShirtMidNeck" : ["01-UT", "02-MT", "03-FA", "14-N", "11-HL", "17-EL"],
+"ShirtMidBack" : ["01-UT", "02-MT", "03-FA", "14-N", "11-HL", "17-EL", "20-BP"],
+"ShirtLongTank" : ["01-UT", "02-MT", "06-PTK"],
+"ShirtLongTankNeck" : ["01-UT", "02-MT", "06-PTK","14-N", "11-HL", "17-EL"],
+"ShirtLongTankBack" : ["01-UT", "02-MT", "06-PTK","14-N", "11-HL", "20-BP", "17-EL"],
+"ShirtLong" : ["01-UT", "02-MT", "06-PTK", "03-FA"],
+"ShirtLongNeck" : ["01-UT", "02-MT", "06-PTK", "03-FA","14-N", "11-HL", "17-EL"],
+"ShirtLongHead": ["01-UT", "02-MT", "06-PTK", "03-FA","14-N", "11-HL", "12-HS", "18-ES", "17-EL"],
 
-"PantsShort" : ["07-PelvisThin"],
-"PantsShortThick" : ["06-PelvisThick", "07-PelvisThin"],
-"PantsShortHigh" : ["06-PelvisThick", "07-PelvisThin", "02-MiddleTorso"],
-"PantsMid" : ["07-PelvisThin", "08-Calf"],
-"PantsMidThick" : ["06-PelvisThick", "07-PelvisThin", "08-Calf"],
-"PantsMidHigh" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "02-MiddleTorso"],
-"PantsLong" : ["07-PelvisThin", "08-Calf", "09-Ankle"],
-"PantsLongThick" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle"],
-"PantsLongHigh" : ["06-PelvisThick", "07-PelvisThin", "08-Calf", "09-Ankle", "02-MiddleTorso"],
+"PantsShort" : ["07-PTN"],
+"PantsShortThick" : ["06-PTK", "07-PTN"],
+"PantsShortHigh" : ["06-PTK", "07-PTN", "02-MT"],
+"PantsMid" : ["07-PTN", "08-C"],
+"PantsMidThick" : ["06-PTK", "07-PTN", "08-C"],
+"PantsMidHigh" : ["06-PTK", "07-PTN", "08-C", "02-MT"],
+"PantsLong" : ["07-PTN", "08-C", "09-A"],
+"PantsLongThick" : ["06-PTK", "07-PTN", "08-C", "09-A"],
+"PantsLongHigh" : ["06-PTK", "07-PTN", "08-C", "09-A", "02-MT"],
 
-"OutfitLong" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "14-Neck", "08-Calf", "09-Ankle","17-EarringsLong"],
-"OutfitLongSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "14-Neck", "08-Calf", "09-Ankle", "17-EarringsLong"],
-"OutfitMid" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "14-Neck", "08-Calf", "17-EarringsLong"],
-"OutfitMidSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "14-Neck", "08-Calf", "17-EarringsLong"],
-"OutfitShort" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "03-ForeArms", "14-Neck", "17-EarringsLong"],
-"OutfitShortSleeveless" : ["01-UpperTorso", "02-MiddleTorso", "06-PelvisThick", "07-PelvisThin", "14-Neck", "17-EarringsLong"],
+"OutfitLong" : ["01-UT", "02-MT", "06-PTK", "07-PTN", "03-FA", "14-N", "08-C", "09-A","17-EL"],
+"OutfitLongTank" : ["01-UT", "02-MT", "06-PTK", "07-PTN", "14-N", "08-C", "09-A", "17-EL"],
+"OutfitMid" : ["01-UT", "02-MT", "06-PTK", "07-PTN", "03-FA", "14-N", "08-C", "17-EL"],
+"OutfitMidTank" : ["01-UT", "02-MT", "06-PTK", "07-PTN", "14-N", "08-C", "17-EL"],
+"OutfitShort" : ["01-UT", "02-MT", "06-PTK", "07-PTN", "03-FA", "14-N", "17-EL"],
+"OutfitShortTank" : ["01-UT", "02-MT", "06-PTK", "07-PTN", "14-N", "17-EL"],
 
-"Forearm" : ["03-ForeArms"],
-"HandsShort" : ["05-Hands", "04-Wrists"],
-"GlovesShort" : ["05-Hands", "04-Wrists"],
-"HandsLong" : ["03-ForeArms", "05-Hands", "04-Wrists"],
-"GlovesLong" : ["03-ForeArms", "05-Hands", "04-Wrists"],
+"Forearm" : ["03-FA"],
+"HandShort" : ["05-H", "04-W"],
+"GlovesShort" : ["05-H", "04-W"],
+"HandLong" : ["03-FA", "05-H", "04-W"],
+"GlovesLong" : ["03-FA", "05-H", "04-W"],
 
-"FeetLong" : ["08-Calf", "09-Ankle", "10-Feet"],
-"FeetMid" : ["09-Ankle", "10-Feet"],
-"FeetShort" : ["10-Feet"],
-"FeetShortNone" : ["10-Feet"],
-"Calf" : ["08-Calf"],
-"CalfLong" : ["08-Calf", "09-Ankle"],
+"FeetLong" : ["08-C", "09-A", "10-F"],
+"FeetMid" : ["09-A", "10-F"],
+"FeetShort" : ["10-F"],
+"FeetShortNone" : ["10-F"],
+"Calf" : ["08-C"],
+"CalfLong" : ["08-C", "09-A"],
 
-"Neck" : ["14-Neck", "17-EarringsLong"],
-"HairShort" : ["12-HairShort"],
-"HairShortFront" : ["12-HairShort", "15-MiddleHead"],
-"HairMid" : ["11-HairLong", "14-Neck", "12-HairShort", "18-Earrings", "17-EarringsLong"],
-"HairMidFront" : ["11-HairLong", "14-Neck", "12-HairShort", "15-MiddleHead", "18-Earrings", "17-EarringsLong"],
-"HairLong" : ["11-HairLong", "14-Neck", "12-HairShort", "18-Earrings", "20-Backpack", "17-EarringsLong"],
+"Neck" : ["14-N", "17-EL"],
+"HairShort" : ["12-HS"],
+"HairShortFront" : ["12-HS", "15-MH"],
+"HairMid" : ["11-HL", "14-N", "12-HS", "18-ES", "17-EL"],
+"HairMidFront" : ["11-HL", "14-N", "12-HS", "15-MH", "18-ES", "17-EL"],
+"HairLong" : ["11-HL", "14-N", "12-HS", "18-ES", "20-BP", "17-EL"],
 
-"HeadFull" : ["11-HairLong", "14-Neck", "12-HairShort", "15-MiddleHead", "16-LowerHead", "18-Earrings", "17-EarringsLong"],
-"HeadExtraEar" : ["17-EarringsLong", "18-Earrings"],
+"HeadFull" : ["11-HL", "14-N", "12-HS", "15-MH", "16-LH", "18-ES", "17-EL"],
+"HeadExtraEar" : ["17-EL", "18-ES"],
 "HeadExtra" : [],
 
-"FaceMid" : ["15-MiddleHead"],
-"FaceMidNeutral" : ["15-MiddleHead", "19-Expression"],
-"FaceLower" : ["16-LowerHead"],
-"FaceFull" : ["15-MiddleHead", "16-LowerHead"],
-"EarringsShort" : ["18-Earrings"], 
-"EarringsLong" : ["18-Earrings", "17-EarringsLong"],
+"FaceMid" : ["15-MH"],
+"FaceMidNeutral" : ["15-MH", "19-EX"],
+"FaceLower" : ["16-LH"],
+"FaceFull" : ["15-MH", "16-LH"],
+"EarringsShort" : ["18-ES"], 
+"EarringsLong" : ["18-ES", "17-EL"],
 
-"Backpack" : ["20-Backpack"],
-"BackpackHigh" : ["14-Neck", "20-Backpack"],
+"Backpack" : ["20-BP"],
+"BackpackHigh" : ["14-N", "20-BP"],
 
-"Expression" : ["19-Expression"],
-"ExpressionLower" : ["16-LowerHead", "19-Expression"],
-"ExpressionLowerNone" : ["16-LowerHead", "19-Expression"],
-"ExpressionUpper" : ["15-MiddleHead", "19-Expression"],
-"ExpressionFull" : ["16-LowerHead", "15-MiddleHead", "19-Expression"],
+"Expression" : ["19-EX"],
+"ExpressionLower" : ["16-LH", "19-EX"],
+"ExpressionLowerNone" : ["16-LH", "19-EX"],
+"ExpressionUpper" : ["15-MH", "19-EX"],
+"ExpressionFull" : ["16-LH", "15-MH", "19-EX"],
 
-"Background" : ["22-Background"],
+"Background" : ["22-BG"],
 
-"TattooMiddleTorso": ["02-MiddleTorso"],
-"TattooForearm": ["03-ForeArms"],
-"TattooCalf": ["08-Calf"],
-"TattooFeet": ["10-Feet"],
-"TattooNeck": ["14-Neck"]
+"TattooMiddleTorso": ["02-MT"],
+"TattooForearm": ["03-FA"],
+"TattooCalf": ["08-C"],
+"TattooFeet": ["10-F"],
+"TattooNeck": ["14-N"]
 
 }
   
@@ -146,7 +146,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
                 textureChoosen = None
             else:
                 #Check if current attribute is an accessory for hair
-                if attribute[3:].startswith("Accessories"): 
+                if attribute[3:] == "HA": 
                     hair_collection = bpy.data.collections[hair_coll_name + '_' + character]
                     typeChoosen, typeIndex, varientChoosen, varientIndex = PickWeightedAccessoryTypeAndVariant(hierarchy[attribute], hair_collection)
                 else:
@@ -155,7 +155,7 @@ def RandomizeFullCharacter(maxNFTs, save_path):
 
                 textureChoosen, textureIndex = PickWeightedTextureVarient(hierarchy[attribute][typeChoosen][varientChoosen])
 
-                if attribute[3:].startswith('Hair') and not varientChoosen.endswith("Null"):
+                if (attribute[3:] == 'HS' or attribute[3:] == 'HL') and not varientChoosen.endswith("Null"):
                     hair_coll_name = varientChoosen
 
                 #if both type and varient index are 0 a NULL collection was choosen
@@ -325,14 +325,14 @@ def GetRandomSingleMesh(att_name):
         typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)
         type = typeChosen[0]
         type_index = list(hierarchy[att_name].keys()).index(type)
-    elif not pointer_name == 'inputAccessories':
+    elif not pointer_name == 'inputHA':
         return "0-0-0"
 
     number_List_Of_i = []
     rarity_List_Of_i = []
     max_attempts = 10
 
-    if pointer_name == 'inputAccessories':
+    if pointer_name == 'inputHA':
         for type in hierarchy[att_name].keys():
             if hierarchy[att_name][type].keys() and not type.endswith('Null'):
                 for variant in hierarchy[att_name][type]:
@@ -381,8 +381,8 @@ def PickWeightedAccessoryTypeAndVariant(AttributeTypes, hair_coll=''):
     number_List_Of_i = []
     rarity_List_Of_i = []
 
-    null_var_rarity = bpy.data.collections["Accessories_AccessoriesNull_000_Null"]['rarity']
-    number_List_Of_i.append("00-AccessoriesNull_Accessories_AccessoriesNull_000_Null")
+    null_var_rarity = bpy.data.collections["HA_HANull_000_Null"]['rarity']
+    number_List_Of_i.append("00-HANull_HA_HANull_000_Null")
     rarity_List_Of_i.append(null_var_rarity)
 
     for type in AttributeTypes:

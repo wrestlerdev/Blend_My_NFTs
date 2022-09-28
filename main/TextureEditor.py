@@ -37,10 +37,10 @@ def rename_all_original_textures(input_path): # renaming all 4k texture images
                             for multi_texture_dir in os.listdir(texture_path):
                                 multi_texture_path = os.path.join(texture_path, multi_texture_dir)
                                 number = '_' + ''.join(i for i in multi_texture_dir if i.isdigit())
-                                rename_all_textures_in_folder(multi_texture_path, var_dir, '_' + texture_dir, number)
+                                rename_all_textures_in_folder(multi_texture_path, var_dir, '_' + texture_dir[3:], number)
                                 # return
                         else:
-                            rename_all_textures_in_folder(texture_path, var_dir, '_' + texture_dir)
+                            rename_all_textures_in_folder(texture_path, var_dir, '_' + texture_dir[3:])
                             # return
 
 
@@ -183,6 +183,7 @@ def rename_texture_set_folder(old_name, new_name, input_path):
                             old_texture_dir = os.path.join(textures, texture_dir)
                             new_texture_dir = os.path.join(textures, new_name)
                             os.rename(old_texture_dir, new_texture_dir)
+                            # return
     return
 
 
@@ -199,3 +200,25 @@ def downres_element_textures(elements_folder_path, dims, should_overwrite):
                 element = os.path.join(elements, sub_dir)
                 downres_all_textures_in_folder(element, dims, should_overwrite)
     return
+
+
+
+#----------------------------------------------------------------------
+
+
+def clean_up_file_names(slots_path):
+    for slot_dir in os.listdir(slots_path):
+        slots = os.path.join(slots_path, slot_dir)
+        for type_dir in os.listdir(slots):
+            type_path = os.path.join(slots, type_dir)
+            for var_dir in os.listdir(type_path):
+                var_split = var_dir.split('_')
+                if len(var_split) == 4:
+                    new_var_name = var_split[2] + '_' + var_split[3]
+                    old_variant_path = os.path.join(type_path, var_dir)
+                    new_variant_path = os.path.join(type_path, new_var_name)
+                    os.rename(old_variant_path, new_variant_path)
+                else:
+                    print("oh no {}".format(var_dir))
+                
+

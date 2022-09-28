@@ -228,84 +228,77 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     inputDNA: bpy.props.StringProperty(name="DNA")
 
 
-    inputUpperTorso: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUpperTorso"))
-    inputMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleTorso"))
-    inputForeArms: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputForeArms"))
-    # inputLWrist: bpy.props.PointerProperty(name="Left Wrist Slot",type=bpy.types.Collection,
-    #                                             update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLWrist"))
-    # inputRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection,
-    #                                             update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputRForeArm"))
-    inputWrists: bpy.props.PointerProperty(name="Right Wrist Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputWrists"))
-    inputPelvisThick: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThick"))
-    inputPelvisThin: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPelvisThin"))
-    inputHands: bpy.props.PointerProperty(name="Hands Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHands"))
-    inputCalf: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputCalf"))
-    inputAnkle: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAnkle"))
-    inputFeet: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFeet"))
-    inputNeck: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputNeck"))
-    inputLowerHead: bpy.props.PointerProperty(name="Lower Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLowerHead"))
-    inputMiddleHead: bpy.props.PointerProperty(name="Middle Head Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMiddleHead"))
-    inputEarrings: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarrings"))
-    inputEarringsLong: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEarringsLong"))
-    inputHairShort: bpy.props.PointerProperty(name="Hair Short Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairShort"))
-    inputHairLong: bpy.props.PointerProperty(name="Hair Long Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHairLong"))
-    inputAccessories: bpy.props.PointerProperty(name="Accessories Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputAccessories"))
-    inputBackpack: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackpack"))
-    inputBackground: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBackground"))
-    inputExpression: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputExpression"))
-    inputEnvironment: bpy.props.PointerProperty(name="Environment Slot",type=bpy.types.Collection,
-                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEnvironment"))
+    inputUT: bpy.props.PointerProperty(name="Upper Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputUT"))
+    inputMT: bpy.props.PointerProperty(name="Middle Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMT"))
+    inputFA: bpy.props.PointerProperty(name="Forearms Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputFA"))
+    inputW: bpy.props.PointerProperty(name="Wrist Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputW"))
+    inputPTK: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPTK"))
+    inputPTN: bpy.props.PointerProperty(name="Lower Torso Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputPTN"))
+    inputH: bpy.props.PointerProperty(name="Hair Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputH"))
+    inputC: bpy.props.PointerProperty(name="Calf Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputC"))
+    inputA: bpy.props.PointerProperty(name="Ankle Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputA"))
+    inputF: bpy.props.PointerProperty(name="Feet Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputF"))
+    inputN: bpy.props.PointerProperty(name="Neck Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputN"))
+    inputLH: bpy.props.PointerProperty(name="Lower Head Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputLH"))
+    inputMH: bpy.props.PointerProperty(name="Middle Head Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputMH"))
+    inputES: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputES"))
+    inputEL: bpy.props.PointerProperty(name="Earrings Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEL"))
+    inputHS: bpy.props.PointerProperty(name="Hair Short Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHS"))
+    inputHL: bpy.props.PointerProperty(name="Hair Long Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHL"))
+    inputHA: bpy.props.PointerProperty(name="Accessories Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputHA"))
+    inputBP: bpy.props.PointerProperty(name="Backpack Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBP"))
+    inputBG: bpy.props.PointerProperty(name="Background Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputBG"))
+    inputEX: bpy.props.PointerProperty(name="Expression Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputEX"))
+    inputENV: bpy.props.PointerProperty(name="Environment Slot",type=bpy.types.Collection,
+                                                update=lambda s,c: Exporter.Previewer.pointers_have_updated("inputENV"))
     inputGeneral: bpy.props.PointerProperty(name="Any Slot",type=bpy.types.Collection,
                                                 update=lambda s,c: Exporter.Previewer.general_pointer_updated())
 
     inputColorListSceneObject: bpy.props.PointerProperty(name="ColorListObject", type=bpy.types.Object)
 
-    lastUpperTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastMiddleTorso: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastForeArms: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastHairShort: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastHairLong: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    # lastLWrist: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    # lastRForeArm: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastWrists: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastPelvisThick: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastPelvisThin: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastHands: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastCalf: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastAnkle: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastFeet: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastNeck: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastLowerHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastMiddleHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastEarrings: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastEarringsLong: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    # lastUpperHead: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastBackpack: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastBackground: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastExpression: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastEnvironment: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
-    lastAccessories: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastUT: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastMT: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastFA: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHS: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHL: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastW: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastPTK: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastPTN: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastH: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastC: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastA: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastF: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastN: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastLH: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastMH: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastES: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEL: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBP: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastBG: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastEX: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastENV: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
+    lastHA: bpy.props.PointerProperty(name="",type=bpy.types.Collection)
 
     colourStyleIndex: bpy.props.StringProperty(default="1", 
                                 update=lambda s,c:DNA_Generator.Outfit_Generator.ColorGen.colourindex_has_been_updated("colourStyleIndex", "lastStyleIndex"))
@@ -1563,7 +1556,8 @@ class downresTextures(bpy.types.Operator):
     def execute(self, context):
         input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
         # resolutions = [2048, 1024, 512, 256, 128, 64]
-        resolutions = [2048, 1024, 512, 64]
+        # resolutions = [2048, 1024, 512, 64]
+        resolutions = [1024, 64]
         # resolutions = [512]
         should_overwrite = bpy.context.scene.my_tool.shouldForceDownres
         TextureEditor.create_downres_textures(input_path, resolutions, should_overwrite)
@@ -1658,7 +1652,7 @@ class countUpAllRarities(bpy.types.Operator):
         NFTRecord_save_path = os.path.join(batch_path, "_NFTRecord_{}.json".format(index))
         Rarity_save_path = os.path.join(batch_path, "_RarityCounter_{}.json".format(index))
 
-        #DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, index)
+        Rarity_Wrangler.count_all_rarities(batch_path, index)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         return {'FINISHED'}
 
@@ -1703,7 +1697,9 @@ class testButton(bpy.types.Operator):
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
         # input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        # TextureEditor.rename_texture_set_folder('A', 'Standard', input_path)
+        # TextureEditor.rename_texture_set_folder('Standard', '01-Standard', input_path)
+        # slots_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
+        # TextureEditor.clean_up_file_names(slots_path)
         return {'FINISHED'}
 
 
@@ -1870,9 +1866,9 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
     bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
-    slots = {"inputUpperTorso": ("MOD_CLOTH"),
-    "inputMiddleTorso": ("MOD_CLOTH"),
-    "inputBackpack": ("CON_ARMATURE")}
+    slots = {"inputUT": ("MOD_CLOTH"),
+    "inputMT": ("MOD_CLOTH"),
+    "inputBP": ("CON_ARMATURE")}
     
     def draw(self, context):
         layout = self.layout
@@ -1925,11 +1921,9 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    # "inputRForeArm": ("LOOP_FORWARDS"),
-    "inputForeArms": ("LOOP_BACK"),
-    "inputWrists": ("FORWARD"),
-    # "inputLWrist": ("BACK"),
-    "inputHands": ("VIEW_PAN"),}
+    "inputFA": ("LOOP_BACK"),
+    "inputW": ("FORWARD"),
+    "inputH": ("VIEW_PAN")}
     
     def draw(self, context):
         layout = self.layout
@@ -1986,11 +1980,11 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputPelvisThick": ("OUTLINER_OB_ARMATURE"),
-    "inputPelvisThin": ("HANDLE_ALIGNED"),
-    "inputCalf": ("LINCURVE"),
-    "inputAnkle": ("LINCURVE"),
-    "inputFeet": ("MOD_DYNAMICPAINT"),}
+    "inputPTK": ("OUTLINER_OB_ARMATURE"),
+    "inputPTN": ("HANDLE_ALIGNED"),
+    "inputC": ("LINCURVE"),
+    "inputA": ("LINCURVE"),
+    "inputF": ("MOD_DYNAMICPAINT"),}
     
     def draw(self, context):
         layout = self.layout
@@ -2046,16 +2040,15 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
 
     slots = {
-    "inputExpression": ("GHOST_ENABLED"),
-    # "inputUpperHead": ("MESH_CONE"),
-    "inputAccessories": ("SOLO_ON"),
-    "inputHairLong": ("PARTICLEMODE"),
-    "inputHairShort": ("PARTICLEMODE"),
-    "inputMiddleHead": ("HIDE_OFF"),
-    "inputLowerHead": ("USER"),
-    "inputEarringsLong": ("PMARKER_ACT"),
-    "inputEarrings": ("PMARKER_SEL"),
-    "inputNeck": ("NODE_INSERT_OFF")}
+    "inputEX": ("GHOST_ENABLED"),
+    "inputHA": ("SOLO_ON"),
+    "inputHL": ("PARTICLEMODE"),
+    "inputHS": ("PARTICLEMODE"),
+    "inputMH": ("HIDE_OFF"),
+    "inputLH": ("USER"),
+    "inputEL": ("PMARKER_ACT"),
+    "inputES": ("PMARKER_SEL"),
+    "inputN": ("NODE_INSERT_OFF")}
     
     def draw(self, context):
         layout = self.layout
@@ -2114,8 +2107,8 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'GENERATION'
     bl_parent_id = 'WCUSTOM_PT_ParentSlots'
-    slots = {"inputBackground": ("NODE_TEXTURE"),
-            "inputEnvironment": ("STICKY_UVS_DISABLE")}
+    slots = {"inputBG": ("NODE_TEXTURE"),
+            "inputENV": ("STICKY_UVS_DISABLE")}
     
     def draw(self, context):
         layout = self.layout

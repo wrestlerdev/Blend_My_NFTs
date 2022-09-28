@@ -419,7 +419,7 @@ def reset_rarity_Record(NFTRecord_save_path):
 
    hierarchy = NFTHirachy.createHirachy()
 
-   zero_null_types = ["00-UpperTorsoNull", "00-PelvisThinNull", "00-BackgroundNull", "00-FeetNull", "00-HairShortNull"]
+   zero_null_types = ["00-UTNull", "00-PTNNull", "00-BGNull", "00-FNull", "00-HSNull"]
 
    for slot in list(hierarchy.keys()):
       for type in list(hierarchy[slot].keys()):
