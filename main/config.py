@@ -13,7 +13,7 @@ Elements = ["Cinnabar", "Bismuth","Gold_02", "Oxygen", "Sulphur", "SpiritOfWine"
 
 Textiles = ["Corn", "OceanSwirl","QuiltedShells", "MetalGate", "Salmon"]   
 
-fallback_texture_set_name = 'Standard'
+fallback_texture_set_name = '01-Standard'
 
 Slots = {"inputUT": ("01-UT", "Upper Torso"),
     "inputMT": ("02-MT", "Mid Torso"),

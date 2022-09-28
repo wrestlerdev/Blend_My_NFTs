@@ -197,13 +197,16 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
                 tempcopy.name = m
                 obj.material_slots[i].material = tempcopy
                 tempcopy.name = m     
-    
-            LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
-            if fallback_texture_set and os.path.isdir(fallback_texture_set):
-                LinkImagesToNodes(tempcopy, os.path.join(fallback_texture_set, matfolderlink[m]))
-            i += 1
+
+            #if texture object is a textile we shouldnt treat it like other material
             if(texture_set in config.Textiles):
-                LinkTextileNodes(tempcopy, texture_set)
+                LinkTextileNodes(tempcopy, texture_set, os.path.join(texture_path, matfolderlink[m]))
+            else:
+                LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
+                if fallback_texture_set and os.path.isdir(fallback_texture_set):
+                    LinkImagesToNodes(tempcopy, os.path.join(fallback_texture_set, matfolderlink[m]))
+            i += 1
+
             
     else: # only one texture set for variant
         material_slots = obj.material_slots
@@ -212,16 +215,19 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
             material.use_nodes = True
             matcopy = material.copy()
             m.material = matcopy
-            LinkImagesToNodes(matcopy, texture_path)
-            if fallback_texture_set and os.path.isdir(fallback_texture_set):
-                LinkImagesToNodes(matcopy, fallback_texture_set)
+
+            #if texture object is a textile we shouldnt treat it like other material
             if(texture_set in config.Textiles):
-                LinkTextileNodes(matcopy, texture_set)
+                LinkTextileNodes(matcopy, texture_set, texture_path)
+            else:
+                LinkImagesToNodes(matcopy, texture_path)
+                if fallback_texture_set and os.path.isdir(fallback_texture_set):
+                    LinkImagesToNodes(matcopy, fallback_texture_set)
+
 
 
 def GetMaterialDomain(type, texture_set, texture_path, matfolderlink = "", fallback_texture_set=''):
     resultTextile = [s for s in config.Textiles if texture_set in s]
-    config.custom_print(texture_set, config.bcolors.ERROR)
     if resultTextile != []:
         material = bpy.data.materials['MasterTextile']
         return material
@@ -255,8 +261,19 @@ def GetMaterialDomain(type, texture_set, texture_path, matfolderlink = "", fallb
         material = bpy.data.materials['MasterV01']
     return material   
 
-def LinkTextileNodes(matcopy, textile_type):
+def LinkTextileNodes(matcopy, textile_type, texture_path):
     matcopy.node_tree.nodes["TextileNode"].node_tree = bpy.data.node_groups[textile_type]
+    for tex in os.listdir(texture_path):      
+        mapType = tex.rpartition("_")[2]
+        mapType = mapType.partition(".")[0]
+        if "ID" == mapType:
+            if not matcopy.node_tree.nodes["ColorIDNode"].image:
+                file = os.path.join(texture_path, tex)
+                file = file.replace('/', '\\')
+                newImage = bpy.data.images.load(file, check_existing=False)
+                matcopy.node_tree.nodes["ColorIDNode"].image = newImage
+                matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
 
 def LinkImagesToNodes(matcopy, texture_path):
         # get the nodes
