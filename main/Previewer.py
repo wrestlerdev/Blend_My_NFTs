@@ -534,8 +534,8 @@ def get_new_texture_name(node, suffix, texture_mesh, slot_pathing, material_name
                config.custom_print("\tPlease down-res textures to speed up previewer :<", col=config.bcolors.WARNING)
                return original_texture
 
-         if texture_set != config.original_texture_set_name: # if texture doesn't exist in current texture set, try find it within the first ('A') texture set
-            original_texture_folder_path = os.path.join(variant_folder_path, "Textures", config.original_texture_set_name)
+         if texture_set != config.fallback_texture_set_name: # if texture doesn't exist in current texture set, try find it within the first ('A') texture set
+            original_texture_folder_path = os.path.join(variant_folder_path, "Textures", config.fallback_texture_set_name)
             for t in os.listdir(original_texture_folder_path):
                if t.endswith(new_texture_end):
                   new_texture = t
