@@ -95,19 +95,17 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                            resolution = 4096
                      else:
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
-                     set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
+                        set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
 
             if type.name[3:].startswith('Expression'):
                variant_name = varient.name.rpartition('_')[2]
                set_shape_keys(character, variant_name)
 
             elif type.name[3:].startswith('Backpack'):
-               config.custom_print("Backoroni")
                config.custom_print(type.name[3:])
                RaycastPackpack(type.name[3:], character, NFTDict)
 
             elif type.name[3:].startswith('Feet'):
-               config.custom_print("Feetoroni")
                config.custom_print(type.name[3:])
                SnapFeetToFloor(type.name[3:], character, NFTDict)
 
@@ -117,7 +115,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
             elif attr.name[3:] == 'HA':
                char_var_coll = bpy.data.collections[varient.name + '_' + character]
-               print("wwwww")
                print(char_var_coll)
                set_hair_accessory_shape_keys(char_var_coll, hair_coll)
 
@@ -138,6 +135,7 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 def set_material_element(element):
+   
    mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer", "TattooElementMixer"]
    element_style, element_type = element.split('-')
 

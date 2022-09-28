@@ -200,7 +200,7 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
 
             #if texture object is a textile we shouldnt treat it like other material
             if(texture_set in config.Textiles):
-                LinkTextileNodes(tempcopy, texture_set, os.path.join(texture_path, matfolderlink[m]))
+                LinkTextileNodes(tempcopy, texture_set, fallback_texture_set)
             else:
                 LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
                 if fallback_texture_set and os.path.isdir(fallback_texture_set):
@@ -218,7 +218,7 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
 
             #if texture object is a textile we shouldnt treat it like other material
             if(texture_set in config.Textiles):
-                LinkTextileNodes(matcopy, texture_set, texture_path)
+                LinkTextileNodes(matcopy, texture_set, fallback_texture_set)
             else:
                 LinkImagesToNodes(matcopy, texture_path)
                 if fallback_texture_set and os.path.isdir(fallback_texture_set):
@@ -266,14 +266,24 @@ def LinkTextileNodes(matcopy, textile_type, texture_path):
     for tex in os.listdir(texture_path):      
         mapType = tex.rpartition("_")[2]
         mapType = mapType.partition(".")[0]
+
         if "ID" == mapType:
             if not matcopy.node_tree.nodes["ColorIDNode"].image:
                 file = os.path.join(texture_path, tex)
                 file = file.replace('/', '\\')
                 newImage = bpy.data.images.load(file, check_existing=False)
                 matcopy.node_tree.nodes["ColorIDNode"].image = newImage
-                matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Raw'
                 matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
+
+        if "N" == mapType:
+                    if not matcopy.node_tree.nodes["NormalNode"].image:
+                        file = os.path.join(texture_path, tex)
+                        file = file.replace('/', '\\')
+                        newImage = bpy.data.images.load(file, check_existing=False)
+                        matcopy.node_tree.nodes["NormalNode"].image = newImage
+                        matcopy.node_tree.nodes["NormalNode"].image.colorspace_settings.name = 'Raw'
+                        matcopy.node_tree.nodes["NormalMix"].outputs["Value"].default_value = 1
 
 def LinkImagesToNodes(matcopy, texture_path):
         # get the nodes
@@ -304,7 +314,7 @@ def LinkImagesToNodes(matcopy, texture_path):
                     file = file.replace('/', '\\')
                     newImage = bpy.data.images.load(file, check_existing=False)
                     matcopy.node_tree.nodes["ColorIDNode"].image = newImage
-                    matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Linear'
+                    matcopy.node_tree.nodes["ColorIDNode"].image.colorspace_settings.name = 'Raw'
                     matcopy.node_tree.nodes["ColorID_RGBMix"].outputs["Value"].default_value = 1
 
             if "M" == mapType:
