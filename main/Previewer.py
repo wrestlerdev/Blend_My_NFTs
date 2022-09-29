@@ -218,46 +218,48 @@ def RaycastPackpack(backpackType, character, NFTDict):
    torsoObj = torsoObj + "_" + character
    objects = bpy.data.collections[torsoObj].objects
    if len(objects) > 0:
-      cb = objects[0]
-      src = bpy.data.objects[character + '_src']
-      dst = bpy.data.objects[character + '_dst']
-      null_loc = bpy.data.objects[character + '_loc']
+      for cb in objects:
+         #cb = objects[0]
+         src = bpy.data.objects[character + '_src']
+         dst = bpy.data.objects[character + '_dst']
+         null_loc = bpy.data.objects[character + '_loc']
 
-      mw = cb.matrix_world
-      mwi = mw.inverted()
+         mw = cb.matrix_world
+         mwi = mw.inverted()
 
-      # src and dst in local space of cb
-      origin = mwi @ src.matrix_world.translation
-      dest = mwi @ dst.matrix_world.translation
-      direction = (dest - origin).normalized()
+         # src and dst in local space of cb
+         origin = mwi @ src.matrix_world.translation
+         dest = mwi @ dst.matrix_world.translation
+         direction = (dest - origin).normalized()
 
-      hit, loc, norm, face = cb.ray_cast(origin, direction)
+         hit, loc, norm, face = cb.ray_cast(origin, direction)
 
-      if hit:
-         config.custom_print("Hit at " + str(mw @ loc) + " (local)")
-         config.custom_print(dst.matrix_world.to_translation())
-         
-         dir = (mw @ loc) - dst.matrix_world.to_translation()
-         dist = dir.magnitude
-         null_loc.location = Vector([0,2,0])
-         null_loc.location.z -= dist
+         if hit:
+            config.custom_print("Hit at " + str(mw @ loc) + " (local)")
+            config.custom_print(dst.matrix_world.to_translation())
+            
+            dir = (mw @ loc) - dst.matrix_world.to_translation()
+            dist = dir.magnitude
+            null_loc.location = Vector([0,2,0])
+            null_loc.location.z -= dist
 
-         if backpackType == "BackpackHigh":
-            backpack = list(NFTDict["14-N"].keys())[0]
+            if backpackType == "BackpackHigh":
+               backpack = list(NFTDict["14-N"].keys())[0]
+            else:
+               backpack = list(NFTDict["20-BP"].keys())[0]
+            backpack = backpack + "_" + character
+            for obj in bpy.data.collections[backpack].objects:
+               if len(obj.constraints) < 1:
+                  obj.constraints.new(type='CHILD_OF')
+               obj.constraints["Child Of"].target = null_loc
+               obj.constraints["Child Of"].inverse_matrix = Matrix(((1.0, 0.0, 0.0, 0.0),
+                                                                  (0.0, 1.0, 0.0, 0.0),
+                                                                  (0.0, 0.0, 1.0, 0.0),
+                                                                  (0.0, 0.0, 0.0, 1.0)))
+               obj.location = Vector([0,0,0])
+            return
          else:
-            backpack = list(NFTDict["20-BP"].keys())[0]
-         backpack = backpack + "_" + character
-         for obj in bpy.data.collections[backpack].objects:
-            if len(obj.constraints) < 1:
-               obj.constraints.new(type='CHILD_OF')
-            obj.constraints["Child Of"].target = null_loc
-            obj.constraints["Child Of"].inverse_matrix = Matrix(((1.0, 0.0, 0.0, 0.0),
-                                                               (0.0, 1.0, 0.0, 0.0),
-                                                               (0.0, 0.0, 1.0, 0.0),
-                                                               (0.0, 0.0, 0.0, 1.0)))
-            obj.location = Vector([0,0,0])
-      else:
-         config.custom_print("No HIT")
+            config.custom_print("No HIT")
 
 # --------------------------------------------------------------
 
