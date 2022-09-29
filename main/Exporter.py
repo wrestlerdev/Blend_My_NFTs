@@ -662,12 +662,12 @@ def save_all_metadata_files(output_path):
 # ------------------------------- Refactor Exports ---------------------------
 
 def refactor_all_batches(batches_path, master_record_path):
-    DNAList = []
-    emptyDict = {}
-    emptyDict["DNAList"] = DNAList
-    emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
-    with open(master_record_path, 'w') as outfile:
-        outfile.write(emptydata + '\n')
+    # DNAList = []
+    # emptyDict = {}
+    # emptyDict["DNAList"] = DNAList
+    # emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
+    # with open(master_record_path, 'w') as outfile:
+    #     outfile.write(emptydata + '\n')
 
     batches = len(next(os.walk(batches_path))[1])
 
@@ -730,7 +730,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
             current_prefix, suffix = old_file.split('.')
 
         new_prefix = bpy.context.scene.my_tool.renderPrefix
-        new_file_name = new_prefix + "{}".format(index) + '.' + suffix
+        new_file_name = new_prefix + "{:04}".format(index) + '.' + suffix
         old_path = os.path.join(folder_path, old_file)
         new_path = os.path.join(folder_path, new_file_name)            
         if suffix == "json":
