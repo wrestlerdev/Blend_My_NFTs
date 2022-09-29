@@ -319,7 +319,7 @@ def GetRandomSingleMesh(att_name):
             type_rarity = hierarchy[att_name][type][first_variant]["type_rarity"]
             if type_rarity and not type.endswith('Null'):
                 type_number_List_Of_i.append(type)
-                type_rarity_List_Of_i.append(int(type_rarity))
+                type_rarity_List_Of_i.append(float(type_rarity))
 
     if type_number_List_Of_i:
         typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)

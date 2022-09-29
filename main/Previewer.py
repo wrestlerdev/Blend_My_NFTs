@@ -118,10 +118,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                print(char_var_coll)
                set_hair_accessory_shape_keys(char_var_coll, hair_coll)
 
-            # elif type.name[3:].startswith('Tattoo'):
-            #    texture_set = itemDictionary["item_texture"].rpartition('_')[2]
-            #    tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
-            #    add_texture_to_tattoos(character, attr.name, tattoo_texture)
             turn_on_tattoo(element, color_key)    
 
    newTempDict = {}
@@ -135,7 +131,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 def set_material_element(element):
-   
    mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer", "TattooElementMixer"]
    element_style, element_type = element.split('-')
 

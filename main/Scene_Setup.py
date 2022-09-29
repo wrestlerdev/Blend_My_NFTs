@@ -293,7 +293,6 @@ def LinkImagesToNodes(matcopy, texture_path):
         for tex in os.listdir(texture_path):      
             mapType = tex.rpartition("_")[2]
             mapType = mapType.partition(".")[0]
-            print(texture_path)
             if "D" == mapType:
                 if not matcopy.node_tree.nodes["DiffuseNode"].image:
                     file = os.path.join(texture_path, tex)

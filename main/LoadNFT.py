@@ -80,7 +80,7 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                     if h_variant_exists: # get rarity from hierarchy if type exists
                         type_rarity = hierarchy[slot][type][h_variant]["type_rarity"]
                         if type in types:
-                            scene_type_coll["rarity"] =  int(float(type_rarity))
+                            scene_type_coll["rarity"] =  float(type_rarity)
                             update_rarity_color(type, type_rarity)
                             if Rarity_save_path:
                                 scene_type_coll["absolute_rarity"] = (rarities[slot][type]["absolute_rarity"]) * 100
@@ -96,8 +96,8 @@ def update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path=''):
                             variant = scene_var_coll.name
                             if variant in variants and type in types: # does variant exist in heirarchy
                                 variant_rarity = hierarchy[slot][type][variant]["variant_rarity"]
-                                update_rarity_color(variant, int(float(variant_rarity)))
-                                scene_var_coll["rarity"] = int(float(variant_rarity))
+                                update_rarity_color(variant, float(variant_rarity))
+                                scene_var_coll["rarity"] = float(variant_rarity)
                                 if Rarity_save_path and variant in rarities[slot][type]:
                                     scene_var_coll["absolute_rarity"] = (rarities[slot][type][variant]["absolute_rarity"]) * 100
                                 elif scene_var_coll.get("absolute_rarity") is not None:

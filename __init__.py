@@ -181,9 +181,9 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             description="texture",
             items=[
                 ('4k', '4k', '4096x4096'),
-                ('2k', '2k', '2048x2048'),
+                # ('2k', '2k', '2048x2048'),
                 ('1k', '1k', '1024x1024'),
-                ('512', '512', '512x512'),
+                # ('512', '512', '512x512'),
                 ('64', '64', '64x64')
             ]
         )
@@ -1217,9 +1217,9 @@ class refactorExports(bpy.types.Operator):
     def execute(self, context):
         export_dir = bpy.context.scene.my_tool.separateExportPath
         batches_path = os.path.join(export_dir, "Blend_My_NFT", "OUTPUT")
-        render_record_path = os.path.join(batches_path, "_RenderRecord.json")
+        # render_record_path = os.path.join(batches_path, "_RenderRecord.json")
+        render_record_path = os.path.join(batches_path, "_NFTRecord.json")
         Exporter.refactor_all_batches(batches_path, render_record_path)
-
         return {'FINISHED'}
 
 
