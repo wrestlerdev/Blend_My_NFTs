@@ -128,7 +128,6 @@ def add_rarity_recurse(rarity_dict, current_probability, hierarchy, filled_slots
 
 
 def get_weighted_rarity(current_name, parent_name, total = 0):
-    # print(current_name)
     if not total:
         for coll in bpy.data.collections[parent_name].children:
             if coll.get('rarity') != None:
@@ -143,7 +142,6 @@ def get_weighted_rarity(current_name, parent_name, total = 0):
             return 0.0, total
 
     else: # CHECK GREEN NULL
-        # print(current_coll.name)
         if len(bpy.data.collections[parent_name].children) == 1:
             return 1.0, total
         else: # CHECK THIS
