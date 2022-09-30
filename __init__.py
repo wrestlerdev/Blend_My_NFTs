@@ -176,6 +176,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
     shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
 
+    searcherString: bpy.props.StringProperty(name="Variants to find:")
+
     textureSize: bpy.props.EnumProperty(
             name='textuuuuuuuuures',
             description="texture",
@@ -1669,6 +1671,23 @@ class countUpAllItems(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class findAllNFTsWithItems(bpy.types.Operator):
+    bl_idname = 'find.items'
+    bl_label = 'Find NFTs with items'
+    bl_description = 'Find all NFTs with items'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        search_string = bpy.context.scene.my_tool.searcherString
+        search_string = search_string.replace(" ", "")
+        search_string = search_string.rstrip(',')
+        if search_string:
+            items = re.split(',', search_string)
+            output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT", "OUTPUT")
+            Rarity_Wrangler.find_nfts_with_items(items, output_path, output_path)
+        return {'FINISHED'}
+
+
 class renameSet(bpy.types.Operator):
     bl_idname = 'set.rename'
     bl_label = 'Rename Set'
@@ -1696,10 +1715,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        # input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        # TextureEditor.rename_texture_set_folder('Standard', '01-Standard', input_path)
-        # slots_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
-        # TextureEditor.clean_up_file_names(slots_path)
+
         return {'FINISHED'}
 
 
@@ -2612,9 +2628,17 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.operator(countUpAllItems.bl_idname, text=countUpAllItems.bl_label)
         
         layout.separator(factor=1.5)
+        box = layout.box()
+        row = box.row()
+        row.prop(mytool, "searcherString", text='')
+        row.scale_x = 0.4
+        row.operator(findAllNFTsWithItems.bl_idname, text=findAllNFTsWithItems.bl_label)
+
+        layout.separator(factor=1.5)
 
         row = layout.row()
         row.operator(testButton.bl_idname, text=testButton.bl_label)
+
 
         # box = layout.box()
         # row = box.row()
@@ -2919,6 +2943,7 @@ classes = (
     downresElementTextures,
     chooseLogPath,
     evaluateExportLog,
+    findAllNFTsWithItems,
     testButton
 
 )

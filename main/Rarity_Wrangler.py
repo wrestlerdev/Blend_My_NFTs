@@ -1,6 +1,7 @@
 # Purpose:
 # This file generates the Outfit DNA based on a rule set
 
+from genericpath import isdir
 import bpy
 import os
 import json
@@ -199,6 +200,59 @@ def count_all_items_in_batch(batches_path, batch_nums, save_path): # goes throug
     with open(save_path, "w") as outfile:
         outfile.write(counter_obj)
     return
+
+
+def find_nfts_with_items(items, output_path, json_path):
+    nfts = []
+    output_dict = {}
+    for batch in os.listdir(output_path):
+        batch_nfts = []
+        batch_path = os.path.join(output_path, batch)
+        if os.path.isdir(batch_path):
+            for dir in os.listdir(batch_path):
+                nft_path = os.path.join(batch_path, dir)
+                if os.path.isdir(nft_path):
+                    for file in os.listdir(nft_path):
+                        if file.endswith(".json") and not file.startswith('ERC721'):
+                            file_path = os.path.join(nft_path, file)
+                            succeeded = find_items_in_single_nft(items, file_path)
+                            if succeeded:
+                                nfts.append(file)
+                                number = file.rpartition('_')[2].partition('.')[0]
+                                batch_nfts.append(number)
+
+        if batch_nfts:
+            output_dict[batch] = ", ".join(batch_nfts).rstrip(',')
+
+    output_dict["All_NFTs"] = nfts
+    file_name = "SEARCHFILE_" + ' '.join(items)
+    json_file_path = os.path.join(json_path, file_name + '.json')
+
+    output_obj = json.dumps(output_dict, indent=1, ensure_ascii=True)
+    with open(json_file_path, "w") as outfile:
+        outfile.write(output_obj)
+
+    config.custom_print("All NFTs with {}:".format(items), '', config.bcolors.OK)
+    for nft in nfts:
+        config.custom_print('\t' + str(nft), '', config.bcolors.WARNING)
+    return
+
+
+def find_items_in_single_nft(items, file_path):
+    been_found = [False] * len(items)
+    NFTDict = json.load(open(file_path))
+    CharacterItems = NFTDict["CharacterItems"]
+    for key in CharacterItems.keys():
+        slot = CharacterItems[key]
+        if slot != 'Null':
+            for var_key in slot.keys():
+                var_dict = slot[var_key]
+                variant = var_dict["item_variant"]
+                for i in range(len(items)):
+                    if items[i].lower() == variant.lower():
+                        been_found[i] = True
+
+    return all(item == True for item in been_found)
 
 
 if __name__ == '__main__':
