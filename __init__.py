@@ -810,7 +810,7 @@ class saveBatch(bpy.types.Operator):
 
         nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
 
-        # DNA_Generator.Outfit_Generator.count_all_rarities(batch_save_path, index)
+        # Rarity_Wrangler.count_all_rarities(batch_save_path, index)
         # LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}

@@ -89,18 +89,18 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 variant = itemDictionary["item_variant"]
                 texture = itemDictionary["item_texture"].rpartition('_')[2]
 
-                if "Tattoo" in type:
-                    if "Forearm" in type:
-                        dict = {"trait_type": "Tattoo", "value": "On Forearm"}
-                    elif "Calf" in type:
-                        dict = {"trait_type": "Tattoo", "value": "On Calf"}
-                    elif "Neck" in type:
-                        dict = {"trait_type": "Tattoo", "value": "On Neck"}
-                    attributes.append(dict)
-                    tattoo_symbol = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', texture).split())
-                    dict = {"trait_type": "Tattoo", "value": "{} Symbol".format(tattoo_symbol)}
-                    attributes.append(dict)
-                    continue
+                # if "Tattoo" in type:
+                #     if "Forearm" in type:
+                #         dict = {"trait_type": "Tattoo", "value": "On Forearm"}
+                #     elif "Calf" in type:
+                #         dict = {"trait_type": "Tattoo", "value": "On Calf"}
+                #     elif "Neck" in type:
+                #         dict = {"trait_type": "Tattoo", "value": "On Neck"}
+                #     attributes.append(dict)
+                #     tattoo_symbol = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', texture).split())
+                #     dict = {"trait_type": "Tattoo", "value": "{} Symbol".format(tattoo_symbol)}
+                #     attributes.append(dict)
+                #     continue
 
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
                 # full_variant_name = [split_variant_name]
