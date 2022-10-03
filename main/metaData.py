@@ -58,7 +58,10 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
         "name": name,
         "description": "This is a test meta data file",
         "image": "Link to IPFS?",
+        "DNA": DNA,
+        "Data": "Link to data json?",
         "attributes": None,
+        
     }
 
     attributes = []
