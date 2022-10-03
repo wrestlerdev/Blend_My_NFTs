@@ -2234,12 +2234,16 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
         row = box.row()
         index = int(bpy.context.scene.my_tool.CurrentBatchIndex)
         nft_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
-
-        if os.path.exists(nft_save_path):
-            row.label(text="Total Generated: " + str(len(next(os.walk(nft_save_path))[1])))
-
+        
         record_path = os.path.join(mytool.batch_json_save_path, '_NFTRecord.json')
         record = json.load(open(record_path))
+
+        single_path = os.path.join(nft_save_path, '_NFTRecord_{}.json'.format(index))
+        single = json.load(open(single_path))
+
+        if os.path.exists(nft_save_path):
+            row.label(text="Total Generated: " + str(single['numNFTsGenerated']))
+
         if record.get('numCharacters'):
             char_dict = record['numCharacters']
             row = box.row()
@@ -2247,8 +2251,6 @@ class WCUSTOM_PT_ELoadFromFile(bpy.types.Panel):
             for char in config.Characters:
                 row.label(text="{}: {}".format(char, char_dict[char]))
 
-            single_path = os.path.join(nft_save_path, '_NFTRecord_{}.json'.format(index))
-            single = json.load(open(single_path))
             single_dict = single['numCharacters']
             row = box.row()
             row.label(text="Batch:")
