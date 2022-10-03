@@ -715,10 +715,11 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
     DNA = single_record["DNAList"]
     if not DNA in DNAList:
         DNAList.append(DNA)
-        index = len(DNAList) - 1
+        # index = len(DNAList) - 1
+        index = len(DNAList)
         is_new = True
     else:
-        index = DNAList.index(DNA)
+        index = DNAList.index(DNA) + 1
         is_new = False
 
     files = os.listdir(folder_path)

@@ -72,7 +72,7 @@ ItemUsedBodySlot = {
 "HairMidFront" : ["11-HL", "14-N", "12-HS", "15-MH", "18-ES", "17-EL"],
 "HairLong" : ["11-HL", "14-N", "12-HS", "18-ES", "20-BP", "17-EL"],
 
-"HeadFull" : ["11-HL", "14-N", "12-HS", "15-MH", "16-LH", "18-ES", "17-EL"],
+"HeadFull" : ["14-N", "15-MH", "16-LH", "18-ES", "17-EL"],
 "HeadExtraEar" : ["17-EL", "18-ES"],
 "HeadExtra" : [],
 
