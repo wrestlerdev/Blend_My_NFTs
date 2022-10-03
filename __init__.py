@@ -1899,7 +1899,10 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -1954,7 +1957,10 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -2015,7 +2021,10 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -2084,7 +2093,10 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)

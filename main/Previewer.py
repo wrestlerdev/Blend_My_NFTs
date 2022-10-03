@@ -356,7 +356,13 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
          current_entry["variant_rarity"] = bpy.data.collections[variant]['rarity']
          current_entry["texture_rarity"] = ohierarchy[attribute[0]][type[0]][variant]["textureSets"][last_texture]
          color_key = DNASplit[3]
-         current_entry["color_key"] = color_key
+         if ColorGen.DoesGlobalColorSetExist(color_key):
+            current_entry["color_key"] = color_key
+         else:
+            current_entry["color_key"] = "Invalid"
+            DNASplit[3] = ("Invalid")
+            DNAString[i] = '-'.join(DNASplit)
+            
          VarientDict[variant] = current_entry
       ItemsUsed[attribute[0]] = VarientDict
 
