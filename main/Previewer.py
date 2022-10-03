@@ -91,7 +91,8 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                      texture_mesh = bpy.data.objects[itemDictionary["item_texture"]]
                      resolution = '_' + bpy.context.scene.my_tool.textureSize
                      if resolution == '_4k':
-                           resolution = 4096
+                        resolution = 4096
+                        set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
                      else:
                         resolution = list(config.texture_suffixes.keys())[list(config.texture_suffixes.values()).index(resolution)]
                         set_texture_on_mesh(varient, meshes, texture_mesh, color_key, resolution, [attr.name, type.name, varient.name])
