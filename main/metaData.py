@@ -56,10 +56,11 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
     keys = list(NFTDict.keys())
     metaDataDictErc721 = {
         "name": name,
-        "description": "This is a test meta data file",
-        "image": "Link to IPFS?",
+        "description": "description should be inserted here",
+        "image": "Link to image file?",
+        "video": "Link to link to video?",
         "DNA": DNA,
-        "Data": "Link to data json?",
+        "data": "Link to data json?",
         "attributes": None,
         
     }
