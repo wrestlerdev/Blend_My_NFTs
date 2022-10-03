@@ -2,7 +2,6 @@
 # This file generates NFT DNA based on a .blend file scene structure and exports NFTRecord.json.
 
 import collections
-from xml.dom.minidom import Element
 import bpy
 import os
 import json
@@ -118,10 +117,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
                print(char_var_coll)
                set_hair_accessory_shape_keys(char_var_coll, hair_coll)
 
-            # elif type.name[3:].startswith('Tattoo'):
-            #    texture_set = itemDictionary["item_texture"].rpartition('_')[2]
-            #    tattoo_texture = get_texture_for_tattoo(attr.name, type.name, itemKey, texture_set)
-            #    add_texture_to_tattoos(character, attr.name, tattoo_texture)
             turn_on_tattoo(element, color_key)    
 
    newTempDict = {}
@@ -135,7 +130,6 @@ def show_nft_from_dna(DNA, NFTDict, Select = False): # goes through collection h
 
 
 def set_material_element(element):
-   
    mixers = ["OutfitElementMixer", "SkinElementMixer", "FullBodyElementMixer", "TattooElementMixer"]
    element_style, element_type = element.split('-')
 
@@ -219,50 +213,55 @@ def SnapFeetToFloor(shoetype, character, NFTDict): # moving character based on s
 
 
 def RaycastPackpack(backpackType, character, NFTDict):
+   if NFTDict["01-UT"] == 'Null':
+      config.custom_print("There is no UPPER TORSO item for backpack to raycast against", '', config.bcolors.ERROR)
+      return
    torsoObj = list(NFTDict["01-UT"].keys())[0]
    torsoObj = torsoObj + "_" + character
    objects = bpy.data.collections[torsoObj].objects
    if len(objects) > 0:
-      cb = objects[0]
-      src = bpy.data.objects[character + '_src']
-      dst = bpy.data.objects[character + '_dst']
-      null_loc = bpy.data.objects[character + '_loc']
+      for cb in objects:
+         #cb = objects[0]
+         src = bpy.data.objects[character + '_src']
+         dst = bpy.data.objects[character + '_dst']
+         null_loc = bpy.data.objects[character + '_loc']
 
-      mw = cb.matrix_world
-      mwi = mw.inverted()
+         mw = cb.matrix_world
+         mwi = mw.inverted()
 
-      # src and dst in local space of cb
-      origin = mwi @ src.matrix_world.translation
-      dest = mwi @ dst.matrix_world.translation
-      direction = (dest - origin).normalized()
+         # src and dst in local space of cb
+         origin = mwi @ src.matrix_world.translation
+         dest = mwi @ dst.matrix_world.translation
+         direction = (dest - origin).normalized()
 
-      hit, loc, norm, face = cb.ray_cast(origin, direction)
+         hit, loc, norm, face = cb.ray_cast(origin, direction)
 
-      if hit:
-         config.custom_print("Hit at " + str(mw @ loc) + " (local)")
-         config.custom_print(dst.matrix_world.to_translation())
-         
-         dir = (mw @ loc) - dst.matrix_world.to_translation()
-         dist = dir.magnitude
-         null_loc.location = Vector([0,2,0])
-         null_loc.location.z -= dist
+         if hit:
+            config.custom_print("Hit at " + str(mw @ loc) + " (local)")
+            config.custom_print(dst.matrix_world.to_translation())
+            
+            dir = (mw @ loc) - dst.matrix_world.to_translation()
+            dist = dir.magnitude
+            null_loc.location = Vector([0,2,0])
+            null_loc.location.z -= dist
 
-         if backpackType == "BackpackHigh":
-            backpack = list(NFTDict["14-N"].keys())[0]
+            if backpackType == "BackpackHigh":
+               backpack = list(NFTDict["14-N"].keys())[0]
+            else:
+               backpack = list(NFTDict["20-BP"].keys())[0]
+            backpack = backpack + "_" + character
+            for obj in bpy.data.collections[backpack].objects:
+               if len(obj.constraints) < 1:
+                  obj.constraints.new(type='CHILD_OF')
+               obj.constraints["Child Of"].target = null_loc
+               obj.constraints["Child Of"].inverse_matrix = Matrix(((1.0, 0.0, 0.0, 0.0),
+                                                                  (0.0, 1.0, 0.0, 0.0),
+                                                                  (0.0, 0.0, 1.0, 0.0),
+                                                                  (0.0, 0.0, 0.0, 1.0)))
+               obj.location = Vector([0,0,0])
+            return
          else:
-            backpack = list(NFTDict["20-BP"].keys())[0]
-         backpack = backpack + "_" + character
-         for obj in bpy.data.collections[backpack].objects:
-            if len(obj.constraints) < 1:
-               obj.constraints.new(type='CHILD_OF')
-            obj.constraints["Child Of"].target = null_loc
-            obj.constraints["Child Of"].inverse_matrix = Matrix(((1.0, 0.0, 0.0, 0.0),
-                                                               (0.0, 1.0, 0.0, 0.0),
-                                                               (0.0, 0.0, 1.0, 0.0),
-                                                               (0.0, 0.0, 0.0, 1.0)))
-            obj.location = Vector([0,0,0])
-      else:
-         config.custom_print("No HIT")
+            config.custom_print("No HIT")
 
 # --------------------------------------------------------------
 
@@ -300,6 +299,9 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
    character = DNAString.pop(0)
    element = DNAString.pop(0)
    style = DNAString.pop(0)
+   if not ColorGen.DoesStyleExist(style):
+      config.custom_print("This ({}) is not a valid color style, setting style to Random".format(style), '', config.bcolors.ERROR)
+      style = 'Random'
    show_character(character)
    ohierarchy = get_hierarchy_ordered()
 
@@ -312,13 +314,31 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
       texture_index = DNASplit[2]
 
       attribute = list(ohierarchy.items())[i]
-      type = list(attribute[1].items())[int(atttype_index)]
-      variant = list(type[1].items())[int(variant_index)][0]
+      if int(atttype_index) >= len(attribute[1].items()):
+         DNAString[i] = "0-0-0"
+         ItemsUsed[attribute[0]] = 'Null'
+         config.custom_print("This is not valid for {}, setting slot to null".format(attribute[0]), '', config.bcolors.ERROR)
+         continue
 
+      type = list(attribute[1].items())[int(atttype_index)]
+      if int(variant_index) >= len(type[1].items()):
+         DNAString[i] = "0-0-0"
+         ItemsUsed[attribute[0]] = 'Null'
+         config.custom_print("This is not valid for {}, setting slot to null".format(attribute[0]), '', config.bcolors.ERROR)
+         continue
+      
+      variant = list(type[1].items())[int(variant_index)][0]
       variant_name = variant.rpartition('_')[2]
       item_index = variant.split('_')[-2]
+      
       if len(list(bpy.data.collections[variant].objects)) > 0:
-         last_texture = list(bpy.data.collections[variant].objects)[int(texture_index)].name
+         if int(texture_index) >= len(bpy.data.collections[variant].objects):
+            DNAString[i] = "0-0-0"
+            ItemsUsed[attribute[0]] = 'Null'
+            config.custom_print("This is not valid for {}, setting slot to null".format(attribute[0]), '', config.bcolors.ERROR)
+            continue
+         else:
+            last_texture = list(bpy.data.collections[variant].objects)[int(texture_index)].name
       else:
          last_texture = None
 
@@ -336,9 +356,18 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
          current_entry["variant_rarity"] = bpy.data.collections[variant]['rarity']
          current_entry["texture_rarity"] = ohierarchy[attribute[0]][type[0]][variant]["textureSets"][last_texture]
          color_key = DNASplit[3]
-         current_entry["color_key"] = color_key
+         if ColorGen.DoesGlobalColorSetExist(color_key):
+            current_entry["color_key"] = color_key
+         else:
+            current_entry["color_key"] = "Invalid"
+            DNASplit[3] = ("Invalid")
+            DNAString[i] = '-'.join(DNASplit)
+            
          VarientDict[variant] = current_entry
       ItemsUsed[attribute[0]] = VarientDict
+
+   DNAString = [character, element, style] + DNAString
+   DNA = ','.join(DNAString)
 
    NewDict["DNAList"] = DNA
    NewDict["CharacterItems"] = ItemsUsed

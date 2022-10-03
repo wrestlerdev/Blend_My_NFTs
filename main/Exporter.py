@@ -662,12 +662,12 @@ def save_all_metadata_files(output_path):
 # ------------------------------- Refactor Exports ---------------------------
 
 def refactor_all_batches(batches_path, master_record_path):
-    DNAList = []
-    emptyDict = {}
-    emptyDict["DNAList"] = DNAList
-    emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
-    with open(master_record_path, 'w') as outfile:
-        outfile.write(emptydata + '\n')
+    # DNAList = []
+    # emptyDict = {}
+    # emptyDict["DNAList"] = DNAList
+    # emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
+    # with open(master_record_path, 'w') as outfile:
+    #     outfile.write(emptydata + '\n')
 
     batches = len(next(os.walk(batches_path))[1])
 
@@ -715,10 +715,11 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
     DNA = single_record["DNAList"]
     if not DNA in DNAList:
         DNAList.append(DNA)
-        index = len(DNAList) - 1
+        # index = len(DNAList) - 1
+        index = len(DNAList)
         is_new = True
     else:
-        index = DNAList.index(DNA)
+        index = DNAList.index(DNA) + 1
         is_new = False
 
     files = os.listdir(folder_path)

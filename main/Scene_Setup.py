@@ -199,8 +199,9 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
                 tempcopy.name = m     
 
             #if texture object is a textile we shouldnt treat it like other material
-            if(texture_set in config.Textiles):
-                LinkTextileNodes(tempcopy, texture_set, fallback_texture_set)
+            textile = texture_set.split("-")[1]
+            if(textile in config.Textiles):
+                LinkTextileNodes(tempcopy, textile, os.path.join(fallback_texture_set, matfolderlink[m]) )
             else:
                 LinkImagesToNodes(tempcopy, os.path.join(texture_path, matfolderlink[m]))
                 if fallback_texture_set and os.path.isdir(fallback_texture_set):
@@ -217,8 +218,9 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
             m.material = matcopy
 
             #if texture object is a textile we shouldnt treat it like other material
-            if(texture_set in config.Textiles):
-                LinkTextileNodes(matcopy, texture_set, fallback_texture_set)
+            textile = texture_set.split("-")[1]
+            if(textile in config.Textiles):
+                LinkTextileNodes(matcopy, textile, fallback_texture_set)
             else:
                 LinkImagesToNodes(matcopy, texture_path)
                 if fallback_texture_set and os.path.isdir(fallback_texture_set):
@@ -227,7 +229,8 @@ def SetUpObjectMaterialsAndTextures(type, texture_set, obj, texture_path, charac
 
 
 def GetMaterialDomain(type, texture_set, texture_path, matfolderlink = "", fallback_texture_set=''):
-    resultTextile = [s for s in config.Textiles if texture_set in s]
+    textile = texture_set.split("-")[1]
+    resultTextile = [s for s in config.Textiles if textile in s]
     if resultTextile != []:
         material = bpy.data.materials['MasterTextile']
         return material
@@ -290,7 +293,6 @@ def LinkImagesToNodes(matcopy, texture_path):
         for tex in os.listdir(texture_path):      
             mapType = tex.rpartition("_")[2]
             mapType = mapType.partition(".")[0]
-            print(texture_path)
             if "D" == mapType:
                 if not matcopy.node_tree.nodes["DiffuseNode"].image:
                     file = os.path.join(texture_path, tex)

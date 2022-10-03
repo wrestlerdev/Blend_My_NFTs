@@ -72,7 +72,7 @@ ItemUsedBodySlot = {
 "HairMidFront" : ["11-HL", "14-N", "12-HS", "15-MH", "18-ES", "17-EL"],
 "HairLong" : ["11-HL", "14-N", "12-HS", "18-ES", "20-BP", "17-EL"],
 
-"HeadFull" : ["11-HL", "14-N", "12-HS", "15-MH", "16-LH", "18-ES", "17-EL"],
+"HeadFull" : ["14-N", "15-MH", "16-LH", "18-ES", "17-EL"],
 "HeadExtraEar" : ["17-EL", "18-ES"],
 "HeadExtra" : [],
 
@@ -319,7 +319,7 @@ def GetRandomSingleMesh(att_name):
             type_rarity = hierarchy[att_name][type][first_variant]["type_rarity"]
             if type_rarity and not type.endswith('Null'):
                 type_number_List_Of_i.append(type)
-                type_rarity_List_Of_i.append(int(type_rarity))
+                type_rarity_List_Of_i.append(float(type_rarity))
 
     if type_number_List_Of_i:
         typeChosen = random.choices(type_number_List_Of_i, weights=type_rarity_List_Of_i, k=1)

@@ -19,11 +19,11 @@ KeywordAttributeDict = {
                          (["Outfit"], "Outfit"),
                          (["Feet"], "Shoes"),
                          (["Head"], "Headwear"),
-                         (["Tattoo"], "Tattoo"),
+                        #  (["Tattoo"], "Tattoo"),
                          (["Gloves", "Forearm"], "Armwear"),
                          (["Face"], "Facewear"),
                          (["Hair"], "Hairstyle"),
-                         (["Earring", "Calf", "Neck", "Hand"], "Accessories"),
+                         (["Earring", "Calf", "Neck", "Hand", "Tattoo"], "Accessories"),
                          (["Backpack"], "Backwear"),
                          (["Plane", "Background", "Particles"], "Environment"),
                          (["Expression"], "Expression")]
@@ -35,7 +35,7 @@ KeywordKeys = [ # this is the order attributes will be listed in the metadata
     "Character",
     "Theme",
     "Element",
-    "Tattoo",
+    # "Tattoo",
     "Expression",
     "Outfit",
     "Tops",
@@ -58,7 +58,10 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
         "name": name,
         "description": "This is a test meta data file",
         "image": "Link to IPFS?",
+        "DNA": DNA,
+        "Data": "Link to data json?",
         "attributes": None,
+        
     }
 
     attributes = []
@@ -89,18 +92,18 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 variant = itemDictionary["item_variant"]
                 texture = itemDictionary["item_texture"].rpartition('_')[2]
 
-                if "Tattoo" in type:
-                    if "Forearm" in type:
-                        dict = {"trait_type": "Tattoo", "value": "On Forearm"}
-                    elif "Calf" in type:
-                        dict = {"trait_type": "Tattoo", "value": "On Calf"}
-                    elif "Neck" in type:
-                        dict = {"trait_type": "Tattoo", "value": "On Neck"}
-                    attributes.append(dict)
-                    tattoo_symbol = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', texture).split())
-                    dict = {"trait_type": "Tattoo", "value": "{} Symbol".format(tattoo_symbol)}
-                    attributes.append(dict)
-                    continue
+                # if "Tattoo" in type:
+                #     if "Forearm" in type:
+                #         dict = {"trait_type": "Tattoo", "value": "On Forearm"}
+                #     elif "Calf" in type:
+                #         dict = {"trait_type": "Tattoo", "value": "On Calf"}
+                #     elif "Neck" in type:
+                #         dict = {"trait_type": "Tattoo", "value": "On Neck"}
+                #     attributes.append(dict)
+                #     tattoo_symbol = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', texture).split())
+                #     dict = {"trait_type": "Tattoo", "value": "{} Symbol".format(tattoo_symbol)}
+                #     attributes.append(dict)
+                #     continue
 
                 # split_variant_name = ' '.join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', variant)).split()) # this one leaves a space between every captial
                 # full_variant_name = [split_variant_name]
@@ -108,11 +111,11 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 # split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
                 split_variant_name = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', variant).split())
                 if "ExpressionLowerNone" in type or "FeetShortNone" in type or "Expression" == type[3:]:
-                    full_variant_name = [split_variant_name]
+                    full_variant_name = split_variant_name
                 else:
-                    full_variant_name = [texture[3:], split_variant_name]
+                    texture_name = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', texture[3:]).split())
+                    full_variant_name = "{} ({})".format(split_variant_name, texture_name)
 
-                full_variant_name = ' '.join(full_variant_name)
                 type_name = type[3:]
                 keyword = None
                 for key in list(KeywordAttributeDict.keys()):

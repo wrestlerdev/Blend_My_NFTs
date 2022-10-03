@@ -141,7 +141,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                 ('Cobalt', 'Cobalt', 'Cobalt'),
                 ('Copper', 'Copper', 'Copper'),
                 ('Cinnabar', 'Cinnabar', 'Cinnabar'),
-                ('Gold_02', 'Gold_02', 'Gold_02')   ,
+                ('Gold', 'Gold', 'Gold')   ,
                 ('Bismuth', 'Bismuth', 'Bismuth'),
                 ('Brimstone', 'Brimstone', 'Brimstone'),
                 ('Iron', 'Iron', 'Iron'),
@@ -176,14 +176,16 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     renameSetTo: bpy.props.StringProperty(name='Rename Set To')
     shouldForceDownres: bpy.props.BoolProperty(name='Force downres', default=False)
 
+    searcherString: bpy.props.StringProperty(name="Variants to find:")
+
     textureSize: bpy.props.EnumProperty(
             name='textuuuuuuuuures',
             description="texture",
             items=[
                 ('4k', '4k', '4096x4096'),
-                ('2k', '2k', '2048x2048'),
+                # ('2k', '2k', '2048x2048'),
                 ('1k', '1k', '1024x1024'),
-                ('512', '512', '512x512'),
+                # ('512', '512', '512x512'),
                 ('64', '64', '64x64')
             ]
         )
@@ -808,7 +810,7 @@ class saveBatch(bpy.types.Operator):
 
         nftrecord_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "Batch_{}".format(index))
 
-        # DNA_Generator.Outfit_Generator.count_all_rarities(batch_save_path, index)
+        # Rarity_Wrangler.count_all_rarities(batch_save_path, index)
         # LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
         return {'FINISHED'}
@@ -1217,9 +1219,9 @@ class refactorExports(bpy.types.Operator):
     def execute(self, context):
         export_dir = bpy.context.scene.my_tool.separateExportPath
         batches_path = os.path.join(export_dir, "Blend_My_NFT", "OUTPUT")
-        render_record_path = os.path.join(batches_path, "_RenderRecord.json")
+        # render_record_path = os.path.join(batches_path, "_RenderRecord.json")
+        render_record_path = os.path.join(batches_path, "_NFTRecord.json")
         Exporter.refactor_all_batches(batches_path, render_record_path)
-
         return {'FINISHED'}
 
 
@@ -1669,6 +1671,23 @@ class countUpAllItems(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class findAllNFTsWithItems(bpy.types.Operator):
+    bl_idname = 'find.items'
+    bl_label = 'Find NFTs with items'
+    bl_description = 'Find all NFTs with items'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        search_string = bpy.context.scene.my_tool.searcherString
+        search_string = search_string.replace(" ", "")
+        search_string = search_string.rstrip(',')
+        if search_string:
+            items = re.split(',', search_string)
+            output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT", "OUTPUT")
+            Rarity_Wrangler.find_nfts_with_items(items, output_path, output_path)
+        return {'FINISHED'}
+
+
 class renameSet(bpy.types.Operator):
     bl_idname = 'set.rename'
     bl_label = 'Rename Set'
@@ -1696,10 +1715,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        # input_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT')
-        # TextureEditor.rename_texture_set_folder('Standard', '01-Standard', input_path)
-        # slots_path = os.path.join(bpy.context.scene.my_tool.root_dir, 'INPUT', 'SLOTS')
-        # TextureEditor.clean_up_file_names(slots_path)
+
         return {'FINISHED'}
 
 
@@ -1883,7 +1899,10 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -1938,7 +1957,10 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -1999,7 +2021,10 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -2068,7 +2093,10 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                 inputDNA = bpy.context.scene.my_tool.inputDNA
                 dna_index = int(config.Slots[name][0][:2])
                 dna_splitstrand = inputDNA.split(',')[dna_index + 2].split('-')
-                color_key = dna_splitstrand[3] or 'X'
+                if(len(dna_splitstrand) > 3):
+                    color_key = dna_splitstrand[3] or 'X'
+                else:
+                    color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
                 label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
@@ -2612,9 +2640,17 @@ class WCUSTOM_PT_Initialize(bpy.types.Panel):
         row.operator(countUpAllItems.bl_idname, text=countUpAllItems.bl_label)
         
         layout.separator(factor=1.5)
+        box = layout.box()
+        row = box.row()
+        row.prop(mytool, "searcherString", text='')
+        row.scale_x = 0.4
+        row.operator(findAllNFTsWithItems.bl_idname, text=findAllNFTsWithItems.bl_label)
+
+        layout.separator(factor=1.5)
 
         row = layout.row()
         row.operator(testButton.bl_idname, text=testButton.bl_label)
+
 
         # box = layout.box()
         # row = box.row()
@@ -2919,6 +2955,7 @@ classes = (
     downresElementTextures,
     chooseLogPath,
     evaluateExportLog,
+    findAllNFTsWithItems,
     testButton
 
 )
