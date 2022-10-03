@@ -2,7 +2,6 @@
 # This file generates NFT DNA based on a .blend file scene structure and exports NFTRecord.json.
 
 import collections
-from xml.dom.minidom import Element
 import bpy
 import os
 import json
@@ -214,6 +213,9 @@ def SnapFeetToFloor(shoetype, character, NFTDict): # moving character based on s
 
 
 def RaycastPackpack(backpackType, character, NFTDict):
+   if NFTDict["01-UT"] == 'Null':
+      config.custom_print("There is no UPPER TORSO item for backpack to raycast against", '', config.bcolors.ERROR)
+      return
    torsoObj = list(NFTDict["01-UT"].keys())[0]
    torsoObj = torsoObj + "_" + character
    objects = bpy.data.collections[torsoObj].objects
@@ -297,6 +299,9 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
    character = DNAString.pop(0)
    element = DNAString.pop(0)
    style = DNAString.pop(0)
+   if not ColorGen.DoesStyleExist(style):
+      config.custom_print("This ({}) is not a valid color style, setting style to Random".format(style), '', config.bcolors.ERROR)
+      style = 'Random'
    show_character(character)
    ohierarchy = get_hierarchy_ordered()
 
@@ -309,13 +314,31 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
       texture_index = DNASplit[2]
 
       attribute = list(ohierarchy.items())[i]
-      type = list(attribute[1].items())[int(atttype_index)]
-      variant = list(type[1].items())[int(variant_index)][0]
+      if int(atttype_index) >= len(attribute[1].items()):
+         DNAString[i] = "0-0-0"
+         ItemsUsed[attribute[0]] = 'Null'
+         config.custom_print("This is not valid for {}, setting slot to null".format(attribute[0]), '', config.bcolors.ERROR)
+         continue
 
+      type = list(attribute[1].items())[int(atttype_index)]
+      if int(variant_index) >= len(type[1].items()):
+         DNAString[i] = "0-0-0"
+         ItemsUsed[attribute[0]] = 'Null'
+         config.custom_print("This is not valid for {}, setting slot to null".format(attribute[0]), '', config.bcolors.ERROR)
+         continue
+      
+      variant = list(type[1].items())[int(variant_index)][0]
       variant_name = variant.rpartition('_')[2]
       item_index = variant.split('_')[-2]
+      
       if len(list(bpy.data.collections[variant].objects)) > 0:
-         last_texture = list(bpy.data.collections[variant].objects)[int(texture_index)].name
+         if int(texture_index) >= len(bpy.data.collections[variant].objects):
+            DNAString[i] = "0-0-0"
+            ItemsUsed[attribute[0]] = 'Null'
+            config.custom_print("This is not valid for {}, setting slot to null".format(attribute[0]), '', config.bcolors.ERROR)
+            continue
+         else:
+            last_texture = list(bpy.data.collections[variant].objects)[int(texture_index)].name
       else:
          last_texture = None
 
@@ -336,6 +359,9 @@ def CreateDNADictFromUI(): # Override NFT_Temp.json with info within the blender
          current_entry["color_key"] = color_key
          VarientDict[variant] = current_entry
       ItemsUsed[attribute[0]] = VarientDict
+
+   DNAString = [character, element, style] + DNAString
+   DNA = ','.join(DNAString)
 
    NewDict["DNAList"] = DNA
    NewDict["CharacterItems"] = ItemsUsed
