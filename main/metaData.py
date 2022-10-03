@@ -108,11 +108,11 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
                 # split_variant_name = ' '.join(re.sub("([a-z])([A-Z])","\g<1> \g<2>",variant).split())
                 split_variant_name = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', variant).split())
                 if "ExpressionLowerNone" in type or "FeetShortNone" in type or "Expression" == type[3:]:
-                    full_variant_name = [split_variant_name]
+                    full_variant_name = split_variant_name
                 else:
-                    full_variant_name = [texture[3:], split_variant_name]
+                    texture_name = ' '.join(re.sub("((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",r' \1', texture[3:]).split())
+                    full_variant_name = "{} ({})".format(split_variant_name, texture_name)
 
-                full_variant_name = ' '.join(full_variant_name)
                 type_name = type[3:]
                 keyword = None
                 for key in list(KeywordAttributeDict.keys()):
