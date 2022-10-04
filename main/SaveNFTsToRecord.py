@@ -2,7 +2,6 @@ import bpy
 import os
 import json
 import shutil
-import bmesh
 from . import config
 
 
@@ -18,6 +17,10 @@ def SaveNFTs(DNASetToAdd, NFTDict, single_batch_save_path, batch_index, master_r
     for nft in DNASetToAdd:
         if nft not in totalDNAList:
             singleNFT = {}
+            if len(DNASetToAdd) == 1:
+                singleNFT["Handmade"] = bpy.context.scene.my_tool.handmadeBool
+            else:
+                singleNFT["Handmade"] = False
             singleNFT["CharacterItems"] = NFTDict[nft]
             singleNFT["DNAList"] = nft
             singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
@@ -147,6 +150,7 @@ def OverrideNFT(DNAToAdd, NFTDict, batch_save_path, batch_index, nft_index, mast
     singleNFT = {}
     singleNFT["DNAList"] = DNAToAdd
     singleNFT["CharacterItems"] = NFTDict[DNAToAdd]
+    singleNFT["Handmade"] = bpy.context.scene.my_tool.handmadeBool
     singleNFTObject = json.dumps(singleNFT, indent=1, ensure_ascii=True)
     with open(os.path.join(batch_save_path, "NFT_{}".format(nft_index), ("Batch_{}_NFT_{}.json".format(batch_index, nft_index))), "w") as outfile:
         outfile.write(singleNFTObject)
