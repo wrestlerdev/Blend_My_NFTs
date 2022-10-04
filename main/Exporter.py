@@ -258,6 +258,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         #return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
+    render_gif = bpy.context.scene.my_tool.gifBool
     frames = int(bpy.context.scene.my_tool.frameLength * 24)
     settings = [str(bpy.context.scene.my_tool.exportDimension), str(bpy.context.scene.my_tool.imageFrame), str(frames)]
     settings = '_'.join(settings)
@@ -291,7 +292,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         folder_path = folder_path.replace('\\', '/')
 
         batch_file_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
-        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path
+        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path + " " + render_gif
 
         os.system(batch_script_path)
         time_taken = time.time() - start_time

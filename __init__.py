@@ -52,12 +52,7 @@ else:
 # User input Property Group:
 class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
-    # Main BMNFTS Panel properties: 
-    nftsPerBatch: bpy.props.IntProperty(name="NFTs Per Batch", default=1, min=1)  # max=(combinations - offset)
-    batchToGenerate: bpy.props.IntProperty(name="Batch To Generate", default=1, min=1)  # max=(collectionSize / nftsPerBatch)
-    
-
-
+    # Main BMNFTS Panel properties:   
     save_path: bpy.props.StringProperty(
                         name="Save Path",
                         description="Save path for NFT files",
@@ -65,8 +60,6 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                         maxlen=1024,
                         subtype="DIR_PATH"
     )
-
-    # enableRarity: bpy.props.BoolProperty(name="Enable Rarity")
 
     imageBool: bpy.props.BoolProperty(name="Image")
     imageEnum: bpy.props.EnumProperty(
@@ -107,9 +100,10 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
         ]
     )
 
-    # API Panel properties:
-    apiKey: bpy.props.StringProperty(name="API Key", subtype='PASSWORD')
+    gifBool: bpy.props.BoolProperty(name="GIF")
 
+
+    # API Panel properties:
 
 
     # Custom properties
@@ -2571,6 +2565,7 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.prop(mytool, "imageBool", toggle=1)
             row.prop(mytool, "animationBool", toggle=1)
             row.prop(mytool, "modelBool", toggle=1)
+            row.prop(mytool, "gifBool", toggle=1)
 
             row = box.row()
             row = box.row()
