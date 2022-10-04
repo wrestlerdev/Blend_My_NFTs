@@ -190,6 +190,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             ]
         )
 
+    customGenerateString: bpy.props.StringProperty(name="Custom Generator String")
+
     customRenderRange: bpy.props.StringProperty(name="Custom Render Range", default='')
     customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
     exportDimension: bpy.props.IntProperty(name="Dimensions", default=2048, min=64, max=4096)
@@ -548,6 +550,34 @@ class createBatch(bpy.types.Operator):
         Exporter.Previewer.show_nft_from_dna(DNA, NFTDict[DNA])
         return {'FINISHED'}
 
+
+class createCustomBatch(bpy.types.Operator):
+    bl_idname = 'create.custom'
+    bl_label = 'Re-generate NFTs'
+    bl_description = "Re-generate NFTs from custom range"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        string = bpy.context.scene.my_tool.customGenerateString
+        string = string.replace(" ", "")
+        string = string.rstrip(',')
+        if string:
+            nft_num = re.split(',', string)
+            DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(len(nft_num))
+
+            batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+            master_record_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
+            index = bpy.context.scene.my_tool.CurrentBatchIndex
+            for i in range(len(nft_num)):
+                DNA = DNASet[i]
+                nft_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index))
+                nft_index = int(nft_num[i])
+                if not SaveNFTsToRecord.OverrideNFT(DNA, NFTDict, nft_save_path, index, nft_index, master_record_save_path):
+                    config.custom_print("This ({}) nft already exists probably".format(DNA), '', config.bcolors.ERROR)
+        return {'FINISHED'}
 
 
 #-------------------------
@@ -1723,20 +1753,6 @@ class testButton(bpy.types.Operator):
 
 #Create Preview Panel
 
-class WCUSTOM_PT_FCreateData(bpy.types.Panel):
-    bl_label = "Create NFTs and Data"
-    bl_idname = "WCUSTOM_PT_FCreateData"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'GENERATION'
-
-    def draw(self, context):
-        layout = self.layout
-        row = layout.row()
-        scene = context.scene
-        mytool = scene.my_tool
-
-
 class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_label = "Create NFTs"
     bl_idname = "WCUSTOM_PT_PreviewNFTs"
@@ -1749,10 +1765,6 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-
-
-        # row = layout.separator()
-        # row = layout.separator(factor=0.0)
         row = layout.row()
         row.prop(mytool, "maxNFTs")
         row.operator(createBatch.bl_idname, text=createBatch.bl_label)
@@ -1761,6 +1773,27 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row = box.row()
         row.operator(saveCurrentNFT.bl_idname, text=saveCurrentNFT.bl_label)
         row.operator(saveNewNFT.bl_idname, text=saveNewNFT.bl_label)
+
+
+class WCUSTOM_PT_CreateCustomRange(bpy.types.Panel):
+    bl_label = "Re-generate NFTs in Range"
+    bl_idname = "WCUSTOM_PT_CreateCustomRange"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_PreviewNFTs'
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "customGenerateString", text='')
+        row.scale_x = 0.5
+        row.operator(createCustomBatch.bl_idname, text=createCustomBatch.bl_label)
 
 
 
@@ -2867,7 +2900,6 @@ classes = (
     WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_ModelSettings,
     WCUSTOM_PT_PreviewNFTs,
-    # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_AllSlots,
     WCUSTOM_PT_HeadSlots,
@@ -2887,6 +2919,7 @@ classes = (
     WCUSTOM_PT_TintUI,
     WCUSTOM_PT_DeleteRange,
     WCUSTOM_PT_EvaluateLogs,
+    WCUSTOM_PT_CreateCustomRange,
     # BMNFTS_PT_Documentation,
 
 
@@ -2958,6 +2991,7 @@ classes = (
     chooseLogPath,
     evaluateExportLog,
     findAllNFTsWithItems,
+    createCustomBatch,
     testButton
 
 )

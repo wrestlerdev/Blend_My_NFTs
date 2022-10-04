@@ -103,7 +103,7 @@ ItemUsedBodySlot = {
 }
   
 
-def RandomizeFullCharacter(maxNFTs, save_path):
+def RandomizeFullCharacter(maxNFTs, save_path=''):
     index = bpy.context.scene.my_tool.CurrentBatchIndex
     batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
     NFTRecord_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index), "_NFTRecord_{}.json".format(index))
