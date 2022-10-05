@@ -52,7 +52,7 @@ KeywordKeys = [ # this is the order attributes will be listed in the metadata
 KeywordAttributeOrder = {KeywordKeys[v]: v for v in range(len(KeywordKeys))} 
 
 
-def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
+def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num, handmadeBool):
     keys = list(NFTDict.keys())
     metaDataDictErc721 = {
         "name": name,
@@ -62,7 +62,6 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
         "DNA": DNA,
         "data": "Link to data json?",
         "attributes": None,
-        
     }
 
     attributes = []
@@ -72,6 +71,9 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num):
     style = DNAString.pop(0)
 
     attributes.append({"trait_type": "Character", "value": character})
+
+    if handmadeBool:
+        attributes.append({"trait_type": "Theme", "value": "Handmade"})
 
     if style != 'Elemental':
         attributes.append({"trait_type": "Theme", "value": style})

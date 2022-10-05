@@ -190,6 +190,11 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             ]
         )
 
+    handmadeBool: bpy.props.BoolProperty(name='Handmade NFT', default=False)
+    handmadeLock: bpy.props.BoolProperty(name='Lock Handmade attribute', default=False)
+
+    customGenerateString: bpy.props.StringProperty(name="Custom Generator String")
+
     customRenderRange: bpy.props.StringProperty(name="Custom Render Range", default='')
     customRenderRangeBool: bpy.props.BoolProperty(name="Custom Range", default=False)
     exportDimension: bpy.props.IntProperty(name="Dimensions", default=2048, min=64, max=4096)
@@ -411,6 +416,8 @@ class initializeRecord(bpy.types.Operator):
         LoadNFT.update_collection_rarity_property(first_nftrecord_save_path)
 
         DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(first_batch_path, 1, True)
+
+        bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -436,6 +443,9 @@ class randomizePreview(bpy.types.Operator):
         SingleDNA = DNA[0]
         SingleNFTDict = NFTDict[DNA[0]]
         Exporter.Previewer.show_nft_from_dna(SingleDNA, SingleNFTDict)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 class randomizeAllColor(bpy.types.Operator):
@@ -532,6 +542,7 @@ class createBatch(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        bpy.context.scene.my_tool.handmadeBool = False
         batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
         index = bpy.context.scene.my_tool.CurrentBatchIndex
@@ -548,6 +559,35 @@ class createBatch(bpy.types.Operator):
         Exporter.Previewer.show_nft_from_dna(DNA, NFTDict[DNA])
         return {'FINISHED'}
 
+
+class createCustomBatch(bpy.types.Operator):
+    bl_idname = 'create.custom'
+    bl_label = 'Re-generate NFTs'
+    bl_description = "Re-generate NFTs from custom range"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        bpy.context.scene.my_tool.handmadeBool = False
+        string = bpy.context.scene.my_tool.customGenerateString
+        string = string.replace(" ", "")
+        string = string.rstrip(',')
+        if string:
+            nft_num = re.split(',', string)
+            DNASet, NFTDict = DNA_Generator.Outfit_Generator.RandomizeFullCharacter(len(nft_num))
+
+            batch_json_save_path = bpy.context.scene.my_tool.batch_json_save_path
+            master_record_save_path = os.path.join(batch_json_save_path, "_NFTRecord.json")
+            index = bpy.context.scene.my_tool.CurrentBatchIndex
+            for i in range(len(nft_num)):
+                DNA = DNASet[i]
+                nft_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index))
+                nft_index = int(nft_num[i])
+                if not SaveNFTsToRecord.OverrideNFT(DNA, NFTDict, nft_save_path, index, nft_index, master_record_save_path):
+                    config.custom_print("This ({}) nft already exists probably".format(DNA), '', config.bcolors.ERROR)
+        return {'FINISHED'}
 
 
 #-------------------------
@@ -571,6 +611,8 @@ class loadNFT(bpy.types.Operator):
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
 
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -592,6 +634,9 @@ class loadNextNFT(bpy.types.Operator):
             TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -611,6 +656,9 @@ class loadPrevNFT(bpy.types.Operator):
             TotalDNA, DNA, NFTDict = LoadNFT.read_DNAList_from_file(batch_index, loadNFTIndex)
 
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -639,6 +687,9 @@ class saveNewNFT(bpy.types.Operator):
             self.report({"ERROR"}, "This NFT already exists")
 
         bpy.context.scene.my_tool.loadNFTIndex = LoadNFT.get_total_DNA()
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -667,6 +718,9 @@ class saveCurrentNFT(bpy.types.Operator):
         nft_save_path = os.path.join(batch_json_save_path, "Batch_{}".format(index))
         if not SaveNFTsToRecord.OverrideNFT(DNA, NFTDicts, nft_save_path, index, loadNFTIndex, master_record_save_path):
             self.report({"ERROR"}, "This NFT already exists probably")
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -697,6 +751,9 @@ class deleteNFT(bpy.types.Operator):
             Exporter.Previewer.show_nft_from_dna(DNA, NFTDict)
         else:
             self.report({"ERROR"}, "This is not a valid number (%d), as there are only %d NFTs saved" %(loadNFTIndex, TotalDNA))
+        
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -719,6 +776,9 @@ class deleteRangeNFT(bpy.types.Operator):
         master_save_path = os.path.join(bpy.context.scene.my_tool.batch_json_save_path, "_NFTRecord.json")
 
         SaveNFTsToRecord.DeleteNFTsinRange(start_range, end_range, TotalDNA, nft_save_path, batch_index, master_save_path)
+        
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -742,6 +802,9 @@ class deleteAllNFTs(bpy.types.Operator):
             SaveNFTsToRecord.DeleteAllNFTs(TotalDNA, nft_save_path, batch_index, master_save_path)
         else:
             print(">:^(")
+        
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 #-------------------------------
@@ -781,6 +844,9 @@ class loadBatch(bpy.types.Operator):
             bpy.context.scene.my_tool.colorStyleRarity = rarity_dict[bpy.context.scene.my_tool.colorStyleName]
         else:
             bpy.context.scene.my_tool.colorStyleRarity = 0
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -813,6 +879,9 @@ class saveBatch(bpy.types.Operator):
         # Rarity_Wrangler.count_all_rarities(batch_save_path, index)
         # LoadNFT.update_collection_rarity_property(NFTRecord_save_path, Rarity_save_path)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -843,6 +912,9 @@ class saveNewBatch(bpy.types.Operator):
         DNA_Generator.Outfit_Generator.ColorGen.create_batch_color(current_batch_save_path, index, True)
         # DNA_Generator.Outfit_Generator.count_all_rarities(current_batch_save_path, index)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -875,6 +947,9 @@ class resetBatch(bpy.types.Operator):
 
         # DNA_Generator.Outfit_Generator.count_all_rarities(current_batch_save_path, batch_index)
         LoadNFT.update_collection_rarity_property(nftrecord_path)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -908,6 +983,9 @@ class updateBatch(bpy.types.Operator):
 
         # DNA_Generator.Outfit_Generator.count_all_rarities(batch_save_path, batch_index)
         LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
+
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 #----------------------------------------------------------------
@@ -995,6 +1073,8 @@ class loadDirectory(bpy.types.Operator):
             # DNA_Generator.Outfit_Generator.count_all_rarities(batch_path, 1)
             LoadNFT.update_collection_rarity_property(NFTRecord_save_path)
             
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
         
 
@@ -1639,6 +1719,8 @@ class forceLoadDNAFromUI(bpy.types.Operator):
 
     def execute(self, context):
         Exporter.Previewer.CreateDNADictFromUI()
+        if not bpy.context.scene.my_tool.handmadeLock:
+            bpy.context.scene.my_tool.handmadeBool = False
         return {'FINISHED'}
 
 
@@ -1723,20 +1805,6 @@ class testButton(bpy.types.Operator):
 
 #Create Preview Panel
 
-class WCUSTOM_PT_FCreateData(bpy.types.Panel):
-    bl_label = "Create NFTs and Data"
-    bl_idname = "WCUSTOM_PT_FCreateData"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'GENERATION'
-
-    def draw(self, context):
-        layout = self.layout
-        row = layout.row()
-        scene = context.scene
-        mytool = scene.my_tool
-
-
 class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
     bl_label = "Create NFTs"
     bl_idname = "WCUSTOM_PT_PreviewNFTs"
@@ -1749,10 +1817,6 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-
-
-        # row = layout.separator()
-        # row = layout.separator(factor=0.0)
         row = layout.row()
         row.prop(mytool, "maxNFTs")
         row.operator(createBatch.bl_idname, text=createBatch.bl_label)
@@ -1761,6 +1825,27 @@ class WCUSTOM_PT_PreviewNFTs(bpy.types.Panel):
         row = box.row()
         row.operator(saveCurrentNFT.bl_idname, text=saveCurrentNFT.bl_label)
         row.operator(saveNewNFT.bl_idname, text=saveNewNFT.bl_label)
+
+
+class WCUSTOM_PT_CreateCustomRange(bpy.types.Panel):
+    bl_label = "Re-generate NFTs in Range"
+    bl_idname = "WCUSTOM_PT_CreateCustomRange"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_PreviewNFTs'
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        scene = context.scene
+        mytool = scene.my_tool
+
+        row = layout.row()
+        row.prop(mytool, "customGenerateString", text='')
+        row.scale_x = 0.5
+        row.operator(createCustomBatch.bl_idname, text=createCustomBatch.bl_label)
 
 
 
@@ -1866,11 +1951,20 @@ class WCUSTOM_PT_AllSlots(bpy.types.Panel):
         row.operator(randomizeAllColor.bl_idname, text=randomizeAllColor.bl_label)
         row.operator(randomizeAllSets.bl_idname, text=randomizeAllSets.bl_label)
 
-        # row = layout.row()
-        # row.label(text='')
         row.scale_x = 0.5
         row.prop(mytool, "currentGeneratorStyle", text='')
         row.operator(clearGeneratorStyle.bl_idname, text=clearGeneratorStyle.bl_label)
+
+        box = layout.box()
+        row = box.row()
+        row.label()
+        row.prop(mytool, "handmadeBool")
+        if bpy.context.scene.my_tool.handmadeLock:
+            row.prop(mytool, "handmadeLock", text='', icon='LOCKED')
+        else:
+            row.prop(mytool, "handmadeLock", text='', icon='UNLOCKED')
+        row.scale_x = 1
+        row.label()
 
 
 
@@ -2867,7 +2961,6 @@ classes = (
     WCUSTOM_PT_ELoadFromFile,
     WCUSTOM_PT_ModelSettings,
     WCUSTOM_PT_PreviewNFTs,
-    # WCUSTOM_PT_FCreateData,
     WCUSTOM_PT_ParentSlots,
     WCUSTOM_PT_AllSlots,
     WCUSTOM_PT_HeadSlots,
@@ -2887,6 +2980,7 @@ classes = (
     WCUSTOM_PT_TintUI,
     WCUSTOM_PT_DeleteRange,
     WCUSTOM_PT_EvaluateLogs,
+    WCUSTOM_PT_CreateCustomRange,
     # BMNFTS_PT_Documentation,
 
 
@@ -2958,6 +3052,7 @@ classes = (
     chooseLogPath,
     evaluateExportLog,
     findAllNFTsWithItems,
+    createCustomBatch,
     testButton
 
 )
