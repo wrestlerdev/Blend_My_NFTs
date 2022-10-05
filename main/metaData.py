@@ -14,9 +14,9 @@ from . import config
 
 KeywordAttributeDict = {
     new_key: new_val
-    for keys, new_val in [(["Shirt"], "Tops"),
+    for keys, new_val in [(["Shirt", "Outfit"], "Tops"),
                          (["Pant"], "Bottoms"),
-                         (["Outfit"], "Outfit"),
+                        #  (["Outfit"], "Outfit"),
                          (["Feet"], "Shoes"),
                          (["Head"], "Headwear"),
                         #  (["Tattoo"], "Tattoo"),
