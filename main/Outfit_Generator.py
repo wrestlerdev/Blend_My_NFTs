@@ -34,6 +34,7 @@ ItemUsedBodySlot = {
 "ShirtLong" : ["01-UT", "02-MT", "06-PTK", "03-FA"],
 "ShirtLongNeck" : ["01-UT", "02-MT", "06-PTK", "03-FA","14-N", "11-HL", "17-EL"],
 "ShirtLongHead": ["01-UT", "02-MT", "06-PTK", "03-FA","14-N", "11-HL", "12-HS", "18-ES", "17-EL"],
+"ShirtLongBack" : ["01-UT", "02-MT", "03-FA", "06-PTK", "14-N", "11-HL", "20-BP", "17-EL"],
 
 "PantsShort" : ["07-PTN"],
 "PantsShortThick" : ["06-PTK", "07-PTN"],
