@@ -1993,7 +1993,7 @@ class WCUSTOM_PT_TorsoSlots(bpy.types.Panel):
                     color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
-                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
+                label = "{} {} {}".format(variant.name.split('_')[3],str(int(texture_index) + 1), color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
@@ -2051,7 +2051,7 @@ class WCUSTOM_PT_ArmSlots(bpy.types.Panel):
                     color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
-                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
+                label = "{} {} {}".format(variant.name.split('_')[3],str(int(texture_index) + 1), color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
@@ -2115,7 +2115,7 @@ class WCUSTOM_PT_LegSlots(bpy.types.Panel):
                     color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
-                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
+                label = "{} {} {}".format(variant.name.split('_')[3],str(int(texture_index) + 1), color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
@@ -2187,7 +2187,8 @@ class WCUSTOM_PT_HeadSlots(bpy.types.Panel):
                     color_key = ''
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
-                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
+                label = "{} {} {}".format(variant.name.split('_')[3],str(int(texture_index) + 1), color_key)
+                
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
@@ -2242,7 +2243,7 @@ class WCUSTOM_PT_OtherSlots(bpy.types.Panel):
                 color_key = dna_splitstrand[3] or 'X'
                 texture_index = dna_splitstrand[2]
                 variant = bpy.context.scene.my_tool[name]
-                label = "{} {} {}".format(variant.name.split('_')[3],texture_index, color_key)
+                label = "{} {} {}".format(variant.name.split('_')[3],str(int(texture_index) + 1), color_key)
                 row.label(text=label)
                 row.scale_x = 1
                 row.prop(mytool, name, text="")
