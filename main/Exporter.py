@@ -258,7 +258,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         #return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
-    render_gif = bpy.context.scene.my_tool.gifBool
+    render_gif = '1' if bpy.context.scene.my_tool.gifBool else '0'
     frames = int(bpy.context.scene.my_tool.frameLength * 24)
     settings = [str(bpy.context.scene.my_tool.exportDimension), str(bpy.context.scene.my_tool.imageFrame), str(frames)]
     settings = '_'.join(settings)
@@ -666,24 +666,32 @@ def save_all_metadata_files(output_path):
 
 # ------------------------------- Refactor Exports ---------------------------
 
-def refactor_all_batches(batches_path, master_record_path):
-    # DNAList = []
-    # emptyDict = {}
-    # emptyDict["DNAList"] = DNAList
-    # emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
-    # with open(master_record_path, 'w') as outfile:
-    #     outfile.write(emptydata + '\n')
+def refactor_all_batches(batches_path, master_record_path, look_up_path):
 
+    print(look_up_path)
+    if not os.path.exists(master_record_path):
+        DNAList = []
+        emptyDict = {}
+        emptyDict["DNAList"] = DNAList
+        emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
+        with open(master_record_path, 'w') as outfile:
+            outfile.write(emptydata + '\n')
+    if not os.path.exists(look_up_path):
+        emptyDict = {}
+        emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
+        with open(look_up_path, 'w') as outfile:
+            outfile.write(emptydata + '\n')
     batches = len(next(os.walk(batches_path))[1])
 
     for i in range(batches):
         batch_path = os.path.join(batches_path, "Batch_{}".format(i + 1))
-        refactor_single_batch(batch_path, i+1, master_record_path)
+        refactor_single_batch(batch_path, i+1, master_record_path, look_up_path)
     return
 
 
-def refactor_single_batch(batch_path, batch_index, master_record_path):
+def refactor_single_batch(batch_path, batch_index, master_record_path, look_up_path):
     master_record = json.load(open(master_record_path))
+    record_look_up = json.load(open(look_up_path))
     DNAList = master_record["DNAList"]
     nfts = len(next(os.walk(batch_path))[1])
 
@@ -704,13 +712,20 @@ def refactor_single_batch(batch_path, batch_index, master_record_path):
                     prefix = default_prefix
         
         DNA = refactor_single_nft(nft_path, default_prefix, prefix, DNAList)
-    if DNA:
-        DNAList.append(DNA)
+        if DNA:
+            new_prefix = bpy.context.scene.my_tool.renderPrefix
+            DNAList.append(DNA)
+            index = len(DNAList)
+            record_look_up[new_prefix + str(index)] = default_prefix            
 
     master_record["DNAList"] = DNAList
     master_record_data = json.dumps(master_record, indent=1, ensure_ascii=True)
     with open(master_record_path, 'w') as outfile:
         outfile.write(master_record_data + '\n')
+
+    record_data = json.dumps(record_look_up, indent=1, ensure_ascii=True)
+    with open(look_up_path, 'w') as outfile:
+        outfile.write(record_data + '\n')
     return
 
 
@@ -718,42 +733,43 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
     # will rename export files and add new export names to json file info
     single_record = json.load(open(os.path.join(folder_path, default_prefix + '.json')))
     DNA = single_record["DNAList"]
-    if not DNA in DNAList:
-        DNAList.append(DNA)
-        # index = len(DNAList) - 1
-        index = len(DNAList)
-        is_new = True
-    else:
-        index = DNAList.index(DNA) + 1
-        is_new = False
-
     files = os.listdir(folder_path)
-    for old_file in files:
-        if prefix in old_file:
-            current_prefix = prefix
-            suffix = old_file.split('.')[-1]
-        else: # if file has already been refactored previously
-            current_prefix, suffix = old_file.split('.')
 
-        new_prefix = bpy.context.scene.my_tool.renderPrefix
-        new_file_name = new_prefix + "{}".format(index) + '.' + suffix
-        old_path = os.path.join(folder_path, old_file)
-        new_path = os.path.join(folder_path, new_file_name)            
-        if suffix == "json":
-            if current_prefix == default_prefix:
-                record_path = os.path.join(old_path)
-                save_filename_to_record(record_path, new_file_name)
-            else:
-                metadata_path = os.path.join(old_path)
-                change_nftname_in_metadata(metadata_path, new_file_name)
-                new_file_path = os.path.join(folder_path, "ERC721_" + new_file_name)
-                os.rename(old_path, new_file_path)
-        elif suffix in ["blend", 'blend1']:
-            pass
+    if any(f.endswith('.png') or f.endswith('.mp4') for f in files):
+        if not DNA in DNAList:
+            # DNAList.append(DNA)
+            index = len(DNAList)
+            is_new = True
         else:
-            os.rename(old_path, new_path)
-    
-    return DNA if is_new else None
+            index = DNAList.index(DNA) + 1
+            is_new = False
+
+        for old_file in files:
+            if prefix in old_file:
+                current_prefix = prefix
+                suffix = old_file.split('.')[-1]
+            else: # if file has already been refactored previously
+                current_prefix, suffix = old_file.split('.')
+
+            new_prefix = bpy.context.scene.my_tool.renderPrefix
+            new_file_name = new_prefix + "{}".format(index) + '.' + suffix
+            old_path = os.path.join(folder_path, old_file)
+            new_path = os.path.join(folder_path, new_file_name)            
+            if suffix == "json":
+                if current_prefix == default_prefix:
+                    record_path = os.path.join(old_path)
+                    save_filename_to_record(record_path, new_file_name)
+                else:
+                    metadata_path = os.path.join(old_path)
+                    change_nftname_in_metadata(metadata_path, new_file_name)
+                    new_file_path = os.path.join(folder_path, "ERC721_" + new_file_name)
+                    os.rename(old_path, new_file_path)
+            elif suffix in ["blend", 'blend1']:
+                pass
+            else:
+                os.rename(old_path, new_path)
+        
+        return DNA if is_new else None
 
 
 def save_filename_to_record(nftrecord_path, new_name):

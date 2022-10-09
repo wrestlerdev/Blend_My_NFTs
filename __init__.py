@@ -208,10 +208,12 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     renderPrefix: bpy.props.StringProperty(name="Output Prefix:", default="SAE #")
 
     renderFullBatch: bpy.props.BoolProperty(name= "Render Full Batch", default=True)
+    renderMultiBatch: bpy.props.BoolProperty(name= "Render Multiple Batches", default=False)
     renderSectionSize: bpy.props.IntProperty(name= "Section Size", default=1, min=1, max=9999)
     renderSectionIndex: bpy.props.IntProperty(name= "Section Index", default=1, min=1, max=9999)
     rangeBool: bpy.props.BoolProperty(name="Use Sections", default=False)
     BatchRenderIndex: bpy.props.IntProperty(name= "Batch To Render", default=1, min=1, max=100)
+    BatchRenderEndIndex: bpy.props.IntProperty(name= "Batch To Render To", default=1, min=1, max=100)
     PNGTransparency: bpy.props.BoolProperty(name= 'Transparency', default=True)
 
     batch_json_save_path: bpy.props.StringProperty(name="Batch Save Path")
@@ -1186,33 +1188,47 @@ class createBlenderSave(bpy.types.Operator):
         export_path = os.path.join(export_path, "Blend_My_NFT")
         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{}".format(render_batch_num))
         record_path = os.path.join(batch_path, "_NFTRecord_{}.json".format(render_batch_num))
+
         range_start = bpy.context.scene.my_tool.renderSectionIndex
         batch_count = len(next(os.walk(batch_path))[1])
         ranges = []
-        if not bpy.context.scene.my_tool.renderFullBatch:
-            if bpy.context.scene.my_tool.customRenderRangeBool:
-                ranges = Exporter.get_custom_range()
-            elif bpy.context.scene.my_tool.rangeBool:
-                size = bpy.context.scene.my_tool.renderSectionSize
-                index = bpy.context.scene.my_tool.renderSectionIndex
-                range_start = size * (index - 1) + 1
-                range_end = min(size * (index), batch_count)
-                if range_start <= batch_count:
-                    ranges = [[range_start, range_end]]
-            else:
-                range_start = bpy.context.scene.my_tool.renderSectionIndex
-                range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
-                if range_start <= batch_count and range_end >= range_start:
-                    ranges = [[range_start, range_end]]
+        if bpy.context.scene.my_tool.renderMultiBatch and bpy.context.scene.my_tool.renderFullBatch:
+            batch_end = max(bpy.context.scene.my_tool.BatchRenderEndIndex, bpy.context.scene.my_tool.BatchRenderIndex)
+            for i in range( bpy.context.scene.my_tool.BatchRenderIndex, batch_end + 1):
+                batch_path = os.path.join(export_path, "OUTPUT", "Batch_{}".format(i))
+                batch_count = len(next(os.walk(batch_path))[1])
+                ranges = [[1, batch_count]]
+                for range_ in ranges:
+                    passed = Exporter.create_blender_saves(batch_path, render_batch_num, range_)
+                    if passed:
+                        print("SAVE NEW BLENDER SCENES: " + batch_path)
+                if not ranges:
+                    print("Something went wrong for batch {} :(".format(i))
         else:
-            ranges = [[1, batch_count]]
+            if not bpy.context.scene.my_tool.renderFullBatch:
+                if bpy.context.scene.my_tool.customRenderRangeBool:
+                    ranges = Exporter.get_custom_range()
+                elif bpy.context.scene.my_tool.rangeBool:
+                    size = bpy.context.scene.my_tool.renderSectionSize
+                    index = bpy.context.scene.my_tool.renderSectionIndex
+                    range_start = size * (index - 1) + 1
+                    range_end = min(size * (index), batch_count)
+                    if range_start <= batch_count:
+                        ranges = [[range_start, range_end]]
+                else:
+                    range_start = bpy.context.scene.my_tool.renderSectionIndex
+                    range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
+                    if range_start <= batch_count and range_end >= range_start:
+                        ranges = [[range_start, range_end]]
+            else:
+                ranges = [[1, batch_count]]
 
-        for range in ranges:
-            passed = Exporter.create_blender_saves(batch_path, render_batch_num, range)
-            if passed:
-                print("SAVE NEW BLENDER SCENES: " + batch_path)
-        if not ranges:
-            print("Custom render string is empty or not valid so nothing was rendered :(")
+            for range_ in ranges:
+                passed = Exporter.create_blender_saves(batch_path, render_batch_num, range_)
+                if passed:
+                    print("SAVE NEW BLENDER SCENES: " + batch_path)
+            if not ranges:
+                print("Custom render string is empty or not valid so nothing was rendered :(")
 
         return {'FINISHED'}
 
@@ -1292,10 +1308,12 @@ class refactorExports(bpy.types.Operator):
 
     def execute(self, context):
         export_dir = bpy.context.scene.my_tool.separateExportPath
+        root_dir = bpy.context.scene.my_tool.root_dir
         batches_path = os.path.join(export_dir, "Blend_My_NFT", "OUTPUT")
-        # render_record_path = os.path.join(batches_path, "_RenderRecord.json")
-        render_record_path = os.path.join(batches_path, "_NFTRecord.json")
-        Exporter.refactor_all_batches(batches_path, render_record_path)
+        render_record_path = os.path.join(root_dir, "_RenderRecord.json")
+        look_up_path = os.path.join(root_dir, "_RenderLookUp.json")
+        # render_record_path = os.path.join(batches_path, "_NFTRecord.json")
+        Exporter.refactor_all_batches(batches_path, render_record_path, look_up_path)
         return {'FINISHED'}
 
 
@@ -2508,6 +2526,8 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.label(text="Total Batches: {}".format(batch_count))            
             row = box.row()
             row.prop(mytool, "BatchRenderIndex")
+            if bpy.context.scene.my_tool.renderMultiBatch and bpy.context.scene.my_tool.renderFullBatch:
+                row.prop(mytool, "BatchRenderEndIndex")
 
             row = box.row()
             if os.path.exists(batch_path):
@@ -2517,6 +2537,11 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
                 batch_count = 0
                 row.label(text="This batch doesn't exist")
             row.prop(mytool, "renderFullBatch",toggle=-1)
+
+            if bpy.context.scene.my_tool.renderFullBatch:
+                row.prop(mytool, "renderMultiBatch")
+            else:
+                row.label(text='')
             layout.separator()
 
             box = layout.box()
@@ -2573,28 +2598,11 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row = box.row()
             row.prop(mytool, "imageFrame")
             row.prop(mytool, "frameLength")
-            # if mytool.imageBool:
-            #     row = layout.row()
-            #     row.label(text="Image Type:")
-            #     row.prop(mytool, "imageEnum", expand=True)
-            #     row = layout.row()
-
-            #     if(bpy.context.scene.my_tool.imageEnum == 'PNG'):
-            #         row.label(text="")
-            #         row.label(text="")
-            #         row.prop(mytool, "PNGTransparency",toggle=1)
-            #         row = layout.row()
-            # if mytool.modelBool:
-            #     row = layout.row()
-            #     row.label(text="Model Type:")
-            #     row.prop(mytool, "modelEnum", expand=True)
-            #     row = layout.row()
 
             layout.separator()
             box = layout.box()
             box2 = box.box()
             box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper())
-            # box.operator(renderBatch.bl_idname, text=renderBatch.bl_label)
 
 
 
