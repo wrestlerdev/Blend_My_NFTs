@@ -667,12 +667,10 @@ def save_all_metadata_files(output_path):
 # ------------------------------- Refactor Exports ---------------------------
 
 def refactor_all_batches(batches_path, master_record_path, look_up_path):
-
-    print(look_up_path)
     if not os.path.exists(master_record_path):
-        DNAList = []
+        NFTList = []
         emptyDict = {}
-        emptyDict["DNAList"] = DNAList
+        emptyDict["NFTList"] = NFTList
         emptydata = json.dumps(emptyDict, indent=1, ensure_ascii=True)
         with open(master_record_path, 'w') as outfile:
             outfile.write(emptydata + '\n')
@@ -692,7 +690,8 @@ def refactor_all_batches(batches_path, master_record_path, look_up_path):
 def refactor_single_batch(batch_path, batch_index, master_record_path, look_up_path):
     master_record = json.load(open(master_record_path))
     record_look_up = json.load(open(look_up_path))
-    DNAList = master_record["DNAList"]
+    NFTList = master_record["NFTList"]
+
     nfts = len(next(os.walk(batch_path))[1])
 
     for i in range(nfts):
@@ -711,14 +710,14 @@ def refactor_single_batch(batch_path, batch_index, master_record_path, look_up_p
                 else:
                     prefix = default_prefix
         
-        DNA = refactor_single_nft(nft_path, default_prefix, prefix, DNAList)
-        if DNA:
+        added = refactor_single_nft(nft_path, default_prefix, prefix, NFTList)
+        if added:
             new_prefix = bpy.context.scene.my_tool.renderPrefix
-            DNAList.append(DNA)
-            index = len(DNAList)
-            record_look_up[new_prefix + str(index)] = default_prefix            
+            NFTList.append(default_prefix)
+            index = len(NFTList)
+            record_look_up["_" + str(index)] = default_prefix
 
-    master_record["DNAList"] = DNAList
+    master_record["NFTList"] = NFTList
     master_record_data = json.dumps(master_record, indent=1, ensure_ascii=True)
     with open(master_record_path, 'w') as outfile:
         outfile.write(master_record_data + '\n')
@@ -729,19 +728,19 @@ def refactor_single_batch(batch_path, batch_index, master_record_path, look_up_p
     return
 
 
-def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
+def refactor_single_nft(folder_path, default_prefix, prefix, NFTList):
     # will rename export files and add new export names to json file info
     single_record = json.load(open(os.path.join(folder_path, default_prefix + '.json')))
-    DNA = single_record["DNAList"]
+    # DNA = single_record["DNAList"]
     files = os.listdir(folder_path)
 
     if any(f.endswith('.png') or f.endswith('.mp4') for f in files):
-        if not DNA in DNAList:
+        if not default_prefix in NFTList:
             # DNAList.append(DNA)
-            index = len(DNAList)
+            index = len(NFTList) + 1
             is_new = True
         else:
-            index = DNAList.index(DNA) + 1
+            index = NFTList.index(default_prefix) + 1
             is_new = False
 
         for old_file in files:
@@ -769,7 +768,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, DNAList):
             else:
                 os.rename(old_path, new_path)
         
-        return DNA if is_new else None
+        return default_prefix if is_new else None
 
 
 def save_filename_to_record(nftrecord_path, new_name):
@@ -986,6 +985,56 @@ def get_hierarchy_ordered(index=0):
       hierarchy = DataDictionary["hierarchy"]
       return hierarchy
    return None
+
+
+
+def restructure_files(final_path, export_path):
+    if not os.path.exists(final_path):
+        config.custom_print("New path is not valid :(", '', config.bcolors.ERROR)
+        return
+
+    batch_path = os.path.join(export_path, 'Blend_My_NFT', 'OUTPUT')
+    batches = [f.path for f in os.scandir(batch_path) if f.is_dir()]
+    for batch in batches:
+        batch_num = batch.rpartition('_')[2]
+        nfts = [f.path for f in os.scandir(batch) if f.is_dir()]
+        for nft_folder in nfts:
+            nft_num = nft_folder.rpartition('_')[2]
+            batch_text_path = os.path.join(nft_folder, "Batch_{}_NFT_{}.json".format(batch_num, nft_num))
+            batch_text = json.load(open(batch_text_path))
+
+            for item in os.listdir(nft_folder):
+                if any(item.endswith(suf) for suf in ["mp4", "png", "gif"]):
+                    name = batch_text["filename"]
+                    new_file_path = os.path.join(final_path, name)
+                    move_to_restructure_folder(item, nft_folder, new_file_path)
+                else:
+                    if item.endswith("json") and "filename" in batch_text.keys():
+                        name = batch_text["filename"]
+                        new_file_path = os.path.join(final_path, name)
+                        if item.startswith("Batch_"):
+                            move_to_restructure_folder(item, nft_folder, new_file_path, True)
+                        elif item.startswith("ERC"):
+                            move_to_restructure_folder(item, nft_folder, new_file_path)
+    return
+
+
+def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy=''):
+    if not os.path.isdir(new_folder_name):
+        os.mkdir(new_folder_name)
+
+    item_path = os.path.join(item_folder, item)
+    new_item_path = os.path.join(new_folder_name, item)
+    if os.path.exists(new_item_path):
+        os.remove(new_item_path)
+
+    if should_copy:
+        shutil.copy(item_path, new_item_path)
+    else:
+        shutil.move(item_path, new_item_path)
+    return
+
+
 
 if __name__ == '__main__':
     render_and_save_NFTs()

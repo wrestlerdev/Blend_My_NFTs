@@ -184,6 +184,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
             ]
         )
 
+    refactor_dir: bpy.props.StringProperty(name='Moooooove')
+
     handmadeBool: bpy.props.BoolProperty(name='Handmade NFT', default=False)
     handmadeLock: bpy.props.BoolProperty(name='Lock Handmade attribute', default=False)
 
@@ -205,7 +207,7 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
     isCharacterLocked: bpy.props.BoolProperty(name="Lock Character", default=False)
 
     separateExportPath: bpy.props.StringProperty(name="Directory")
-    renderPrefix: bpy.props.StringProperty(name="Output Prefix:", default="SAE #")
+    renderPrefix: bpy.props.StringProperty(name="Output Prefix", default="SAE #")
 
     renderFullBatch: bpy.props.BoolProperty(name= "Render Full Batch", default=True)
     renderMultiBatch: bpy.props.BoolProperty(name= "Render Multiple Batches", default=False)
@@ -1199,7 +1201,7 @@ class createBlenderSave(bpy.types.Operator):
                 batch_count = len(next(os.walk(batch_path))[1])
                 ranges = [[1, batch_count]]
                 for range_ in ranges:
-                    passed = Exporter.create_blender_saves(batch_path, render_batch_num, range_)
+                    passed = Exporter.create_blender_saves(batch_path, i, range_)
                     if passed:
                         print("SAVE NEW BLENDER SCENES: " + batch_path)
                 if not ranges:
@@ -1363,6 +1365,40 @@ class evaluateExportLog(bpy.types.Operator):
         Exporter.evaluate_export_log(path, min_sec, max_sec)
         return {'FINISHED'}
 
+
+class chooseRefactorFolder(bpy.types.Operator):
+    bl_idname = 'choose.refactor'
+    bl_label = 'Choose Final Folder'
+    bl_description = "Choose folder for all finalized data"
+    bl_options = {"REGISTER", "UNDO"}
+    filepath: bpy.props.StringProperty(subtype='FILE_PATH', default='')
+    filter_glob: bpy.props.StringProperty(default ='',options = {'HIDDEN'})
+
+    def execute(self, context):
+        print(self.filepath)
+        bpy.context.scene.my_tool.refactor_dir = self.filepath
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        self.filepath = ""
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class moveToFinalFolder(bpy.types.Operator):
+    bl_idname = 'move.tofinal'
+    bl_label = 'MOVE ALL FILES TO FINAL LAYOUT'
+    bl_description = "THIS REALLY CAN'T BE UNDONE OKAY???????"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        final_path = bpy.context.scene.my_tool.refactor_dir
+        if os.path.exists(final_path):
+            Exporter.restructure_files(final_path, bpy.context.scene.my_tool.separateExportPath)
+        return {'FINISHED'}
 
 #----------------------------------------------------------------
 
@@ -1809,7 +1845,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-
+        # Exporter.restructure_files('C://Users//Wrestler//Desktop//refactor_test', bpy.context.scene.my_tool.separateExportPath)
         return {'FINISHED'}
 
 
@@ -2665,19 +2701,30 @@ class WCUSTOM_PT_RefactorExports(bpy.types.Panel):
         scene = context.scene
         mytool = scene.my_tool
 
-
         if canRefactor:
             export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFT", "OUTPUT")
             if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
-
-                row = layout.row()
+                box = layout.box()
+                row = box.row()
                 row.prop(mytool, "renderPrefix")
 
-                row = layout.row()
+                row = box.row()
                 row.label(text="Output example:")
-                row.label(text="{}0123.png".format(mytool.renderPrefix))
-                row = layout.row()
+                row.label(text="{}1234.png".format(mytool.renderPrefix))
+                row = box.row()
                 row.operator(refactorExports.bl_idname, text=refactorExports.bl_label)
+
+                layout.separator()
+
+                box = layout.box()
+                box2 = box.box()
+                row = box2.row()
+                row.label(text="Move and re-structure files for Upload:")
+                row = box.row()
+                row.prop(mytool, "refactor_dir", text='')
+                row.operator(chooseRefactorFolder.bl_idname, text=chooseRefactorFolder.bl_label)
+                row = box.row()
+                row.operator(moveToFinalFolder.bl_idname, text=moveToFinalFolder.bl_label)
         else:
             box = layout.box()
             row = box.row()
@@ -3056,6 +3103,8 @@ classes = (
     evaluateExportLog,
     findAllNFTsWithItems,
     createCustomBatch,
+    chooseRefactorFolder,
+    moveToFinalFolder,
     testButton
 
 )
