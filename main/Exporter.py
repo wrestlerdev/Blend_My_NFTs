@@ -987,6 +987,8 @@ def get_hierarchy_ordered(index=0):
    return None
 
 
+#--------------------------------------------------------
+
 
 def restructure_files(final_path, export_path):
     if not os.path.exists(final_path):
@@ -1033,6 +1035,44 @@ def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy='
     else:
         shutil.move(item_path, new_item_path)
     return
+
+
+#--------------------------------------------------------
+
+def check_renders(render_types, render_suffixes, output_dir, batches, show_only_failed=False):
+    for batch in range(batches[0], batches[1] + 1):
+        batch_path = os.path.join(output_dir, "Batch_{}".format(batch))
+        missing_renders = []
+        passed = []
+        for nft_dir in os.listdir(batch_path):
+            nft_folder = os.path.join(batch_path, nft_dir)
+            if os.path.isdir(nft_folder):
+                nft_num = nft_dir.rpartition('_')[2]
+                files = os.listdir(nft_folder)
+
+                batch_code = "Batch_{}_NFT_{}".format(batch, nft_num)
+                for i in range(len(render_suffixes)):
+                # for suf in render_suffixes:
+                    if not any(f.endswith(render_suffixes[i]) for f in files):
+                        # pass
+                        missing_renders.append(batch_code)
+                        break
+                if not batch_code in missing_renders:
+                    passed.append("Batch_{}_NFT_{}".format(batch, nft_num))
+
+        if passed and not show_only_failed:
+            config.custom_print("These renders in Batch {} succeeded:".format(batch), "", config.bcolors.OK)
+            for p in passed:
+                config.custom_print("\t{}".format(p), "", config.bcolors.OK)
+
+        if missing_renders:
+            config.custom_print("", "")
+            config.custom_print("These nfts folders in Batch {} did not have all ({}) render outputs:".format(batch, render_types), "", config.bcolors.ERROR)
+            for m in missing_renders:
+                config.custom_print("\t{}".format(m), "", config.bcolors.WARNING)
+
+    return
+
 
 
 

@@ -1385,6 +1385,43 @@ class chooseRefactorFolder(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+
+class checkRenders(bpy.types.Operator):
+    bl_idname = 'check.renders'
+    bl_label = 'Check Renders'
+    bl_description = "Evaluate if renders have succeeded"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        export_dir = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFT", 'OUTPUT')
+        exports = []
+        suffixes = []
+        if bpy.context.scene.my_tool.imageBool:
+            exports.append("Image")
+            suffixes.append(".png")
+        if bpy.context.scene.my_tool.animationBool:
+            exports.append("Animation")
+            suffixes.append(".mp4")
+        if bpy.context.scene.my_tool.modelBool:
+            exports.append("Model")
+            suffixes.append(".glb")
+        if bpy.context.scene.my_tool.gifBool:
+            exports.append("Gif")
+            suffixes.append(".gif")
+        if not exports:
+            exports.append("Blender")
+            suffixes.append(".blend")
+
+        if bpy.context.scene.my_tool.renderMultiBatch:
+            max_batch = max(bpy.context.scene.my_tool.BatchRenderIndex, bpy.context.scene.my_tool.BatchRenderEndIndex)
+            batches = [bpy.context.scene.my_tool.BatchRenderIndex, max_batch]
+        else:
+            batches = [bpy.context.scene.my_tool.BatchRenderIndex, bpy.context.scene.my_tool.BatchRenderIndex]
+        Exporter.check_renders(exports, suffixes, export_dir, batches)
+        return {'FINISHED'}
+
+
+
 class moveToFinalFolder(bpy.types.Operator):
     bl_idname = 'move.tofinal'
     bl_label = 'MOVE ALL FILES TO FINAL LAYOUT'
@@ -1845,7 +1882,8 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        # Exporter.restructure_files('C://Users//Wrestler//Desktop//refactor_test', bpy.context.scene.my_tool.separateExportPath)
+        output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT", "OUTPUT")
+        TextureEditor.go_through_all_nft_files(output_path)
         return {'FINISHED'}
 
 
@@ -2641,6 +2679,13 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             box2 = box.box()
             box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper())
 
+            layout.separator(factor=0.0)
+            row = layout.row()
+            row.label(text='')
+            row.operator(checkRenders.bl_idname, text=checkRenders.bl_label)
+            row.label(text='')
+
+
 
 
 #-------------------------------------------
@@ -3106,6 +3151,7 @@ classes = (
     createCustomBatch,
     chooseRefactorFolder,
     moveToFinalFolder,
+    checkRenders,
     testButton
 
 )
