@@ -757,7 +757,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, NFTList):
             if suffix == "json":
                 if current_prefix == default_prefix:
                     record_path = os.path.join(old_path)
-                    save_filename_to_record(record_path, new_file_name)
+                    save_filename_to_record(record_path, new_file_name, default_prefix)
                 else:
                     metadata_path = os.path.join(old_path)
                     change_nftname_in_metadata(metadata_path, new_file_name)
@@ -771,11 +771,12 @@ def refactor_single_nft(folder_path, default_prefix, prefix, NFTList):
         return default_prefix if is_new else None
 
 
-def save_filename_to_record(nftrecord_path, new_name):
+def save_filename_to_record(nftrecord_path, new_name, old_name):
     new_name = new_name.split('.')[0]
     if os.path.exists(nftrecord_path):
         record = json.load(open(nftrecord_path))
         record["filename"] = new_name
+        record["batchcode"] = old_name
 
         recordObj = json.dumps(record, indent=1, ensure_ascii=True)
         with open(nftrecord_path, "w") as outfile:
@@ -1004,29 +1005,36 @@ def restructure_files(final_path, export_path):
             nft_num = nft_folder.rpartition('_')[2]
             batch_text_path = os.path.join(nft_folder, "Batch_{}_NFT_{}.json".format(batch_num, nft_num))
             batch_text = json.load(open(batch_text_path))
-
-            for item in os.listdir(nft_folder):
-                if any(item.endswith(suf) for suf in ["mp4", "png", "gif"]):
-                    name = batch_text["filename"]
-                    new_file_path = os.path.join(final_path, name)
-                    move_to_restructure_folder(item, nft_folder, new_file_path)
-                else:
-                    if item.endswith("json") and "filename" in batch_text.keys():
+            items = os.listdir(nft_folder)
+            if any(not i.startswith("Batch_") for i in items): # find any refactored files
+                for item in items:
+                    if any(item.endswith(suf) for suf in ["mp4", "png", "gif"]):
                         name = batch_text["filename"]
                         new_file_path = os.path.join(final_path, name)
-                        if item.startswith("Batch_"):
-                            move_to_restructure_folder(item, nft_folder, new_file_path, True)
-                        elif item.startswith("ERC"):
-                            move_to_restructure_folder(item, nft_folder, new_file_path)
+                        move_to_restructure_folder(item, nft_folder, new_file_path)
+                    else:
+                        if item.endswith("json") and "filename" in batch_text.keys():
+                            name = batch_text["filename"]
+                            if item.startswith("Batch_"):
+                                new_file_path = os.path.join(final_path, name)
+                                new_batch_name = "DATA_" + name + '.json'
+                                move_to_restructure_folder(item, nft_folder, new_file_path, should_copy=True, new_item_overwrite=new_batch_name)
+                            elif item.startswith("ERC"):
+                                new_file_path = os.path.join(final_path, name)
+                                move_to_restructure_folder(item, nft_folder, new_file_path)
     return
 
 
-def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy=''):
+def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy='', new_item_overwrite=''):
     if not os.path.isdir(new_folder_name):
         os.mkdir(new_folder_name)
 
     item_path = os.path.join(item_folder, item)
-    new_item_path = os.path.join(new_folder_name, item)
+    if new_item_overwrite:
+        new_item_path = os.path.join(new_folder_name, new_item_overwrite)
+    else:
+        new_item_path = os.path.join(new_folder_name, item)
+
     if os.path.exists(new_item_path):
         os.remove(new_item_path)
 
@@ -1052,9 +1060,7 @@ def check_renders(render_types, render_suffixes, output_dir, batches, show_only_
 
                 batch_code = "Batch_{}_NFT_{}".format(batch, nft_num)
                 for i in range(len(render_suffixes)):
-                # for suf in render_suffixes:
                     if not any(f.endswith(render_suffixes[i]) for f in files):
-                        # pass
                         missing_renders.append(batch_code)
                         break
                 if not batch_code in missing_renders:
