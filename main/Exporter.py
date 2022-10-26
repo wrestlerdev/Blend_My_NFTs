@@ -992,6 +992,7 @@ def get_hierarchy_ordered(index=0):
 
 
 def restructure_files(final_path, export_path):
+    checkif_erc_exists = False
     if not os.path.exists(final_path):
         config.custom_print("New path is not valid :(", '', config.bcolors.ERROR)
         return
@@ -1021,11 +1022,11 @@ def restructure_files(final_path, export_path):
                                 move_to_restructure_folder(item, nft_folder, new_file_path, should_copy=True, new_item_overwrite=new_batch_name)
                             elif item.startswith("ERC"):
                                 new_file_path = os.path.join(final_path, name)
-                                move_to_restructure_folder(item, nft_folder, new_file_path)
+                                move_to_restructure_folder(item, nft_folder, new_file_path, check_if_exists=checkif_erc_exists)
     return
 
 
-def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy='', new_item_overwrite=''):
+def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy='', new_item_overwrite='', check_if_exists=False):
     if not os.path.isdir(new_folder_name):
         os.mkdir(new_folder_name)
 
@@ -1035,7 +1036,9 @@ def move_to_restructure_folder(item, item_folder, new_folder_name, should_copy='
     else:
         new_item_path = os.path.join(new_folder_name, item)
 
-    if os.path.exists(new_item_path):
+    if check_if_exists and os.path.exists(new_item_path):
+        return
+    elif os.path.exists(new_item_path):
         os.remove(new_item_path)
 
     if should_copy:
