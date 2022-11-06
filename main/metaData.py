@@ -56,11 +56,11 @@ def returnERC721MetaDataCustom(name, DNA, NFTDict, batch_num, handmadeBool):
     keys = list(NFTDict.keys())
     metaDataDictErc721 = {
         "name": name,
-        "description": "description should be inserted here",
-        "image": "Link to image file?",
-        "video": "Link to link to video?",
+        "description": "Soul Aether is a young adult sci-fantasy world exploring past lives, science, magic and alchemy. Spanning NFTs, animated series, games, metaverse experiences and more.",
+        "image": "Link to image file",
+        "video": "Link to video",
+        "data": "Link to data json",
         "DNA": DNA,
-        "data": "Link to data json?",
         "attributes": None,
     }
 
