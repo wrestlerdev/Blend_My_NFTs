@@ -61,6 +61,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
                         subtype="DIR_PATH"
     )
 
+    pfpBool: bpy.props.BoolProperty(name="PFP")
+
     imageBool: bpy.props.BoolProperty(name="Image")
     imageEnum: bpy.props.EnumProperty(
         name="Image File Format", 
@@ -107,6 +109,8 @@ class BMNFTS_PGT_MyProperties(bpy.types.PropertyGroup):
 
 
     # Custom properties
+
+    checkRenderFilePath: bpy.props.StringProperty("File Path")
 
     elementStyle: bpy.props.EnumProperty(
             name='Elemental Type',
@@ -1113,73 +1117,76 @@ class createCharacterCollections(bpy.types.Operator): # OLD
 #----------------------------------------------------------------
 
 
-class renderBatch(bpy.types.Operator):
-    bl_idname = "render.batch"
-    bl_label = "Render Batch"
-    bl_description = "Render out batch"
-    bl_options = {'REGISTER', 'UNDO'}
+# class renderBatch(bpy.types.Operator):
+#     bl_idname = "render.batch"
+#     bl_label = "Render Batch"
+#     bl_description = "Render out batch"
+#     bl_options = {'REGISTER', 'UNDO'}
     
-    def execute(self, context):
-        LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
-        render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
-        # export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
-        export_path = bpy.context.scene.my_tool.separateExportPath
-        export_path = os.path.join(export_path, "Blend_My_NFT")
-        batch_path = os.path.join(export_path, "OUTPUT", "Batch_{}".format(render_batch_num))
-        record_path = os.path.join(batch_path, "_NFTRecord_{}.json".format(render_batch_num))
+#     def execute(self, context):
+#         LoadNFT.check_if_paths_exist(bpy.context.scene.my_tool.BatchSliderIndex)
+#         render_batch_num = bpy.context.scene.my_tool.BatchRenderIndex
+#         # export_path = os.path.abspath(bpy.context.scene.my_tool.separateExportPath)
+#         export_path = bpy.context.scene.my_tool.separateExportPath
+#         export_path = os.path.join(export_path, "Blend_My_NFT")
+#         batch_path = os.path.join(export_path, "OUTPUT", "Batch_{}".format(render_batch_num))
+#         record_path = os.path.join(batch_path, "_NFTRecord_{}.json".format(render_batch_num))
 
-        if os.path.exists(record_path):
-            bpy.context.scene.render.engine = 'BLENDER_EEVEE'
+#         if os.path.exists(record_path):
+#             bpy.context.scene.render.engine = 'BLENDER_EEVEE'
             
-            imageEnum = bpy.context.scene.my_tool.imageEnum
-            imageBool = bpy.context.scene.my_tool.imageBool
-            animationBool = bpy.context.scene.my_tool.animationBool
-            modelBool = bpy.context.scene.my_tool.modelBool
-            modelEnum = bpy.context.scene.my_tool.modelEnum
-            if imageEnum == 'PNG':
-                transparency = bpy.context.scene.my_tool.PNGTransparency
-            else:
-                transparency = False
-            batch_count = len(next(os.walk(batch_path))[1])
-            range = []
-            if not bpy.context.scene.my_tool.renderFullBatch:
-                if bpy.context.scene.my_tool.rangeBool:
-                    size = bpy.context.scene.my_tool.renderSectionSize
-                    index = bpy.context.scene.my_tool.renderSectionIndex
-                    range_start = size * (index - 1) + 1
-                    range_end = min(size * (index), batch_count)
-                    if range_start <= batch_count:
-                        range = [range_start, range_end]
-                else:
-                    range_start = bpy.context.scene.my_tool.renderSectionIndex
-                    range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
-                    if range_start <= batch_count and range_end >= range_start:
-                        range = [range_start, range_end]
-            else:
-                range = [1, batch_count]
+#             imageEnum = bpy.context.scene.my_tool.imageEnum
+#             imageBool = bpy.context.scene.my_tool.imageBool
+#             pfpBool = bpy.context.scene.my_tool.pfpBool
+#             animationBool = bpy.context.scene.my_tool.animationBool
+#             modelBool = bpy.context.scene.my_tool.modelBool
+#             modelEnum = bpy.context.scene.my_tool.modelEnum
+#             if imageEnum == 'PNG':
+#                 transparency = bpy.context.scene.my_tool.PNGTransparency
+#             else:
+#                 transparency = False
+#             batch_count = len(next(os.walk(batch_path))[1])
+#             range = []
+#             if not bpy.context.scene.my_tool.renderFullBatch:
+#                 if bpy.context.scene.my_tool.rangeBool:
+#                     size = bpy.context.scene.my_tool.renderSectionSize
+#                     index = bpy.context.scene.my_tool.renderSectionIndex
+#                     range_start = size * (index - 1) + 1
+#                     range_end = min(size * (index), batch_count)
+#                     if range_start <= batch_count:
+#                         range = [range_start, range_end]
+#                 else:
+#                     range_start = bpy.context.scene.my_tool.renderSectionIndex
+#                     range_end = min(bpy.context.scene.my_tool.renderSectionSize, batch_count)
+#                     if range_start <= batch_count and range_end >= range_start:
+#                         range = [range_start, range_end]
+#             else:
+#                 range = [1, batch_count]
 
-            file_formats = []
-            if imageBool:
-                file_formats.append(imageEnum)
-            if animationBool:
-                file_formats.append("MP4")
-            if modelBool:
-                file_formats.append(modelEnum)
+#             file_formats = []
+#             if imageBool:
+#                 file_formats.append(imageEnum)
+#             if animationBool:
+#                 file_formats.append("MP4")
+#             if modelBool:
+#                 file_formats.append(modelEnum)
+#             if pfpBool:
+#                 file_formats.append("pfp")
 
-            if file_formats:
-                if range:
-                    Exporter.render_nft_batch_custom(export_path, render_batch_num, file_formats, range, transparency)
-                else:
-                    self.report({"ERROR"}, "Failed: Invalid range")
-            else:
-                self.report({"ERROR"}, "Failed: No output render types selected :(")
-        else:
-            self.report({"ERROR"}, "Failed: This Batch does not exist")
-        return {'FINISHED'}
+#             if file_formats:
+#                 if range:
+#                     Exporter.render_nft_batch_custom(export_path, render_batch_num, file_formats, range, transparency)
+#                 else:
+#                     self.report({"ERROR"}, "Failed: Invalid range")
+#             else:
+#                 self.report({"ERROR"}, "Failed: No output render types selected :(")
+#         else:
+#             self.report({"ERROR"}, "Failed: This Batch does not exist")
+#         return {'FINISHED'}
 
 class createBlenderSave(bpy.types.Operator):
     bl_idname = "createblendersave.batch"
-    bl_label = "Render"
+    bl_label = "RENDER"
     bl_description = "Create Blender Saves and Render"
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -1388,7 +1395,7 @@ class chooseRefactorFolder(bpy.types.Operator):
 
 class checkRenders(bpy.types.Operator):
     bl_idname = 'check.renders'
-    bl_label = 'Check Renders'
+    bl_label = 'Check All Renders in Batch'
     bl_description = "Evaluate if renders have succeeded"
     bl_options = {"REGISTER", "UNDO"}
 
@@ -1408,6 +1415,9 @@ class checkRenders(bpy.types.Operator):
         if bpy.context.scene.my_tool.gifBool:
             exports.append("Gif")
             suffixes.append(".gif")
+        if bpy.context.scene.my_tool.pfpBool:
+            exports.append("PFP")
+            suffixes.append("pfp")
         if not exports:
             exports.append("Blender")
             suffixes.append(".blend")
@@ -1420,6 +1430,75 @@ class checkRenders(bpy.types.Operator):
         Exporter.check_renders(exports, suffixes, export_dir, batches)
         return {'FINISHED'}
 
+
+class checkRendersFromList(bpy.types.Operator):
+    bl_idname = 'check.listrenders'
+    bl_label = 'Check Renders from List'
+    bl_description = "Evaluate if renders have succeeded"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        export_dir = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFT", 'OUTPUT')
+        exports = []
+        list_dir = bpy.context.scene.my_tool.checkRenderFilePath
+        suffixes = []
+        if bpy.context.scene.my_tool.imageBool:
+            exports.append("Image")
+            suffixes.append(".png")
+        if bpy.context.scene.my_tool.animationBool:
+            exports.append("Animation")
+            suffixes.append(".mp4")
+        if bpy.context.scene.my_tool.modelBool:
+            exports.append("Model")
+            suffixes.append(".glb")
+        if bpy.context.scene.my_tool.gifBool:
+            exports.append("Gif")
+            suffixes.append(".gif")
+        if bpy.context.scene.my_tool.pfpBool:
+            exports.append("PFP")
+            suffixes.append("pfp")
+        if not exports:
+            exports.append("Blender")
+            suffixes.append(".blend")
+
+        batch = bpy.context.scene.my_tool.BatchRenderIndex
+        Exporter.check_renders_from_list(exports, suffixes, export_dir, batch, list_dir)
+        return {'FINISHED'}
+
+
+class checkRendersOutsideList(bpy.types.Operator):
+    bl_idname = 'check.listoutsiderenders'
+    bl_label = 'Check Excess Renders Against List'
+    bl_description = "Check Excess Renders Against List"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        export_dir = os.path.join(bpy.context.scene.my_tool.separateExportPath, "Blend_My_NFT", 'OUTPUT')
+        exports = []
+        list_dir = bpy.context.scene.my_tool.checkRenderFilePath
+        suffixes = []
+        if bpy.context.scene.my_tool.imageBool:
+            exports.append("Image")
+            suffixes.append(".png")
+        if bpy.context.scene.my_tool.animationBool:
+            exports.append("Animation")
+            suffixes.append(".mp4")
+        if bpy.context.scene.my_tool.modelBool:
+            exports.append("Model")
+            suffixes.append(".glb")
+        if bpy.context.scene.my_tool.gifBool:
+            exports.append("Gif")
+            suffixes.append(".gif")
+        if bpy.context.scene.my_tool.pfpBool:
+            exports.append("PFP")
+            suffixes.append("pfp")
+        if not exports:
+            exports.append("Blender")
+            suffixes.append(".blend")
+
+        batch = bpy.context.scene.my_tool.BatchRenderIndex
+        Exporter.check_excess_renders_from_list(exports, suffixes, export_dir, batch, list_dir)
+        return {'FINISHED'}
 
 
 class moveToFinalFolder(bpy.types.Operator):
@@ -2665,7 +2744,10 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             row.prop(mytool, "imageBool", toggle=1)
             row.prop(mytool, "animationBool", toggle=1)
             row.prop(mytool, "modelBool", toggle=1)
+            row = box.row()
             row.prop(mytool, "gifBool", toggle=1)
+            row.label(text='')
+            row.prop(mytool, "pfpBool", toggle=1)
 
             row = box.row()
             row = box.row()
@@ -2677,13 +2759,30 @@ class WCUSTOM_PT_Render(bpy.types.Panel):
             layout.separator()
             box = layout.box()
             box2 = box.box()
-            box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label.upper())
+            box2.operator(createBlenderSave.bl_idname, text=createBlenderSave.bl_label)
 
-            layout.separator(factor=0.0)
-            row = layout.row()
-            row.label(text='')
-            row.operator(checkRenders.bl_idname, text=checkRenders.bl_label)
-            row.label(text='')
+
+
+class WCUSTOM_PT_CheckRenders(bpy.types.Panel):
+    bl_label = "Check Renders"
+    bl_idname = "WCUSTOM_PT_CheckRenders"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'GENERATION'
+    bl_parent_id = 'WCUSTOM_PT_Render'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        row = layout.row()
+        row.operator(checkRenders.bl_idname, text=checkRenders.bl_label)
+
+        row = layout.row()
+        row.prop(mytool, 'checkRenderFilePath', text='')
+        row = layout.row()
+        row.operator(checkRendersFromList.bl_idname, text=checkRendersFromList.bl_label)
+        row.operator(checkRendersOutsideList.bl_idname, text=checkRendersOutsideList.bl_label)
 
 
 
@@ -3077,6 +3176,7 @@ classes = (
     WCUSTOM_PT_DeleteRange,
     WCUSTOM_PT_EvaluateLogs,
     WCUSTOM_PT_CreateCustomRange,
+    WCUSTOM_PT_CheckRenders,
     # BMNFTS_PT_Documentation,
 
 
@@ -3104,7 +3204,7 @@ classes = (
     createSlotFolders,
     # organizeScene,
     createCharacterCollections,
-    renderBatch,
+    # renderBatch,
     createBlenderSave,
     chooseExportFolder,
     moveDataToLocal,
@@ -3152,8 +3252,9 @@ classes = (
     chooseRefactorFolder,
     moveToFinalFolder,
     checkRenders,
+    checkRendersFromList,
+    checkRendersOutsideList,
     testButton
-
 )
 
 addon_keymaps = []

@@ -252,12 +252,14 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     imageBool = bpy.context.scene.my_tool.imageBool
     animationBool = bpy.context.scene.my_tool.animationBool
     modelBool = bpy.context.scene.my_tool.modelBool
+    pfpBool = bpy.context.scene.my_tool.pfpBool
 
     if not imageBool and not animationBool and not modelBool:
         print("Please select a render output type - Only creating blender saves")
         #return False
 
     RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0'])
+    # RenderTypes = ''.join(['1' if imageBool else '0', '1' if animationBool else '0', '1' if modelBool else '0', '1' if pfpBool else '0'])
     render_gif = '1' if bpy.context.scene.my_tool.gifBool else '0'
     frames = int(bpy.context.scene.my_tool.frameLength * 24)
     settings = [str(bpy.context.scene.my_tool.exportDimension), str(bpy.context.scene.my_tool.imageFrame), str(frames)]
@@ -266,6 +268,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
     render_types.append("IMAGE") if imageBool else None
     render_types.append("ANIMATION") if animationBool else None
     render_types.append("MODEL") if modelBool else None
+    # render_types.append("PFP") if pfpBool else None
     render_types = ' || '.join(render_types)
 
     render_start_time = time.time()
@@ -367,6 +370,10 @@ def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, trans
                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
                 file_type = '3DMODELS'
                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
+
+            elif file_format in ["PFP"]:
+                pass
+    
     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
     return
 
@@ -750,10 +757,13 @@ def refactor_single_nft(folder_path, default_prefix, prefix, NFTList):
             else: # if file has already been refactored previously
                 current_prefix, suffix = old_file.split('.')
 
+
             new_prefix = bpy.context.scene.my_tool.renderPrefix
             new_file_name = new_prefix + "{}".format(index) + '.' + suffix
             old_path = os.path.join(folder_path, old_file)
-            new_path = os.path.join(folder_path, new_file_name)            
+            new_path = os.path.join(folder_path, new_file_name)
+            if "PFP" in old_file:
+                new_path = os.path.join(folder_path, "PFP" + new_file_name)
             if suffix == "json":
                 if current_prefix == default_prefix:
                     record_path = os.path.join(old_path)
@@ -1063,7 +1073,11 @@ def check_renders(render_types, render_suffixes, output_dir, batches, show_only_
 
                 batch_code = "Batch_{}_NFT_{}".format(batch, nft_num)
                 for i in range(len(render_suffixes)):
-                    if not any(f.endswith(render_suffixes[i]) for f in files):
+                    if render_suffixes[i] == 'pfp':
+                        if not any(f.startswith("PFP") for f in files):
+                            missing_renders.append(batch_code)
+                            break
+                    elif not any(f.endswith(render_suffixes[i]) for f in files):
                         missing_renders.append(batch_code)
                         break
                 if not batch_code in missing_renders:
@@ -1080,8 +1094,86 @@ def check_renders(render_types, render_suffixes, output_dir, batches, show_only_
             for m in missing_renders:
                 config.custom_print("\t{}".format(m), "", config.bcolors.WARNING)
 
+
+
+def check_renders_from_list(render_types, render_suffixes, output_dir, batch, nfts_list_path, show_only_failed=False):
+    batch_path = os.path.join(output_dir, "Batch_{}".format(batch))
+    missing_renders = []
+    passed = []
+
+    with open(nfts_list_path, 'r') as file:
+        nft_list_string = file.read().replace('\n', '')
+        nft_list_string = nft_list_string.replace(' ', '')
+        nft_list = set(filter(None, nft_list_string.split(',')))
+
+    for nft_num in nft_list:
+        nft_dir = 'NFT_' + nft_num
+        nft_folder = os.path.join(batch_path, nft_dir)
+        if os.path.isdir(nft_folder):
+            nft_num = nft_dir.rpartition('_')[2]
+            files = os.listdir(nft_folder)
+
+            batch_code = "Batch_{}_NFT_{}".format(batch, nft_num)
+            for i in range(len(render_suffixes)):
+                if render_suffixes[i] == 'pfp':
+                    if not any(f.startswith("PFP") for f in files):
+                        missing_renders.append(batch_code)
+                        break
+                elif not any(f.endswith(render_suffixes[i]) for f in files):
+                    missing_renders.append(batch_code)
+                    break
+            if not batch_code in missing_renders:
+                passed.append("Batch_{}_NFT_{}".format(batch, nft_num))
+
+    if passed and not show_only_failed:
+        config.custom_print("These renders in Batch {} succeeded:".format(batch), "", config.bcolors.OK)
+        for p in passed:
+            config.custom_print("\t{}".format(p), "", config.bcolors.OK)
+
+    if missing_renders:
+        config.custom_print("", "")
+        config.custom_print("These nfts folders in Batch {} did not have all ({}) render outputs:".format(batch, render_types), "", config.bcolors.ERROR)
+        for m in missing_renders:
+            config.custom_print("\t{}".format(m), "", config.bcolors.WARNING)
     return
 
+
+def check_excess_renders_from_list(render_types, render_suffixes, output_dir, batch, nfts_list_path):
+    batch_path = os.path.join(output_dir, "Batch_{}".format(batch))
+    has_renders = []
+    excess_renders = []
+
+    with open(nfts_list_path, 'r') as file:
+        nft_list_string = file.read().replace('\n', '')
+        nft_list_string = nft_list_string.replace(' ', '')
+        nft_list = set(filter(None, nft_list_string.split(',')))
+
+    for nft_dir in os.listdir(batch_path):
+        nft_folder = os.path.join(batch_path, nft_dir)
+        if os.path.isdir(nft_folder):
+            nft_num = nft_dir.rpartition('_')[2]
+            files = os.listdir(nft_folder)
+
+            batch_code = "Batch_{}_NFT_{}".format(batch, nft_num)
+            for i in range(len(render_suffixes)):
+                if render_suffixes[i] == 'pfp':
+                    if any(f.startswith("PFP") for f in files):
+                        has_renders.append(batch_code)
+                        break
+                elif any(f.endswith(render_suffixes[i]) for f in files):
+                    has_renders.append(batch_code)
+                    break
+            if batch_code in has_renders: # if passed render
+                if nft_num not in nft_list:
+                    excess_renders.append("Batch_{}_NFT_{}".format(batch, nft_num))
+                    
+    if excess_renders:
+        config.custom_print("", "")
+        config.custom_print("These nfts folders in Batch {} outside of the list, had some ({}) render outputs:".format(batch, render_types), "", config.bcolors.ERROR)
+        for m in excess_renders:
+            config.custom_print("\t{}".format(m), "", config.bcolors.WARNING)
+
+    return
 
 
 
