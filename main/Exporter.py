@@ -1002,19 +1002,29 @@ def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_pat
                     file_mtime = os.path.getmtime(export_name)
                     file_time = time.ctime(file_mtime)
                     dt = datetime.datetime.strptime(file_time, "%a %b %d %H:%M:%S %Y")
-                    # print(dt)
                     times.append(dt)
 
             if len(times) > 1:
-                for t in range(1, len(time)):
+                for t in range(1, len(times)):
                     if times[0] - times[t] > datetime.timedelta(hours=1):
                         export_ood.append(folder_name)
-
         else:
             missing_folder.append(folder_name)
 
-    for d in export_ood:
-        print(d)
+    if missing_folder:
+        config.custom_print("These refactored folders were missing", "", config.bcolors.ERROR)
+        for f in missing_folder:
+            config.custom_print("\t{}".format(f), "", config.bcolors.ERROR)
+
+    if missing_renders:
+        config.custom_print("These folders did not have all the required outputs ({})".format(render_types), "", config.bcolors.ERROR)
+        for r in missing_renders:
+            config.custom_print("\t{}".format(r), "", config.bcolors.ERROR)
+
+    if export_ood:
+        config.custom_print("These folders have renders that were rendered > 1 hour apart", "", config.bcolors.WARNING)
+        for d in export_ood:
+            config.custom_print("\t{}".format(d), "", config.bcolors.WARNING)
 
     return
 
