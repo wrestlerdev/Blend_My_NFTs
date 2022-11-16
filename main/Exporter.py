@@ -8,7 +8,7 @@ import time
 import json
 import importlib
 import shutil
-from datetime import datetime
+import datetime
 from . import config
 from . import Previewer
 importlib.reload(Previewer)
@@ -976,7 +976,6 @@ def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_pat
 
     missing_folder = []
     missing_renders = set()
-    export_time_limit = 1
     export_ood = []
 
     first_folder = os.listdir(refactor_dir)[0]
@@ -997,35 +996,25 @@ def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_pat
 
             times = []
             for export in exports:
-                if any(export.endswith(s) for s in render_suffixes):
-                # if any(export.endswith(s) for s in render_suffixes) and not export.startswith('PFP'):
-                    # print(export)
+                # if any(export.endswith(s) for s in render_suffixes):
+                if any(export.endswith(s) for s in render_suffixes) and not export.startswith('PFP'):
                     export_name = os.path.join(folder_path, export)
                     file_mtime = os.path.getmtime(export_name)
                     file_time = time.ctime(file_mtime)
-                    time_split = file_time.split(' ')
-                    # print(time_split)
-                    dt = datetime.strptime(time_split,)
-                    times.append(file_time)
+                    dt = datetime.datetime.strptime(file_time, "%a %b %d %H:%M:%S %Y")
+                    # print(dt)
+                    times.append(dt)
 
             if len(times) > 1:
-                print(times[0])
-                print(times[0] - times[1])
-            # if len(times) > 1:
-            #     month = times[0][1]
-            #     for i in range(1, len(times)):
-            #         if times[i][1] != time[0][1]:
-            #             print("different months")
-            #             break
-            #         if times[i][2] != time[1][1]:
-            #             print("different days")
-            #             break
-            #         if times
-
+                for t in range(1, len(time)):
+                    if times[0] - times[t] > datetime.timedelta(hours=1):
+                        export_ood.append(folder_name)
 
         else:
             missing_folder.append(folder_name)
 
+    for d in export_ood:
+        print(d)
 
     return
 

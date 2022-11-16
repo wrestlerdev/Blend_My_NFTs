@@ -1895,7 +1895,31 @@ class testButton(bpy.types.Operator):
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
         output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT", "OUTPUT")
-        TextureEditor.go_through_all_nft_files(output_path)
+        record_path = os.path.join(output_path, "_NFTRecord.json")
+        refactor_dir = bpy.context.scene.my_tool.refactor_dir
+        exports = []
+        suffixes = []
+        if bpy.context.scene.my_tool.imageBool:
+            exports.append("Image")
+            suffixes.append(".png")
+        if bpy.context.scene.my_tool.animationBool:
+            exports.append("Animation")
+            suffixes.append(".mp4")
+        if bpy.context.scene.my_tool.modelBool:
+            exports.append("Model")
+            suffixes.append(".glb")
+        if bpy.context.scene.my_tool.gifBool:
+            exports.append("Gif")
+            suffixes.append(".gif")
+        if bpy.context.scene.my_tool.pfpBool:
+            exports.append("PFP")
+            suffixes.append("pfp")
+        if not exports:
+            exports.append("Blender")
+            suffixes.append(".blend")
+
+
+        Exporter.check_refactored(exports, suffixes, refactor_dir, record_path)
         return {'FINISHED'}
 
 
