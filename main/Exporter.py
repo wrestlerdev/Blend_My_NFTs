@@ -990,14 +990,15 @@ def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_pat
                 if suf == 'pfp':
                     if not any(f.startswith("PFP") for f in exports):
                         missing_renders.add(folder_name)
+                        break
                 elif not any(f.endswith(suf) for f in exports):
                     missing_renders.add(folder_name)
                     break
 
             times = []
             for export in exports:
-                # if any(export.endswith(s) for s in render_suffixes):
-                if any(export.endswith(s) for s in render_suffixes) and not export.startswith('PFP'):
+                if any(export.endswith(s) for s in render_suffixes):
+                # if any(export.endswith(s) for s in render_suffixes) and not export.startswith('PFP'):
                     export_name = os.path.join(folder_path, export)
                     file_mtime = os.path.getmtime(export_name)
                     file_time = time.ctime(file_mtime)
@@ -1006,8 +1007,9 @@ def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_pat
 
             if len(times) > 1:
                 for t in range(1, len(times)):
-                    if times[0] - times[t] > datetime.timedelta(hours=1):
+                    if times[0] - times[t] > datetime.timedelta(minutes=30):
                         export_ood.append(folder_name)
+                        break
         else:
             missing_folder.append(folder_name)
 
@@ -1026,8 +1028,5 @@ def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_pat
         for d in export_ood:
             config.custom_print("\t{}".format(d), "", config.bcolors.WARNING)
 
-    return
-
-
-# if __name__ == '__main__':
-#     render_and_save_NFTs()
+    if not (missing_folder or missing_renders or export_ood):
+        config.custom_print("Everything seems fine ᕕ( ᐛ )ᕗ", "", config.bcolors.OK)

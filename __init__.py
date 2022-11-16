@@ -1449,6 +1449,41 @@ class moveToFinalFolder(bpy.types.Operator):
             Exporter.restructure_files(final_path, bpy.context.scene.my_tool.separateExportPath)
         return {'FINISHED'}
 
+
+class checkRefactoredFolder(bpy.types.Operator):
+    bl_idname = 'check.refactors'
+    bl_label = 'Check Refactored Files'
+    bl_description = "Check Refactored Files"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT", "OUTPUT")
+        record_path = os.path.join(output_path, "_NFTRecord.json")
+        refactor_dir = bpy.context.scene.my_tool.refactor_dir
+        exports = []
+        suffixes = []
+        if bpy.context.scene.my_tool.imageBool:
+            exports.append("Image")
+            suffixes.append(".png")
+        if bpy.context.scene.my_tool.animationBool:
+            exports.append("Animation")
+            suffixes.append(".mp4")
+        if bpy.context.scene.my_tool.modelBool:
+            exports.append("Model")
+            suffixes.append(".glb")
+        if bpy.context.scene.my_tool.gifBool:
+            exports.append("Gif")
+            suffixes.append(".gif")
+        if bpy.context.scene.my_tool.pfpBool:
+            exports.append("PFP")
+            suffixes.append("pfp")
+        if not exports:
+            exports.append("Blender")
+            suffixes.append(".blend")
+        Exporter.check_refactored(exports, suffixes, refactor_dir, record_path)
+        return {'FINISHED'}
+
+
 #----------------------------------------------------------------
 
 class purgeData(bpy.types.Operator):
@@ -1894,32 +1929,7 @@ class testButton(bpy.types.Operator):
 
     def execute(self, context):
         print("(╬ಠิ益ಠิ)")
-        output_path = os.path.join(bpy.context.scene.my_tool.root_dir, "Blend_My_NFT", "OUTPUT")
-        record_path = os.path.join(output_path, "_NFTRecord.json")
-        refactor_dir = bpy.context.scene.my_tool.refactor_dir
-        exports = []
-        suffixes = []
-        if bpy.context.scene.my_tool.imageBool:
-            exports.append("Image")
-            suffixes.append(".png")
-        if bpy.context.scene.my_tool.animationBool:
-            exports.append("Animation")
-            suffixes.append(".mp4")
-        if bpy.context.scene.my_tool.modelBool:
-            exports.append("Model")
-            suffixes.append(".glb")
-        if bpy.context.scene.my_tool.gifBool:
-            exports.append("Gif")
-            suffixes.append(".gif")
-        if bpy.context.scene.my_tool.pfpBool:
-            exports.append("PFP")
-            suffixes.append("pfp")
-        if not exports:
-            exports.append("Blender")
-            suffixes.append(".blend")
 
-
-        Exporter.check_refactored(exports, suffixes, refactor_dir, record_path)
         return {'FINISHED'}
 
 
@@ -2829,6 +2839,13 @@ class WCUSTOM_PT_RefactorExports(bpy.types.Panel):
                 row.operator(chooseRefactorFolder.bl_idname, text=chooseRefactorFolder.bl_label)
                 row = box.row()
                 row.operator(moveToFinalFolder.bl_idname, text=moveToFinalFolder.bl_label)
+
+                row = box.row()
+                row = box.row()
+                row.label(text='')
+                row.operator(checkRefactoredFolder.bl_idname, text=checkRefactoredFolder.bl_label)
+                row.label(text='')
+
         else:
             box = layout.box()
             row = box.row()
@@ -3213,6 +3230,7 @@ classes = (
     checkRenders,
     checkRendersFromList,
     checkRendersOutsideList,
+    checkRefactoredFolder,
     testButton
 )
 
