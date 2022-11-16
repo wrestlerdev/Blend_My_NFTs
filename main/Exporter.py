@@ -35,7 +35,6 @@ class bcolors:
 
 
 def create_blender_saves(batch_path, batch_num, nft_range):
-
     print(os.listdir(batch_path))
     imageBool = bpy.context.scene.my_tool.imageBool
     animationBool = bpy.context.scene.my_tool.animationBool
@@ -71,6 +70,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
         select_hierarchy(bpy.data.collections["Rendering"])
         bpy.data.objects["CameraStill"].select_set(True)
+        bpy.data.objects["CameraPFP"].select_set(True)
         blend_name = "Batch_{}_NFT_{}.blend".format(batch_num, i)
         blend_save  = os.path.join(batch_path, "NFT_{}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
@@ -105,90 +105,90 @@ def select_hierarchy(parent_col):
     get_child_names(parent_col)
 
 
-def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
-    folder = os.path.join(save_path, "OUTPUT")
-    master_record_path = os.path.join(folder, "_NFTRecord.json")
-    MasterDictionary = json.load(open(master_record_path))
-    totalDNAList = MasterDictionary["DNAList"]
+# def render_nft_batch_custom(save_path, batch_num, file_formats, nft_range, transparency=False):
+#     folder = os.path.join(save_path, "OUTPUT")
+#     master_record_path = os.path.join(folder, "_NFTRecord.json")
+#     MasterDictionary = json.load(open(master_record_path))
+#     totalDNAList = MasterDictionary["DNAList"]
 
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+#     if not os.path.exists(folder):
+#         os.makedirs(folder)
 
-    batch_path = os.path.join(save_path, "OUTPUT", "Batch_{}".format(batch_num))
-    for i in range(nft_range[0], nft_range[1] + 1):
-        file_name = "Batch_{}_NFT_{}.json".format(batch_num, i)
-        json_path = os.path.join(batch_path, "NFT_{}".format(i), file_name)
+#     batch_path = os.path.join(save_path, "OUTPUT", "Batch_{}".format(batch_num))
+#     for i in range(nft_range[0], nft_range[1] + 1):
+#         file_name = "Batch_{}_NFT_{}.json".format(batch_num, i)
+#         json_path = os.path.join(batch_path, "NFT_{}".format(i), file_name)
 
-        for file_format in file_formats:
-            if file_format in ['PNG', 'JPEG']:
-                camera_name = "CameraStill"
-                if bpy.data.objects.get(camera_name) is not None:
-                    bpy.context.scene.camera = bpy.data.objects[camera_name]
-                else:
-                    print("Cannot find camera of name 'CameraStill', will continue with current camera")
-                if transparency:
-                    color_mode = 'RGBA'
-                else:
-                    color_mode = 'RGB'
-                start_time = time.time()
-                nft_name, render_passed = render_nft_single_custom(batch_path, batch_num, i, file_format, color_mode, totalDNAList)
-                time_taken = time.time() - start_time
-                print(f"{bcolors.OK}Time taken: {bcolors.RESET}" + "{:.2f}".format(time_taken))
-                file_type = 'IMAGES'
-                send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
+#         for file_format in file_formats:
+#             if file_format in ['PNG', 'JPEG']:
+#                 camera_name = "CameraStill"
+#                 if bpy.data.objects.get(camera_name) is not None:
+#                     bpy.context.scene.camera = bpy.data.objects[camera_name]
+#                 else:
+#                     print("Cannot find camera of name 'CameraStill', will continue with current camera")
+#                 if transparency:
+#                     color_mode = 'RGBA'
+#                 else:
+#                     color_mode = 'RGB'
+#                 start_time = time.time()
+#                 nft_name, render_passed = render_nft_single_custom(batch_path, batch_num, i, file_format, color_mode, totalDNAList)
+#                 time_taken = time.time() - start_time
+#                 print(f"{bcolors.OK}Time taken: {bcolors.RESET}" + "{:.2f}".format(time_taken))
+#                 file_type = 'IMAGES'
+#                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
 
-            elif file_format in ['MP4']:
-                camera_name = "CameraVideo"
-                if bpy.data.objects.get(camera_name) is not None:
-                    bpy.context.scene.camera = bpy.data.objects[camera_name]
-                else:
-                    print("Cannot find camera of name 'CameraVideo', will continue with current camera")
-                start_time = time.time()
-                nft_name, render_passed = render_nft_single_video(batch_path, batch_num, i, file_format, totalDNAList)
-                time_taken = time.time() - start_time
-                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
-                file_type = 'ANIMATIONS'
-                send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
+#             elif file_format in ['MP4']:
+#                 camera_name = "CameraVideo"
+#                 if bpy.data.objects.get(camera_name) is not None:
+#                     bpy.context.scene.camera = bpy.data.objects[camera_name]
+#                 else:
+#                     print("Cannot find camera of name 'CameraVideo', will continue with current camera")
+#                 start_time = time.time()
+#                 nft_name, render_passed = render_nft_single_video(batch_path, batch_num, i, file_format, totalDNAList)
+#                 time_taken = time.time() - start_time
+#                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
+#                 file_type = 'ANIMATIONS'
+#                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
 
-            elif file_format in ['FBX', 'GLB']:
-                start_time = time.time()
-                nft_name, render_passed = render_nft_single_model(batch_path, batch_num, i, file_format, totalDNAList)
-                time_taken = time.time() - start_time
-                print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
-                file_type = '3DMODELS'
-                send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
+#             elif file_format in ['FBX', 'GLB']:
+#                 start_time = time.time()
+#                 nft_name, render_passed = render_nft_single_model(batch_path, batch_num, i, file_format, totalDNAList)
+#                 time_taken = time.time() - start_time
+#                 print((f"{bcolors.OK}Time taken: {bcolors.RESET}") + "{:.2f}".format(time_taken))
+#                 file_type = '3DMODELS'
+#                 send_to_export_log(batch_path, batch_num, json_path, nft_name, file_type, file_format, time_taken, file_name, render_passed)
 
-            elif file_format in ["PFP"]:
-                pass
+#             elif file_format in ["PFP"]:
+#                 pass
     
-    print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
-    return
+#     print((f"{bcolors.OK}Render Finished :^){bcolors.RESET}"))
+#     return
 
 
 
-def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, color_mode, totalDNAList):
-    file_name = "Batch_{}_NFT_{}.json".format(batch_num, nft_num)
-    json_path = os.path.join(batch_path, "NFT_{}".format(nft_num), file_name)
-    SingleDict = json.load(open(json_path))
+# def render_nft_single_custom(batch_path, batch_num, nft_num, image_file_format, color_mode, totalDNAList):
+#     file_name = "Batch_{}_NFT_{}.json".format(batch_num, nft_num)
+#     json_path = os.path.join(batch_path, "NFT_{}".format(nft_num), file_name)
+#     SingleDict = json.load(open(json_path))
 
-    DNA = SingleDict["DNAList"]
-    NFTDict = SingleDict["CharacterItems"]
-    total_index = totalDNAList.index(DNA) + 1
-    print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
-    nft_name = file_name[:-len(".json")]
+#     DNA = SingleDict["DNAList"]
+#     NFTDict = SingleDict["CharacterItems"]
+#     total_index = totalDNAList.index(DNA) + 1
+#     print(f"{bcolors.OK}Rendering Image: {bcolors.RESET}" + str(total_index) + " (File: {})".format(file_name))
+#     nft_name = file_name[:-len(".json")]
 
-    image_path = os.path.join(batch_path, "NFT_{}".format(nft_num), nft_name)
-    Previewer.show_nft_from_dna(DNA, NFTDict)
+#     image_path = os.path.join(batch_path, "NFT_{}".format(nft_num), nft_name)
+#     Previewer.show_nft_from_dna(DNA, NFTDict)
 
-    bpy.context.scene.render.filepath = image_path
-    bpy.context.scene.render.image_settings.file_format = image_file_format
-    bpy.context.scene.render.image_settings.color_mode = color_mode
-    try:
-        bpy.ops.render.render(write_still=True)
-        return nft_name, True
-    except:
-        print((f"{bcolors.ERROR}Render Failed{bcolors.RESET}"))
-        return nft_name, False
+#     bpy.context.scene.render.filepath = image_path
+#     bpy.context.scene.render.image_settings.file_format = image_file_format
+#     bpy.context.scene.render.image_settings.color_mode = color_mode
+#     try:
+#         bpy.ops.render.render(write_still=True)
+#         return nft_name, True
+#     except:
+#         print((f"{bcolors.ERROR}Render Failed{bcolors.RESET}"))
+#         return nft_name, False
 
 
 
@@ -550,7 +550,7 @@ def refactor_single_nft(folder_path, default_prefix, prefix, NFTList):
             old_path = os.path.join(folder_path, old_file)
             new_path = os.path.join(folder_path, new_file_name)
             if "PFP" in old_file:
-                new_path = os.path.join(folder_path, "PFP" + new_file_name)
+                new_path = os.path.join(folder_path, "PFP_" + new_file_name)
             if suffix == "json":
                 if current_prefix == default_prefix:
                     record_path = os.path.join(old_path)
@@ -807,6 +807,9 @@ def restructure_files(final_path, export_path):
             if any(not i.startswith("Batch_") for i in items): # find any refactored files
                 for item in items:
                     if any(item.endswith(suf) for suf in ["mp4", "png", "gif"]):
+                    #     if item.startswith('PFP'):
+                    #         name = 'PFP_' + batch_text["filename"]
+                    #     else:
                         name = batch_text["filename"]
                         new_file_path = os.path.join(final_path, name)
                         move_to_restructure_folder(item, nft_folder, new_file_path)
@@ -964,5 +967,5 @@ def check_excess_renders_from_list(render_types, render_suffixes, output_dir, ba
 
 
 
-if __name__ == '__main__':
-    render_and_save_NFTs()
+# if __name__ == '__main__':
+#     render_and_save_NFTs()

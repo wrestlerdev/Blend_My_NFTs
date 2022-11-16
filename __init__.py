@@ -2708,14 +2708,16 @@ class WCUSTOM_PT_CheckRenders(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
-        row.operator(checkRenders.bl_idname, text=checkRenders.bl_label)
+        export_path = os.path.join(mytool.separateExportPath, "Blend_My_NFT", "OUTPUT")
+        if os.path.exists(export_path) and bpy.context.scene.my_tool.root_dir != bpy.context.scene.my_tool.separateExportPath:
+            row = layout.row()
+            row.operator(checkRenders.bl_idname, text=checkRenders.bl_label)
 
-        row = layout.row()
-        row.prop(mytool, 'checkRenderFilePath', text='')
-        row = layout.row()
-        row.operator(checkRendersFromList.bl_idname, text=checkRendersFromList.bl_label)
-        row.operator(checkRendersOutsideList.bl_idname, text=checkRendersOutsideList.bl_label)
+            row = layout.row()
+            row.prop(mytool, 'checkRenderFilePath', text='')
+            row = layout.row()
+            row.operator(checkRendersFromList.bl_idname, text=checkRendersFromList.bl_label)
+            row.operator(checkRendersOutsideList.bl_idname, text=checkRendersOutsideList.bl_label)
 
 
 
