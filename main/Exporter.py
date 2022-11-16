@@ -67,10 +67,11 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         print(json_path)
 
         NFTDict = json.load(open(json_path))
+        character = NFTDict["DNAList"].partition(',')[0]
         Previewer.show_nft_from_dna(NFTDict["DNAList"], NFTDict["CharacterItems"], True)
         select_hierarchy(bpy.data.collections["Rendering"])
         bpy.data.objects["CameraStill"].select_set(True)
-        bpy.data.objects["CameraPFP"].select_set(True)
+        bpy.data.objects["CameraPFP_" + character].select_set(True)
         blend_name = "Batch_{}_NFT_{}.blend".format(batch_num, i)
         blend_save  = os.path.join(batch_path, "NFT_{}".format(i), blend_name)
         bpy.ops.save_selected.save(filepath=blend_save)
@@ -82,7 +83,7 @@ def create_blender_saves(batch_path, batch_num, nft_range):
         folder_path = folder_path.replace('\\', '/')
 
         batch_file_path = os.path.join(bpy.context.scene.my_tool.separateExportPath, "ExportBatchSingle.bat")
-        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path + " " + render_gif
+        batch_script_path = batch_file_path + " " + blenderFolder + " " + blend_save + " " + python_path  + " " + settings + " " + RenderTypes + " " +  folder_path + " " + render_gif + " " + character
 
         os.system(batch_script_path)
         time_taken = time.time() - start_time
@@ -965,6 +966,68 @@ def check_excess_renders_from_list(render_types, render_suffixes, output_dir, ba
 
     return
 
+
+# --------------------------------------------------------------
+
+
+def check_refactored(render_types, render_suffixes, refactor_dir, nft_record_path):
+    nft_record = json.load(open(nft_record_path))
+    count = nft_record["numNFTsGenerated"]
+
+    missing_folder = []
+    missing_renders = set()
+    export_time_limit = 1
+    export_ood = []
+
+    first_folder = os.listdir(refactor_dir)[0]
+    prefix = ''.join([i for i in first_folder if not i.isdigit()])
+
+    for i in range(1, count + 1):
+        folder_name = prefix + str(i)
+        folder_path = os.path.join(refactor_dir, folder_name)
+        if os.path.exists(folder_path):
+            exports = os.listdir(folder_path) 
+            for suf in render_suffixes:
+                if suf == 'pfp':
+                    if not any(f.startswith("PFP") for f in exports):
+                        missing_renders.add(folder_name)
+                elif not any(f.endswith(suf) for f in exports):
+                    missing_renders.add(folder_name)
+                    break
+
+            times = []
+            for export in exports:
+                if any(export.endswith(s) for s in render_suffixes):
+                # if any(export.endswith(s) for s in render_suffixes) and not export.startswith('PFP'):
+                    # print(export)
+                    export_name = os.path.join(folder_path, export)
+                    file_mtime = os.path.getmtime(export_name)
+                    file_time = time.ctime(file_mtime)
+                    time_split = file_time.split(' ')
+                    # print(time_split)
+                    dt = datetime.strptime(time_split,)
+                    times.append(file_time)
+
+            if len(times) > 1:
+                print(times[0])
+                print(times[0] - times[1])
+            # if len(times) > 1:
+            #     month = times[0][1]
+            #     for i in range(1, len(times)):
+            #         if times[i][1] != time[0][1]:
+            #             print("different months")
+            #             break
+            #         if times[i][2] != time[1][1]:
+            #             print("different days")
+            #             break
+            #         if times
+
+
+        else:
+            missing_folder.append(folder_name)
+
+
+    return
 
 
 # if __name__ == '__main__':
