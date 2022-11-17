@@ -306,7 +306,7 @@ def render_nft_single_model(batch_path, batch_num, nft_num, file_format, totalDN
 def send_to_export_log(batch_path, batch_num, nft_name, render_time, key, render_sucess, render_types):
     Log, log_name = return_export_log_data(batch_path, batch_num)
     log_path = os.path.join(batch_path, log_name)
-    logged_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    logged_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     Log[key] = {'nft_number': nft_name, 'finished': logged_time, 
                 'time_taken': "{:.2f} seconds".format(render_time),
                 'has_succeeded': render_sucess,
